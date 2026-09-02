@@ -1,0 +1,4189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#0C1015">
+
+<!-- installable on Android/desktop Chrome via the manifest above; iOS needs these -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Polyrhythm">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="icon" href="./icon-192.png">
+</head>
+<body>
+<title>Polyrhythm Circle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Archivo is requested as a variable font across its width axis: the UI uses it
+     at normal width, the titles at 125%. One file covers both, and dropping
+     Fraunces removes a whole typeface from the load. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+/* This panel commits to its own dark instrument look on every device, rather
+   than following the viewer's light/dark setting. The Light skin below is opt-in
+   through the header toggle; its selector carries an extra type on purpose, so it
+   outranks any data-theme the host stamps on the root element. */
+:root{
+  --ground:#0C1015;
+  --panel:#141A20;
+  --sunk:#0F151A;
+  --ink:#E7EDF2;
+  --ink-2:#9AA8B4;
+  --ink-3:#6C7A87;
+  --line:#232C35;
+  --line-2:#313D48;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.7);
+  --dot-off:#3A464F;
+  --c1:#F0AB4B;
+  --c2:#2FC9BC;
+  --c3:#F0729D;
+  --c4:#9A90FF;
+  --grid:rgba(231,237,242,.08);
+  --sweep:rgba(231,237,242,.28);
+  /* the progress wedge darkens the panel rather than lightening it - a shadow
+     filling up, not a light sweeping round */
+  --wedge:rgba(0,0,0,.30);
+  /* titles: the UI face stretched wide, so the panel reads as one design
+     instead of a logo sitting on top of it. Swap these two to change it. */
+  --title:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --title-stretch:125%;
+}
+/* Warm rather than neutral: sand for the page, cream for the panels sitting on
+   it, and a khaki line family - the greys the rings are drawn against carry a
+   little colour of their own. The ring hues stay cool so they read as marks on
+   the surface rather than more of it. */
+html:root[data-skin="light"]{
+  --ground:#E4DCC9;
+  --panel:#FBF8F1;
+  --sunk:#EFE8D9;
+  --ink:#2B2822;
+  --ink-2:#5F5646;
+  --ink-3:#877A61;
+  --line:#D2C7AE;
+  --line-2:#BCAE90;
+  --shadow:0 1px 2px rgba(43,40,34,.06), 0 8px 24px -12px rgba(43,40,34,.22);
+  --dot-off:#C2B69B;
+  --c1:#B5701A;
+  --c2:#0E8F86;
+  --c3:#C2426E;
+  --c4:#5B4FD6;
+  --grid:rgba(43,40,34,.08);
+  --sweep:rgba(43,40,34,.24);
+  --wedge:rgba(43,40,34,.06);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:"Archivo","Helvetica Neue",Arial,sans-serif;
+  font-size:15px;
+  line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+}
+button,input,select{font:inherit;color:inherit;-webkit-tap-highlight-color:transparent}
+/* No border-radius here: it used to square off round elements while focused,
+   which is what put corners outside the circular play button. An outline
+   already follows whatever radius the element itself has. */
+/* Focus follows whatever you are editing: inside a ring's card or on its tab it
+   takes that ring's colour, so the highlight and the ring agree instead of the
+   pink ring being outlined in teal. The fallback matters - the "+" tab carries
+   no --lc, and an undefined variable would void the whole declaration and leave
+   it with no focus ring at all. */
+:root{--focus:var(--c2)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.ring-card,.tabs .tab{--focus:var(--lc,var(--c2))}
+/* the preset tabs are deliberately not a ring's colour */
+.ptabs .tab{--focus:var(--c2)}
+
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
+.lbl{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+
+.wrap{max-width:1180px;margin:0 auto;padding:22px 20px 64px}
+
+.nameplate{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
+  padding-bottom:14px;margin-bottom:18px;border-bottom:1px solid var(--line);flex-wrap:wrap;
+}
+.nameplate h1{
+  font-family:var(--title);font-stretch:var(--title-stretch);
+  font-weight:600;font-size:clamp(23px,4vw,36px);line-height:1.05;letter-spacing:-.015em;margin:0;
+}
+.nameplate h1 span{color:var(--ink-3)}
+.np-right{display:flex;align-items:center;gap:14px;flex:none}
+.btn.skin{display:inline-flex;align-items:center;gap:7px;padding:7px 12px}
+.btn.skin svg{width:15px;height:15px;flex:none}
+.tagline{color:var(--ink-2);font-size:13px;max-width:52ch;margin:7px 0 0}
+
+.transport{
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow);padding:16px 18px;margin-bottom:18px;
+  display:grid;gap:22px;align-items:center;
+  grid-template-columns:minmax(260px,1fr) auto;
+}
+/* centred in the dial's hub, sized off the dial so it never crowds the
+   innermost ring, and out of the way while the count-in owns that spot */
+.play{
+  position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  width:clamp(58px,21%,86px);aspect-ratio:1/1;
+  border-radius:50%;z-index:2;
+  border:1px solid var(--ink);background:var(--ink);color:var(--panel);
+  cursor:pointer;display:grid;place-items:center;
+  /* held back so it does not out-shout the rings it sits among */
+  opacity:.5;
+  transition:transform .12s ease,opacity .18s ease;
+}
+.play:hover{opacity:.85}
+.play:active{transform:translate(-50%,-50%) scale(.94)}
+.play svg{width:36%;height:36%;display:block}
+.play[data-on="1"]{background:var(--c3);border-color:var(--c3);color:#fff}
+/* invisible during the count-in, but still tappable so you can abort it */
+.play[data-preroll="1"]{opacity:0}
+
+/* the two jump pairs sit flush with the column edges, so -10 lines up under the
+   slider's - button and +10 under its + */
+.bpm-block{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.jump-pair{display:flex;align-items:center;gap:10px;flex:none}
+.bpm-read{display:flex;align-items:baseline;gap:8px;flex:1 1 auto;justify-content:center;padding:0 4px}
+.bpm-num{
+  font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;
+  font-size:clamp(36px,6vw,52px);font-weight:500;line-height:.9;letter-spacing:-.03em;
+  min-width:3ch;text-align:center;
+  border:0;background:transparent;padding:0;cursor:text;
+  border-bottom:1px dashed transparent;
+}
+.bpm-num:hover{border-bottom-color:var(--line-2)}
+.bpm-in{
+  font-size:clamp(34px,5.6vw,48px);font-weight:500;line-height:1;letter-spacing:-.03em;
+  width:3.4ch;text-align:center;padding:0 2px;
+  border:1px solid var(--line-2);border-radius:8px;background:var(--sunk);color:var(--ink);
+}
+.bpm-in::-webkit-outer-spin-button,.bpm-in::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.bpm-in{-moz-appearance:textfield}
+.bpm-unit{font-size:10px;font-weight:600;letter-spacing:.16em;color:var(--ink-3)}
+.cycle-line{
+  margin:9px 0 0;font-size:11.5px;color:var(--ink-3);letter-spacing:.01em;
+}
+.jump{
+  width:46px;height:46px;flex:none;border-radius:13px;cursor:pointer;
+  border:1px solid var(--line-2);background:var(--sunk);color:var(--ink-2);
+  font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:600;
+  transition:transform .1s ease;
+}
+.jump.wide{width:52px;font-size:13px}
+.jump:hover{border-color:var(--ink-3);color:var(--ink)}
+.jump:active{transform:scale(.94)}
+/* wrapping only; justify-content stays space-between so the pairs keep their
+   edges on the narrow layout too */
+.bpm-block{flex-wrap:wrap}
+.bpm-row{display:flex;align-items:center;gap:10px;margin-top:6px}
+.stepbtn{
+  width:34px;height:34px;flex:none;border-radius:9px;cursor:pointer;
+  border:1px solid var(--line-2);background:var(--sunk);color:var(--ink-2);
+  display:grid;place-items:center;font-size:15px;line-height:1;
+}
+.stepbtn:hover{border-color:var(--ink-3);color:var(--ink)}
+
+/* Two stacked toggles beside one big tap pad, with the volume spanning both
+   underneath. Every control lands on a shared height scale (44 for a toggle,
+   two rows for the pad, 30 for the icon) so nothing sits a stray few pixels
+   off its neighbour, and the pad is unmistakably the largest thing to hit. */
+.tools{
+  display:grid;gap:10px;
+  grid-template-columns:112px 118px 200px;
+  grid-template-rows:44px 44px;
+}
+.tools .count{grid-area:1/1/2/2}
+.tools .mode {grid-area:2/1/3/2}
+.tools .tap  {grid-area:1/2/3/3}
+.tools .vol  {grid-area:1/3/3/4}
+.btn{
+  border:1px solid var(--line-2);background:var(--panel);border-radius:9px;padding:8px 13px;
+  cursor:pointer;font-size:12.5px;font-weight:600;color:var(--ink-2);white-space:nowrap;
+}
+.btn:hover{border-color:var(--ink-3);color:var(--ink)}
+.tools .btn{width:100%;height:100%;text-align:center;padding:6px 10px}
+/* tapped in a hurry, often without looking, so it gets the whole second column */
+.btn.tap{font-size:13.5px;border-radius:12px;line-height:1.25;position:relative}
+/* one of these per tap, growing out of the button and fading, the way a dot
+   flashes on its tick. Several can overlap while you are tapping. */
+.tap-ping{
+  position:absolute;inset:0;border-radius:12px;pointer-events:none;
+  border:1px solid var(--c1);background:color-mix(in srgb,var(--c1) 13%,transparent);
+  /* the button is position:relative with z-index:auto, so it makes no stacking
+     context and this lifts the ping above the neighbouring controls */
+  z-index:5;
+}
+.btn.tap[data-armed="1"]{border-color:var(--c1);color:var(--ink)}
+.btn.count[data-on="1"]{border-color:var(--c2);color:var(--ink);background:color-mix(in srgb,var(--c2) 15%,transparent)}
+/* amber edge while the advanced controls are on show */
+.btn.mode[data-adv="1"]{
+  border-color:var(--c1);color:var(--ink);
+  background:color-mix(in srgb,var(--c1) 14%,transparent);
+}
+.btn.mode[data-adv="0"]{color:var(--ink-3)}
+
+/* Simplified layout: the extras come out of the page entirely rather than
+   sitting there greyed, and the cards close up around the gap */
+:root[data-ui="simple"] #countBtn,
+:root[data-ui="simple"] .sub-btns,
+:root[data-ui="simple"] .off-head,
+:root[data-ui="simple"] .ring-card input[data-off]{display:none}
+:root[data-ui="simple"] .grid2{margin-top:12px}
+/* don't advertise dragging while offsets are switched off */
+:root[data-ui="simple"] .adv-only{display:none}
+/* one toggle instead of two: the row keeps its height so the tap pad stays the
+   same size, and the lone button centres against it rather than stretching */
+:root[data-ui="simple"] .tools{grid-template-rows:98px}
+:root[data-ui="simple"] .tools .mode{grid-area:1/1/2/2;align-self:center;height:44px}
+:root[data-ui="simple"] .tools .tap{grid-area:1/2/2/3}
+:root[data-ui="simple"] .tools .vol{grid-area:1/3/2/4}
+
+.vol{display:flex;flex-direction:column;gap:3px;justify-content:center}
+.vol-row{display:flex;align-items:center;gap:9px}
+.vol-row input[type=range]{flex:1 1 auto;min-width:0}
+.vol-row .icobtn{width:30px;height:30px;border-radius:8px;flex:none}
+
+input[type=range]{
+  -webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;cursor:pointer;
+  /* the browser keeps vertical panning, so a stray finger while scrolling
+     the page cannot grab a slider - only horizontal drags reach it */
+  touch-action:pan-y;
+}
+input[type=range]::-webkit-slider-runnable-track{height:5px;border-radius:99px;background:var(--line)}
+input[type=range]::-moz-range-track{height:5px;border-radius:99px;background:var(--line)}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:17px;height:17px;border-radius:50%;margin-top:-6px;
+  background:var(--lc,var(--ink));border:2px solid var(--panel);box-shadow:0 0 0 1px var(--line-2);
+}
+input[type=range]::-moz-range-thumb{
+  width:15px;height:15px;border-radius:50%;border:2px solid var(--panel);
+  background:var(--lc,var(--ink));box-shadow:0 0 0 1px var(--line-2);
+}
+
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 342px;gap:18px;align-items:start}
+.dial{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px 18px 18px}
+.dial{position:relative}
+/* Three fixed columns with the name in the middle one: the two 1fr sides are
+   equal by definition, so the name is centred on the dial whatever the sides
+   hold. space-between only centred it when the sides happened to match, which
+   is why it drifted. Columns are assigned explicitly so hiding the name leaves
+   an empty middle rather than sliding the beat counter into it. */
+.dial-head{
+  display:grid;
+  /* fit-content caps the middle track against the header's own width. A
+     max-width on the item resolved against this track instead - which the item
+     itself sizes - and collapsed the name to 46% of its own width. */
+  grid-template-columns:minmax(0,1fr) fit-content(46%) minmax(0,1fr);
+  align-items:baseline;gap:8px;margin-bottom:2px;
+}
+#dialRatio{grid-column:1;text-align:left}
+#dialPat{grid-column:2;justify-self:stretch;text-align:center}
+#posLbl{grid-column:3;text-align:right}
+/* the readouts that used to sit in the hub - now the dial's headline, so they
+   carry the weight the hub used to give them */
+/* the ratio may shrink and, in the worst case, clip with an ellipsis rather than
+   pushing the position readout out of the panel */
+.metric{
+  font-size:16px;font-weight:500;color:var(--ink);letter-spacing:.01em;white-space:nowrap;
+  min-width:0;overflow:hidden;text-overflow:ellipsis;
+}
+.metric.sub{font-size:13px;color:var(--ink-2);flex:none}
+/* the pattern in play, centred on the dial. It takes the width it needs and the
+   readouts either side shrink to make room - see fitHead(). */
+.metric.pat{color:var(--ink-3)}
+
+/* Tapping practice. The bar answers each tap on its own border - teal tight,
+   gold close, pink out - because a number you have to read is no use while you
+   are still tapping. */
+.tapbar{
+  margin-top:12px; width:100%; min-height:84px; border-radius:12px;
+  border:1px solid var(--line-2); background:var(--sunk);
+  display:grid; place-items:center; align-content:center; gap:3px;
+  text-align:center; padding:10px; cursor:pointer;
+  touch-action:none;                  /* nothing may arbitrate before the tap lands */
+  user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent;
+  transition:border-color .12s linear, background-color .12s linear;
+}
+.tapbar .tb-main{
+  font-family:var(--title); font-stretch:var(--title-stretch);
+  font-weight:700; font-size:26px; line-height:1; color:var(--ink); letter-spacing:-.01em;
+  font-variant-numeric:tabular-nums;
+}
+.tapbar .tb-sub{
+  font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--ink-3);
+  letter-spacing:.06em;
+}
+.tapbar[data-grade="c2"]{border-color:var(--c2); background:color-mix(in srgb,var(--c2) 17%,var(--sunk))}
+.tapbar[data-grade="c1"]{border-color:var(--c1); background:color-mix(in srgb,var(--c1) 17%,var(--sunk))}
+.tapbar[data-grade="c3"]{border-color:var(--c3); background:color-mix(in srgb,var(--c3) 17%,var(--sunk))}
+@media (prefers-reduced-motion:reduce){ .tapbar{transition:none} }
+.tapnow .k{color:var(--ink-3)}
+/* set from the active ring so the readout belongs to the same thing the card does */
+:root[data-rec="1"] #tapNowIn{color:var(--reclc,var(--ink))}
+.tap-hint{margin:0; font-size:12.5px; color:var(--ink-2); line-height:1.6}
+.btn.sm[data-on="1"]{
+  border-color:var(--c2); color:var(--ink);
+  background:color-mix(in srgb,var(--c2) 15%,transparent);
+}
+
+/* The sequence: patterns in the order you want to practise them. Every box is
+   the same size and carries the name only - the row is meant to be read as an
+   order at a glance, not studied. */
+.seq-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seq-note{font-size:11.5px;color:var(--ink-3)}
+.seq-box,.seq-add{width:94px;height:40px;flex:none;border-radius:9px;padding:0 6px}
+.seq-box{
+  position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1px;border:1px solid var(--line-2);background:var(--sunk);cursor:pointer;
+  touch-action:pan-y;                 /* a sideways drag reorders, a vertical one still scrolls */
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;-webkit-user-select:none;
+}
+.seq-box:hover{border-color:var(--ink-3)}
+.seq-box .n{font-size:9px;font-weight:600;letter-spacing:.1em;color:var(--ink-3);line-height:1}
+.seq-box .nm{
+  font-size:12px;font-weight:500;color:var(--ink);line-height:1.15;
+  max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.seq-box[data-drag="1"]{opacity:.4;border-style:dashed}
+.seq-box[data-over="1"]{border-color:var(--c2);box-shadow:0 0 0 2px color-mix(in srgb,var(--c2) 22%,transparent)}
+.seq-add{
+  border:1px dashed var(--line-2);background:transparent;color:var(--ink-3);
+  font-size:19px;line-height:1;cursor:pointer;display:grid;place-items:center;
+}
+.seq-add:hover{border-color:var(--ink);color:var(--ink)}
+.pickbar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;
+  padding:9px 12px;border:1px solid var(--c2);border-radius:10px;
+  background:color-mix(in srgb,var(--c2) 7%,transparent);
+}
+.pickbar .msg{font-size:12.5px;color:var(--ink)}
+.btn.sm{padding:5px 10px;font-size:11.5px}
+
+/* While a session runs, where you are in it matters more than a tip you have
+   already read, so it takes the hint's place at the ratio readout's size. */
+/* Kept to a single line and scaled down to fit rather than allowed to wrap:
+   a readout that reflows under your hands is worse than a slightly smaller one. */
+.sessnow{margin:0;padding:0 2px;text-align:center;width:100%}
+/* sized by font-size, not transform: a scaled transform keeps the box's layout
+   width, so an over-long line stayed off-centre and clipped on the right. The
+   label sizes are em so they come along. */
+#sessNowIn{
+  display:inline-block;white-space:nowrap;
+  font-size:16px;font-weight:500;color:var(--ink);letter-spacing:.01em;
+}
+#sessNowIn .k{font-size:.69em;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+#sessNowIn .sil{color:var(--c3);letter-spacing:.06em}
+/* Any class that sets `display` out-specifies the UA rule for [hidden], which
+   left dismissed panels on screen. One rule covers every toggle in the app. */
+[hidden]{display:none !important}
+
+/* tutorial */
+/* it lives in the header now, beside the skin toggle - the dial's own corner is
+   better spent on the session readout */
+.info{
+  width:32px;height:32px;border-radius:50%;flex:none;
+  border:1px solid var(--line-2);background:var(--sunk);color:var(--ink-3);
+  cursor:pointer;font-family:var(--title);font-stretch:var(--title-stretch);
+  font-size:14px;font-weight:600;
+  display:grid;place-items:center;line-height:1;padding:0;
+}
+.info:hover{color:var(--ink);border-color:var(--ink-3)}
+.modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:grid;place-items:center;padding:20px}
+.modal[hidden]{display:none}
+.sheet{
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  box-shadow:var(--shadow);max-width:430px;width:100%;max-height:82vh;overflow:auto;
+  padding:16px 20px 20px;
+}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:4px}
+.sheet h2{
+  font-family:var(--title);font-stretch:var(--title-stretch);
+  font-weight:600;font-size:19px;margin:0;letter-spacing:-.01em;
+}
+.sheet h3{
+  font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3);margin:16px 0 6px;
+}
+.sheet ul{margin:0;padding-left:18px;color:var(--ink-2);font-size:13px;line-height:1.6}
+.sheet li{margin:3px 0}
+.sheet b{color:var(--ink);font-weight:600}
+.canvas-hold{position:relative;width:100%;max-width:min(100%,64vh,560px);aspect-ratio:1/1;margin:0 auto}
+canvas{
+  width:100%;height:100%;display:block;touch-action:manipulation;
+  /* a mouse-drag across the dial must not start selecting the page */
+  user-select:none;-webkit-user-select:none;-webkit-user-drag:none;
+}
+/* side room so it can never run under the info button in the corner */
+/* minmax(0,1fr), not the default auto: a nowrap readout would otherwise set the
+   column's min-content width and widen the whole panel instead of scaling down */
+.dial-foot{
+  height:26px;margin-top:8px;overflow:hidden;
+  display:grid;grid-template-columns:minmax(0,1fr);justify-items:center;align-items:center;
+}
+.hint{color:var(--ink-3);font-size:11.5px;text-align:center;margin:0;padding:0 12px}
+
+.rack{display:flex;flex-direction:column;gap:12px}
+.ring-card{
+  background:var(--panel);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);
+  padding:13px 14px 14px;border-left:3px solid var(--lc);
+}
+.ring-card[data-mute="1"]{opacity:.5}
+/* While a ring is taking taps its division count is undecided, so every control
+   that reads one is put out of reach - the number itself stays lit, showing --. */
+.tapbtn{flex:none;margin:0;padding:5px 10px;font-size:11.5px}
+/* the button wears its own ring's colour, like everything else on the card */
+.ring-card .tapbtn[data-on="1"]{
+  border-color:var(--lc); color:var(--ink);
+  background:color-mix(in srgb,var(--lc) 18%,transparent);
+}
+:root[data-ui="simple"] .tapbtn{display:none}
+/* While a ring listens the whole wheel is the tap target, so the play button
+   steps out of the way, and the two controls that would fight over the tempo
+   are put beyond reach. */
+:root[data-rec="1"] .play{display:none}
+:root[data-rec="1"] #countBtn,
+:root[data-rec="1"] #tap{opacity:.32; pointer-events:none}
+/* Genuinely disabled rather than only greyed: pointer-events would still leave
+   it reachable by keyboard. */
+#sessBtn:disabled{opacity:.32; cursor:not-allowed}
+#sessBtn:disabled:hover{border-color:var(--line-2); color:var(--ink-2)}
+:root[data-rec="1"] canvas{cursor:pointer}
+.ring-card[data-rec="1"] [data-divdown],
+.ring-card[data-rec="1"] [data-divup],
+.ring-card[data-rec="1"] .div-sub,
+.ring-card[data-rec="1"] .sub-btns,
+.ring-card[data-rec="1"] input[data-div],
+.ring-card[data-rec="1"] .off-head,
+.ring-card[data-rec="1"] input[data-off]{opacity:.32; pointer-events:none}
+.ring-card[data-rec="1"] .div-num{color:var(--lc)}
+/* Three columns with the tap button in the middle one: the two 1fr sides are
+   equal by definition, so it lands in the same place on every tab. As a flex row
+   with spacers it drifted, because ring 1 has no delete button and so one fewer
+   item to balance against. */
+.rc-top{
+  display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  align-items:center;gap:8px;margin-bottom:9px;
+}
+.rc-side{display:flex;align-items:center;gap:8px;min-width:0}
+.rc-side.end{justify-content:flex-end}
+.rc-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.swatch{width:11px;height:11px;border-radius:50%;background:var(--lc);flex:none}
+.rc-name{font-weight:600;font-size:13.5px;letter-spacing:-.01em}
+.chip{
+  font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;padding:2.5px 7px;border-radius:6px;
+  background:color-mix(in srgb,var(--lc) 15%,transparent);color:var(--lc);
+}
+.chip.ref{background:var(--sunk);color:var(--ink-3);letter-spacing:.1em}
+.icobtn{
+  width:27px;height:27px;border-radius:7px;border:1px solid var(--line);background:var(--sunk);
+  cursor:pointer;color:var(--ink-3);display:grid;place-items:center;font-size:12px;font-weight:700;
+}
+.icobtn:hover{color:var(--ink);border-color:var(--ink-3)}
+.icobtn[data-on="1"]{background:var(--c3);border-color:var(--c3);color:#fff}
+
+.div-row{display:flex;align-items:center;gap:9px}
+.stepbtn.sm{width:27px;height:27px;border-radius:8px;font-size:14px}
+/* the ring sliders sit inside a scrollable stack, so they stay physically slim */
+.ring-card input[type=range]{height:17px}
+.ring-card input[type=range]::-webkit-slider-runnable-track{height:4px}
+.ring-card input[type=range]::-moz-range-track{height:4px}
+.ring-card input[type=range]::-webkit-slider-thumb{width:14px;height:14px;margin-top:-5px}
+.ring-card input[type=range]::-moz-range-thumb{width:12px;height:12px}
+.div-num{
+  font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;
+  font-size:28px;font-weight:500;line-height:1;width:2.2ch;text-align:right;
+}
+.div-sub{font-size:10px;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;line-height:1.25}
+.sub-btns{margin-left:auto;display:flex;gap:4px;flex:none}
+.subbtn{
+  width:29px;height:25px;flex:none;border-radius:7px;cursor:pointer;
+  border:1px solid var(--line);background:var(--sunk);color:var(--ink-3);
+  font-size:11px;font-weight:600;line-height:1;padding:0;
+}
+.subbtn:hover:not(:disabled){color:var(--ink);border-color:var(--ink-3)}
+.subbtn[data-on="1"]{background:var(--lc);border-color:var(--lc);color:var(--panel)}
+.subbtn:disabled{opacity:.28;cursor:not-allowed}
+.off-head{display:flex;align-items:center;gap:9px;margin-top:9px}
+.off-val{font-size:12px;color:var(--ink-2);margin-left:auto;letter-spacing:.01em}
+.off-val[data-zero="1"]{color:var(--ink-3)}
+.offbtn{
+  flex:none;height:24px;padding:0 10px;border-radius:7px;cursor:pointer;
+  border:1px solid var(--line);background:var(--sunk);color:var(--ink-3);
+  font-size:12px;font-weight:600;line-height:1;
+}
+.offbtn:hover{color:var(--ink);border-color:var(--ink-3)}
+.offbtn[data-on="1"]{background:var(--lc);border-color:var(--lc);color:var(--panel)}
+.icobtn svg{display:block}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.field{display:flex;flex-direction:column;gap:3px}
+select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);background:var(--sunk);font-size:12.5px;width:100%}
+.rc-foot{
+  margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);
+  display:flex;justify-content:space-between;gap:8px;font-size:11px;color:var(--ink-3);
+}
+/* Ring tabs: one card at a time, so tweaking ring 3 no longer means scrolling
+   past rings 1 and 2. Numbered rather than named to stay inside a phone's
+   width; the colour dot ties each tab to its circle on the dial. */
+.tabs{display:flex;gap:6px;align-items:stretch}
+.tab{
+  flex:1 1 0;min-width:0;height:38px;border-radius:11px;cursor:pointer;
+  border:1px solid var(--line);background:var(--sunk);color:var(--ink-3);
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;
+}
+.tab:hover:not(:disabled){border-color:var(--ink-3);color:var(--ink)}
+.tabdot{width:9px;height:9px;border-radius:50%;background:var(--lc);flex:none}
+.tabword{font-family:"Archivo",sans-serif;font-size:12.5px}
+@media (max-width:620px){
+  /* four tabs and a + will not fit spelled out on a phone */
+  .tabs[data-count="4"] .tabword{display:none}
+}
+.tab[data-on="1"]{
+  background:color-mix(in srgb,var(--lc) 16%,transparent);
+  border-color:var(--lc);color:var(--ink);
+}
+.tab[data-mute="1"] .tabdot{background:var(--dot-off)}
+.tab[data-mute="1"]{color:var(--ink-3)}
+.tab.add{flex:0 0 44px;font-size:17px;font-weight:500;font-family:inherit}
+/* Until you have used it once, + breathes in the colour the next ring will be,
+   so it reads as the way to make one rather than punctuation after the tabs.
+   The stops are sin(pi*t) sampled every eighth, which is the 0-1-0 curve asked
+   for; CSS cannot express a sine directly and this runs on the compositor. */
+.tab.add[data-hint="1"]{animation:addPulse 2s linear infinite}
+@keyframes addPulse{
+  0%,100%    {border-color:var(--line);   background:var(--sunk);                                          color:var(--ink-3)}
+  12.5%,87.5%{border-color:color-mix(in srgb,var(--nc) 38%,var(--line)); background:color-mix(in srgb,var(--nc) 6%,var(--sunk));  color:color-mix(in srgb,var(--ink) 38%,var(--ink-3))}
+  25%,75%    {border-color:color-mix(in srgb,var(--nc) 71%,var(--line)); background:color-mix(in srgb,var(--nc) 11%,var(--sunk)); color:color-mix(in srgb,var(--ink) 71%,var(--ink-3))}
+  37.5%,62.5%{border-color:color-mix(in srgb,var(--nc) 92%,var(--line)); background:color-mix(in srgb,var(--nc) 15%,var(--sunk)); color:color-mix(in srgb,var(--ink) 92%,var(--ink-3))}
+  50%        {border-color:var(--nc);     background:color-mix(in srgb,var(--nc) 16%,var(--sunk));         color:var(--ink)}
+}
+@media (prefers-reduced-motion:reduce){ .tab.add[data-hint="1"]{animation:none} }
+.tab.add:disabled{opacity:.35;cursor:not-allowed}
+
+.presets{margin-top:18px;background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px 18px}
+/* same tab mechanism as the rings, but neutral: these are not a ring's colour */
+.ptabs{--lc:var(--ink-2)}
+.ptabs .tab{font-family:"Archivo",sans-serif;font-size:12.5px}
+.pane{padding-top:14px}
+.pane[hidden]{display:none}
+.pgrid{display:flex;gap:8px;flex-wrap:wrap;margin:0}
+.rgroup{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3);margin:16px 0 8px}
+.rgroup:first-child{margin-top:0}
+
+/* Practice session. Written as a sentence you can read straight through, with
+   the whole plan spelled out underneath before you commit to it. */
+.sess-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.sess-head .lbl{margin-right:auto}
+/* the plan, stage by stage: one line each, tempo first */
+.plan-sum{font-size:12.5px;color:var(--ink-2);line-height:1.6;margin:0 0 12px;
+  padding-bottom:11px;border-bottom:1px dashed var(--line)}
+.plan-sum b{color:var(--ink)}
+.plan-row{
+  display:grid;grid-template-columns:58px 44px minmax(0,1fr);gap:8px;align-items:baseline;
+  padding:4px 0;font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink-2);
+}
+.plan-row + .plan-row{border-top:1px solid var(--line)}
+.plan-row .pb{color:var(--ink);font-weight:500}
+.plan-row .pl{color:var(--ink-3);font-size:11.5px}
+.plan-row .pn{font-family:"Archivo",sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.plan-row[data-now="1"]{background:color-mix(in srgb,var(--c2) 12%,transparent);
+  border-radius:7px;padding-left:7px;padding-right:7px;margin:0 -7px}
+.plan-note{margin:12px 0 0;font-size:12px;color:var(--ink-3);line-height:1.6}
+.sess-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.sess-txt{font-size:12.5px;color:var(--ink-2);white-space:nowrap}
+.sess-in{
+  width:58px;padding:6px 4px;border-radius:8px;text-align:center;
+  border:1px solid var(--line-2);background:var(--sunk);color:var(--ink);font-weight:500;
+}
+.sess-in::-webkit-outer-spin-button,.sess-in::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.sess-in{-moz-appearance:textfield}
+/* select.snd sets width:100% and out-specifies a bare class, which stacked the
+   two dropdowns onto their own lines and broke the sentence */
+select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
+.sess-gap{margin-left:14px}
+@media (max-width:640px){ .sess-gap{margin-left:0} }
+.sess-plan{
+  margin:12px 0 0;padding-top:11px;border-top:1px dashed var(--line);
+  font-size:12px;color:var(--ink-2);line-height:1.6;
+}
+.sess-plan b{color:var(--ink);font-weight:600}
+.sess-plan .ladder{font-family:"IBM Plex Mono",monospace;color:var(--ink-3)}
+#sessBtn[data-on="1"]{border-color:var(--c3);color:var(--ink);
+  background:color-mix(in srgb,var(--c3) 16%,transparent)}
+/* the whole panel is an advanced-only feature */
+:root[data-ui="simple"] #sessionPanel,
+:root[data-ui="simple"] #tapPanel,
+:root[data-ui="simple"] #seqPanel{display:none}
+.pchip{border:1px solid var(--line-2);background:var(--sunk);border-radius:8px;padding:7px 12px;cursor:pointer;font-family:"IBM Plex Mono",monospace;font-size:12.5px;font-weight:500}
+.pchip:hover{border-color:var(--ink);color:var(--ink)}
+.pchip small{font-family:"Archivo",sans-serif;color:var(--ink-3);margin-left:7px;font-size:10.5px}
+.saverow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.saverow input[type=text]{padding:8px 10px;border-radius:9px;border:1px solid var(--line-2);background:var(--sunk);font-size:13px;min-width:180px}
+.mine{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
+.mine .pchip{display:flex;align-items:center;gap:9px;font-family:"Archivo",sans-serif;font-size:12.5px}
+.mine .del{color:var(--ink-3);font-weight:700}
+.mine .del:hover{color:var(--c3)}
+.empty{color:var(--ink-3);font-size:12px;margin-top:11px}
+.keys{margin-top:16px;color:var(--ink-3);font-size:11.5px;display:flex;gap:18px;flex-wrap:wrap}
+kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(--line-2);border-bottom-width:2px;border-radius:5px;padding:1px 5px;color:var(--ink-2);background:var(--sunk)}
+
+@media (max-width:940px){
+  .stage{grid-template-columns:minmax(0,1fr)}
+  /* tempo above, tools below, each spanning the panel */
+  .transport{grid-template-columns:1fr;row-gap:16px}
+  .tools{grid-template-columns:minmax(112px,1fr) minmax(118px,1.1fr) minmax(170px,1.5fr)}
+}
+@media (max-width:620px){
+  /* the tempo number gets its own line so the four jump buttons sit
+     together on a single comfortable row beneath it */
+  .bpm-block{gap:8px}
+  .bpm-read{flex:0 0 100%;order:-1}
+  /* too narrow for three columns: the volume drops to its own full-width row */
+  .tools{grid-template-columns:1fr 1.15fr;grid-template-rows:44px 44px auto}
+  .tools .vol{grid-area:3/1/4/3;justify-content:flex-end}
+  :root[data-ui="simple"] .tools{grid-template-rows:98px auto}
+  :root[data-ui="simple"] .tools .vol{grid-area:2/1/3/3}
+}
+/* no physical keyboard to speak of, so the shortcut legend is just clutter */
+@media (max-width:760px), (pointer:coarse){
+  .keys{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="nameplate">
+    <h1>Polyrhythm <span>Circle</span></h1>
+    <div class="np-right">
+      <button class="info" id="infoBtn" title="How this works" aria-label="How this works">i</button>
+      <button class="btn skin" id="skin" title="Switch skin">
+        <svg id="skinIcon" viewBox="0 0 24 24" aria-hidden="true"></svg>
+        <span id="skinTxt">Dark</span>
+      </button>
+    </div>
+  </header>
+
+  <section class="transport">
+    <div>
+      <div class="bpm-block">
+        <span class="jump-pair">
+          <button class="jump wide" id="bpmDown10" aria-label="Tempo down 10">&minus;10</button>
+          <button class="jump" id="bpmDown5" aria-label="Tempo down 5">&minus;5</button>
+        </span>
+        <span class="bpm-read">
+          <button class="bpm-num" id="bpmNum" title="Click to type a tempo">96</button>
+          <input class="bpm-in mono" id="bpmIn" type="number" min="20" max="330" step="1"
+                 inputmode="numeric" aria-label="Type a tempo" hidden>
+          <span class="bpm-unit">BPM</span>
+        </span>
+        <span class="jump-pair">
+          <button class="jump" id="bpmUp5" aria-label="Tempo up 5">+5</button>
+          <button class="jump wide" id="bpmUp10" aria-label="Tempo up 10">+10</button>
+        </span>
+      </div>
+      <div class="bpm-row">
+        <button class="stepbtn" id="bpmDown" aria-label="Tempo down 1">&minus;</button>
+        <input type="range" id="bpmRange" min="20" max="330" step="1" value="96" aria-label="Tempo in beats per minute">
+        <button class="stepbtn" id="bpmUp" aria-label="Tempo up 1">+</button>
+      </div>
+      <p class="cycle-line" id="cycleLine"></p>
+    </div>
+
+    <div class="tools">
+      <button class="btn count" id="countBtn" data-on="0" aria-pressed="false"
+              title="Play three counting beats before the rings start">Count-in</button>
+      <button class="btn mode" id="uiBtn">Simple</button>
+      <button class="btn tap" id="tap" data-armed="0"><span id="tapTxt">Tap tempo</span></button>
+      <div class="vol">
+        <span class="lbl">Volume</span>
+        <div class="vol-row">
+          <button class="icobtn" id="masterMute" aria-pressed="false" title="Mute"></button>
+          <input type="range" id="master" min="0" max="1" step="0.01" value="0.9" aria-label="Volume">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="stage">
+    <section class="dial">
+      <div class="dial-head">
+        <span class="metric mono" id="dialRatio">4 : 3</span>
+        <span class="metric sub mono pat" id="dialPat" hidden></span>
+        <span class="metric sub mono" id="posLbl">stopped</span>
+      </div>
+      <div class="canvas-hold">
+        <canvas id="cv"></canvas>
+        <!-- play sits in the hub: the one big empty area, always on screen -->
+        <button class="play" id="play" data-preroll="0" aria-label="Play" title="Play (Space)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path id="playIcon" fill="currentColor" d="M8 5.5v13l11-6.5z"/></svg>
+        </button>
+      </div>
+      <!-- one fixed-height slot, so swapping tip for readout cannot resize the dial -->
+      <div class="dial-foot">
+        <p class="hint" id="dialHint">Click a dot to silence it.<span class="adv-only"> Drag a ring to offset it.</span></p>
+        <p class="sessnow" id="sessNow" hidden><span class="mono" id="sessNowIn"></span></p>
+        <p class="sessnow tapnow" id="tapNow" hidden><span class="mono" id="tapNowIn"></span></p>
+      </div>
+      <!-- the target sits below the dial so your thumb never covers the beat -->
+      <div class="tapbar" id="tapBar" hidden data-grade="">
+        <span class="tb-main" id="tbMain">TAP</span>
+        <span class="tb-sub" id="tbSub"></span>
+      </div>
+    </section>
+
+    <section class="rack" id="rack"></section>
+  </div>
+
+  <section class="presets" id="sessionPanel">
+    <div class="sess-head">
+      <span class="lbl">Practice session</span>
+      <button class="btn sm" id="planBtn">Plan</button>
+      <button class="btn" id="sessBtn" data-on="0">Start</button>
+    </div>
+
+    <div class="sess-row">
+      <span class="sess-txt">Tempo from</span>
+      <input class="sess-in mono" id="sFrom" type="number" min="20" max="330" step="1" value="100" aria-label="Starting tempo">
+      <span class="sess-txt">to</span>
+      <input class="sess-in mono" id="sTo" type="number" min="20" max="330" step="1" value="120" aria-label="Target tempo">
+      <span class="sess-txt">in steps of</span>
+      <input class="sess-in mono" id="sStep" type="number" min="1" max="60" step="1" value="5" aria-label="Tempo step">
+      <span class="sess-txt">every</span>
+      <input class="sess-in mono" id="sPer" type="number" min="1" max="32" step="1" value="4" aria-label="Loops per step">
+      <span class="sess-txt">loops</span>
+    </div>
+
+    <div class="sess-row">
+      <span class="sess-txt">Change pattern</span>
+      <select class="snd sess-sel" id="sPat" aria-label="Change pattern each step">
+        <option value="none">keep mine</option>
+        <option value="rhythms">from Rhythms</option>
+        <option value="classic">from Classic ratios</option>
+        <option value="mine">from my Presets</option>
+        <option value="seq">from Sequence</option>
+      </select>
+      <span class="sess-txt sess-gap">Silent loops</span>
+      <select class="snd sess-sel" id="sSil" aria-label="Silent loops">
+        <option value="0">off</option>
+        <option value="8">1 in 8</option>
+        <option value="6">1 in 6</option>
+        <option value="4">1 in 4</option>
+        <option value="3">1 in 3</option>
+        <option value="2">every other</option>
+        <option value="1">all but first</option>
+      </select>
+    </div>
+
+    <p class="sess-plan" id="sPlan"></p>
+  </section>
+
+  <section class="presets" id="tapPanel">
+    <div class="sess-head">
+      <span class="lbl">Tapping</span>
+      <button class="btn sm" id="tapFollow" data-on="0">Tap along</button>
+    </div>
+    <p class="tap-hint" id="tapHint"></p>
+  </section>
+
+  <section class="presets" id="seqPanel">
+    <div class="sess-head">
+      <span class="lbl">Sequence</span>
+      <span class="seq-note" id="seqNote"></span>
+    </div>
+    <div class="seq-row" id="seqRow"></div>
+  </section>
+
+  <section class="presets">
+    <!-- shown only while a sequence step is waiting to be filled -->
+    <div class="pickbar" id="pickBar" hidden>
+      <span class="msg" id="pickMsg"></span>
+      <button class="btn sm" id="pickDel" hidden>Remove step</button>
+      <button class="btn sm" id="pickCancel">Cancel</button>
+    </div>
+    <div class="tabs ptabs" id="ptabs">
+      <button class="tab" data-ptab="mine" data-on="1">Presets</button>
+      <button class="tab" data-ptab="rhythms" data-on="0">Rhythms</button>
+      <button class="tab" data-ptab="classic" data-on="0">Classic ratios</button>
+    </div>
+
+    <div class="pane" data-pane="mine">
+      <div class="saverow">
+        <input type="text" id="pname" placeholder="Name this setup" maxlength="28">
+        <button class="btn" id="psave">Save current</button>
+      </div>
+      <div class="mine" id="mine"></div>
+      <p class="empty" id="pempty">Nothing saved yet — presets stay in this browser.</p>
+    </div>
+
+    <div class="pane" data-pane="rhythms" hidden>
+      <div id="rgrid"></div>
+      <p class="empty">Skeletons, not arrangements — the fewest strokes that still name the rhythm.</p>
+    </div>
+
+    <div class="pane" data-pane="classic" hidden>
+      <div class="pgrid" id="pgrid"></div>
+    </div>
+
+    <div class="keys">
+      <span><kbd>Space</kbd> play / stop</span>
+      <span><kbd>&uarr;</kbd><kbd>&darr;</kbd> tempo (hold <kbd>Shift</kbd> for 5)</span>
+      <span><kbd>1</kbd>&ndash;<kbd>4</kbd> mute a ring</span>
+      <span><kbd>T</kbd> tap</span>
+    </div>
+  </section>
+</div>
+
+<div class="modal" id="planSheet" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="planTitle">
+    <div class="sheet-head">
+      <h2 id="planTitle">The plan</h2>
+      <button class="icobtn" id="planClose" title="Close" aria-label="Close">&times;</button>
+    </div>
+    <p class="plan-sum" id="planSum"></p>
+    <div id="planBody"></div>
+    <p class="plan-note" id="planNote"></p>
+  </div>
+</div>
+
+<div class="modal" id="help" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="sheet-head">
+      <h2 id="helpTitle">How this works</h2>
+      <button class="icobtn" id="helpClose" title="Close" aria-label="Close">&times;</button>
+    </div>
+
+    <h3>The rings</h3>
+    <ul>
+      <li><b>Ring 1</b> is the click.</li>
+      <li>It ticks at the <b>BPM</b> you set.</li>
+      <li>A <b>polyrhythm</b> can be created adding more <b>rings</b>. Four rings maximum.</li>
+    </ul>
+
+    <h3>The dial</h3>
+    <ul>
+      <li>Click a <b>dot</b> to <b>silence</b> that beat.</li>
+      <li>Hold and <b>Drag</b> a ring to <b>offset</b> it.</li>
+    </ul>
+
+    <h3>Tempo</h3>
+    <ul>
+      <li>Click the number to type a <b>tempo</b>.</li>
+      <li><b>Tap tempo</b> sets it by feel.</li>
+      <li><b>Count-in</b> plays three beats before the rings.</li>
+    </ul>
+
+    <h3>Per ring</h3>
+    <ul>
+      <li>Sets the number of <b>divisions</b>.</li>
+      <li>&times;2 &times;3 &times;4 <b>subdivide</b> to create accents.</li>
+      <li>A <b>subdivision</b> sounds on its own, beat off or not.</li>
+      <li><b>Offset</b> nudges it off the beat.</li>
+      <li>Each ring has its own <b>sound</b>, level and mute.</li>
+    </ul>
+
+    <h3>Practice session</h3>
+    <ul>
+      <li>Change <b>tempo</b> by small <b>increments</b> each amount of <b>loops</b>.</li>
+      <li>Random <b>silent</b> loops.</li>
+      <li><b>Patterns</b> played randomly each increment of time.</li>
+    </ul>
+
+    <h3>Sequence</h3>
+    <ul>
+      <li>The practice session plays the <b>sequence</b> in order.</li>
+      <li>Press <b>+</b> to put a <b>pattern</b> in the row.</li>
+      <li><b>Drag</b> one box onto another to <b>swap</b> them.</li>
+      <li>Tap a box to <b>change</b> or remove that step.</li>
+    </ul>
+
+    <h3>Tapping</h3>
+    <ul>
+      <li>Practise a rhythm with no instrument at all.</li>
+      <li><b>Tap along</b> grades every tap on the bar under the dial.</li>
+      <li>Teal is <b>tight</b>, gold is close, pink is <b>off</b>.</li>
+      <li>Your taps stay on the dial, so you can see if you run <b>early</b>.</li>
+      <li><b>Tap pattern</b> on a ring builds it instead: tap the <b>wheel</b>.</li>
+      <li>On <b>ring 1</b> the count sets the divisions and the speed the <b>tempo</b>.</li>
+      <li>On the others each tap drops a <b>dot</b> where the hand is.</li>
+      <li>The <b>grid</b> works itself out, and placed dots never move.</li>
+      <li>After the first loop, tapping a dot again takes it <b>off</b>.</li>
+      <li>Press it again to keep them.</li>
+    </ul>
+
+    <h3>Keeping it</h3>
+    <ul>
+      <li>Between sessions <b>autosave</b>.</li>
+      <li><b>Advanced</b> buttons shows/hide some features.</li>
+      <li><b>Preset</b> chips are classic ratios; name your own below.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ------------------------------------------------------------------ state */
+var SOUNDS = [
+  {id:"kick",  name:"Kick"},
+  {id:"snare", name:"Snare"},
+  {id:"hihat", name:"Hi-hat"},
+  {id:"wood",  name:"Wood block"},
+  {id:"click", name:"Click"},
+  {id:"beep",  name:"Beep"},
+  {id:"bell",  name:"Bell"},
+  {id:"rim",   name:"Rim"}
+];
+var DEFAULT_SOUND = ["kick","wood","beep","rim"];
+
+var S = {
+  bpm: 96,
+  master: 0.9,
+  muted: false,
+  active: 0,       /* which ring's card the tab strip is showing */
+  ptab: "mine",
+  seq: [],
+  tapMode: "",                 /* "", "follow" or "record" - never persisted */    /* which presets tab is open */
+  countIn: false,
+  playing: false,
+  rings: [ mkRing(0,4), mkRing(1,3) ]
+};
+
+var MAX_STEPS = 48;    /* divisions x subdivision - past this a ring is unreadable */
+/* Subdivisions sit far under the main beat. The level has to be this low because
+   the output limiter squashes the loud main beat and leaves quiet subs alone,
+   which shrinks whatever gap you dial in; pitching them up a fifth keeps them
+   audible and distinct instead of just quieter. */
+var SUB_LEVEL = 0.12;
+var SUB_PITCH = 1.5;
+
+function mkRing(i, div){
+  return {
+    div: div,
+    sub: 1,          /* 1 = no subdivision; 2, 3 or 4 fills the gaps */
+    sound: DEFAULT_SOUND[i] || "click",
+    vol: i === 0 ? 0.95 : 0.8,
+    off: 0,          /* phase offset, as a fraction of ONE of this ring's steps */
+    mute: false,
+    /* one flat slot per position, main and subdivision alike, so both toggle
+       the same way. Position k is a main beat when k % sub === 0. */
+    steps: filled(div),
+    nextTick: 0,
+    lastTick: null,
+    flash: []
+  };
+}
+function filled(n){ var a=[],i; for(i=0;i<n;i++) a.push(true); return a; }
+function gcd(a,b){ while(b){ var t=b; b=a%b; a=t; } return a; }
+
+function total(r){ return r.div * r.sub; }
+function offPhase(r){ return r.off / r.div; }   /* offset stays in MAIN steps */
+function isMain(r, k){ return (k % r.sub) === 0; }
+/* Every dot that is on sounds, subdivision or not. A subdivision used to need
+   its parent beat on as well, which made an off-beat impossible to write on its
+   own - and left a tapped dot silent whenever the grid had to be fine enough to
+   land it between main beats. It still sounds AS a subdivision: quieter and a
+   fifth up, as they always have. */
+function audible(r, k){ return !!r.steps[k]; }
+/* largest subdivision no greater than `want` that still fits the step budget */
+function fitSub(div, want){
+  var opts = [4,3,2,1], i;
+  for(i=0;i<opts.length;i++){
+    if(opts[i] <= want && div * opts[i] <= MAX_STEPS) return opts[i];
+  }
+  return 1;
+}
+/* rebuild a ring's slots for a new division/subdivision, keeping main beats */
+function reshape(r, newDiv, newSub){
+  var old = r.steps, oldSub = r.sub, keep = Math.min(r.div, newDiv), i;
+  var next = filled(newDiv * newSub);
+  for(i=0;i<keep;i++) next[i*newSub] = old[i*oldSub];
+  r.div = newDiv;
+  r.sub = newSub;
+  r.steps = next;
+  r.flash = [];
+  r.lastTick = null;
+}
+
+/* ------------------------------------------------------------------ audio */
+var ctx=null, out=null, noiseBuf=null, ciGain=null;
+
+/* Phone speakers are quiet and roll off hard below ~400 Hz, so the whole chain
+   runs hot into a limiter instead of leaving headroom nothing will ever use. */
+var DRIVE = 2.1;      /* master fader -> pre-limiter gain */
+var MAKEUP = 1.45;    /* post-limiter trim, kept just under clipping */
+
+function initAudio(){
+  if(ctx) return;
+  var AC = window.AudioContext || window.webkitAudioContext;
+  ctx = new AC();
+
+  out = ctx.createGain();
+  out.gain.value = S.muted ? 0 : S.master * DRIVE;
+
+  /* count-in ticks get their own tap so Stop can silence the ones already
+     queued in the audio graph rather than letting them ring on */
+  ciGain = ctx.createGain();
+  ciGain.gain.value = 1;
+  ciGain.connect(out);
+
+  var comp = ctx.createDynamicsCompressor();
+  comp.threshold.value = -6;
+  comp.knee.value = 8;
+  comp.ratio.value = 4;
+  comp.attack.value = 0.0008;
+  comp.release.value = 0.12;
+
+  var makeup = ctx.createGain();
+  makeup.gain.value = MAKEUP;
+
+  /* Final safety net: four rings landing on the same downbeat can outrun the
+     limiter's attack, so soft-clip instead of letting the output crackle.
+     Transparent below 0.6, asymptotic to 1.0 above it. */
+  var shaper = ctx.createWaveShaper();
+  var N = 2048, curve = new Float32Array(N), KNEE = 0.6;
+  for(var j=0;j<N;j++){
+    var x = (j / (N-1)) * 8 - 4;               /* -4 .. +4 */
+    var ax = Math.abs(x), y;
+    if(ax <= KNEE) y = ax;
+    else y = KNEE + (1 - KNEE) * Math.tanh((ax - KNEE) / (1 - KNEE));
+    curve[j] = (x < 0 ? -y : y);
+  }
+  shaper.curve = curve;
+  /* No oversampling on purpose: its resampling filter rings past the curve's
+     ceiling (measured 1.31 peak at 4x), which is the very thing this prevents. */
+  shaper.oversample = "none";
+
+  out.connect(comp); comp.connect(makeup); makeup.connect(shaper); shaper.connect(ctx.destination);
+
+  var len = Math.floor(ctx.sampleRate * 0.4);
+  noiseBuf = ctx.createBuffer(1, len, ctx.sampleRate);
+  var d = noiseBuf.getChannelData(0), i;
+  for(i=0;i<len;i++) d[i] = Math.random()*2 - 1;
+}
+var DEST = null;   /* where the next voice() lands; null means the master bus */
+var PITCH = 1;     /* multiplies every frequency in the next voice() */
+function bus(){ return DEST || out; }
+
+function noise(t, dur, gain, freq, q, type){
+  var src = ctx.createBufferSource(); src.buffer = noiseBuf;
+  var bp = ctx.createBiquadFilter(); bp.type = type || "bandpass";
+  bp.frequency.value = Math.min(freq * PITCH, 18000); bp.Q.value = q || 1;
+  var g = ctx.createGain();
+  g.gain.setValueAtTime(gain, t);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  src.connect(bp); bp.connect(g); g.connect(bus());
+  src.start(t); src.stop(t + dur + 0.02);
+}
+function tone(t, dur, gain, f0, f1, type){
+  var o = ctx.createOscillator(); o.type = type || "sine";
+  o.frequency.setValueAtTime(f0 * PITCH, t);
+  if(f1 && f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1 * PITCH, t + dur);
+  var g = ctx.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(gain, t + 0.002);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(bus());
+  o.start(t); o.stop(t + dur + 0.02);
+}
+function voice(kind, t, v, accent){
+  var k = accent ? 1.4 : 1;    /* pitch lift on the downbeat */
+  var a = accent ? 1.3 : 1;    /* level lift on the downbeat */
+  if(kind === "kick"){
+    /* mid-forward kick: a triangle drop that lands around 150 Hz, where a phone
+       speaker can still move air, plus a bright transient to cut through a guitar */
+    tone(t, 0.115, 1.15*v*a, accent ? 520 : 440, 150, "triangle");
+    tone(t, 0.055, 0.50*v*a, accent ? 250 : 210, 130, "sine");
+    noise(t, 0.013, 0.60*v*a, 1900, 1, "highpass");
+  } else if(kind === "snare"){
+    noise(t, 0.135, 1.00*v*a, accent ? 2200 : 1800, 0.7);
+    tone(t, 0.070, 0.45*v*a, accent ? 250 : 205, 175, "triangle");
+  } else if(kind === "hihat"){
+    noise(t, accent ? 0.055 : 0.038, 0.80*v*a, accent ? 8200 : 7200, 0.8, "highpass");
+    noise(t, 0.012, 0.35*v*a, 4200, 1.5);
+  } else if(kind === "wood"){
+    tone(t, 0.050, 1.00*v*a, 900*k, 780*k, "triangle");
+    noise(t, 0.016, 0.45*v*a, 2400, 2);
+  } else if(kind === "click"){
+    noise(t, 0.028, 1.15*v*a, accent ? 3400 : 2600, 3.5);
+  } else if(kind === "beep"){
+    tone(t, 0.080, 0.80*v*a, accent ? 1400 : 950, 0, "triangle");
+  } else if(kind === "bell"){
+    /* Two square waves a fifth apart, ringing for 300ms, was all odd harmonics
+       and read as harsh beside the others. A triangle fundamental, pitched
+       lower, with one quiet inharmonic partial around 2.7x gives a soft bell
+       instead of a chord - and a shorter tail stops it ringing over the beat. */
+    tone(t, 0.260, 0.40*v*a, 470*k, 0, "triangle");
+    tone(t, 0.150, 0.10*v*a, 1270*k, 0, "sine");
+    noise(t, 0.012, 0.12*v*a, 3600, 1, "highpass");
+  } else { /* rim */
+    tone(t, 0.024, 1.00*v*a, accent ? 1950 : 1500, 0, "square");
+    noise(t, 0.018, 0.60*v*a, 3400, 2);
+  }
+}
+
+/* ------------------------------------------------------------- phase clock */
+var refTime = 0;   /* audio-clock time of refPhase */
+var refPhase = 0;  /* rotations elapsed */
+
+function acNow(){ return ctx ? ctx.currentTime : 0; }
+/* Ring 1 is the click: its steps land exactly on the BPM, so its division count
+   is what a rotation is worth in beats. Every other ring fits into that rotation. */
+function baseBeats(){ return S.rings[0] ? S.rings[0].div : 1; }
+function cycleDur(){ return baseBeats() * 60 / S.bpm; }
+function phaseAt(t){ return refPhase + (t - refTime) / cycleDur(); }
+function phaseNow(){ return S.playing ? phaseAt(acNow()) : refPhase; }
+function rebase(){
+  if(!S.playing) return;
+  var t = acNow(), p = phaseAt(t);
+  refPhase = p; refTime = t;
+}
+
+var COUNT_BEATS = 3;
+var COUNT_SOUND = "rim";
+/* true only while a run that actually asked for a count-in is still counting.
+   Without it, the short scheduling lead before every start reads as a stray "1". */
+var ciRun = false;
+
+function start(){
+  initAudio();
+  if(ctx.state === "suspended") ctx.resume();
+  ciGain.gain.cancelScheduledValues(ctx.currentTime);
+  ciGain.gain.setValueAtTime(1, ctx.currentTime);
+
+  var t0 = ctx.currentTime + 0.12;
+  var beat = 60 / S.bpm;
+  ciRun = !!S.countIn && S.tapMode !== "record";
+  var lead = ciRun ? COUNT_BEATS * beat : 0;
+
+  refPhase = 0;
+  refTime = t0 + lead;      /* phase runs negative through the count-in */
+
+  if(S.countIn){
+    DEST = ciGain;
+    for(var i=0;i<COUNT_BEATS;i++){
+      voice(COUNT_SOUND, t0 + i * beat, 0.85, i === 0);
+    }
+    DEST = null;
+  }
+
+  S.rings.forEach(function(r){ r.nextTick = 0; r.lastTick = null; });
+  /* the clock always restarts at phase 0; this records which loop of the plan
+     phase 0 now is, so a resumed session picks up where it paused instead of
+     waiting out however many cycles it had already played */
+  if(run) run.off = run.cur;
+  S.playing = true;
+  paintTransport();
+  if(S.tapMode === "record") paintTapNow();   /* play is what starts it listening */
+}
+/* Stops the transport only. A running practice session survives it, so the
+   button in the hub pauses the plan where it stands; ending a session is the
+   job of the Stop button in the panel (and of the plan running out). */
+function stop(){
+  S.playing = false;
+  ciRun = false;
+  refPhase = 0;
+  if(ciGain){                       /* kill count-in ticks already queued */
+    ciGain.gain.cancelScheduledValues(ctx.currentTime);
+    ciGain.gain.setValueAtTime(0, ctx.currentTime);
+  }
+  S.rings.forEach(function(r){ r.lastTick = null; r.flash = []; });
+  paintTransport();
+  if(S.tapMode === "record") recEnd(true);    /* stopping is the other way to keep it */
+}
+function toggle(){ S.playing ? stop() : start(); }
+
+var LOOKAHEAD = 0.18;
+function schedule(){
+  if(!S.playing || !ctx) return;
+
+  var t = acNow();
+  sessionTick(t);                  /* may pin the clock to a loop boundary */
+  var horizon = t + LOOKAHEAD, cd = cycleDur();
+  S.rings.forEach(function(r){
+    var tot = total(r), oph = offPhase(r), guard = 0;
+    while(guard++ < 512){
+      /* position k sits at rotation phase k/total + the ring's offset */
+      var tickTime = refTime + (r.nextTick / tot + oph - refPhase) * cd;
+      if(tickTime > horizon) break;
+      if(tickTime >= t - 0.01){
+        var idx = ((r.nextTick % tot) + tot) % tot;
+        /* which loop this tick belongs to decides whether it is heard at all */
+        if(!r.mute && audible(r, idx) && !loopIsSilent(r.nextTick / tot + oph)){
+          if(isMain(r, idx)){
+            voice(r.sound, tickTime, r.vol, idx === 0);
+          } else {
+            PITCH = SUB_PITCH;
+            voice(r.sound, tickTime, r.vol * SUB_LEVEL, false);
+            PITCH = 1;
+          }
+        }
+      }
+      r.nextTick++;
+    }
+  });
+}
+setInterval(schedule, 25);
+
+/* re-align a ring's tick counter to the current phase.
+   Callers must rebase() BEFORE mutating anything that changes cycleDur(). */
+function realign(r){
+  if(!S.playing){ r.nextTick = 0; return; }
+  r.nextTick = Math.ceil((refPhase - offPhase(r)) * total(r) - 1e-9);
+}
+
+/* ----------------------------------------------------------------- drawing */
+var cv = document.getElementById("cv"), g2 = cv.getContext("2d");
+var THEME = {};
+function readTheme(){
+  var cs = getComputedStyle(document.documentElement);
+  ["--ink","--ink-2","--ink-3","--line","--dot-off","--grid","--sweep","--wedge","--panel","--c1","--c2","--c3","--c4"]
+    .forEach(function(k){ THEME[k] = cs.getPropertyValue(k).trim(); });
+}
+function ringColor(i){ return THEME["--c" + (i+1)] || THEME["--ink"]; }
+
+var W = 0, H = 0, DPR = 1;
+/* radius the play button occupies in the hub, measured rather than recomputed
+   from its CSS clamp, and refreshed whenever the dial is resized */
+var hubR = 30;
+function sizeCanvas(){
+  var rect = cv.getBoundingClientRect();
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = Math.max(160, Math.round(rect.width));
+  H = Math.max(160, Math.round(rect.height));
+  cv.width = Math.round(W * DPR);
+  cv.height = Math.round(H * DPR);
+  g2.setTransform(DPR, 0, 0, DPR, 0, 0);
+  if(playBtn){
+    var pr = playBtn.getBoundingClientRect();
+    if(pr.width) hubR = pr.width / 2;
+  }
+}
+if(window.ResizeObserver) new ResizeObserver(sizeCanvas).observe(cv);
+window.addEventListener("resize", function(){
+  sizeCanvas();
+  if(run) run.scale = null;      /* the slot changed width - measure again */
+  fitSessNow();
+  fitHead();
+});
+
+var hitmap = [];
+var FLASH_MS = 330;
+
+/* Live dial geometry, written by draw() and read by the pointer handlers, so
+   the two can never disagree about where a ring is. */
+var geom = {cx:0, cy:0, gap:0, radii:[]};
+
+/* Drag-to-offset, with different rules per input device. A finger has to hold
+   still first, or every attempt to switch a dot off would nudge the ring
+   instead; a mouse drags immediately, because a click is already a precise,
+   deliberate gesture and waiting half a second for it feels broken. */
+var DRAG_HOLD = 500;   /* ms a finger must hold before the ring becomes draggable */
+var TAP_SLOP = 12;     /* px of finger movement that still counts as a tap */
+var MOUSE_SLOP = 4;    /* px of mouse movement that starts a drag */
+var press = null;      /* {ring, id, touch, x0, y0, t0, armed, lastPhase, acc, startOff} */
+var hoverRing = -1;
+
+function draw(){
+  var p = phaseNow();
+  var pos = p - Math.floor(p);
+  if(p < 0) pos = 0;
+  var n = S.rings.length;
+  var cx = W/2, cy = H/2;
+  var R = Math.min(W,H) * 0.43;
+  var gap = R * (n <= 2 ? 0.20 : n === 3 ? 0.185 : 0.168);
+  var tnow = performance.now();
+
+  /* A silent loop has to be silent to the eye as well: the flash halo lands on
+     the beat, so leaving it running would just hand the answer back. */
+  var hushed = S.playing && p >= 0 && loopIsSilent(p);
+
+  /* register hits for the visual flash */
+  if(S.playing && p >= 0 && !hushed){
+    S.rings.forEach(function(r){
+      var tot = total(r);
+      var tick = Math.floor((p - offPhase(r)) * tot);
+      if(r.lastTick === null){ r.lastTick = tick; return; }
+      while(r.lastTick < tick){
+        r.lastTick++;
+        var idx = ((r.lastTick % tot) + tot) % tot;
+        if(!r.mute && audible(r, idx)) r.flash[idx] = tnow;
+      }
+    });
+  }
+
+  g2.clearRect(0,0,W,H);
+  hitmap = [];
+  geom.cx = cx; geom.cy = cy; geom.gap = gap; geom.radii = [];
+  for(var gi=0; gi<n; gi++) geom.radii.push(R - (n - 1 - gi)*gap);
+
+  /* Every tap leaves a tick on a track just outside the ring being followed, so
+     a few bars of tapping become a picture of where you actually sit against the
+     dots rather than a number you have to trust. */
+  if(S.tapMode === "follow" && tapHits.length && geom.radii[S.active] != null){
+    var trR = geom.radii[S.active] + gap * 0.30;
+    g2.save();
+    g2.strokeStyle = THEME["--grid"]; g2.lineWidth = 1;
+    g2.beginPath(); g2.arc(cx, cy, trR, 0, Math.PI*2); g2.stroke();
+    for(var ti = 0; ti < tapHits.length; ti++){
+      var h = tapHits[ti];
+      var age = (p - h.at) / TAP_TRAIL;            /* in rotations, so it tracks tempo */
+      if(age < 0 || age > 1) continue;
+      var a2 = -Math.PI/2 + h.ph * Math.PI * 2;
+      g2.globalAlpha = 0.20 + 0.75 * (1 - age);
+      g2.strokeStyle = THEME["--c" + h.grade.slice(1)] || THEME["--ink"];
+      g2.lineWidth = 2;
+      g2.beginPath();
+      g2.moveTo(cx + Math.cos(a2) * (trR - 5), cy + Math.sin(a2) * (trR - 5));
+      g2.lineTo(cx + Math.cos(a2) * (trR + 5), cy + Math.sin(a2) * (trR + 5));
+      g2.stroke();
+    }
+    g2.restore();
+    g2.globalAlpha = 1;
+  }
+
+  var armedRing = (press && press.armed) ? press.ring : -1;
+  var holdRing  = (press && !press.armed) ? press.ring : -1;
+  var holdT = (holdRing >= 0) ? Math.min(1, (tnow - press.t0) / DRAG_HOLD) : 0;
+
+  var ang = -Math.PI/2 + pos * Math.PI * 2;
+  var outerR = R + gap*0.34;
+  /* the hub belongs to the play button, so nothing is drawn inside it - at half
+     opacity the button would otherwise show the hand and the wedge through itself */
+  /* the play button is out of the way while a ring listens, so the hand and the
+     wedge can run all the way in */
+  var innerR = (S.tapMode === "record") ? 0 : hubR + 5;
+  var counting = S.playing && ciRun && p < 0;
+  var listening = (S.tapMode === "record");
+  /* Ring 1 has no rotation to show until its taps give it one. An outer ring is
+     tapped against the others, which are already turning, so its hand stays. */
+  var frozen = listening && !S.playing;
+
+  /* how much of the rotation is done: a band that grows behind the rings from
+     12 o'clock and empties itself the instant the cycle turns over */
+  if(pos > 0.0005 && !frozen){
+    g2.fillStyle = THEME["--wedge"];
+    g2.beginPath();
+    g2.arc(cx, cy, outerR, -Math.PI/2, ang, false);
+    g2.arc(cx, cy, innerR, ang, -Math.PI/2, true);
+    g2.closePath();
+    g2.fill();
+  }
+
+  /* sweep hand, hidden while the count-in runs and while a ring listens */
+  if(!counting && !frozen){
+    g2.strokeStyle = THEME["--sweep"];
+    g2.lineWidth = 1.4;
+    g2.beginPath();
+    g2.moveTo(cx + Math.cos(ang)*innerR, cy + Math.sin(ang)*innerR);
+    g2.lineTo(cx + Math.cos(ang)*outerR, cy + Math.sin(ang)*outerR);
+    g2.stroke();
+  }
+
+  for(var i=0;i<n;i++){
+    var r = S.rings[i];
+    /* Ring 1 is the innermost circle: the click sits at the core and the
+       cross-rhythms ride outside it, where their bigger counts have the
+       circumference to stay readable */
+    var rad = R - (n - 1 - i)*gap;
+    var col = ringColor(i);
+
+    /* guide circle - it lights up in the ring's own colour while that ring is
+       being held, and stays lit with its dots swollen once the drag engages */
+    var grab = 1;
+    if(i === armedRing){
+      g2.strokeStyle = col; g2.lineWidth = 2; g2.globalAlpha = 0.9;
+      grab = 1.3;
+    } else if(i === holdRing){
+      g2.strokeStyle = col; g2.lineWidth = 1 + holdT; g2.globalAlpha = holdT * 0.75;
+      grab = 1 + holdT * 0.12;
+    } else {
+      g2.strokeStyle = THEME["--grid"]; g2.lineWidth = 1;
+    }
+    g2.beginPath(); g2.arc(cx, cy, rad, 0, Math.PI*2); g2.stroke();
+    g2.globalAlpha = 1;
+
+    var circ = 2 * Math.PI * rad;
+    var tot = total(r), oph = offPhase(r);
+    /* Two caps: the tightest spacing along the ring, so subdivisions never
+       collide, and a share of the gap between rings, so the downbeat's accent
+       ring cannot reach its neighbours - every ring's beat 1 sits at twelve
+       o'clock, and on a phone-sized dial those accents used to overlap. */
+    var dotR = Math.max(2.2, Math.min(6.6, gap * 0.22, circ / tot / 2.6));
+    var subR = Math.max(1.3, dotR * 0.5);
+    var accentCap = gap * 0.30;
+
+    for(var s=0; s<tot; s++){
+      var main = isMain(r, s);
+      var a = -Math.PI/2 + (s/tot + oph) * Math.PI * 2;
+      var x = cx + Math.cos(a)*rad, y = cy + Math.sin(a)*rad;
+      var on = audible(r, s);
+      var accent = (s === 0);
+      var base = (main ? dotR : subR) * grab;
+      var rr = base;
+      if(accent) rr = Math.max(base, Math.min(base * 1.55, accentCap - 2.2));
+      hitmap.push({x:x, y:y, r:Math.max(main ? 11 : 8, rr+6), ring:i, step:s});
+
+      /* flash halo */
+      var f = r.flash[s];
+      if(f){
+        var age = (tnow - f) / FLASH_MS;
+        if(age >= 0 && age < 1){
+          g2.globalAlpha = (1 - age) * (main ? 0.55 : 0.35);
+          g2.fillStyle = col;
+          g2.beginPath(); g2.arc(x, y, rr + 3 + age * gap * (main ? 0.5 : 0.3), 0, Math.PI*2); g2.fill();
+          g2.globalAlpha = 1;
+          rr = rr * (1 + (1 - age) * (main ? 0.85 : 0.6));
+        } else { r.flash[s] = 0; }
+      }
+
+      if(on && !r.mute){
+        g2.fillStyle = col;
+        g2.globalAlpha = (main ? 1 : 0.62) * (hushed ? 0.30 : 1);
+        g2.beginPath(); g2.arc(x, y, rr, 0, Math.PI*2); g2.fill();
+        g2.globalAlpha = 1;
+        if(accent){
+          g2.strokeStyle = col; g2.lineWidth = 1.2;
+          g2.globalAlpha = hushed ? 0.30 : 1;
+          g2.beginPath(); g2.arc(x, y, Math.min(rr + 3.4, accentCap), 0, Math.PI*2); g2.stroke();
+          g2.globalAlpha = 1;
+        }
+      } else if(main || r.steps[s]){
+        /* an off dot still shows its place; a muted ring keeps its colour for
+           the dots that are on, just faint */
+        g2.strokeStyle = on ? col : THEME["--dot-off"];
+        g2.globalAlpha = on ? 0.45 : (main ? 1 : 0.55);
+        g2.lineWidth = main ? 1.3 : 1;
+        g2.beginPath(); g2.arc(x, y, Math.max(1.6, base*0.95), 0, Math.PI*2); g2.stroke();
+        g2.globalAlpha = 1;
+      } else {
+        /* subdivision switched off by hand: a bare pip */
+        g2.fillStyle = THEME["--dot-off"];
+        g2.globalAlpha = 0.8;
+        g2.beginPath(); g2.arc(x, y, Math.max(1.1, subR*0.55), 0, Math.PI*2); g2.fill();
+        g2.globalAlpha = 1;
+      }
+    }
+  }
+
+  /* The hub belongs to the play button now, so the ratio and the rotation time
+     live in the dial header instead (written by tickLabel). Nothing is drawn in
+     the middle except the count-in, which fades the button out while it runs. */
+  var scale = Math.min(W,H);
+
+  /* 3, 2, 1 while the phase is still negative - each number swells and fades
+     across its own beat, and the hub is clear again by the downbeat */
+  if(listening) recCentre(cx, cy, scale, ringColor(S.active));
+  if(S.playing && ciRun && p < 0){
+    /* clamped: the scheduling lead in front of the first tick would otherwise
+       read as one extra count */
+    var beats = baseBeats();
+    var left = Math.min(-p * beats, COUNT_BEATS);
+    var cn = Math.max(1, Math.ceil(left - 1e-9));
+    countNumber(cx, cy, scale, String(cn), Math.min(1, Math.max(0, cn - left)));
+  }
+
+  requestAnimationFrame(draw);
+}
+
+/* the count-in takes over the centre readout: each number starts at the size the
+   ratio normally sits at, then rushes out past the rings as it fades away */
+var COUNT_GROW = 15;
+/* The wheel is the tap target while a ring listens, so it says so in the middle.
+   Each tap sends a copy of the words growing outward and fading, the same
+   gesture the count-in uses, in the colour of the ring being tapped. */
+function recCentre(cx, cy, scale, col){
+  var base = Math.round(scale * 0.052);
+  g2.save();
+  g2.textAlign = "center"; g2.textBaseline = "middle";
+  g2.font = "700 " + base + 'px var(--title), "Archivo", sans-serif';
+  g2.font = "700 " + base + 'px "Archivo", sans-serif';
+  g2.fillStyle = col;
+  g2.globalAlpha = 0.55;
+  g2.fillText("TAP PATTERN", cx, cy);
+
+  var age = (performance.now() - recPulse) / FLASH_MS;
+  if(age >= 0 && age < 1){
+    g2.globalAlpha = (1 - age) * 0.8;
+    g2.translate(cx, cy);
+    g2.scale(1 + 2.2 * age, 1 + 2.2 * age);
+    g2.fillText("TAP PATTERN", 0, 0);
+  }
+  g2.restore();
+  g2.globalAlpha = 1;
+}
+function countNumber(cx, cy, scale, txt, t){
+  var grow = 1 + (COUNT_GROW - 1) * t, alpha = 1 - t;
+  if(alpha <= 0.01) return;
+  g2.save();
+  g2.globalAlpha = alpha;
+  g2.translate(cx, cy);
+  g2.scale(grow, grow);
+  g2.textAlign = "center";
+  g2.textBaseline = "middle";
+  g2.fillStyle = THEME["--ink"];
+  g2.font = "500 " + Math.round(scale*0.072) + 'px "IBM Plex Mono", monospace';
+  g2.fillText(txt, 0, 0);
+  g2.restore();
+}
+
+/* listed outermost ring first, so the dial reads the way the ratio is written:
+   5 over 4 shows as "5 : 4", with the 4 on the inner click ring */
+function ratioString(){
+  return S.rings.map(function(r){ return r.div; }).reverse().join(" : ");
+}
+
+var suppressClick = false;
+
+cv.addEventListener("click", function(e){
+  if(suppressClick){ suppressClick = false; return; }
+  var rect = cv.getBoundingClientRect();
+  var x = e.clientX - rect.left, y = e.clientY - rect.top;
+  var best = null, bd = Infinity;
+  hitmap.forEach(function(h){
+    var d = Math.hypot(h.x - x, h.y - y);
+    if(d < h.r && d < bd){ bd = d; best = h; }
+  });
+  if(!best) return;
+  var r = S.rings[best.ring];
+  r.steps[best.step] = !r.steps[best.step];
+  paintRack();
+});
+
+/* ------------------------------------------------------- drag a ring round */
+function localPoint(e){
+  var rect = cv.getBoundingClientRect();
+  return {x: e.clientX - rect.left, y: e.clientY - rect.top};
+}
+/* rotation position of a point, 0 at twelve o'clock, clockwise */
+function pointPhase(p){
+  var a = Math.atan2(p.y - geom.cy, p.x - geom.cx) + Math.PI/2;
+  var t = a / (Math.PI*2);
+  return t - Math.floor(t);
+}
+/* which ring's band the point falls in, or -1 */
+function ringAt(p){
+  var d = Math.hypot(p.x - geom.cx, p.y - geom.cy);
+  var best = -1, bd = Infinity, i;
+  for(i=0;i<geom.radii.length;i++){
+    var dd = Math.abs(d - geom.radii[i]);
+    if(dd < bd){ bd = dd; best = i; }
+  }
+  return (bd <= geom.gap * 0.55) ? best : -1;
+}
+function endPress(){
+  if(press && press.armed) cv.style.cursor = "";
+  press = null;
+  hoverRing = -1;
+}
+
+function arm(p){
+  if(!press || press.armed) return;
+  press.armed = true;
+  press.t0 = performance.now();
+  press.lastPhase = pointPhase(p || {x:press.x0, y:press.y0});
+  press.startOff = S.rings[press.ring].off;
+  press.acc = 0;
+  cv.style.cursor = "grabbing";
+  try{ cv.setPointerCapture(press.id); } catch(err){}
+  if(press.touch && navigator.vibrate) navigator.vibrate(12);   /* Android confirms the arm */
+}
+
+cv.addEventListener("pointerdown", function(e){
+  if(!e.isPrimary) return;
+  /* While tapping, the dial is a target rather than a set of controls - and this
+     is tested before the `press` guard below, or a drag still in flight when the
+     mode changed would swallow taps for as long as the finger stayed down. */
+  if(S.tapMode){ e.preventDefault(); tapAt(e.timeStamp || performance.now()); return; }
+  if(press) return;
+  if(document.documentElement.getAttribute("data-ui") === "simple") return;  /* offsets are hidden */
+  var p = localPoint(e);
+  var ring = ringAt(p);
+  if(ring < 0) return;
+  press = {
+    ring: ring, id: e.pointerId, touch: (e.pointerType !== "mouse"),
+    x0: p.x, y0: p.y, t0: performance.now(),
+    armed: false, lastPhase: pointPhase(p), acc: 0,
+    startOff: S.rings[ring].off
+  };
+  /* only a finger waits; a mouse arms as soon as it actually moves */
+  if(press.touch){
+    press.timer = setTimeout(function(){ arm(null); }, DRAG_HOLD);
+  }
+});
+
+cv.addEventListener("pointermove", function(e){
+  /* hovering a ring band advertises that it can be dragged */
+  if(!press && e.pointerType === "mouse"){
+    var hp = localPoint(e);
+    var hr = (document.documentElement.getAttribute("data-ui") === "simple") ? -1 : ringAt(hp);
+    if(hr !== hoverRing){
+      hoverRing = hr;
+      cv.style.cursor = (hr >= 0) ? "grab" : "";
+    }
+    return;
+  }
+  if(!press || e.pointerId !== press.id) return;
+  var p = localPoint(e);
+
+  if(!press.armed){
+    var dist = Math.hypot(p.x - press.x0, p.y - press.y0);
+    if(!press.touch){
+      if(dist > MOUSE_SLOP){ suppressClick = true; arm(p); }
+      else return;
+    } else {
+      /* a finger moving before the hold completes was scrolling, or a sloppy tap */
+      if(dist > TAP_SLOP){
+        clearTimeout(press.timer);
+        suppressClick = true;
+        endPress();
+      }
+      return;
+    }
+  }
+
+  var r = S.rings[press.ring];
+  var ph = pointPhase(p);
+  var dp = ph - press.lastPhase;
+  if(dp > 0.5) dp -= 1; else if(dp < -0.5) dp += 1;   /* crossing twelve o'clock */
+  press.acc += dp;
+  press.lastPhase = ph;
+
+  /* offset is measured in this ring's own steps and stops at nought and one */
+  var raw = press.startOff + press.acc * r.div;
+  if(raw < 0){ press.acc = -press.startOff / r.div; raw = 0; }
+  else if(raw > 1){ press.acc = (1 - press.startOff) / r.div; raw = 1; }
+
+  var snapped = Math.round(raw * 12) / 12;
+  if(snapped !== r.off){
+    rebase();
+    r.off = snapped;
+    r.flash = [];
+    r.lastTick = null;
+    realign(r);
+    paintRack();
+  }
+});
+
+function releasePress(e){
+  if(!press || (e && e.pointerId !== press.id)) return;
+  clearTimeout(press.timer);
+  if(press.armed) suppressClick = true;   /* the drag is not also a dot tap */
+  endPress();
+}
+cv.addEventListener("pointerup", releasePress);
+cv.addEventListener("pointercancel", releasePress);
+
+/* Once armed, keep the browser from turning the drag into a page scroll. The
+   listener must be non-passive for preventDefault to count. */
+cv.addEventListener("touchmove", function(e){
+  if(press && press.armed) e.preventDefault();
+}, {passive:false});
+
+/* -------------------------------------------------------------------- rack */
+var rack = document.getElementById("rack");
+/* deliberately not persisted: the hint is per session, so a fresh open shows it
+   again to anyone still learning where rings come from */
+var addUsed = false;
+
+function buildRack(){
+  rack.innerHTML = "";
+  S.rings.forEach(function(r){ r._el = null; });
+  if(S.active >= S.rings.length) S.active = S.rings.length - 1;
+  if(S.active < 0) S.active = 0;
+
+  /* one card at a time, picked from a tab strip: with four rings stacked the
+     page was long enough that every small tweak meant scrolling */
+  var tabs = document.createElement("div");
+  tabs.className = "tabs";
+  tabs.dataset.count = S.rings.length;   /* four tabs plus + only fit as numbers */
+  S.rings.forEach(function(r, i){
+    var t = document.createElement("button");
+    t.className = "tab";
+    t.style.setProperty("--lc", "var(--c" + (i+1) + ")");
+    t.dataset.on = (i === S.active) ? "1" : "0";
+    t.dataset.mute = r.mute ? "1" : "0";
+    t.title = "Ring " + (i+1);
+    t.setAttribute("aria-label", t.title);
+    t.innerHTML = '<span class="tabdot"></span><span class="tabword">Ring </span><span>' + (i+1) + '</span>';
+    t.addEventListener("click", function(){
+      if(S.active === i) return;
+      S.active = i;
+      buildRack(); paintRack();
+      /* a ring only listens while you are on its own tab */
+      if(S.tapMode === "record"){ recEnd(true); return; }
+      /* the practice aims at the ring you are looking at: same mode, fresh count */
+      if(S.tapMode){
+        var m = S.tapMode;
+        S.tapMode = "";              /* so setTapMode does not read this as a toggle off */
+        setTapMode(m);
+      }
+    });
+    tabs.appendChild(t);
+  });
+
+  var add = document.createElement("button");
+  add.className = "tab add";
+  add.id = "addRing";
+  add.textContent = "+";
+  add.disabled = S.rings.length >= 4;
+  /* the colour the next ring will be, so the hint tells you what you would get */
+  add.style.setProperty("--nc", "var(--c" + Math.min(4, S.rings.length + 1) + ")");
+  add.dataset.hint = (!addUsed && !add.disabled) ? "1" : "0";
+  add.title = add.disabled ? "Maximum of four rings" : "Add a ring";
+  add.setAttribute("aria-label", add.title);
+  add.addEventListener("click", function(){
+    if(S.rings.length >= 4) return;
+    addUsed = true;                   /* found it - stop waving for this session */
+    /* Same as stepping to another tab and pressing Tap pattern there: keep what
+       was tapped on this ring, then start listening on the new one. Without it
+       the mode stayed on while its state still pointed at the old ring. */
+    var carryRec = (S.tapMode === "record");
+    if(carryRec) recEnd(true);
+    var i = S.rings.length;
+    var used = S.rings.map(function(r){ return r.div; });
+    var cand = [5,7,2,3,6,8].filter(function(d){ return used.indexOf(d) < 0; });
+    var r = mkRing(i, cand.length ? cand[0] : 5);
+    rebase();
+    realign(r);
+    S.rings.push(r);
+    S.active = i;                     /* land on the ring you just made */
+    buildRack(); paintRack();
+    if(carryRec) recStart();
+  });
+  tabs.appendChild(add);
+  rack.appendChild(tabs);
+
+  [S.rings[S.active]].forEach(function(r){
+    var i = S.active;
+    var card = document.createElement("div");
+    card.className = "ring-card";
+    card.style.setProperty("--lc", "var(--c" + (i+1) + ")");
+    card.dataset.mute = r.mute ? "1" : "0";
+    card.innerHTML =
+      '<div class="rc-top">' +
+        '<span class="rc-side">' +
+          '<span class="swatch"></span>' +
+          '<span class="rc-name">Ring ' + (i+1) + '</span>' +
+          '<span class="chip' + (i===0 ? ' ref' : '') + '" data-chip></span>' +
+        '</span>' +
+        '<button class="btn sm tapbtn" data-taprec>Tap pattern</button>' +
+        '<span class="rc-side end">' +
+          '<button class="icobtn" data-mute title="Mute ring" aria-label="Mute ring"></button>' +
+          (i > 0 ? '<button class="icobtn" data-del title="Remove ring">&times;</button>' : '') +
+        '</span>' +
+      '</div>' +
+      '<div class="div-row">' +
+        '<button class="stepbtn sm" data-divdown aria-label="One division fewer">&minus;</button>' +
+        '<span class="div-num" data-divnum></span>' +
+        '<button class="stepbtn sm" data-divup aria-label="One division more">+</button>' +
+        '<span class="div-sub">divisions<br>of the cycle</span>' +
+        '<span class="sub-btns">' +
+          '<button class="subbtn" data-sub="2" title="Two ticks per beat">&times;2</button>' +
+          '<button class="subbtn" data-sub="3" title="Triplets">&times;3</button>' +
+          '<button class="subbtn" data-sub="4" title="Four ticks per beat">&times;4</button>' +
+        '</span>' +
+      '</div>' +
+      '<input type="range" data-div min="1" max="32" step="1" style="margin-top:4px" aria-label="Divisions for ring ' + (i+1) + '">' +
+      '<div class="off-head">' +
+        '<span class="lbl">Offset</span>' +
+        '<span class="off-val mono" data-offval></span>' +
+        '<button class="offbtn" data-offhalf title="Jump to half a step">Half</button>' +
+      '</div>' +
+      '<input type="range" data-off min="0" max="12" step="1" aria-label="Offset for ring ' + (i+1) + ', in twelfths of a step">' +
+      '<div class="grid2">' +
+        '<div class="field"><span class="lbl">Sound</span>' +
+          '<select class="snd" data-snd>' + SOUNDS.map(function(s){
+            return '<option value="' + s.id + '">' + s.name + '</option>';
+          }).join("") + '</select></div>' +
+        '<div class="field"><span class="lbl">Level</span>' +
+          '<input type="range" data-vol min="0" max="1" step="0.01" aria-label="Level for ring ' + (i+1) + '"></div>' +
+      '</div>' +
+      '<div class="rc-foot"><span data-rate class="mono"></span><span data-active></span></div>';
+
+    var recBtn = card.querySelector("[data-taprec]");
+    recBtn.dataset.on = (S.tapMode === "record" && i === S.active) ? "1" : "0";
+    recBtn.addEventListener("click", function(){
+      if(S.tapMode === "record") recEnd(true); else recStart();
+    });
+
+    var divR = card.querySelector("[data-div]");
+    divR.value = r.div;
+    var setDiv = function(nd){
+      nd = Math.max(1, Math.min(32, nd));
+      if(nd === r.div){ divR.value = r.div; return; }
+      rebase();                       /* freeze phase against the OLD cycle length */
+      reshape(r, nd, fitSub(nd, r.sub));   /* a wider ring may not afford its subs */
+      realign(r);
+      divR.value = nd;
+      /* Ring 1's count is the length of the rotation, so the transport moves with it */
+      if(i === 0) paintTransport();
+      paintRack();
+    };
+    divR.addEventListener("input", function(){ setDiv(parseInt(divR.value, 10)); });
+    card.querySelector("[data-divdown]").addEventListener("click", function(){ setDiv(r.div - 1); });
+    card.querySelector("[data-divup]").addEventListener("click", function(){ setDiv(r.div + 1); });
+
+    [].slice.call(card.querySelectorAll("[data-sub]")).forEach(function(sb){
+      sb.addEventListener("click", function(){
+        var want = parseInt(sb.dataset.sub, 10);
+        var ns = (r.sub === want) ? 1 : want;          /* pressing the active one clears it */
+        if(r.div * ns > MAX_STEPS) return;
+        rebase();
+        reshape(r, r.div, ns);
+        realign(r);
+        paintRack();
+      });
+    });
+
+    var offR = card.querySelector("[data-off]");
+    offR.value = Math.round(r.off * 12);
+    offR.addEventListener("input", function(){
+      rebase();
+      r.off = parseInt(offR.value, 10) / 12;
+      r.flash = [];
+      r.lastTick = null;
+      realign(r);
+      paintRack();
+    });
+    card.querySelector("[data-offhalf]").addEventListener("click", function(){
+      rebase();
+      r.off = (Math.abs(r.off - 0.5) < 1e-6) ? 0 : 0.5;
+      offR.value = Math.round(r.off * 12);
+      r.flash = [];
+      r.lastTick = null;
+      realign(r);
+      paintRack();
+    });
+
+    var sel = card.querySelector("[data-snd]");
+    sel.value = r.sound;
+    sel.addEventListener("change", function(){
+      r.sound = sel.value;
+      if(ctx) voice(r.sound, ctx.currentTime + 0.01, r.vol, true);
+    });
+
+    var vol = card.querySelector("[data-vol]");
+    vol.value = r.vol;
+    vol.addEventListener("input", function(){ r.vol = parseFloat(vol.value); });
+
+    card.querySelector("[data-mute]").addEventListener("click", function(){
+      r.mute = !r.mute; paintRack();
+    });
+    var del = card.querySelector("[data-del]");
+    if(del) del.addEventListener("click", function(){
+      var idx = S.rings.indexOf(r);
+      if(idx > 0){
+        S.rings.splice(idx, 1);
+        S.active = idx - 1;            /* fall back to the ring inside it */
+        buildRack(); paintRack();
+      }
+    });
+
+    r._el = card;
+    rack.appendChild(card);
+  });
+}
+
+var SPK_ON = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" ' +
+  'stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+  '<path d="M11 4.8 6.4 8.9H3.1v6.2h3.3L11 19.2z" fill="currentColor" stroke="none"/>' +
+  '<path d="M15.3 9.1a4.3 4.3 0 0 1 0 5.8M18.2 6.4a8.2 8.2 0 0 1 0 11.2"/></svg>';
+var SPK_OFF = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" ' +
+  'stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+  '<path d="M11 4.8 6.4 8.9H3.1v6.2h3.3L11 19.2z" fill="currentColor" stroke="none"/>' +
+  '<path d="M15.6 9.6l5 4.8M20.6 9.6l-5 4.8"/></svg>';
+
+/* offsets live on a twelfths grid, so every musical fraction lands exactly.
+   Written as plain twelfths rather than ¼ / ⅓ glyphs, which render too small to read. */
+var FRACTIONS = {
+  0:"aligned", 1:"1/12", 2:"2/12", 3:"3/12", 4:"4/12", 5:"5/12", 6:"Half",
+  7:"7/12", 8:"8/12", 9:"9/12", 10:"10/12", 11:"11/12", 12:"12/12"
+};
+function offLabel(r, stepDur){
+  var twelfths = Math.round(r.off * 12);
+  if(twelfths === 0) return "aligned";
+  var ms = r.off * stepDur * 1000;
+  return FRACTIONS[twelfths] + " step · " + (ms >= 100 ? Math.round(ms) : ms.toFixed(1)) + " ms";
+}
+
+function paintRack(){
+  var ref = S.rings[0] ? S.rings[0].div : 1;
+  var cd = cycleDur();
+
+  /* the strip has to answer for rings whose card is not on screen - muting one
+     with the 1-4 keys, for instance */
+  var tabEls = rack.querySelectorAll(".tab:not(.add)");
+  for(var ti=0; ti<tabEls.length; ti++){
+    tabEls[ti].dataset.on = (ti === S.active) ? "1" : "0";
+    if(S.rings[ti]) tabEls[ti].dataset.mute = S.rings[ti].mute ? "1" : "0";
+  }
+  S.rings.forEach(function(r, i){
+    var el = r._el; if(!el) return;
+    el.dataset.mute = r.mute ? "1" : "0";
+    el.querySelector("[data-divnum]").textContent =
+      (S.tapMode === "record" && i === S.active && recTaps.length === 0) ? "––" : r.div;
+    el.dataset.rec = (S.tapMode === "record" && i === S.active) ? "1" : "0";
+
+    var mb = el.querySelector("[data-mute]");
+    mb.dataset.on = r.mute ? "1" : "0";
+    mb.innerHTML = r.mute ? SPK_OFF : SPK_ON;
+    mb.title = r.mute ? "Unmute ring" : "Mute ring";
+    mb.setAttribute("aria-label", mb.title);
+    mb.setAttribute("aria-pressed", r.mute ? "true" : "false");
+    var chip = el.querySelector("[data-chip]");
+    if(i === 0) chip.textContent = "CLICK";
+    else {
+      var d = gcd(r.div, ref) || 1;
+      chip.textContent = (r.div/d) + ":" + (ref/d);
+    }
+    var stepDur = cd / r.div;
+    el.querySelector("[data-rate]").textContent = (60/stepDur).toFixed(1) + " bpm" +
+      (r.sub > 1 ? " · ×" + r.sub + " (" + (60/(stepDur/r.sub)).toFixed(0) + ")" : "");
+    var ov = el.querySelector("[data-offval]");
+    ov.textContent = offLabel(r, stepDur);
+    ov.dataset.zero = (r.off === 0) ? "1" : "0";
+    /* keeps the slider in step when the offset is changed by dragging the ring */
+    var os = el.querySelector("[data-off]");
+    if(os) os.value = Math.round(r.off * 12);
+    el.querySelector("[data-offhalf]").dataset.on = (Math.abs(r.off - 0.5) < 1e-6) ? "1" : "0";
+
+    [].slice.call(el.querySelectorAll("[data-sub]")).forEach(function(sb){
+      var want = parseInt(sb.dataset.sub, 10);
+      sb.dataset.on = (r.sub === want) ? "1" : "0";
+      sb.disabled = (r.div * want > MAX_STEPS) && r.sub !== want;
+    });
+
+    var mainOn = 0, k;
+    for(k=0;k<r.steps.length;k+=r.sub) if(r.steps[k]) mainOn++;
+    var txt = mainOn + " / " + r.div + " beats on";
+    if(r.sub > 1){
+      var subOn = 0, subTot = 0;
+      for(k=0;k<r.steps.length;k++) if(!isMain(r,k)){ subTot++; if(audible(r,k)) subOn++; }
+      txt += " · " + subOn + "/" + subTot + " subs";
+    }
+    el.querySelector("[data-active]").textContent = txt;
+  });
+  queueSave();
+}
+
+/* --------------------------------------------------------------- transport */
+var playBtn = document.getElementById("play");
+var playIcon = document.getElementById("playIcon");
+var bpmNum = document.getElementById("bpmNum");
+var bpmRange = document.getElementById("bpmRange");
+var cycleLine = document.getElementById("cycleLine");
+var bpmIn = document.getElementById("bpmIn");
+var posLbl = document.getElementById("posLbl");
+var dialRatio = document.getElementById("dialRatio");
+
+/* The name in the middle has first claim on the header. Whatever is left is
+   split evenly between the two readouts either side, and each shrinks its own
+   type to fit rather than ellipsising - the numbers stay readable and, more to
+   the point, the name stays centred. */
+var HEAD_MIN = 0.66;          /* about 10.5px: below this, clipping is kinder */
+var headProbe = null;
+function fitOne(el, full){
+  var avail = el.clientWidth;
+  if(!avail) return;
+  el.style.fontSize = "";
+  if(!headProbe){
+    headProbe = document.createElement("span");
+    headProbe.style.cssText =
+      "position:absolute;visibility:hidden;white-space:nowrap;left:-9999px;top:0";
+    document.body.appendChild(headProbe);
+  }
+  var cs = getComputedStyle(el);
+  ["fontFamily","fontSize","fontWeight","fontStyle","fontStretch",
+   "letterSpacing","textTransform","fontVariant"].forEach(function(k){
+    headProbe.style[k] = cs[k];
+  });
+  headProbe.textContent = el.textContent;
+  var w = headProbe.getBoundingClientRect().width;
+  if(w > avail){
+    el.style.fontSize = (full * Math.max(HEAD_MIN, avail / w)).toFixed(2) + "px";
+  }
+}
+function fitHead(){
+  fitOne(dialRatio, 16);
+  fitOne(posLbl, 13);
+}
+
+function paintTransport(){
+  playBtn.dataset.on = S.playing ? "1" : "0";
+  playBtn.setAttribute("aria-label", S.playing ? "Stop" : "Play");
+  playIcon.setAttribute("d", S.playing ? "M7 6h4v12H7zm6 0h4v12h-4z" : "M8 5.5v13l11-6.5z");
+  bpmNum.textContent = S.bpm;
+  bpmRange.value = S.bpm;
+  var beats = baseBeats();
+  cycleLine.textContent = "One rotation · " + beats + (beats === 1 ? " beat · " : " beats · ") +
+    cycleDur().toFixed(2) + " s · Ring 1 is the click";
+  queueSave();
+}
+function setBpm(v){
+  v = Math.max(20, Math.min(330, Math.round(v)));
+  if(v === S.bpm) return;
+  rebase();
+  S.bpm = v;
+  paintTransport(); paintRack();
+}
+
+playBtn.addEventListener("click", toggle);
+bpmRange.addEventListener("input", function(){ setBpm(parseInt(bpmRange.value,10)); });
+document.getElementById("bpmUp").addEventListener("click", function(){ setBpm(S.bpm + 1); });
+document.getElementById("bpmDown").addEventListener("click", function(){ setBpm(S.bpm - 1); });
+document.getElementById("bpmUp5").addEventListener("click", function(){ setBpm(S.bpm + 5); });
+document.getElementById("bpmDown5").addEventListener("click", function(){ setBpm(S.bpm - 5); });
+document.getElementById("bpmUp10").addEventListener("click", function(){ setBpm(S.bpm + 10); });
+document.getElementById("bpmDown10").addEventListener("click", function(){ setBpm(S.bpm - 10); });
+
+/* type a tempo: the number swaps for a field, Enter or blur commits, Esc backs out */
+function openBpmEntry(){
+  bpmIn.value = S.bpm;
+  bpmNum.hidden = true;
+  bpmIn.hidden = false;
+  bpmIn.focus();
+  bpmIn.select();
+}
+function closeBpmEntry(commit){
+  if(commit){
+    var v = parseInt(bpmIn.value, 10);
+    if(!isNaN(v)) setBpm(v);
+  }
+  bpmIn.hidden = true;
+  bpmNum.hidden = false;
+  paintTransport();
+}
+bpmNum.addEventListener("click", openBpmEntry);
+bpmIn.addEventListener("keydown", function(e){
+  if(e.key === "Enter"){ e.preventDefault(); closeBpmEntry(true); }
+  else if(e.key === "Escape"){ e.preventDefault(); closeBpmEntry(false); }
+});
+bpmIn.addEventListener("blur", function(){ if(!bpmIn.hidden) closeBpmEntry(true); });
+
+var masterEl = document.getElementById("master");
+var muteBtn = document.getElementById("masterMute");
+
+function applyMaster(){
+  if(out) out.gain.setTargetAtTime(S.muted ? 0 : S.master * DRIVE, ctx.currentTime, 0.01);
+  muteBtn.dataset.on = S.muted ? "1" : "0";
+  muteBtn.innerHTML = S.muted ? SPK_OFF : SPK_ON;
+  muteBtn.title = S.muted ? "Unmute" : "Mute";
+  muteBtn.setAttribute("aria-label", muteBtn.title);
+  muteBtn.setAttribute("aria-pressed", S.muted ? "true" : "false");
+  queueSave();
+}
+masterEl.addEventListener("input", function(){
+  S.master = parseFloat(masterEl.value);
+  applyMaster();
+});
+muteBtn.addEventListener("click", function(){
+  S.muted = !S.muted;
+  applyMaster();
+});
+
+/* tap tempo */
+var taps = [], tapBtn = document.getElementById("tap"), tapTimer = null;
+/* the label is its own node - writing the button's textContent would take the
+   ping elements with it */
+var tapTxt = document.getElementById("tapTxt");
+function doTap(){
+  var t = performance.now();
+  if(taps.length && t - taps[taps.length-1] > 2500) taps = [];
+  taps.push(t);
+  if(taps.length > 5) taps.shift();
+  if(taps.length >= 2){
+    var sum = 0;
+    for(var i=1;i<taps.length;i++) sum += taps[i] - taps[i-1];
+    setBpm(60000 / (sum / (taps.length - 1)));
+    tapTxt.textContent = "Tap  " + S.bpm;
+  } else {
+    tapTxt.textContent = "Keep tapping…";
+  }
+  tapBtn.dataset.armed = "1";
+  clearTimeout(tapTimer);
+  tapTimer = setTimeout(function(){
+    tapBtn.dataset.armed = "0";
+    tapTxt.textContent = "Tap tempo";
+    taps = [];
+  }, 2500);
+}
+/* grows out of the button and fades, like a dot on its tick. A fresh element
+   per tap so quick taps overlap instead of restarting one animation. */
+function tapPing(){
+  if(!tapBtn.animate) return;
+  var ping = document.createElement("span");
+  ping.className = "tap-ping";
+  tapBtn.appendChild(ping);
+  var a = ping.animate(
+    [{transform:"scale(1)", opacity:0.75}, {transform:"scale(1.5)", opacity:0}],
+    {duration:520, easing:"cubic-bezier(.22,.6,.3,1)"}
+  );
+  a.onfinish = function(){ ping.remove(); };
+  a.oncancel = function(){ ping.remove(); };
+}
+tapBtn.addEventListener("click", function(){ tapPing(); doTap(); });
+
+var countBtn = document.getElementById("countBtn");
+function paintCount(){
+  countBtn.dataset.on = S.countIn ? "1" : "0";
+  countBtn.setAttribute("aria-pressed", S.countIn ? "true" : "false");
+  countBtn.textContent = S.countIn ? "Count-in " + COUNT_BEATS : "Count-in";
+  queueSave();
+}
+countBtn.addEventListener("click", function(){
+  S.countIn = !S.countIn;
+  paintCount();
+});
+
+/* ---- Advanced / Simple ------------------------------------------------- */
+/* Simple mode hides subdivisions, offsets and the count-in. Hidden settings
+   would otherwise keep sounding with no control in sight, so they are parked
+   and neutralised on the way in, and handed back on the way out. */
+var UI_KEY = "polyrhythm-circle:ui";
+var uiBtn = document.getElementById("uiBtn");
+var advSnap = null;
+
+function paintUi(simple){
+  document.documentElement.setAttribute("data-ui", simple ? "simple" : "advanced");
+  /* the label stays put and the state is carried by the highlight - swapping
+     the word between Advanced and Simple read as two different controls */
+  uiBtn.textContent = "Advanced";
+  uiBtn.dataset.adv = simple ? "0" : "1";
+  uiBtn.setAttribute("aria-pressed", simple ? "false" : "true");
+  uiBtn.title = simple
+    ? "Show subdivisions, offsets and count-in"
+    : "Hide subdivisions, offsets and count-in";
+}
+function setUiMode(mode, store){
+  var simple = (mode === "simple");
+  var was = document.documentElement.getAttribute("data-ui") === "simple";
+
+  if(simple && !was){
+    advSnap = {
+      countIn: S.countIn,
+      rings: S.rings.map(function(r){
+        return {div:r.div, sub:r.sub, off:r.off, steps:r.steps.slice()};
+      })
+    };
+    S.countIn = false;
+    rebase();
+    S.rings.forEach(function(r){
+      if(r.sub !== 1) reshape(r, r.div, 1);
+      r.off = 0;
+      realign(r);
+    });
+  } else if(!simple && was && advSnap){
+    rebase();
+    S.rings.forEach(function(r, i){
+      var s = advSnap.rings[i];
+      if(!s || s.div !== r.div) return;    /* divisions changed meanwhile: leave it */
+      if(s.sub !== r.sub) reshape(r, r.div, fitSub(r.div, s.sub));
+      if(s.steps.length === total(r)) r.steps = s.steps.slice();
+      r.off = s.off;
+      realign(r);
+    });
+    S.countIn = advSnap.countIn;
+    advSnap = null;
+  }
+
+  paintUi(simple);
+  paintPtabs();          /* Rhythms comes and goes with the mode */
+  paintCount();
+  buildRack();
+  paintTransport();
+  paintRack();
+  if(store){ try{ localStorage.setItem(UI_KEY, simple ? "simple" : "advanced"); } catch(err){} }
+}
+uiBtn.addEventListener("click", function(){
+  setUiMode(document.documentElement.getAttribute("data-ui") === "simple" ? "advanced" : "simple", true);
+});
+
+/* ---- tutorial sheet ---------------------------------------------------- */
+var help = document.getElementById("help");
+var infoBtn = document.getElementById("infoBtn");
+function showHelp(on){
+  help.hidden = !on;
+  if(on) document.getElementById("helpClose").focus();
+  else infoBtn.focus();
+}
+infoBtn.addEventListener("click", function(){ showHelp(true); });
+document.getElementById("helpClose").addEventListener("click", function(){ showHelp(false); });
+/* the scrim closes it, the sheet itself does not */
+help.addEventListener("click", function(e){ if(e.target === help) showHelp(false); });
+
+/* keyboard */
+document.addEventListener("keydown", function(e){
+  if(!help.hidden || !planSheet.hidden){
+    if(e.key === "Escape"){
+      e.preventDefault();
+      if(!help.hidden) showHelp(false); else showPlanSheet(false);
+    }
+    return;                      /* a sheet swallows the shortcuts while open */
+  }
+  var el = e.target || {};
+  var tag = (el.tagName || "").toLowerCase();
+  var type = (el.type || "").toLowerCase();
+  var space = (e.key === " " || e.code === "Space");
+
+  if(tag === "textarea" || tag === "select") return;
+  if(tag === "input" && type !== "range") return;      /* type freely in text / number fields */
+  if(tag === "input" && type === "range"){
+    if(space){ e.preventDefault(); toggle(); }
+    return;                                            /* arrows keep adjusting the slider */
+  }
+  if(tag === "button" && (space || e.key === "Enter")) return;  /* let the button activate */
+
+  if(space){ e.preventDefault(); toggle(); return; }
+  if(e.key === "ArrowUp"){ e.preventDefault(); setBpm(S.bpm + (e.shiftKey?5:1)); return; }
+  if(e.key === "ArrowDown"){ e.preventDefault(); setBpm(S.bpm - (e.shiftKey?5:1)); return; }
+  if(e.key === "t" || e.key === "T"){ doTap(); return; }
+  if(/^[1-4]$/.test(e.key)){
+    var r = S.rings[parseInt(e.key,10) - 1];
+    if(r){ r.mute = !r.mute; paintRack(); }
+  }
+});
+
+/* ------------------------------------------------- stray-touch guard: sliders */
+/* A native range input jumps to wherever you touch it, so a brush of the thumb
+   while reaching for something else moves the value instantly. On touch only, a
+   slider therefore ignores the first moment of contact: the change is held back
+   and put through once the finger has stayed put long enough to look deliberate.
+   Lift before then and the value is restored. A mouse is precise, so it is
+   exempt - the same split as dragging a ring. */
+var SLIDER_HOLD = 150;
+var sGuard = null;   /* {el, value, pending, ok} */
+
+document.addEventListener("pointerdown", function(e){
+  var el = e.target;
+  if(!el || el.tagName !== "INPUT" || el.type !== "range") return;
+  if(e.pointerType === "mouse"){ sGuard = null; return; }
+  var g = sGuard = {el: el, value: el.value, pending: null, ok: false};
+  setTimeout(function(){
+    if(sGuard !== g) return;
+    g.ok = true;
+    /* honour where the finger actually landed, now that it has earned it */
+    if(g.pending !== null && g.pending !== g.value){
+      g.el.value = g.pending;
+      g.el.dispatchEvent(new Event("input", {bubbles:true}));
+    }
+  }, SLIDER_HOLD);
+}, true);
+
+document.addEventListener("input", function(e){
+  if(!sGuard || e.target !== sGuard.el) return;
+  if(sGuard.ok){ sGuard.value = sGuard.el.value; return; }
+  sGuard.pending = sGuard.el.value;      /* remember it, undo it, swallow it */
+  sGuard.el.value = sGuard.value;
+  e.stopPropagation();
+}, true);
+
+function endSliderGuard(e){
+  if(sGuard && e.target === sGuard.el) sGuard = null;
+}
+document.addEventListener("pointerup", endSliderGuard, true);
+document.addEventListener("pointercancel", endSliderGuard, true);
+
+/* --------------------------------------------------------------- presets */
+/* Ring 1 holds the reference pulse - the "against" number of the ratio - so that
+   the click stays at the BPM you dialled and the cross-rhythm rides on top. */
+var BUILTIN = [
+  {label:"3:2",     note:"hemiola",         divs:[2,3]},
+  {label:"4:3",     note:"four over three", divs:[3,4]},
+  {label:"5:4",     note:"quintuplet",      divs:[4,5]},
+  {label:"7:8",     note:"seven in eight",  divs:[8,7]},
+  {label:"7:4",     note:"septuplet",       divs:[4,7]},
+  {label:"9:8",     note:"nine in eight",   divs:[8,9]},
+  {label:"11:4",    note:"wide",            divs:[4,11]},
+  {label:"3:4:5",   note:"3 and 5 over 4",  divs:[4,3,5]},
+  {label:"2:3:4:6", note:"stacked on 4",    divs:[4,2,3,6]}
+];
+
+function applyConfig(cfg){
+  /* loading a pattern by hand means leaving the session - otherwise its next
+     boundary would swap this one straight back out */
+  if(run){ stop(); finishSession(); }
+  var wasPlaying = S.playing;
+  if(wasPlaying) stop();
+  if(cfg.bpm) S.bpm = Math.max(20, Math.min(330, cfg.bpm));
+  S.rings = (cfg.rings || []).slice(0,4).map(function(rc, i){
+    var r = mkRing(i, Math.max(1, Math.min(32, rc.div || 4)));
+    if(rc.sound) r.sound = rc.sound;
+    if(typeof rc.vol === "number") r.vol = rc.vol;
+    if(typeof rc.off === "number") r.off = Math.max(0, Math.min(1, Math.round(rc.off * 12) / 12));
+    r.mute = !!rc.mute;
+    r.sub = fitSub(r.div, Math.max(1, Math.min(4, rc.sub || 1)));
+    r.steps = filled(total(r));
+    if(Array.isArray(rc.steps) && rc.steps.length === total(r)) r.steps = rc.steps.slice();
+    return r;
+  });
+  if(!S.rings.length) S.rings = [ mkRing(0,4) ];
+  S.active = 0;
+  buildRack(); paintTransport(); paintRack();
+  if(wasPlaying) start();
+}
+
+/* preset tabs: your own setups first, the classic ratios a tap away. Which one
+   you left open is remembered with the rest of the session. */
+var ptabEls = [].slice.call(document.querySelectorAll("#ptabs .tab"));
+var ppanes = [].slice.call(document.querySelectorAll(".presets .pane"));
+/* Rhythms is an advanced section. S.ptab is left alone when it is hidden, so
+   the tab you were on comes back with Advanced rather than being forgotten. */
+function ptabOK(name){
+  return !(name === "rhythms" &&
+           document.documentElement.getAttribute("data-ui") === "simple");
+}
+function paintPtabs(){
+  var act = ptabOK(S.ptab) ? S.ptab : "mine";
+  ptabEls.forEach(function(t){
+    t.hidden = !ptabOK(t.dataset.ptab);
+    t.dataset.on = (t.dataset.ptab === act) ? "1" : "0";
+  });
+  ppanes.forEach(function(p){ p.hidden = (p.dataset.pane !== act); });
+}
+ptabEls.forEach(function(t){
+  t.addEventListener("click", function(){
+    if(S.ptab === t.dataset.ptab) return;
+    S.ptab = t.dataset.ptab;
+    paintPtabs();
+    queueSave();
+  });
+});
+
+/* ------------------------------------------------------- rhythm skeletons */
+/* Each is the fewest strokes that still name the rhythm - no variations, no
+   arrangement. Ring 1 always carries the pulse the BPM refers to, so the
+   rotation is one full cycle of the rhythm: two bars for the clave family,
+   twelve pulses for the flamenco compás and the West African bells, and the
+   additive count for the Balkan metres.
+   Patterns are written on the grid of that ring: "x" sounds, "." is silent. */
+function pat(str){
+  var a = [], i;
+  for(i=0;i<str.length;i++) a.push(str.charAt(i) !== ".");
+  return a;
+}
+
+var RHYTHM_GROUPS = [
+  { group:"Cuba & the Caribbean", items:[
+    { name:"Rumba", note:"clave 3-2", bpm:100, rings:[
+      { div:8,  sound:"wood", vol:0.42, pattern:"xxxxxxxx" },
+      { div:16, sound:"rim",  vol:1.00, pattern:"x..x...x..x.x..." },
+      { div:8,  sound:"kick", vol:0.70, pattern:"x...x..." }
+    ]},
+    { name:"Mambo", note:"bell + clave 2-3", bpm:106, rings:[
+      { div:8,  sound:"bell", vol:0.70, pattern:"xxxxxxxx" },
+      { div:16, sound:"rim",  vol:0.95, pattern:"..x.x...x..x..x." },
+      { div:8,  sound:"kick", vol:0.70, pattern:"x...x..." }
+    ]},
+    { name:"Chachachá", note:"the 4-and-1 figure", bpm:120, rings:[
+      { div:4, sound:"wood",  vol:0.35, pattern:"xxxx" },
+      { div:8, sound:"click", vol:0.95, pattern:"x.....xx" },
+      { div:8, sound:"kick",  vol:0.70, pattern:"x...x..." }
+    ]},
+    { name:"Merengue", note:"güira + tambora", bpm:140, rings:[
+      { div:4,  sound:"wood",  vol:0.30, pattern:"xxxx" },
+      { div:16, sound:"hihat", vol:0.45, pattern:"xxxxxxxxxxxxxxxx" },
+      { div:8,  sound:"kick",  vol:0.90, pattern:"x...xx.." }
+    ]},
+    { name:"Bachata", note:"derecho · push on 4-and", bpm:130, rings:[
+      { div:4, sound:"wood",  vol:0.30, pattern:"xxxx" },
+      { div:8, sound:"hihat", vol:0.45, pattern:"xxxxxxxx" },
+      { div:8, sound:"kick",  vol:0.90, pattern:"x...x..x" }
+    ]},
+    { name:"Reggaetón", note:"dembow", bpm:96, rings:[
+      { div:4,  sound:"kick",  vol:0.95, pattern:"x.x." },
+      { div:16, sound:"snare", vol:0.90, pattern:"...x..x....x..x." },
+      { div:4,  sound:"hihat", vol:0.45, off:0.5, pattern:"xxxx" }
+    ]},
+    { name:"Dembow", note:"Dominican · busier kick", bpm:115, rings:[
+      { div:4,  sound:"wood",  vol:0.28, pattern:"xxxx" },
+      { div:16, sound:"kick",  vol:0.90, pattern:"x..x..x.x..x..x." },
+      { div:16, sound:"snare", vol:0.85, pattern:"...x..x....x..x." }
+    ]}
+  ]},
+
+  { group:"South America", items:[
+    { name:"Samba", note:"surdo + clave", bpm:96, rings:[
+      { div:4,  sound:"kick",  vol:0.95, pattern:".x.x" },
+      { div:16, sound:"rim",   vol:0.85, pattern:"x..x..x...x.x..." },
+      { div:4,  sound:"hihat", vol:0.50, off:0.5, pattern:"xxxx" }
+    ]},
+    { name:"Bossa nova", note:"bossa clave", bpm:128, rings:[
+      { div:8,  sound:"wood", vol:0.35, pattern:"xxxxxxxx" },
+      { div:16, sound:"rim",  vol:0.90, pattern:"x..x..x...x..x.." },
+      { div:8,  sound:"kick", vol:0.60, pattern:"x.x.x.x." }
+    ]},
+    { name:"Forró", note:"baião · zabumba tresillo", bpm:104, rings:[
+      { div:4,  sound:"wood",  vol:0.30, pattern:"xxxx" },
+      { div:16, sound:"kick",  vol:0.92, pattern:"x..x..x.x..x..x." },
+      { div:8,  sound:"hihat", vol:0.45, pattern:"xxxxxxxx" }
+    ]},
+    { name:"Cumbia", note:"llamador on every off-beat", bpm:96, rings:[
+      { div:4, sound:"wood", vol:0.30, pattern:"xxxx" },
+      { div:4, sound:"rim",  vol:0.90, off:0.5, pattern:"xxxx" },
+      { div:8, sound:"kick", vol:0.85, pattern:"x....xx." }
+    ]},
+    { name:"Tango", note:"habanera", bpm:108, rings:[
+      { div:4, sound:"wood", vol:0.40, pattern:"xxxx" },
+      { div:8, sound:"kick", vol:0.95, pattern:"x..xx.x." },
+      { div:4, sound:"rim",  vol:0.50, pattern:".x.x" }
+    ]},
+    { name:"Milonga", note:"3+3+2", bpm:104, rings:[
+      { div:4, sound:"wood", vol:0.32, pattern:"xxxx" },
+      { div:8, sound:"kick", vol:0.95, pattern:"x..x..x." },
+      { div:4, sound:"rim",  vol:0.55, pattern:".x.x" }
+    ]},
+    { name:"Landó", note:"12/8 · Afro-Peruvian", bpm:150, rings:[
+      { div:12, sound:"wood",  vol:0.28, pattern:"xxxxxxxxxxxx" },
+      { div:12, sound:"click", vol:0.92, pattern:"x..x..xx..x." },
+      { div:12, sound:"kick",  vol:0.70, pattern:"x.....x....." }
+    ]}
+  ]},
+
+  { group:"Flamenco", items:[
+    { name:"Soleá", note:"12 · accents 12 3 6 8 10", bpm:80, rings:[
+      { div:12, sound:"wood", vol:0.30, pattern:"xxxxxxxxxxxx" },
+      { div:12, sound:"wood", vol:1.00, pattern:"x..x..x.x.x." },
+      { div:12, sound:"kick", vol:0.65, pattern:"x.....x....." }
+    ]},
+    { name:"Bulerías", note:"same 12, fast", bpm:210, rings:[
+      { div:12, sound:"wood",  vol:0.30, pattern:"xxxxxxxxxxxx" },
+      { div:12, sound:"click", vol:1.00, pattern:"x..x..x.x.x." },
+      { div:12, sound:"kick",  vol:0.60, pattern:"x.....x....." }
+    ]},
+    { name:"Alegrías", note:"same 12, bright", bpm:180, rings:[
+      { div:12, sound:"wood",  vol:0.30, pattern:"xxxxxxxxxxxx" },
+      { div:12, sound:"click", vol:0.98, pattern:"x..x..x.x.x." },
+      { div:12, sound:"kick",  vol:0.62, pattern:"x.....x....." }
+    ]},
+    { name:"Seguiriya", note:"12 · accents 1 3 5 8 11", bpm:130, rings:[
+      { div:12, sound:"wood",  vol:0.28, pattern:"xxxxxxxxxxxx" },
+      { div:12, sound:"click", vol:0.95, pattern:"x.x.x..x..x." },
+      { div:12, sound:"kick",  vol:0.62, pattern:"x......x...." }
+    ]},
+    { name:"Tangos", note:"flamenco 4/4", bpm:110, rings:[
+      { div:4, sound:"wood",  vol:0.32, pattern:"xxxx" },
+      { div:4, sound:"click", vol:0.90, pattern:".x.x" },
+      { div:8, sound:"kick",  vol:0.78, pattern:"x..x.x.." }
+    ]},
+    { name:"Rumba flamenca", note:"3+3+2 + off-beat palmas", bpm:100, rings:[
+      { div:4, sound:"wood",  vol:0.30, pattern:"xxxx" },
+      { div:8, sound:"click", vol:0.92, pattern:"x..x..x." },
+      { div:4, sound:"rim",   vol:0.60, off:0.5, pattern:"xxxx" }
+    ]},
+    { name:"Tanguillo", note:"2/4 · 16th tresillo", bpm:130, rings:[
+      { div:4,  sound:"wood",  vol:0.30, pattern:"xxxx" },
+      { div:16, sound:"click", vol:0.92, pattern:"x..x..x.x..x..x." },
+      { div:4,  sound:"kick",  vol:0.70, pattern:"x.x." }
+    ]}
+  ]},
+
+  { group:"Spain · folk", items:[
+    { name:"Jota", note:"3/4 · castanet subdivisions", bpm:150, rings:[
+      { div:3, sub:2, sound:"wood",  vol:0.50, pattern:"xxxxxx" },
+      { div:3, sound:"click", vol:0.92, pattern:"x.." },
+      { div:3, sound:"kick",  vol:0.65, pattern:"x.x" }
+    ]},
+    { name:"Fandango", note:"6 pulses · 3 against 2", bpm:180, rings:[
+      { div:6, sound:"wood",  vol:0.30, pattern:"xxxxxx" },
+      { div:3, sound:"click", vol:0.85, pattern:"xxx" },
+      { div:2, sound:"kick",  vol:0.80, pattern:"xx" }
+    ]},
+    { name:"Sevillanas", note:"3/4 · palmas on 2 and 3", bpm:150, rings:[
+      { div:3, sub:2, sound:"wood",  vol:0.45, pattern:"xxxxxx" },
+      { div:3, sound:"click", vol:0.90, pattern:".xx" },
+      { div:3, sound:"kick",  vol:0.70, pattern:"x.." }
+    ]}
+  ]},
+
+  { group:"Africa", items:[
+    { name:"Ewe", note:"12/8 · seven-stroke bell", bpm:210, rings:[
+      { div:12, sound:"wood", vol:0.25, pattern:"xxxxxxxxxxxx" },
+      { div:12, sound:"bell", vol:1.00, pattern:"x.x.xx.x.x.x" },
+      { div:4,  sound:"kick", vol:0.60, pattern:"xxxx" }
+    ]},
+    { name:"Mandinga", note:"12/8 · five-stroke bell", bpm:200, rings:[
+      { div:12, sound:"wood", vol:0.28, pattern:"xxxxxxxxxxxx" },
+      { div:12, sound:"bell", vol:0.95, pattern:"x.x..x.x..x." },
+      { div:4,  sound:"kick", vol:0.60, pattern:"xxxx" }
+    ]},
+    { name:"Foli", note:"12 pulses · three on four", bpm:190, rings:[
+      { div:12, sound:"wood", vol:0.25, pattern:"xxxxxxxxxxxx" },
+      { div:4,  sound:"kick", vol:0.85, pattern:"xxxx" },
+      { div:3,  sound:"rim",  vol:0.80, pattern:"xxx" }
+    ]},
+    { name:"Gnawa", note:"6/8 · qraqeb", bpm:190, rings:[
+      { div:6, sound:"wood",  vol:0.30, pattern:"xxxxxx" },
+      { div:6, sound:"click", vol:0.92, pattern:"x.xx.x" },
+      { div:6, sound:"kick",  vol:0.80, pattern:"x..x.." }
+    ]},
+    { name:"Mbalax", note:"sabar · 4/4 syncopation", bpm:130, rings:[
+      { div:4,  sound:"wood",  vol:0.28, pattern:"xxxx" },
+      { div:16, sound:"rim",   vol:0.92, pattern:"x..x..xx..x..x.." },
+      { div:16, sound:"kick",  vol:0.80, pattern:"x......x........" }
+    ]},
+    { name:"Afrobeat", note:"clave-leaning kick + shaker", bpm:112, rings:[
+      { div:4,  sound:"wood",  vol:0.26, pattern:"xxxx" },
+      { div:16, sound:"hihat", vol:0.40, pattern:"xxxxxxxxxxxxxxxx" },
+      { div:16, sound:"kick",  vol:0.90, pattern:"x..x..x...x.x..." }
+    ]}
+  ]},
+
+  { group:"Middle East", items:[
+    { name:"Maqsum", note:"iqa' · 4/4", bpm:100, rings:[
+      { div:4, sound:"wood", vol:0.30, pattern:"xxxx" },
+      { div:8, sound:"kick", vol:0.95, pattern:"x...x..." },
+      { div:8, sound:"rim",  vol:0.80, pattern:".x.x..x." }
+    ]},
+    { name:"Samai", note:"10/8 · 3+2+2+3", bpm:120, rings:[
+      { div:10, sound:"wood", vol:0.30, pattern:"xxxxxxxxxx" },
+      { div:10, sound:"kick", vol:0.95, pattern:"x....xx..." },
+      { div:10, sound:"rim",  vol:0.80, pattern:"...x....x." }
+    ]},
+    { name:"Dabke", note:"Levantine 4/4", bpm:120, rings:[
+      { div:4, sound:"wood", vol:0.30, pattern:"xxxx" },
+      { div:8, sound:"kick", vol:0.95, pattern:"x..x.x.." },
+      { div:8, sound:"rim",  vol:0.75, pattern:".x..x..x" }
+    ]}
+  ]},
+
+  { group:"Balkans & Europe", items:[
+    { name:"Aksak", note:"9/8 · 2+2+2+3", bpm:260, rings:[
+      { div:9, sound:"wood",  vol:0.30, pattern:"xxxxxxxxx" },
+      { div:9, sound:"click", vol:0.95, pattern:"x.x.x.x.." },
+      { div:9, sound:"kick",  vol:0.65, pattern:"x........" }
+    ]},
+    { name:"Kopačka", note:"11/16 · 2+2+3+2+2", bpm:240, rings:[
+      { div:11, sound:"wood",  vol:0.30, pattern:"xxxxxxxxxxx" },
+      { div:11, sound:"click", vol:0.95, pattern:"x.x.x..x.x." },
+      { div:11, sound:"kick",  vol:0.65, pattern:"x.........." }
+    ]},
+    { name:"Kalamatianós", note:"7/8 · 3+2+2", bpm:220, rings:[
+      { div:7, sound:"wood",  vol:0.30, pattern:"xxxxxxx" },
+      { div:7, sound:"click", vol:0.95, pattern:"x..x.x." },
+      { div:7, sound:"kick",  vol:0.68, pattern:"x......" }
+    ]},
+    { name:"Csárdás", note:"2/4 · esztam off-beat", bpm:132, rings:[
+      { div:2, sound:"wood", vol:0.35, pattern:"xx" },
+      { div:2, sound:"rim",  vol:0.85, off:0.5, pattern:"xx" },
+      { div:2, sound:"kick", vol:0.92, pattern:"x." }
+    ]},
+    { name:"Verbunkos", note:"4/4 · dotted long-short", bpm:112, rings:[
+      { div:4,  sound:"wood",  vol:0.32, pattern:"xxxx" },
+      { div:16, sound:"click", vol:0.85, pattern:"x..xx..xx..xx..x" },
+      { div:4,  sound:"kick",  vol:0.72, pattern:"x.x." }
+    ]},
+    { name:"Tarantella", note:"6/8 · tambourine", bpm:200, rings:[
+      { div:6, sound:"wood",  vol:0.28, pattern:"xxxxxx" },
+      { div:6, sound:"hihat", vol:0.50, pattern:"xxxxxx" },
+      { div:6, sound:"kick",  vol:0.88, pattern:"x..x.." }
+    ]}
+  ]},
+
+  { group:"Asia", items:[
+    { name:"Konnakol", note:"adi tala 8 · with a 5", bpm:120, rings:[
+      { div:8, sub:2, sound:"wood",  vol:0.50, pattern:"xxxxxxxxxxxxxxxx" },
+      { div:8, sound:"click", vol:0.95, pattern:"x...x.x." },
+      { div:5, sound:"rim",   vol:0.70, pattern:"xxxxx" }
+    ]},
+    { name:"Gamelan", note:"colotomic · gong every 16", bpm:160, rings:[
+      { div:16, sound:"wood", vol:0.32, pattern:"xxxxxxxxxxxxxxxx" },
+      { div:4,  sound:"bell", vol:0.75, pattern:"xxxx" },
+      { div:1,  sound:"kick", vol:0.95, pattern:"x" }
+    ]}
+  ]},
+
+  { group:"Electronic", items:[
+    { name:"Drum & bass", note:"two-step", bpm:174, rings:[
+      { div:4,  sub:2, sound:"hihat", vol:0.45, pattern:"xxxxxxxx" },
+      { div:16, sound:"kick",  vol:0.95, pattern:"x.........x....." },
+      { div:16, sound:"snare", vol:0.90, pattern:"........x......." }
+    ]},
+    { name:"Jungle", note:"amen-style break", bpm:170, rings:[
+      { div:4,  sub:4, sound:"hihat", vol:0.38, pattern:"xxxxxxxxxxxxxxxx" },
+      { div:16, sound:"kick",  vol:0.95, pattern:"x....x....x....." },
+      { div:16, sound:"snare", vol:0.90, pattern:"....x..x.x..x..." }
+    ]},
+    { name:"House", note:"four to the floor", bpm:124, rings:[
+      { div:4, sound:"kick",  vol:0.95, pattern:"xxxx" },
+      { div:4, sound:"hihat", vol:0.55, off:0.5, pattern:"xxxx" },
+      { div:4, sound:"snare", vol:0.72, pattern:".x.x" }
+    ]},
+    { name:"Techno", note:"4/4 · sixteenth hats", bpm:134, rings:[
+      { div:4,  sound:"kick",  vol:0.95, pattern:"xxxx" },
+      { div:16, sound:"hihat", vol:0.38, pattern:"xxxxxxxxxxxxxxxx" },
+      { div:4,  sound:"rim",   vol:0.58, off:0.5, pattern:"xxxx" }
+    ]},
+    { name:"UK garage", note:"two-step", bpm:132, rings:[
+      { div:4,  sound:"wood",  vol:0.26, pattern:"xxxx" },
+      { div:16, sound:"kick",  vol:0.95, pattern:"x.........x....." },
+      { div:16, sound:"snare", vol:0.86, pattern:"....x.......x..." }
+    ]},
+    { name:"Breakbeat", note:"funky-drummer lean", bpm:132, rings:[
+      { div:4,  sound:"wood",  vol:0.24, pattern:"xxxx" },
+      { div:16, sound:"kick",  vol:0.92, pattern:"x.....x...x....." },
+      { div:16, sound:"snare", vol:0.88, pattern:"....x..x....x..x" }
+    ]},
+    { name:"Dubstep", note:"half-time · snare on 3", bpm:140, rings:[
+      { div:4, sub:2, sound:"hihat", vol:0.40, pattern:"xxxxxxxx" },
+      { div:4, sound:"kick",  vol:0.95, pattern:"x..." },
+      { div:4, sound:"snare", vol:0.90, pattern:"..x." }
+    ]},
+    { name:"Trap", note:"half-time · triplet hats", bpm:140, rings:[
+      { div:4,  sub:3, sound:"hihat", vol:0.42, pattern:"xxxxxxxxxxxx" },
+      { div:16, sound:"kick",  vol:0.95, pattern:"x.....x...x....." },
+      { div:4,  sound:"snare", vol:0.88, pattern:"..x." }
+    ]}
+  ]},
+
+  { group:"Rock & indie", items:[
+    { name:"Rock", note:"backbeat · eighth hats", bpm:120, rings:[
+      { div:4, sub:2, sound:"hihat", vol:0.42, pattern:"xxxxxxxx" },
+      { div:4, sound:"kick",  vol:0.95, pattern:"x.x." },
+      { div:4, sound:"snare", vol:0.88, pattern:".x.x" }
+    ]},
+    { name:"Indie disco", note:"four to the floor", bpm:128, rings:[
+      { div:4, sub:2, sound:"hihat", vol:0.42, pattern:"xxxxxxxx" },
+      { div:4, sound:"kick",  vol:0.95, pattern:"xxxx" },
+      { div:4, sound:"snare", vol:0.85, pattern:".x.x" }
+    ]},
+    { name:"Punk", note:"eighth-note kick", bpm:190, rings:[
+      { div:4, sound:"wood",  vol:0.24, pattern:"xxxx" },
+      { div:8, sound:"kick",  vol:0.95, pattern:"xxxxxxxx" },
+      { div:4, sound:"snare", vol:0.90, pattern:".x.x" }
+    ]},
+    { name:"Shuffle", note:"triplets · middle one muted", bpm:96, rings:[
+      { div:4, sub:3, sound:"hihat", vol:0.48, pattern:"x.xx.xx.xx.x" },
+      { div:4, sound:"kick",  vol:0.92, pattern:"x.x." },
+      { div:4, sound:"snare", vol:0.88, pattern:".x.x" }
+    ]},
+    { name:"Motorik", note:"sixteenth drive", bpm:140, rings:[
+      { div:4, sub:4, sound:"hihat", vol:0.35, pattern:"xxxxxxxxxxxxxxxx" },
+      { div:4, sound:"kick",  vol:0.92, pattern:"x.x." },
+      { div:4, sound:"snare", vol:0.82, pattern:".x.x" }
+    ]},
+    { name:"Math rock", note:"7/8 · 3+2+2", bpm:150, rings:[
+      { div:7, sound:"wood",  vol:0.28, pattern:"xxxxxxx" },
+      { div:7, sound:"kick",  vol:0.92, pattern:"x..x..." },
+      { div:7, sound:"snare", vol:0.85, pattern:"..x..x." }
+    ]}
+  ]}
+];
+
+var rgrid = document.getElementById("rgrid");
+RHYTHM_GROUPS.forEach(function(g){
+  var h = document.createElement("p");
+  h.className = "rgroup";
+  h.textContent = g.group;
+  rgrid.appendChild(h);
+
+  var grid = document.createElement("div");
+  grid.className = "pgrid";
+  g.items.forEach(function(rh){
+    var b = document.createElement("button");
+    b.className = "pchip";
+    /* the name alone: the descriptions read as noise down a list of fifty-odd
+       and made the phone list far longer to get through. Kept as the tooltip. */
+    b.textContent = rh.name;
+    b.title = rh.note;
+    b.addEventListener("click", function(){
+      chipHit(rh.name, {
+        bpm: rh.bpm,
+        rings: rh.rings.map(function(rc){
+          return {
+            div: rc.div, sub: rc.sub || 1, off: rc.off || 0,
+            sound: rc.sound, vol: rc.vol, steps: pat(rc.pattern)
+          };
+        })
+      });
+    });
+    grid.appendChild(b);
+  });
+  rgrid.appendChild(grid);
+});
+
+var pgrid = document.getElementById("pgrid");
+BUILTIN.forEach(function(p){
+  var b = document.createElement("button");
+  b.className = "pchip";
+  b.innerHTML = p.label + " <small>" + p.note + "</small>";
+  b.addEventListener("click", function(){
+    chipHit(p.label, {
+      bpm: S.bpm,
+      rings: p.divs.map(function(d,i){ return {div:d, sound:DEFAULT_SOUND[i], vol: i===0?0.95:0.8}; })
+    });
+  });
+  pgrid.appendChild(b);
+});
+
+/* -------------------------------------------------- the session, kept for you */
+/* Everything you touch is written back a moment later and restored next time the
+   app opens, so the named presets below stay for setups you want to come back
+   to rather than being the only way not to lose your work. */
+var SESSION_KEY = "polyrhythm-circle:session:v1";
+var saveTimer = null;
+
+function sessionSnapshot(){
+  return {
+    bpm: S.bpm,
+    master: S.master,
+    muted: S.muted,
+    countIn: S.countIn,
+    active: S.active,
+    ptab: S.ptab,
+    seq: S.seq,
+    sess: {from:sFrom.value, to:sTo.value, step:sStep.value, per:sPer.value,
+           pat:sPat.value, sil:sSil.value},
+    rings: S.rings.map(function(r){
+      return {div:r.div, sub:r.sub, sound:r.sound, vol:r.vol, off:r.off,
+              mute:r.mute, steps:r.steps.slice()};
+    })
+  };
+}
+function queueSave(){
+  clearTimeout(saveTimer);
+  /* debounced: dragging a slider would otherwise write on every frame */
+  saveTimer = setTimeout(function(){
+    try{ localStorage.setItem(SESSION_KEY, JSON.stringify(sessionSnapshot())); } catch(err){}
+  }, 500);
+}
+/* Applies straight onto S before the first paint, so boot needs no extra work.
+   Anything malformed is ignored rather than throwing the app away. */
+function restoreSession(){
+  var raw = null;
+  try{ raw = localStorage.getItem(SESSION_KEY); } catch(err){ return; }
+  if(!raw) return;
+  var c;
+  try{ c = JSON.parse(raw); } catch(err){ return; }
+  applySession(c);
+}
+/* also used to hand the setup back after a practice session borrows it */
+function applySession(c){
+  if(!c || !Array.isArray(c.rings) || !c.rings.length) return;
+
+  if(typeof c.bpm === "number") S.bpm = Math.max(20, Math.min(330, Math.round(c.bpm)));
+  if(typeof c.master === "number") S.master = Math.max(0, Math.min(1, c.master));
+  S.muted = !!c.muted;
+  S.countIn = !!c.countIn;
+
+  S.rings = c.rings.slice(0,4).map(function(rc, i){
+    var r = mkRing(i, Math.max(1, Math.min(32, rc.div || 4)));
+    if(typeof rc.sound === "string") r.sound = rc.sound;
+    if(typeof rc.vol === "number") r.vol = Math.max(0, Math.min(1, rc.vol));
+    if(typeof rc.off === "number") r.off = Math.max(0, Math.min(1, Math.round(rc.off * 12) / 12));
+    r.mute = !!rc.mute;
+    r.sub = fitSub(r.div, Math.max(1, Math.min(4, rc.sub || 1)));
+    r.steps = filled(total(r));
+    if(Array.isArray(rc.steps) && rc.steps.length === total(r)){
+      r.steps = rc.steps.map(function(v){ return !!v; });
+    }
+    return r;
+  });
+  S.active = Math.max(0, Math.min(S.rings.length - 1, c.active || 0));
+  if(c.ptab === "mine" || c.ptab === "classic" || c.ptab === "rhythms") S.ptab = c.ptab;
+  if(Array.isArray(c.seq)){
+    S.seq = c.seq.filter(function(st){
+      return st && typeof st.name === "string" && Array.isArray(st.rings) && st.rings.length;
+    }).slice(0, MAX_SEQ);
+  }
+  if(c.sess){
+    if(c.sess.from) sFrom.value = c.sess.from;
+    if(c.sess.to)   sTo.value   = c.sess.to;
+    if(c.sess.step) sStep.value = c.sess.step;
+    if(c.sess.per)  sPer.value  = c.sess.per;
+    if(c.sess.pat)  sPat.value  = c.sess.pat;
+    if(c.sess.sil !== undefined) sSil.value = c.sess.sil;
+  }
+  masterEl.value = S.master;
+}
+
+var KEY = "polyrhythm-circle:presets:v1";
+function loadMine(){
+  try{
+    var raw = localStorage.getItem(KEY);
+    var arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  } catch(err){ return []; }
+}
+function saveMine(arr){
+  try{ localStorage.setItem(KEY, JSON.stringify(arr)); } catch(err){}
+}
+var mineEl = document.getElementById("mine"), pempty = document.getElementById("pempty");
+function paintMine(){
+  var arr = loadMine();
+  mineEl.innerHTML = "";
+  pempty.style.display = arr.length ? "none" : "block";
+  arr.forEach(function(p, i){
+    var b = document.createElement("button");
+    b.className = "pchip";
+    b.innerHTML = '<span>' + escapeHtml(p.name) + '</span>' +
+      '<span class="mono" style="color:var(--ink-3)">' +
+      p.rings.map(function(r){ return r.div; }).reverse().join(":") + ' · ' + p.bpm + '</span>' +
+      '<span class="del" data-del>&times;</span>';
+    b.addEventListener("click", function(e){
+      if(e.target && e.target.hasAttribute("data-del")){
+        if(pickSlot !== null) return;      /* not while a step is waiting */
+        var a = loadMine(); a.splice(i,1); saveMine(a); paintMine(); return;
+      }
+      chipHit(p.name, p);
+    });
+    mineEl.appendChild(b);
+  });
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+  });
+}
+document.getElementById("psave").addEventListener("click", function(){
+  var input = document.getElementById("pname");
+  var name = (input.value || "").trim() || (ratioString().replace(/ /g,"") + " @ " + S.bpm);
+  var arr = loadMine();
+  arr.unshift({
+    name: name.slice(0,28),
+    bpm: S.bpm,
+    rings: S.rings.map(function(r){
+      return {div:r.div, sub:r.sub, sound:r.sound, vol:r.vol, off:r.off,
+              mute:r.mute, steps:r.steps.slice()};
+    })
+  });
+  saveMine(arr.slice(0,12));
+  input.value = "";
+  paintMine();
+});
+
+/* ===================================================== practice session ====
+   A session walks the tempo from one value to another, a few loops at a time,
+   optionally swapping the pattern at each step and dropping the sound out for
+   the odd loop so you have to keep time yourself.
+
+   Two decisions worth knowing about:
+
+   - The target tempo is always played. If the step does not divide the span
+     evenly the last step is short (100 -> 120 by 7 gives 100, 107, 114, 120)
+     rather than overshooting or stopping short.
+   - The whole plan - tempos, loop count, which loops are silent - is worked out
+     before the first note and shown in the panel, so nothing about a running
+     session is a surprise. It also makes the thing testable.
+
+   Changes land on the loop boundary, not when the eye notices it: the clock is
+   pinned to the boundary's exact time before the new tempo is applied, so ticks
+   already queued for the old tempo are untouched and nothing smears. */
+
+var sessPlan = null;   /* the worked-out plan, rebuilt whenever the inputs change */
+var run = null;        /* the live session: {plan, cur, snapshot} */
+
+function sessInputs(){
+  return {
+    from: clampNum(sFrom.value, 20, 330, 100),
+    to:   clampNum(sTo.value,   20, 330, 120),
+    step: clampNum(sStep.value,  1,  60,   5),
+    per:  clampNum(sPer.value,   1,  32,   4),
+    pat:  sPat.value,
+    sil:  parseInt(sSil.value, 10) || 0
+  };
+}
+function clampNum(v, lo, hi, dflt){
+  var n = parseInt(v, 10);
+  if(isNaN(n)) return dflt;
+  return Math.max(lo, Math.min(hi, n));
+}
+
+/* the ladder of tempos, with the target always landed on exactly */
+function tempoLadder(from, to, step){
+  var out = [from], guard = 0;
+  if(to === from) return out;
+  var dir = to > from ? 1 : -1;
+  var t = from;
+  while(guard++ < 400){
+    t += dir * step;
+    if(dir > 0 ? t >= to : t <= to){ out.push(to); break; }
+    out.push(t);
+  }
+  return out;
+}
+
+/* every pattern the chosen library can offer, already in applyConfig shape */
+function patternSource(src){
+  var list = [], i;
+  if(src === "rhythms"){
+    RHYTHM_GROUPS.forEach(function(g){
+      g.items.forEach(function(rh){
+        list.push({ name:rh.name, rings:rh.rings.map(function(rc){
+          return {div:rc.div, sub:rc.sub || 1, off:rc.off || 0,
+                  sound:rc.sound, vol:rc.vol, steps:pat(rc.pattern)};
+        })});
+      });
+    });
+  } else if(src === "classic"){
+    BUILTIN.forEach(function(p){
+      list.push({ name:p.label, rings:p.divs.map(function(d,i){
+        return {div:d, sound:DEFAULT_SOUND[i], vol: i===0?0.95:0.8};
+      })});
+    });
+  } else if(src === "seq"){
+    S.seq.forEach(function(st){
+      list.push({ name:st.name, rings:st.rings.map(function(r){
+        var o = {div:r.div, sub:r.sub, off:r.off, sound:r.sound, vol:r.vol, mute:r.mute};
+        if(r.steps) o.steps = r.steps.slice();
+        return o;
+      })});
+    });
+  } else if(src === "mine"){
+    loadMine().forEach(function(p){
+      if(p && Array.isArray(p.rings)) list.push({name:p.name, rings:p.rings});
+    });
+  }
+  return list;
+}
+
+function buildPlan(){
+  var c = sessInputs();
+  var tempos = tempoLadder(c.from, c.to, c.step);
+
+  /* one entry per loop, so the engine never has to work anything out mid-flight */
+  var loops = [], si, i;
+  for(si=0; si<tempos.length; si++){
+    for(i=0;i<c.per;i++) loops.push({bpm:tempos[si], stage:si});
+  }
+
+  /* One pattern per stage, shuffled so a session is not always the same three.
+     Settled before the silent loops, which need to know where a stage begins. */
+  var patterns = null, names = [];
+  var pool = patternSource(c.pat);
+  if(pool.length){
+    var bag = pool.slice();
+    /* a sequence is an order the user chose - shuffling it would be the one
+       thing they asked this feature not to do */
+    if(c.pat !== "seq"){
+      for(i=bag.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=bag[i]; bag[i]=bag[j]; bag[j]=t; }
+    }
+    patterns = [];
+    for(si=0; si<tempos.length; si++){
+      var p = bag[si % bag.length];
+      patterns.push(p);
+      names.push(p.name);
+    }
+  }
+
+  /* Silent loops are drawn up front so the panel can promise a number and keep
+     it. An exact count beats a coin flip per loop: "1 in 4" of twelve loops is
+     always three, never none.
+
+     Three rules, each of which outranks the count:
+       - never the loop that opens a stage, when that stage brings a new
+         pattern: you have to hear a pattern before being asked to hold it alone
+       - never the very first loop
+       - never two in a row, so there is always a loop to recover in
+     Where those leave no room the count gives way. The panel counts this array
+     rather than the request, so the number it shows stays the truth. */
+  var silent = loops.map(function(){ return false; });
+  /* A loop has to be heard when it is the first of a new pattern - and the very
+     first loop always, since there is nothing before it to have learned from.
+     Through a plain tempo ramp the same pattern plays all the way, so only that
+     opening loop is protected. */
+  function mustSound(idx){
+    if(idx === 0) return true;
+    return !!patterns && loops[idx].stage !== loops[idx-1].stage;
+  }
+  if(c.sil === 1){
+    /* silence everything the rule allows: you get one loop of each pattern to
+       hear it, then hold it alone for the rest of the stage */
+    for(i=0;i<loops.length;i++) silent[i] = !mustSound(i);
+  } else if(c.sil === 2){
+    /* "every other" means exactly that - one on, one off. There is no room to
+       place half the loops at random and still keep them apart, so this case is
+       laid out rather than drawn. */
+    for(i=1;i<loops.length;i+=2) if(!mustSound(i)) silent[i] = true;
+  } else if(c.sil > 0 && loops.length > 1){
+    var want = Math.max(1, Math.round((loops.length - 1) / c.sil));
+    var slots = [];
+    for(i=1;i<loops.length;i++) if(!mustSound(i)) slots.push(i);
+    for(i=slots.length-1;i>0;i--){ var j2=Math.floor(Math.random()*(i+1)); var t2=slots[i]; slots[i]=slots[j2]; slots[j2]=t2; }
+    var taken = 0;
+    for(i=0;i<slots.length && taken<want;i++){
+      var k = slots[i];
+      if(silent[k-1] || silent[k+1]) continue;      /* leave a loop to recover */
+      silent[k] = true; taken++;
+    }
+  }
+
+  /* the loop length follows ring 1, which a pattern swap changes, so take the
+     beats from whichever pattern that stage will be playing */
+  var here = baseBeats(), secs = 0;
+  loops.forEach(function(l){
+    var beats = here;
+    if(patterns && patterns[l.stage] && patterns[l.stage].rings[0]){
+      beats = patterns[l.stage].rings[0].div || here;
+    }
+    secs += beats * 60 / l.bpm;
+  });
+
+  return {cfg:c, tempos:tempos, loops:loops, silent:silent,
+          anySilent: silent.some(function(b){ return b; }),
+          patterns:patterns, names:names, seconds:secs};
+}
+
+function clockText(secs){
+  var m = Math.floor(secs / 60), sec = Math.round(secs - m * 60);
+  if(sec === 60){ m++; sec = 0; }
+  if(m === 0) return sec + " sec";
+  if(sec === 0) return m + " min";
+  return m + " min " + sec + " sec";
+}
+/* the big readout under the dial - stage, loop and tempo at a glance, which is
+   all you can take in while both hands are busy */
+function paintSessNow(l, sil){
+  if(S.tapMode) return;          /* the tap readout has the slot while practising */
+  sessNowIn.innerHTML =
+    '<span class="k">Stage</span> ' + (l.stage + 1) + '/' + run.plan.tempos.length +
+    ' <span class="k">Loop</span> ' + (run.cur + 1) + '/' + run.plan.loops.length +
+    ' ' + l.bpm + ' <span class="k">bpm</span>' +
+    (sil ? ' <span class="sil">SILENT</span>' : '');
+  sessNow.hidden = false;
+  dialHint.hidden = true;
+  fitSessNow();
+
+  if(run.plan.names.length){
+    dialPat.textContent = run.plan.names[l.stage];
+    dialPat.hidden = false;
+  } else { dialPat.hidden = true; }
+  fitHead();                     /* the sides have less room now, or more */
+}
+/* The longest line this session can produce: the last stage, the last loop, the
+   fastest tempo, and SILENT if any loop is. Measuring that instead of the line
+   in front of us keeps one size for the whole session - fitting each line on its
+   own merits made the text change size the moment SILENT appeared. */
+function worstSessLine(){
+  var st = run.plan.tempos.length, lp = run.plan.loops.length;
+  var bpm = run.plan.tempos.reduce(function(a,b){ return b > a ? b : a; }, 0);
+  return '<span class="k">Stage</span> ' + st + '/' + st +
+    ' <span class="k">Loop</span> ' + lp + '/' + lp +
+    ' ' + bpm + ' <span class="k">bpm</span>' +
+    (run.plan.anySilent ? ' <span class="sil">SILENT</span>' : '');
+}
+/* shrink to fit rather than wrap - the slot has a fixed height */
+function fitSessNow(){
+  if(!run || sessNow.hidden) return;
+  if(run.scale === null){
+    var keep = sessNowIn.innerHTML;
+    sessNowIn.innerHTML = worstSessLine();
+    sessNowIn.style.fontSize = "";
+    var avail = sessNow.clientWidth - 2, w = sessNowIn.scrollWidth;
+    run.scale = (w > avail && w > 0) ? Math.max(0.62, avail / w) : 1;
+    sessNowIn.innerHTML = keep;
+  }
+  sessNowIn.style.fontSize = (run.scale < 1) ? (16 * run.scale).toFixed(2) + "px" : "";
+}
+function clearSessNow(){
+  sessNow.hidden = true;
+  sessNowIn.innerHTML = "";
+  sessNowIn.style.fontSize = "";
+  dialHint.hidden = !!S.tapMode;
+  dialPat.hidden = true;
+  dialPat.textContent = "";
+  fitHead();
+}
+function paintPlan(){
+  if(run){
+    var l = run.plan.loops[run.cur];
+    var sil = run.plan.silent[run.cur];
+    paintSessNow(l, sil);
+    sPlan.innerHTML =
+      'Stage <b>' + (l.stage + 1) + ' of ' + run.plan.tempos.length + '</b>' +
+      ' · loop <b>' + (run.cur + 1) + ' of ' + run.plan.loops.length + '</b>' +
+      ' · <b>' + l.bpm + ' bpm</b>' +
+      (sil ? ' · <b>silent</b>' : '') +
+      (run.plan.names.length ? '<br><span class="ladder">' +
+         run.plan.names[l.stage] + '</span>' : '');
+    if(!planSheet.hidden) paintPlanSheet();   /* so the marked stage keeps up */
+    return;
+  }
+  sessPlan = buildPlan();
+  var p = sessPlan, c = p.cfg;
+
+  var silCount = p.silent.filter(Boolean).length;
+  var html = planSummary(p);
+  if(!p.names.length && c.pat === "seq"){
+    html += '<br>The sequence is empty, so your own setup plays throughout.';
+  }
+  var note = planNote(p);
+  if(note) html += '<br>' + note;
+  sPlan.innerHTML = html;
+  if(!planSheet.hidden) paintPlanSheet();
+}
+
+/* stages, loops, silent, time - the order they are read in */
+function planSummary(p){
+  var bits = [
+    '<b>' + p.tempos.length + '</b> ' + (p.tempos.length === 1 ? 'stage' : 'stages'),
+    '<b>' + p.loops.length + '</b> ' + (p.loops.length === 1 ? 'loop' : 'loops')
+  ];
+  if(p.cfg.sil > 0) bits.push('<b>' + p.silent.filter(Boolean).length + '</b> silent');
+  bits.push('about <b>' + clockText(p.seconds) + '</b>');
+  return bits.join(' · ');
+}
+function planNote(p){
+  var c = p.cfg, notes = [];
+  if(c.sil === 1 && p.anySilent){
+    notes.push(p.patterns
+      ? 'Only the loop that opens each pattern sounds; the rest are yours to hold.'
+      : 'Only the first loop sounds; the rest are yours to hold.');
+  }
+  if(c.sil > 0 && !p.anySilent){
+    notes.push(p.patterns
+      ? 'Every loop opens a new pattern, so none can be silent.'
+      : 'No silent loops fit this plan.');
+  }
+  if(c.to !== c.from){
+    var last = p.tempos[p.tempos.length - 1], prev = p.tempos[p.tempos.length - 2];
+    if(prev !== undefined && Math.abs(last - prev) !== c.step){
+      notes.push('Last step is <b>' + Math.abs(last - prev) +
+                 '</b> so it lands exactly on ' + c.to + '.');
+    }
+  }
+  return notes.join(' ');
+}
+
+/* ---- the plan, stage by stage, in a sheet of its own -------------------- */
+/* Spelled out as lines rather than two arrows-and-names paragraphs: reading a
+   tempo off one list and its pattern off another meant counting positions. */
+function paintPlanSheet(){
+  var p = run ? run.plan : (sessPlan || buildPlan());
+  var per = p.cfg.per;
+  planSum.innerHTML = planSummary(p);
+  var rows = "";
+  for(var i=0;i<p.tempos.length;i++){
+    var now = run && run.plan.loops[run.cur] && run.plan.loops[run.cur].stage === i;
+    rows += '<div class="plan-row"' + (now ? ' data-now="1"' : '') + '>' +
+      '<span class="pb">' + p.tempos[i] + '</span>' +
+      '<span class="pl">&times;' + per + '</span>' +
+      '<span class="pn">' + (p.names.length ? escapeHtml(p.names[i]) : '&mdash;') + '</span>' +
+      '</div>';
+  }
+  planBody.innerHTML = rows;
+  var note = planNote(p);
+  if(!p.names.length && p.cfg.pat === "seq"){
+    note = "The sequence is empty, so your own setup plays throughout." + (note ? " " + note : "");
+  }
+  planNoteEl.innerHTML = note;
+  planNoteEl.hidden = !note;
+}
+
+/* swap the rings without touching the transport - applyConfig restarts playback,
+   which would defeat the point of changing pattern on a boundary */
+function swapRings(cfg){
+  S.rings = (cfg.rings || []).slice(0,4).map(function(rc, i){
+    var r = mkRing(i, Math.max(1, Math.min(32, rc.div || 4)));
+    if(rc.sound) r.sound = rc.sound;
+    if(typeof rc.vol === "number") r.vol = rc.vol;
+    if(typeof rc.off === "number") r.off = Math.max(0, Math.min(1, Math.round(rc.off * 12) / 12));
+    r.mute = !!rc.mute;
+    r.sub = fitSub(r.div, Math.max(1, Math.min(4, rc.sub || 1)));
+    r.steps = filled(total(r));
+    if(Array.isArray(rc.steps) && rc.steps.length === total(r)) r.steps = rc.steps.slice();
+    return r;
+  });
+  if(!S.rings.length) S.rings = [ mkRing(0,4) ];
+  S.active = 0;
+  S.rings.forEach(function(r){ realign(r); });
+  buildRack(); paintRack(); paintTransport();
+}
+
+function applyLoop(idx){
+  var l = run.plan.loops[idx];
+  var prev = idx > 0 ? run.plan.loops[idx-1] : null;
+
+  if(run.plan.patterns && (!prev || prev.stage !== l.stage)){
+    swapRings(run.plan.patterns[l.stage]);   /* the pattern's own bpm is ignored */
+  }
+  if(S.bpm !== l.bpm){
+    S.bpm = l.bpm;
+    paintTransport();
+  }
+  S.rings.forEach(function(r){ realign(r); });
+  paintPlan();
+}
+
+function startSession(){
+  if(run) return;
+  /* stop first: stop() ends a session, so claiming `run` before this would have
+     the session cancel itself the moment it began */
+  if(S.playing) stop();
+
+  /* the plan on screen is the plan that plays - reshuffling here would make the
+     preview a lie */
+  var plan = sessPlan || buildPlan();
+  run = { plan: plan, cur: 0, off: 0, snapshot: sessionSnapshot(), scale: null };
+  sessBtn.textContent = "Stop";
+  sessBtn.dataset.on = "1";
+  syncSessBtn();
+  applyLoop(0);
+  start();
+  paintPlan();
+}
+
+function finishSession(){
+  if(!run) return;
+  var snap = run.snapshot;
+  /* the snapshot carries the panel's own inputs too - keep whatever is in them
+     now, or editing a field mid-session would be undone when it ends */
+  if(snap) delete snap.sess;
+  run = null;
+  sessBtn.textContent = "Start";
+  sessBtn.dataset.on = "0";
+  syncSessBtn();
+  clearSessNow();
+  applySession(snap);            /* hand back the setup the session borrowed */
+  buildRack(); paintTransport(); paintRack(); paintCount();
+  paintPlan();
+}
+
+/* called from the scheduler, before anything is queued, so a change can be
+   pinned to the boundary rather than to "now" */
+function sessionTick(t){
+  if(!run || !S.playing) return;
+  var cd = cycleDur();
+  var nextPhase = (run.cur - run.off) + 1;      /* phase of the coming boundary */
+  var tB = refTime + (nextPhase - refPhase) * cd;
+  if(t + LOOKAHEAD < tB) return;               /* boundary not in range yet */
+
+  if(run.cur + 1 >= run.plan.loops.length){
+    stop();
+    finishSession();                            /* the plan is done */
+    return;
+  }
+  refPhase = nextPhase;                         /* pin the clock to the boundary */
+  refTime = tB;
+  run.cur = run.cur + 1;
+  applyLoop(run.cur);
+}
+function loopIsSilent(phase){
+  if(!run || phase < 0) return false;           /* negative is the count-in */
+  var i = run.off + Math.floor(phase);
+  return i >= 0 && !!run.plan.silent[i];
+}
+
+/* ================================================= tapping practice =======
+   Two modes over one tap surface, because they are the same measurement:
+
+   - follow: judge each tap against the active ring's strokes and show where it
+     landed. The bar flashes the grade so you get an answer instantly; the dial
+     keeps the last few bars of taps as ticks, so the drift you cannot feel
+     becomes a shape you can see.
+   - record: quantise each tap to the nearest step of the active ring and turn
+     it on, so a pattern can be played in rather than dialled in.
+
+   Nothing here plays a sound on the tap. Measured on a phone, tap to sound is
+   about 96ms - late enough to feel detached and nothing can shorten it. The
+   backing pattern is scheduled ahead of time, so it is unaffected; only the
+   reaction would have suffered, and it is visual instead. */
+
+var TAP_TIGHT = 20;        /* ms - inside this is a hit worth calling tight */
+var TAP_FINE  = 50;        /* ms - outside this is a miss, not a loose hit */
+var TAP_TRAIL = 4;         /* rotations a tick stays on the dial before fading */
+var TAP_KEEP  = 24;        /* offsets kept for the drift and spread readout */
+
+var tapHits = [];          /* {ph, ms, grade, at} - what the dial draws */
+var tapStat = {offs:[], streak:0, best:0, n:0, tight:0};
+
+/* The phase you were hearing at that moment. getOutputTimestamp maps the page
+   clock onto the audio being played out, which folds in the output delay - the
+   84ms of it on this phone would otherwise read as 84ms of lateness. */
+function heardPhase(perfMs){
+  if(!ctx) return null;
+  var ts = ctx.getOutputTimestamp ? ctx.getOutputTimestamp() : null, at;
+  if(ts && ts.contextTime != null && ts.performanceTime){
+    at = ts.contextTime + (perfMs - ts.performanceTime) / 1000;
+  } else {
+    at = ctx.currentTime - (ctx.outputLatency || 0) + (perfMs - performance.now()) / 1000;
+  }
+  return phaseAt(at);
+}
+
+/* nearest audible stroke of a ring to a phase, as a signed rotation distance */
+function nearestStroke(r, ph){
+  var tot = total(r), oph = offPhase(r), best = null;
+  for(var k = 0; k < tot; k++){
+    if(!isMain(r, k) || !audible(r, k)) continue;
+    var d = ph - (k / tot + oph);
+    d -= Math.round(d);                 /* wrap to the nearer side of the circle */
+    if(best === null || Math.abs(d) < Math.abs(best.d)) best = {k:k, d:d};
+  }
+  return best;
+}
+
+function tapAt(perfMs){
+  if(!S.tapMode) return;
+  var r = S.rings[S.active];
+  if(!r) return;
+  if(S.tapMode === "record"){ recTap(perfMs); return; }
+  if(!S.playing){ start(); return; }    /* first tap starts the transport */
+
+  var ph = heardPhase(perfMs);
+  if(ph === null) return;
+  var frac = ph - Math.floor(ph);
+
+  /* follow */
+  var near = nearestStroke(r, ph);
+  if(!near){ flashBar("c3"); return; }  /* every step silenced: nothing to aim at */
+  var ms = near.d * cycleDur() * 1000;
+  var grade = Math.abs(ms) <= TAP_TIGHT ? "c2" : (Math.abs(ms) <= TAP_FINE ? "c1" : "c3");
+
+  tapStat.n++;
+  if(grade === "c2"){ tapStat.tight++; tapStat.streak++;
+    if(tapStat.streak > tapStat.best) tapStat.best = tapStat.streak;
+  } else { tapStat.streak = 0; }
+  /* Every tap counts toward the drift, misses included. Filtering them out hid
+     the number from exactly the player who needs it - somebody consistently
+     60ms late grades every tap a miss and would have been told nothing. The
+     median carries the outliers on its own. */
+  tapStat.offs.push(ms);
+  if(tapStat.offs.length > TAP_KEEP) tapStat.offs.shift();
+  tapHits.push({ph:frac, ms:ms, grade:grade, at:ph});
+  if(tapHits.length > 64) tapHits.shift();
+  flashBar(grade);
+  paintTapNow();
+}
+
+
+/* -------------------------------------------------- tapping a ring in ------
+   The taps decide two things at once: how many there were is the division
+   count, and how far apart they were is the tempo. Tapping ring 1 makes this
+   exactly tap tempo, since its divisions ARE the beat. For an outer ring the
+   tempo is worked back through the rotation instead, so the steps still land
+   where you tapped them rather than merely sharing your tap rate.
+
+   The clock stands still throughout: a rotation has no length until the count
+   is known, so there is nothing to schedule and nothing to rotate. */
+var recTaps = [];
+var recPrev = null;        /* what to put back if the taps never amount to anything */
+var recPulse = -1e9;       /* when the centre words last took a hit */
+var recTotal = 1;          /* the grid the dots live on, in steps per rotation */
+var recOn = [];            /* which of those steps are lit */
+var recStartPhase = 0;     /* so the first loop can add freely and later ones toggle */
+
+/* A dot, once placed, does not move. That is the whole rule here: the grid is
+   only ever refined by a whole factor, so every step k of the old grid is step
+   k*m of the new one and lands in exactly the same place. Re-fitting the grid
+   freely - picking whichever division best explained the taps - is what used to
+   shuffle the dots you had already played. */
+function recGcd(a, b){ while(b){ var t = a % b; a = b; b = t; } return a; }
+
+/* the coarsest grid that holds these dots without any of them moving */
+function recSimplify(){
+  if(!recOn.length){ recTotal = 1; return; }
+  var g = recTotal;
+  for(var i = 0; i < recOn.length; i++) g = recGcd(g, recOn[i]);
+  if(g > 1){
+    recTotal /= g;
+    recOn = recOn.map(function(k){ return k / g; });
+  }
+}
+
+/* Can the ring hold a grid this fine? Up to 32 it is all main beats. Past that
+   the only way to go finer is subdivision, which is a last resort: those steps
+   sound quieter and higher by design. */
+function recShapeable(T){
+  if(T <= 32) return true;
+  if(T > MAX_STEPS) return false;
+  for(var m = 2; m <= 4; m++) if(T % m === 0 && T / m <= 32) return true;
+  return false;
+}
+function recShape(){
+  var r = S.rings[S.active];
+  var T = Math.max(1, recTotal), div = T, sub = 1;
+  if(T > 32){
+    for(var m = 2; m <= 4; m++){
+      if(T % m === 0 && T / m <= 32){ div = T / m; sub = m; break; }
+    }
+  }
+  if(r.div !== div || r.sub !== sub){
+    reshape(r, div, sub);
+    r.flash = [];              /* old indices point at steps that no longer exist */
+  }
+  var steps = [];
+  for(var k = 0; k < total(r); k++) steps.push(false);
+  recOn.forEach(function(k){ if(k >= 0 && k < steps.length) steps[k] = true; });
+  r.steps = steps;
+  /* the ring is audible while it is being tapped, so its tick counter has to be
+     put back against the current phase whenever the grid underneath it changes */
+  realign(r);
+}
+
+/* Place a tap. The current grid gets first refusal - if the tap plausibly
+   belongs to a step it already has, nothing changes and nothing moves. Only
+   when it clearly falls between steps is the grid doubled, tripled and so on
+   until the tap has a step of its own. */
+function recAdd(frac){
+  /* Every grid the dots could survive is a whole multiple of the one they are
+     on, so those are the only candidates. Each is scored on how far the tap
+     sits from the step it would take, plus a penalty for fineness - taking the
+     first grid that merely tolerated the tap put a quarter-note on a third. */
+  var best = null;
+  for(var m = 1; m <= MAX_STEPS; m++){
+    var T = recTotal * m;
+    if(T > MAX_STEPS) break;
+    if(!recShapeable(T)) continue;
+    var k = ((Math.round(frac * T) % T) + T) % T;
+    if(recOn.indexOf(k) >= 0) continue;        /* that step is already played */
+    var absErr = Math.abs(frac - k / T);
+    absErr = Math.min(absErr, 1 - absErr);     /* the circle wraps */
+    /* 0.0006 per step of fineness, tuned against a suite of tapped rhythms:
+       enough to prefer 4 over 8 for a clean quarter, little enough that fifths,
+       sevenths and sixteenths are still reachable when that is what was played */
+    var score = absErr + T * 0.0006;
+    if(best === null || score < best.score) best = {T:T, m:m, k:k, score:score};
+  }
+  if(!best) return -1;                         /* nothing fits: leave it alone */
+  if(best.m > 1){
+    recOn = recOn.map(function(j){ return j * best.m; });
+    recTotal = best.T;
+  }
+  recOn.push(best.k);
+  recOn.sort(function(a, b){ return a - b; });
+  recSimplify();
+  return best.k;
+}
+
+function recRemove(frac){
+  var tol = Math.min(0.12 / cycleDur(), 0.5 / Math.max(1, recTotal));
+  var hit = -1, near = 1e9;
+  recOn.forEach(function(k, i){
+    var d = Math.abs(frac - k / recTotal);
+    d = Math.min(d, 1 - d);    /* the circle wraps */
+    if(d < near){ near = d; hit = i; }
+  });
+  if(hit < 0 || near > tol) return false;
+  recOn.splice(hit, 1);
+  recSimplify();
+  return true;
+}
+
+function recStart(){
+  if(!S.rings[S.active]) return;
+  if(S.tapMode === "follow") setTapMode("");
+  /* A practice session borrows the whole setup and drives the tempo, which is
+     the opposite of what tapping a ring in needs, so it ends here rather than
+     merely pausing. It hands the setup back as it goes - and that resets which
+     ring is active, so the ring is read again below. */
+  if(run){ stop(); finishSession(); }
+  /* stop before claiming the mode: stop() ends a recording, so doing it after
+     would have this cancel itself the moment it began */
+  if(S.playing) stop();
+  var r = S.rings[S.active];
+  if(!r) return;
+  recPrev = {div:r.div, sub:r.sub, steps:r.steps.slice(), bpm:S.bpm};
+  recTaps = [];
+  recTotal = 1;
+  recOn = [];
+  recStartPhase = 0;
+  recPulse = -1e9;
+  S.tapMode = "record";
+  /* the taps are heard back, so the context has to be live even on ring 1,
+     where nothing starts the transport - this click is the gesture that allows it */
+  initAudio();
+  if(ctx && ctx.state === "suspended") ctx.resume();
+  document.documentElement.dataset.rec = "1";
+  syncSessBtn();
+  document.documentElement.style.setProperty("--reclc", "var(--c" + (S.active + 1) + ")");
+  /* whatever was on the ring goes: it is waiting to be played, not edited */
+  reshape(r, 1, 1);
+  r.steps = [false];
+  r.flash = [];
+  tapNow.hidden = false;
+  sessNow.hidden = true;
+  dialHint.hidden = true;
+  tapBar.hidden = true;              /* the wheel itself is the target now */
+  buildRack(); paintRack(); paintTapNow();
+}
+
+function recEnd(keep){
+  if(S.tapMode !== "record") return;
+  var r = S.rings[S.active];
+  var n = recTaps.length;
+  var enough = (S.active === 0) ? (n >= 2) : (n >= 1);
+  if(keep && enough){
+    /* Ring 1 is the pulse, so its taps set the tempo - exactly tap tempo. An
+       outer ring is played against rings already keeping time, so the tempo is
+       settled and the taps only say where the dots go. */
+    if(S.active === 0){
+      var mean = (recTaps[n-1] - recTaps[0]) / (n - 1) / 1000;
+      S.bpm = Math.max(20, Math.min(330, Math.round(60 / mean)));
+    }
+  } else if(recPrev){
+    reshape(r, recPrev.div, recPrev.sub);
+    if(recPrev.steps.length === total(r)) r.steps = recPrev.steps.slice();
+    S.bpm = recPrev.bpm;
+  }
+  recPrev = null;
+  recTaps = [];
+  recOn = [];
+  recTotal = 1;
+  S.tapMode = "";
+  document.documentElement.dataset.rec = "0";
+  syncSessBtn();
+  tapNow.hidden = true;
+  tapBar.hidden = true;
+  dialHint.hidden = !!run;
+  S.rings.forEach(function(rr){ realign(rr); });
+  buildRack(); paintTransport(); paintRack();
+  if(run) paintPlan();
+  queueSave();
+}
+
+/* The dot is heard as it is made. It arrives about 96ms after the finger, which
+   is why nothing else in the app answers a tap with sound - but here it confirms
+   what was placed rather than marking time, so being late costs little. Played
+   at full level even on a subdivision step: it is a confirmation, not the beat. */
+/* A session cannot be started into a ring with no pattern yet. Only Start is
+   barred - were one already running, Stop has to stay reachable rather than
+   trapping it. */
+function syncSessBtn(){
+  sessBtn.disabled = (S.tapMode === "record" && sessBtn.dataset.on !== "1");
+}
+
+function recSound(r){
+  if(!ctx || r.mute) return;     /* a silenced ring stays silenced */
+  if(ctx.state === "suspended") ctx.resume();
+  voice(r.sound, acNow(), r.vol, false);
+}
+
+function recTap(perfMs){
+  var r = S.rings[S.active];
+  var first = (recTaps.length === 0);
+  recPulse = performance.now();
+  recTaps.push(perfMs);
+  if(recTaps.length > 64) recTaps.shift();
+
+  if(S.active === 0){
+    /* Ring 1 is the pulse: the count is the division and the spacing is the
+       tempo, so its dots are even by definition. */
+    var div = Math.max(1, Math.min(32, recTaps.length));
+    if(div !== r.div || r.sub !== 1) reshape(r, div, 1);
+    r.steps = filled(total(r));
+    r.flash[div - 1] = performance.now();
+    recSound(r);
+    paintRack(); paintTapNow();
+    return;
+  }
+
+  /* An outer ring is played against the rings already written: the first tap
+     starts them and is the downbeat, and every tap after lands wherever the
+     hand happens to be. */
+  if(first){
+    if(!S.playing) start();
+    recStartPhase = 0;
+    recTotal = 1;
+    recOn = [0];
+    recShape();
+    r.flash[0] = performance.now();
+    recSound(r);
+    paintRack(); paintTapNow();
+    return;
+  }
+
+  var ph = heardPhase(perfMs);
+  if(ph === null) return;
+  var frac = ph - Math.floor(ph);
+
+  /* Once the first loop is behind us, a tap on a dot takes it off again, so a
+     pattern can be corrected without starting over. "On" is judged by distance,
+     not by which step it rounds to: on a coarse grid a deliberate new
+     subdivision rounds onto its neighbour and would delete it instead. */
+  var removed = (ph - recStartPhase >= 1) && recRemove(frac);
+  var placed = removed ? -1 : recAdd(frac);
+  recShape();
+  if(placed >= 0 && placed < total(r)){
+    r.flash[placed] = performance.now();
+    recSound(r);                 /* taking a dot off stays silent - it is a removal */
+  }
+  paintRack(); paintTapNow();
+}
+
+/* what the taps add up to so far */
+function recBpm(){
+  if(S.active !== 0) return null;      /* only ring 1's taps decide the tempo */
+  var n = recTaps.length;
+  if(n < 2) return null;
+  var mean = (recTaps[n-1] - recTaps[0]) / (n - 1) / 1000;
+  if(mean <= 0) return null;
+  return Math.round(Math.max(20, Math.min(330, 60 / mean)));
+}
+
+/* ------------------------------------------------------------------ readout */
+function tapMedian(a){
+  if(!a.length) return null;
+  var s = a.slice().sort(function(x,y){ return x-y; }), n = s.length;
+  return n % 2 ? s[(n-1)/2] : (s[n/2-1] + s[n/2]) / 2;
+}
+function tapSpread(a){
+  if(a.length < 4) return null;
+  var s = a.slice().sort(function(x,y){ return x-y; });
+  var q = function(p){ var i = (s.length-1)*p, lo = Math.floor(i), hi = Math.ceil(i);
+    return s[lo] + (s[hi]-s[lo]) * (i-lo); };
+  return q(0.75) - q(0.25);
+}
+
+function paintTapNow(){
+  if(!S.tapMode){ return; }
+  var r = S.rings[S.active], lbl = function(t){ return '<span class="k">'+t+'</span>'; };
+
+  if(S.tapMode === "record"){
+    var bpm = recBpm();
+    if(!recTaps.length){
+      tapNowIn.innerHTML = lbl("ring") + " " + (S.active+1) + "  " +
+        lbl(S.active === 0 ? "tap the pulse on the wheel" : "tap in time on the wheel");
+    } else {
+      if(S.active === 0){
+        tapNowIn.innerHTML = lbl("divisions") + " " + recTaps.length +
+          (bpm === null ? "  " + lbl("one more for the tempo") : "  " + bpm + " " + lbl("bpm"));
+      } else {
+        var on = r.steps.filter(Boolean).length;
+        tapNowIn.innerHTML = lbl("in") + " " + r.div +
+          (r.sub > 1 ? " ×" + r.sub : "") + "  " +
+          on + " " + lbl(on === 1 ? "dot" : "dots");
+      }
+    }
+    return;
+  }
+
+  var med = tapMedian(tapStat.offs), sp = tapSpread(tapStat.offs);
+  var drift;
+  if(med === null) drift = lbl("drift") + " &mdash;";
+  else if(Math.abs(med) < 8) drift = lbl("on the beat");
+  else drift = Math.round(Math.abs(med)) + " ms " + lbl(med < 0 ? "early" : "late");
+  tapNowIn.innerHTML = drift + (sp === null ? "" : "  " + lbl("spread") + " " + Math.round(sp) + " ms");
+
+  tbMain.textContent = tapStat.streak ? String(tapStat.streak) : "TAP";
+  tbSub.textContent = tapStat.n
+    ? "tight in a row · best " + tapStat.best + " · " + tapStat.tight + " of " + tapStat.n
+    : "with ring " + (S.active+1);
+}
+
+var barTimer = null;
+function flashBar(grade){
+  tapBar.dataset.grade = grade;
+  clearTimeout(barTimer);
+  barTimer = setTimeout(function(){ tapBar.dataset.grade = ""; }, 190);
+}
+
+/* --------------------------------------------------------------- mode switch */
+function setTapMode(mode){
+  if(S.tapMode === mode) mode = "";        /* the buttons toggle */
+  S.tapMode = mode;
+  tapHits = [];
+  tapStat = {offs:[], streak:0, best:0, n:0, tight:0};
+
+  if(mode) releasePress(null);     /* let go of any drag caught by the switch */
+  tapFollow.dataset.on = (mode === "follow") ? "1" : "0";
+  tapBar.hidden = !mode;
+  tapBar.dataset.grade = "";
+  tapNow.hidden = !mode;
+  if(mode){
+    sessNow.hidden = true;       /* only one of the two readouts fits the slot */
+    dialHint.hidden = true;
+  } else {
+    dialHint.hidden = !!run;
+    if(run) paintPlan();         /* hand the slot back to a running session */
+  }
+
+  if(mode){
+    tapHint.textContent = "Tap the bar under the dial in time with ring " + (S.active+1) +
+      ". Your taps stay on the dial as ticks, so you can see whether you run early or late.";
+    if(!S.playing) start();
+    paintTapNow();
+  } else {
+    tapHint.textContent = TAP_IDLE_TEXT;
+  }
+}
+
+/* ------------------------------------------------------------------- tap UI */
+var TAP_IDLE_TEXT = "Practise a rhythm with nothing but the phone. Tap along to see how close " +
+  "you are. To build a ring by tapping instead, use Tap pattern on the ring itself.";
+var tapPanel = document.getElementById("tapPanel");
+var tapHint = document.getElementById("tapHint");
+var tapFollow = document.getElementById("tapFollow");
+var tapBar = document.getElementById("tapBar");
+var tapNow = document.getElementById("tapNow");
+var tapNowIn = document.getElementById("tapNowIn");
+var tbMain = document.getElementById("tbMain");
+var tbSub = document.getElementById("tbSub");
+
+tapFollow.addEventListener("click", function(){ setTapMode("follow"); });
+tapBar.addEventListener("pointerdown", function(e){
+  e.preventDefault();
+  tapAt(e.timeStamp || performance.now());
+});
+
+/* --------------------------------------------------------------- session UI */
+var sessBtn = document.getElementById("sessBtn");
+var sFrom = document.getElementById("sFrom"), sTo = document.getElementById("sTo");
+var sStep = document.getElementById("sStep"), sPer = document.getElementById("sPer");
+var sPat = document.getElementById("sPat"), sSil = document.getElementById("sSil");
+var sPlan = document.getElementById("sPlan");
+var planSheet = document.getElementById("planSheet");
+var planSum = document.getElementById("planSum");
+var planBody = document.getElementById("planBody");
+var planNoteEl = document.getElementById("planNote");
+var planBtn = document.getElementById("planBtn");
+function showPlanSheet(on){
+  if(on) paintPlanSheet();
+  planSheet.hidden = !on;
+  if(on) document.getElementById("planClose").focus();
+  else planBtn.focus();
+}
+planBtn.addEventListener("click", function(){ showPlanSheet(true); });
+document.getElementById("planClose").addEventListener("click", function(){ showPlanSheet(false); });
+planSheet.addEventListener("click", function(e){ if(e.target === planSheet) showPlanSheet(false); });
+/* ==================================================== the sequence ==========
+   Patterns in the order you want to practise them, which the practice session
+   can then walk through instead of picking at random.
+
+   Two things worth knowing:
+
+   - A step stores a copy of the pattern, not a reference to it. Renaming or
+     deleting one of your presets afterwards leaves the sequence intact.
+   - Filling a step reuses the three libraries below rather than duplicating
+     fifty-odd chips into a modal: pressing + puts those tabs into pick mode and
+     the next chip you tap lands in the step. It is the same list you already
+     know, and there is only one copy of it to keep right. */
+
+var MAX_SEQ = 8;
+var pickSlot = null;          /* index being filled, or -1 for a new step */
+var seqDrag = null;
+var seqNoClick = false;       /* set when a pointerup ended a drag, not a tap */
+
+function seqRender(){
+  seqRow.innerHTML = "";
+  S.seq.forEach(function(step, i){
+    var b = document.createElement("button");
+    b.className = "seq-box";
+    b.type = "button";
+    b.title = step.name + " - tap to change, drag onto another step to swap";
+    b.innerHTML = '<span class="n">' + (i + 1) + '</span>' +
+                  '<span class="nm">' + escapeHtml(step.name) + '</span>';
+    b.addEventListener("click", function(){
+      if(seqNoClick){ seqNoClick = false; return; }
+      startPick(i);
+    });
+    b.addEventListener("pointerdown", function(e){ seqDown(e, i); });
+    seqRow.appendChild(b);
+  });
+
+  if(S.seq.length < MAX_SEQ){
+    var add = document.createElement("button");
+    add.className = "seq-add";
+    add.type = "button";
+    add.textContent = "+";
+    add.title = "Add a step";
+    add.setAttribute("aria-label", "Add a step");
+    add.addEventListener("click", function(){ startPick(-1); });
+    seqRow.appendChild(add);
+  }
+
+  seqNote.textContent = S.seq.length
+    ? S.seq.length + (S.seq.length === 1 ? " step" : " steps")
+    : "Press + to add a pattern";
+}
+
+/* ------------------------------------------------------------- filling a step */
+function startPick(i){
+  pickSlot = i;
+  pickMsg.textContent = (i < 0)
+    ? "Choose a pattern for step " + (S.seq.length + 1)
+    : "Choose a pattern for step " + (i + 1) + " - now " + S.seq[i].name;
+  pickDel.hidden = (i < 0);
+  pickBar.hidden = false;
+  pickBar.scrollIntoView({block:"nearest"});
+}
+function endPick(){
+  pickSlot = null;
+  pickBar.hidden = true;
+}
+/* every chip in the three libraries comes through here */
+function chipHit(name, cfg){
+  if(pickSlot === null){ applyConfig(cfg); return; }
+  var step = { name: name, rings: (cfg.rings || []).map(function(r){
+    return {div:r.div, sub:r.sub || 1, off:r.off || 0, sound:r.sound,
+            vol:r.vol, mute:!!r.mute, steps:Array.isArray(r.steps) ? r.steps.slice() : null};
+  })};
+  if(pickSlot < 0) S.seq.push(step); else S.seq[pickSlot] = step;
+  endPick();
+  seqRender();
+  paintPlan();
+  queueSave();
+}
+
+/* --------------------------------------------------------- dragging to swap */
+function seqDown(e, i){
+  if(pickSlot !== null) return;
+  var box = e.currentTarget;
+  seqDrag = {i:i, box:box, x:e.clientX, y:e.clientY, armed:false, dead:false, over:-1};
+  /* mouse arms on the smallest movement; touch has to hold, so that a finger
+     starting on a box can still scroll the page - same split as the dial */
+  if(e.pointerType === "touch"){
+    seqDrag.timer = setTimeout(function(){
+      if(seqDrag && !seqDrag.dead) seqArm(box, e.pointerId);
+    }, DRAG_HOLD);
+  }
+}
+function seqArm(box, id){
+  seqDrag.armed = true;
+  box.dataset.drag = "1";
+  try{ box.setPointerCapture(id); } catch(err){}
+}
+function seqMove(e){
+  if(!seqDrag || seqDrag.dead) return;
+  var dx = e.clientX - seqDrag.x, dy = e.clientY - seqDrag.y;
+  var dist = Math.sqrt(dx*dx + dy*dy);
+  if(!seqDrag.armed){
+    if(e.pointerType === "touch"){
+      /* moved before the hold landed: they are scrolling, not reordering */
+      if(dist > TAP_SLOP){ seqEnd(true); }
+    } else if(dist > MOUSE_SLOP){
+      seqArm(seqDrag.box, e.pointerId);
+    }
+    return;
+  }
+  e.preventDefault();
+  var t = document.elementFromPoint(e.clientX, e.clientY);
+  var box = t && t.closest ? t.closest(".seq-box") : null;
+  var j = box ? [].indexOf.call(seqRow.children, box) : -1;
+  if(j === seqDrag.i) j = -1;
+  if(j !== seqDrag.over){
+    [].forEach.call(seqRow.children, function(c){ delete c.dataset.over; });
+    if(j >= 0) seqRow.children[j].dataset.over = "1";
+    seqDrag.over = j;
+  }
+}
+function seqEnd(cancel){
+  if(!seqDrag) return;
+  var d = seqDrag;
+  seqDrag = null;
+  d.dead = true;
+  if(d.timer) clearTimeout(d.timer);
+  delete d.box.dataset.drag;
+  [].forEach.call(seqRow.children, function(c){ delete c.dataset.over; });
+  if(!d.armed) return;
+  seqNoClick = true;                       /* the pointerup was a drag, not a tap */
+  if(cancel || d.over < 0 || d.over >= S.seq.length) return;
+  var a = S.seq[d.i]; S.seq[d.i] = S.seq[d.over]; S.seq[d.over] = a;
+  seqRender();
+  paintPlan();
+  queueSave();
+}
+
+var seqRow = document.getElementById("seqRow");
+var seqNote = document.getElementById("seqNote");
+var pickBar = document.getElementById("pickBar");
+var pickMsg = document.getElementById("pickMsg");
+var pickDel = document.getElementById("pickDel");
+var pickCancel = document.getElementById("pickCancel");
+
+window.addEventListener("pointermove", seqMove);
+window.addEventListener("pointerup", function(){ seqEnd(false); });
+window.addEventListener("pointercancel", function(){ seqEnd(true); });
+pickCancel.addEventListener("click", endPick);
+pickDel.addEventListener("click", function(){
+  if(pickSlot === null || pickSlot < 0) return;
+  S.seq.splice(pickSlot, 1);
+  endPick(); seqRender(); paintPlan(); queueSave();
+});
+
+var sessNow = document.getElementById("sessNow");
+var sessNowIn = document.getElementById("sessNowIn");
+var dialPat = document.getElementById("dialPat");
+var lastPos = "";
+var dialHint = document.getElementById("dialHint");
+
+[sFrom, sTo, sStep, sPer, sPat, sSil].forEach(function(el){
+  el.addEventListener("change", function(){
+    if(!run) paintPlan();          /* a running session keeps the plan it started with */
+    queueSave();
+  });
+  el.addEventListener("input", function(){ if(!run) paintPlan(); });
+});
+sessBtn.addEventListener("click", function(){
+  if(run){ stop(); finishSession(); } else { startSession(); }
+});
+
+/* ------------------------------------------------------------------- boot */
+/* The dial header carries what used to sit in the hub: the ratio and rotation
+   time on the left, position on the right - and, while a ring is being dragged,
+   that ring's offset, since its card is often scrolled out of view. */
+function tickLabel(){
+  var counting = false;
+  if(!S.playing){ posLbl.textContent = run ? "paused" : "stopped"; }
+  else {
+    var p = phaseNow();
+    var beats = baseBeats();
+    if(ciRun && p < 0){
+      counting = true;
+      posLbl.textContent = "count-in " + Math.min(COUNT_BEATS, Math.ceil(-p * beats - 1e-9));
+    } else {
+      var pp = p < 0 ? 0 : p;      /* the lead before the first tick reads as beat 1 */
+      var pos = pp - Math.floor(pp);
+      /* SILENT is called out under the dial - saying it twice reads as two states */
+      posLbl.textContent = "beat " + (Math.floor(pos * beats) + 1) + " / " + beats;
+    }
+  }
+
+  /* only on change: rewriting the same value 16 times a second keeps nudging
+     the opacity transition and the fade crawls instead of taking its 180ms */
+  var wantPre = counting ? "1" : "0";
+  if(wantPre !== playBtn.dataset.preroll) playBtn.dataset.preroll = wantPre;
+
+  var wantRatio;
+  if(press && press.armed){
+    var dr = S.rings[press.ring];
+    var tw = Math.round(dr.off * 12);
+    wantRatio = "ring " + (press.ring + 1) + " · " +
+      (tw === 0 ? "aligned" : FRACTIONS[tw] + " step");
+  } else {
+    /* just the ratio: four rings plus the rotation time overran the header, and
+       the seconds are already on the transport's own line a few pixels above */
+    wantRatio = ratioString();
+  }
+  /* refitting 16 times a second would measure the same string over and over */
+  if(wantRatio !== dialRatio.textContent || posLbl.textContent !== lastPos){
+    dialRatio.textContent = wantRatio;
+    lastPos = posLbl.textContent;
+    fitHead();
+  }
+
+  setTimeout(tickLabel, 60);
+}
+
+if(!document.querySelector('meta[name="viewport"]')){
+  var mv = document.createElement("meta");
+  mv.name = "viewport";
+  mv.content = "width=device-width, initial-scale=1";
+  document.head.appendChild(mv);
+}
+
+/* Skin: dark unless this browser has opted into light. Deliberately independent
+   of the viewer's system/app theme, so the panel looks the same on a phone. */
+var SKIN_KEY = "polyrhythm-circle:skin";
+var skinBtn = document.getElementById("skin");
+var skinTxt = document.getElementById("skinTxt");
+var skinIcon = document.getElementById("skinIcon");
+var MOON = '<path fill="currentColor" d="M12.9 2.8A7.6 7.6 0 0 0 12 18a7.6 7.6 0 0 0 7.2-5.2 6.2 6.2 0 0 1-6.3-10z"/>';
+var SUN = '<g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">' +
+  '<circle cx="12" cy="12" r="4"/><path d="M12 2.6v2.1M12 19.3v2.1M2.6 12h2.1M19.3 12h2.1' +
+  'M5.4 5.4l1.5 1.5M17.1 17.1l1.5 1.5M18.6 5.4l-1.5 1.5M6.9 17.1l-1.5 1.5"/></g>';
+
+function applySkin(skin, store){
+  var light = (skin === "light");
+  document.documentElement.setAttribute("data-skin", light ? "light" : "dark");
+  skinTxt.textContent = light ? "Light" : "Dark";
+  skinIcon.innerHTML = light ? SUN : MOON;
+  skinBtn.title = light ? "Switch to the dark skin" : "Switch to the light skin";
+  if(store){ try{ localStorage.setItem(SKIN_KEY, light ? "light" : "dark"); } catch(err){} }
+  readTheme();
+}
+var storedSkin = null;
+try{ storedSkin = localStorage.getItem(SKIN_KEY); } catch(err){}
+applySkin(storedSkin === "light" ? "light" : "dark", false);
+skinBtn.addEventListener("click", function(){
+  applySkin(document.documentElement.getAttribute("data-skin") === "light" ? "dark" : "light", true);
+});
+
+var storedUi = null;
+try{ storedUi = localStorage.getItem(UI_KEY); } catch(err){}
+paintUi(storedUi === "simple");
+
+restoreSession();
+
+sizeCanvas();
+buildRack();
+applyMaster();
+paintCount();      /* a restored count-in has to show on its button */
+paintPtabs();
+seqRender();
+tapHint.textContent = TAP_IDLE_TEXT;
+paintPlan();
+paintTransport();
+paintRack();
+paintMine();
+tickLabel();
+requestAnimationFrame(draw);
+document.fonts && document.fonts.ready.then(sizeCanvas);
+})();
+</script>
+
+<script>
+/* PWA plumbing for the hosted build: offline cache, an Install button, a screen
+   wake lock while playing, and a ?diag panel that reports why Chrome might be
+   refusing to install. All of it is optional - if an API is missing the app
+   simply runs without that part. */
+(function(){
+  "use strict";
+
+  /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
+     is almost always two different builds, so make the build readable. */
+  var BUILD = "2026-09-02 21:37";
+  window.POLY_BUILD = BUILD;
+
+  var deferred = null;          /* the captured beforeinstallprompt event */
+  var promptFired = false;
+
+  function standalone(){
+    try{
+      return matchMedia("(display-mode: standalone)").matches ||
+             matchMedia("(display-mode: fullscreen)").matches ||
+             matchMedia("(display-mode: minimal-ui)").matches ||
+             navigator.standalone === true;
+    } catch(err){ return false; }
+  }
+
+  /* ---- service worker ------------------------------------------------- */
+  if("serviceWorker" in navigator){
+    addEventListener("load", function(){
+      navigator.serviceWorker.register("./sw.js").catch(function(err){
+        console.warn("service worker did not register:", err);
+      });
+    });
+  }
+
+  /* ---- install button ------------------------------------------------- */
+  function showInstall(){
+    if(standalone() || document.getElementById("installBtn")) return;
+    var b = document.createElement("button");
+    b.id = "installBtn";
+    b.className = "btn";
+    b.textContent = "Install app";
+    b.style.borderColor = "var(--c2)";
+    b.style.color = "var(--ink)";
+    b.addEventListener("click", function(){
+      if(!deferred) return;
+      deferred.prompt();
+      deferred.userChoice.then(function(res){
+        if(res && res.outcome === "accepted") b.remove();
+        deferred = null;
+      });
+    });
+    var host = document.querySelector(".np-right") || document.body;
+    host.appendChild(b);
+  }
+  addEventListener("beforeinstallprompt", function(e){
+    e.preventDefault();
+    deferred = e;
+    promptFired = true;
+    showInstall();
+  });
+  addEventListener("appinstalled", function(){
+    var b = document.getElementById("installBtn");
+    if(b) b.remove();
+  });
+
+  /* ---- keep the screen awake while it plays --------------------------- */
+  var lock = null;
+  function wake(on){
+    if(!("wakeLock" in navigator)) return;
+    if(on && !lock){
+      navigator.wakeLock.request("screen").then(function(l){
+        lock = l;
+        l.addEventListener("release", function(){ lock = null; });
+      }).catch(function(){});
+    } else if(!on && lock){
+      lock.release().catch(function(){});
+      lock = null;
+    }
+  }
+  var play = document.getElementById("play");
+  if(play){
+    new MutationObserver(function(){ wake(play.dataset.on === "1"); })
+      .observe(play, {attributes:true, attributeFilter:["data-on"]});
+  }
+  document.addEventListener("visibilitychange", function(){
+    if(document.visibilityState === "visible" && play && play.dataset.on === "1") wake(true);
+  });
+
+  /* ---- ?diag ----------------------------------------------------------- */
+  if(!/[?&]diag/.test(location.search)) return;
+
+  var box = document.createElement("pre");
+  box.style.cssText = "margin:18px auto;max-width:1180px;padding:14px 18px;" +
+    "background:var(--panel);border:1px solid var(--line);border-radius:12px;" +
+    "color:var(--ink-2);font:12px/1.6 ui-monospace,Menlo,Consolas,monospace;" +
+    "white-space:pre-wrap;overflow-x:auto";
+  document.querySelector(".wrap").appendChild(box);
+
+  var lines = [];
+  function say(k, v){ lines.push(k + ": " + v); box.textContent = lines.join("\n"); }
+
+  var localhost = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+  var secureOrigin = (location.protocol === "https:") || localhost;
+  say("build", BUILD);
+  say("url", location.href);
+  say("protocol", location.protocol +
+    (secureOrigin ? (localhost ? "  OK (localhost counts as secure)" : "  OK")
+                  : "  NOT https - install is impossible"));
+  say("secure context", (window.isSecureContext ? "yes" : "NO"));
+  say("display-mode", standalone() ? "standalone (already installed)" : "browser tab");
+  say("serviceWorker API", ("serviceWorker" in navigator) ? "present" : "MISSING");
+
+  var link = document.querySelector('link[rel="manifest"]');
+  say("manifest link", link ? link.href : "MISSING FROM PAGE");
+
+  if(link){
+    fetch(link.href, {cache:"no-store"}).then(function(res){
+      say("manifest HTTP", res.status + "  type=" + (res.headers.get("content-type") || "?"));
+      return res.json();
+    }).then(function(j){
+      say("manifest name", j.name || "(none)");
+      say("manifest display", j.display || "(none)");
+      say("manifest start_url", j.start_url || "(none)");
+      var icons = j.icons || [];
+      say("manifest icons", icons.length + " declared");
+      icons.forEach(function(ic){
+        var u = new URL(ic.src, link.href).href;
+        fetch(u, {cache:"no-store"}).then(function(r){
+          say("  icon " + (ic.sizes || "?"), r.status + (r.status === 200 ? "" : "  <-- BROKEN"));
+        }).catch(function(e){ say("  icon " + ic.sizes, "FETCH FAILED " + e.message); });
+      });
+    }).catch(function(e){
+      say("manifest ERROR", e.message + "  (bad JSON, wrong path, or 404 page returned)");
+    });
+  }
+
+  fetch("./sw.js", {cache:"no-store"}).then(function(r){
+    say("sw.js HTTP", r.status + "  type=" + (r.headers.get("content-type") || "?"));
+  }).catch(function(e){ say("sw.js", "FETCH FAILED " + e.message); });
+
+  if("serviceWorker" in navigator){
+    navigator.serviceWorker.getRegistration().then(function(reg){
+      if(!reg){ say("sw registration", "NONE yet"); return; }
+      say("sw registration", "scope " + reg.scope);
+      say("sw state", (reg.active && "active") || (reg.installing && "installing") ||
+                      (reg.waiting && "waiting") || "unknown");
+    }).catch(function(e){ say("sw registration", "ERROR " + e.message); });
+  }
+
+  setTimeout(function(){
+    say("beforeinstallprompt", promptFired
+      ? "fired - Install app is available"
+      : "not fired (already installed, criteria unmet, or Chrome is still checking)");
+    say("verdict", promptFired ? "installable - use the Install app button"
+      : !secureOrigin ? "blocked: serve this over https"
+      : standalone() ? "already installed"
+      : "everything above looks fine, so Chrome is either still checking (reload once) "
+        + "or this browser is not Chrome/Edge. Use the browser menu and look for "
+        + "'Install app' rather than 'Add to Home screen'.");
+  }, 2500);
+})();
+</script>
+</body>
+</html>

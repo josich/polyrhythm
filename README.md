@@ -1,49 +1,52 @@
-# Polyrhythm Circle — installing it on a phone
+# Polyrhythm Circle
 
-Two copies, for two different jobs.
+A polyrhythm metronome for practising on a phone. Ring 1 clicks at your tempo;
+up to three more rings fit their own divisions into the same rotation, so 5
+against 4 or 7 against 8 sits in front of you as a circle rather than a number.
 
-## 1. `polyrhythm-offline.html` — the one that cannot break
+**Open it:** https://josich.github.io/polyrhythm/
 
-One file, nothing outside it: the icons and both typefaces are embedded, so it
-needs no server and no connection, ever. Copy it to the phone and open it from
-Files or Downloads.
+Built for practising guitar with the phone propped up nearby, so the sounds are
+pitched to carry on a phone speaker rather than to sound pretty on headphones.
 
-What you give up: a browser can only install an app from a real address, so this
-one opens in a browser tab rather than as its own app with an icon. Keep it as
-the copy that always works.
+## Install it on your phone
 
-## 2. `pwa/` — the installable app
+Open the link above and the app offers to install itself.
 
-Upload this folder to a host that serves it over https, open the address on the
-phone, then use Install.
+- **Android / Chrome** — tap **Install**, or the ⋮ menu → *Install app*.
+- **iPhone / Safari** — there is no Install button; use **Share → Add to Home
+  Screen**. Two things differ on iOS: the screen will not stay awake while
+  playing, and you have to tap play once before iOS permits any sound.
+- **Computer** — Chrome and Edge can install it from the same link.
 
-**The address has to keep working.** Netlify Drop links expire unless the site is
-claimed into an account, and once the address dies the app can no longer update.
-Somewhere permanent and free:
+You need a connection for that first open only. After installing, the app runs
+from the phone: no internet, no loading, nothing to wait for. Turn on aeroplane
+mode and open it from its icon to see for yourself.
 
-- **GitHub Pages** — make a repository, put these files at its root, then
-  Settings → Pages → Deploy from branch → `main` / root. The address
-  `https://<user>.github.io/<repo>/` does not expire.
-- **Netlify** — sign in first, then drag the folder in, so the site belongs to
-  your account rather than being an anonymous drop.
-- **Cloudflare Pages** — same idea, connect a repository.
+## What it does
 
-### After every rebuild
+- **Up to four rings**, each with its own divisions, sound, level and mute.
+- **Offset** a ring to sit off the beat, by dragging it round or by slider.
+- **Subdivisions** (×2 ×3 ×4) for accents, and any single beat can be silenced.
+- **55 rhythms** from ten regions — clave, bulerías, aksak, dembow, samba,
+  Ewe bell patterns and so on — plus the classic ratios.
+- **Tap a pattern in** rather than dialling it: tap the wheel and the taps decide
+  the divisions, and on ring 1 the tempo too.
+- **Tap along** to practise timing with no instrument at all. Every tap is
+  graded and left on the dial, so you can see whether you run early or late.
+- **Practice sessions** that walk the tempo up a step at a time, silence loops at
+  random so you have to hold the time yourself, and swap patterns as they go.
+- **Dark or light**, and it never follows the phone's theme — a metronome
+  propped on a music stand should look the same at every hour.
 
-`sh build-pwa.sh` writes `pwa/index.html`, then bump `CACHE` in `pwa/sw.js`
-(`polyrhythm-v10` → `v11`) and re-upload. Installed phones pick the new version
-up on the next launch.
+## Your things stay yours
 
-### Why a dead link used to break the installed app
+Presets, tapped patterns and everything you set are kept by your own browser on
+your own device. Nothing is uploaded, there is no account, and there is nothing
+to sign up for. Clearing your browser's data for this site is what removes them.
 
-The service worker asked the network for the page first, so a fix appeared
-without waiting for a cache bump. But a host that has expired still *answers* —
-with its own "site not found" page, which is a perfectly valid HTTP response.
-The worker took it at face value: it served the error instead of the app and
-overwrote the offline copy with it, so the installed app died along with the
-address.
+## Sharing it
 
-It now only accepts a response as the app if it arrives with a success status,
-is HTML, and contains a string only this app contains. Anything else falls back
-to the cached copy, so a dead or misconfigured host can no longer take the app
-with it.
+The link works for anyone — send it on and they can install it the same way.
+Mention the Install step, or they will end up with a bookmark and never get the
+icon.

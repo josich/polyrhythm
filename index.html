@@ -329,6 +329,9 @@ input[type=range]::-moz-range-thumb{
 .tapnow .k{color:var(--ink-3)}
 /* set from the active ring so the readout belongs to the same thing the card does */
 :root[data-rec="1"] #tapNowIn{color:var(--reclc,var(--ink))}
+/* the whole line is labels while a ring listens, so they take the ring's colour
+   rather than the muted grey they wear elsewhere */
+:root[data-rec="1"] #tapNowIn .k{color:inherit}
 .tap-hint{margin:0; font-size:12.5px; color:var(--ink-2); line-height:1.6}
 .btn.sm[data-on="1"]{
   border-color:var(--c2); color:var(--ink);
@@ -368,6 +371,9 @@ input[type=range]::-moz-range-thumb{
 }
 .pickbar .msg{font-size:12.5px;color:var(--ink)}
 .btn.sm{padding:5px 10px;font-size:11.5px}
+/* the repeat toggle: a square button carrying the two-arrow loop */
+.btn.sm.icon{padding:5px;width:29px;height:29px;display:grid;place-items:center;flex:none}
+.btn.sm.icon svg{width:16px;height:16px;display:block}
 
 /* While a session runs, where you are in it matters more than a tip you have
    already read, so it takes the hint's place at the ratio readout's size. */
@@ -377,11 +383,15 @@ input[type=range]::-moz-range-thumb{
 /* sized by font-size, not transform: a scaled transform keeps the box's layout
    width, so an over-long line stayed off-centre and clipped on the right. The
    label sizes are em so they come along. */
-#sessNowIn{
+/* both readouts share the slot, so they share its type: one line, never wrapped,
+   shrunk to fit if the sentence is long */
+#sessNowIn, #tapNowIn{
   display:inline-block;white-space:nowrap;
   font-size:16px;font-weight:500;color:var(--ink);letter-spacing:.01em;
 }
-#sessNowIn .k{font-size:.69em;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+#sessNowIn .k, #tapNowIn .k{
+  font-size:.69em;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);
+}
 #sessNowIn .sil{color:var(--c3);letter-spacing:.06em}
 /* Any class that sets `display` out-specifies the UA rule for [hidden], which
    left dismissed panels on screen. One rule covers every toggle in the app. */
@@ -422,6 +432,9 @@ canvas{
   width:100%;height:100%;display:block;touch-action:manipulation;
   /* a mouse-drag across the dial must not start selecting the page */
   user-select:none;-webkit-user-select:none;-webkit-user-drag:none;
+  /* Chrome on Android paints a blue box over anything it thinks is tappable,
+     which during tap pattern covered the wheel */
+  -webkit-tap-highlight-color:transparent;
 }
 /* side room so it can never run under the info button in the corner */
 /* minmax(0,1fr), not the default auto: a nowrap readout would otherwise set the
@@ -446,7 +459,7 @@ canvas{
   border-color:var(--lc); color:var(--ink);
   background:color-mix(in srgb,var(--lc) 18%,transparent);
 }
-:root[data-ui="simple"] .tapbtn{display:none}
+:root[data-ui="simple"] .tap-row{display:none}
 /* While a ring listens the whole wheel is the tap target, so the play button
    steps out of the way, and the two controls that would fight over the tempo
    are put beyond reach. */
@@ -466,17 +479,13 @@ canvas{
 .ring-card[data-rec="1"] .off-head,
 .ring-card[data-rec="1"] input[data-off]{opacity:.32; pointer-events:none}
 .ring-card[data-rec="1"] .div-num{color:var(--lc)}
-/* Three columns with the tap button in the middle one: the two 1fr sides are
-   equal by definition, so it lands in the same place on every tab. As a flex row
-   with spacers it drifted, because ring 1 has no delete button and so one fewer
-   item to balance against. */
-.rc-top{
-  display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
-  align-items:center;gap:8px;margin-bottom:9px;
-}
-.rc-side{display:flex;align-items:center;gap:8px;min-width:0}
-.rc-side.end{justify-content:flex-end}
+.rc-top{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.rc-top .spacer{margin-left:auto}
 .rc-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Its own row between the two sliders, so the header keeps the mute and close
+   buttons hard right where they belong - and stays put in simple mode, where
+   the button is hidden and a header slot would have collapsed. */
+.tap-row{display:flex;justify-content:center;margin:10px 0 2px}
 .swatch{width:11px;height:11px;border-radius:50%;background:var(--lc);flex:none}
 .rc-name{font-weight:600;font-size:13.5px;letter-spacing:-.01em}
 .chip{
@@ -552,6 +561,9 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
   background:color-mix(in srgb,var(--lc) 16%,transparent);
   border-color:var(--lc);color:var(--ink);
 }
+/* an active tab with its settings folded away sits flat, so the strip shows at a
+   glance whether there is a card below it */
+.tab[data-on="1"][data-open="0"]{background:transparent}
 .tab[data-mute="1"] .tabdot{background:var(--dot-off)}
 .tab[data-mute="1"]{color:var(--ink-3)}
 .tab.add{flex:0 0 44px;font-size:17px;font-weight:500;font-family:inherit}
@@ -577,13 +589,59 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .pane{padding-top:14px}
 .pane[hidden]{display:none}
 .pgrid{display:flex;gap:8px;flex-wrap:wrap;margin:0}
-.rgroup{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--ink-3);margin:16px 0 8px}
+/* Fifty-five rhythms in ten regions is a long scroll, so each region closes.
+   The headings then read as an index, with the count of what is inside. */
+.rgroup{
+  display:flex;align-items:center;gap:8px;width:100%;
+  font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3);margin:14px 0 8px;padding:5px 0;
+  background:none;border:0;border-bottom:1px solid var(--line);
+  text-align:left;cursor:pointer;font-family:inherit;
+  -webkit-tap-highlight-color:transparent;
+}
 .rgroup:first-child{margin-top:0}
+.rgroup:hover{color:var(--ink)}
+.rgroup .rgname{flex:1 1 auto;min-width:0}
+.rgroup .rgcount{
+  flex:none;font-family:"IBM Plex Mono",monospace;letter-spacing:0;
+  font-size:10.5px;color:var(--ink-3);
+}
+.rgroup svg{width:13px;height:13px;flex:none;transition:transform .16s ease}
+.rgroup[data-fold="1"] svg{transform:rotate(-90deg)}
+.rgroup[data-fold="1"]{margin-bottom:0}
+@media (prefers-reduced-motion:reduce){ .rgroup svg{transition:none} }
 
 /* Practice session. Written as a sentence you can read straight through, with
    the whole plan spelled out underneath before you commit to it. */
 .sess-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+/* Folded, a section keeps only its heading - a slim named bar - and everything
+   below it closes the gap. Hiding the children rather than wrapping them in a
+   box means no section had to be restructured to gain this. */
+.caret{
+  flex:none;width:24px;height:24px;padding:0;margin:0;border:0;background:none;
+  color:var(--ink-3);cursor:pointer;display:grid;place-items:center;
+  -webkit-tap-highlight-color:transparent;
+}
+.caret svg{width:15px;height:15px;display:block;transition:transform .16s ease}
+.caret:hover{color:var(--ink)}
+.presets[data-fold="1"]{padding-top:13px;padding-bottom:13px;cursor:pointer}
+.presets[data-fold="1"] > *:not(.sess-head){display:none}
+.presets[data-fold="1"] .sess-head{margin-bottom:0}
+.presets[data-fold="1"] .sess-head > *:not(.caret):not(.lbl){display:none}
+.presets[data-fold="1"] .caret svg{transform:rotate(-90deg)}
+@media (prefers-reduced-motion:reduce){ .caret svg{transition:none} }
+
+/* Something is running in there: the bar breathes so a folded section cannot
+   quietly keep playing. Same sine stops as the + hint on the rings. */
+.presets[data-fold="1"][data-live="1"]{animation:secPulse 2s linear infinite}
+@keyframes secPulse{
+  0%,100%    {border-color:var(--line);                                  background:var(--panel)}
+  12.5%,87.5%{border-color:color-mix(in srgb,var(--c1) 38%,var(--line)); background:color-mix(in srgb,var(--c1) 4%,var(--panel))}
+  25%,75%    {border-color:color-mix(in srgb,var(--c1) 71%,var(--line)); background:color-mix(in srgb,var(--c1) 7%,var(--panel))}
+  37.5%,62.5%{border-color:color-mix(in srgb,var(--c1) 92%,var(--line)); background:color-mix(in srgb,var(--c1) 9%,var(--panel))}
+  50%        {border-color:var(--c1);                                    background:color-mix(in srgb,var(--c1) 10%,var(--panel))}
+}
+@media (prefers-reduced-motion:reduce){ .presets[data-fold="1"][data-live="1"]{animation:none} }
 .sess-head .lbl{margin-right:auto}
 /* the plan, stage by stage: one line each, tempo first */
 .plan-sum{font-size:12.5px;color:var(--ink-2);line-height:1.6;margin:0 0 12px;
@@ -613,8 +671,14 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .sess-gap{margin-left:14px}
 @media (max-width:640px){ .sess-gap{margin-left:0} }
+/* the summary reads left, the way into the detail sits bottom right */
+.sess-foot{
+  display:flex;align-items:flex-end;gap:12px;
+  margin-top:12px;padding-top:11px;border-top:1px dashed var(--line);
+}
+.sess-foot #planBtn{flex:none;margin:0}
 .sess-plan{
-  margin:12px 0 0;padding-top:11px;border-top:1px dashed var(--line);
+  margin:0;flex:1 1 auto;min-width:0;
   font-size:12px;color:var(--ink-2);line-height:1.6;
 }
 .sess-plan b{color:var(--ink);font-weight:600}
@@ -747,8 +811,34 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
 
   <section class="presets" id="sessionPanel">
     <div class="sess-head">
+      <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
       <span class="lbl">Practice session</span>
-      <button class="btn sm" id="planBtn">Plan</button>
+      <button class="btn sm icon" id="sessPong" data-on="0"
+              title="Play the plan out and back again"
+              aria-label="Out and back" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 8h18M3 16h18" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round"></path>
+          <path d="M18 5l3 3-3 3" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+          <path d="M6 13l-3 3 3 3" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </button>
+      <button class="btn sm icon" id="sessLoop" data-on="0"
+              title="Repeat the plan for as long as you like"
+              aria-label="Repeat the plan" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 9a6 6 0 0 1 6-6h7" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round"></path>
+          <path d="M14 1l3 2-3 2" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+          <path d="M20 15a6 6 0 0 1-6 6H7" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round"></path>
+          <path d="M10 23l-3-2 3-2" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </button>
       <button class="btn" id="sessBtn" data-on="0">Start</button>
     </div>
 
@@ -785,11 +875,15 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
       </select>
     </div>
 
-    <p class="sess-plan" id="sPlan"></p>
+    <div class="sess-foot">
+      <p class="sess-plan" id="sPlan"></p>
+      <button class="btn sm" id="planBtn">Plan</button>
+    </div>
   </section>
 
   <section class="presets" id="tapPanel">
     <div class="sess-head">
+      <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
       <span class="lbl">Tapping</span>
       <button class="btn sm" id="tapFollow" data-on="0">Tap along</button>
     </div>
@@ -798,13 +892,18 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
 
   <section class="presets" id="seqPanel">
     <div class="sess-head">
+      <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
       <span class="lbl">Sequence</span>
       <span class="seq-note" id="seqNote"></span>
     </div>
     <div class="seq-row" id="seqRow"></div>
   </section>
 
-  <section class="presets">
+  <section class="presets" id="patPanel">
+    <div class="sess-head">
+      <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+      <span class="lbl">Patterns</span>
+    </div>
     <!-- shown only while a sequence step is waiting to be filled -->
     <div class="pickbar" id="pickBar" hidden>
       <span class="msg" id="pickMsg"></span>
@@ -890,6 +989,7 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
       <li>A <b>subdivision</b> sounds on its own, beat off or not.</li>
       <li><b>Offset</b> nudges it off the beat.</li>
       <li>Each ring has its own <b>sound</b>, level and mute.</li>
+      <li>Tap the <b>tab</b> already showing to fold these away.</li>
     </ul>
 
     <h3>Practice session</h3>
@@ -897,6 +997,8 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
       <li>Change <b>tempo</b> by small <b>increments</b> each amount of <b>loops</b>.</li>
       <li>Random <b>silent</b> loops.</li>
       <li><b>Patterns</b> played randomly each increment of time.</li>
+      <li>The <b>repeat</b> button plays the whole plan over again.</li>
+      <li><b>Out and back</b> runs it to the end and home again.</li>
     </ul>
 
     <h3>Sequence</h3>
@@ -926,6 +1028,9 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
       <li>Between sessions <b>autosave</b>.</li>
       <li><b>Advanced</b> buttons shows/hide some features.</li>
       <li><b>Preset</b> chips are classic ratios; name your own below.</li>
+      <li>The <b>triangle</b> folds a section down to its name.</li>
+      <li>A folded section <b>blinks</b> while something inside it runs.</li>
+      <li>Each <b>region</b> of rhythms opens and closes the same way.</li>
     </ul>
   </div>
 </div>
@@ -954,7 +1059,11 @@ var S = {
   active: 0,       /* which ring's card the tab strip is showing */
   ptab: "mine",
   seq: [],
-  tapMode: "",                 /* "", "follow" or "record" - never persisted */    /* which presets tab is open */
+  tapMode: "",                 /* "", "follow" or "record" - never persisted */
+  sessLoop: false,             /* repeat the practice plan instead of ending */
+  sessPong: false,             /* and run it out and back rather than only out */
+  fold: {},                    /* which sections are folded away, by key */
+  rfold: {},                   /* which rhythm regions are closed, by name */    /* which presets tab is open */
   countIn: false,
   playing: false,
   rings: [ mkRing(0,4), mkRing(1,3) ]
@@ -1182,7 +1291,7 @@ function start(){
   /* the clock always restarts at phase 0; this records which loop of the plan
      phase 0 now is, so a resumed session picks up where it paused instead of
      waiting out however many cycles it had already played */
-  if(run) run.off = run.cur;
+  if(run) run.base = 0;        /* the clock restarts at 0, so the loop does too */
   S.playing = true;
   paintTransport();
   if(S.tapMode === "record") paintTapNow();   /* play is what starts it listening */
@@ -1275,6 +1384,7 @@ window.addEventListener("resize", function(){
   sizeCanvas();
   if(run) run.scale = null;      /* the slot changed width - measure again */
   fitSessNow();
+  fitTapNow();
   fitHead();
 });
 
@@ -1293,6 +1403,7 @@ var DRAG_HOLD = 500;   /* ms a finger must hold before the ring becomes draggabl
 var TAP_SLOP = 12;     /* px of finger movement that still counts as a tap */
 var MOUSE_SLOP = 4;    /* px of mouse movement that starts a drag */
 var press = null;      /* {ring, id, touch, x0, y0, t0, armed, lastPhase, acc, startOff} */
+var slideRing = -1;    /* ring whose offset slider is being worked, for the dial */
 var hoverRing = -1;
 
 function draw(){
@@ -1353,7 +1464,9 @@ function draw(){
     g2.globalAlpha = 1;
   }
 
-  var armedRing = (press && press.armed) ? press.ring : -1;
+  /* nudging the offset by slider is the same act as dragging the ring round, so
+     it lights the ring the same way rather than changing it out of sight */
+  var armedRing = (press && press.armed) ? press.ring : (slideRing >= 0 ? slideRing : -1);
   var holdRing  = (press && !press.armed) ? press.ring : -1;
   var holdT = (holdRing >= 0) ? Math.min(1, (tnow - press.t0) / DRAG_HOLD) : 0;
 
@@ -1548,6 +1661,10 @@ var suppressClick = false;
 
 cv.addEventListener("click", function(e){
   if(suppressClick){ suppressClick = false; return; }
+  /* While a ring listens the wheel is the tap target. pointerdown already took
+     the tap, but the click that follows it would land here and silence whichever
+     dot it happened to hit. */
+  if(S.tapMode === "record") return;
   var rect = cv.getBoundingClientRect();
   var x = e.clientX - rect.left, y = e.clientY - rect.top;
   var best = null, bd = Infinity;
@@ -1696,6 +1813,10 @@ var rack = document.getElementById("rack");
 /* deliberately not persisted: the hint is per session, so a fresh open shows it
    again to anyone still learning where rings come from */
 var addUsed = false;
+/* The settings for a ring are only wanted while you are shaping one, so the tab
+   of the ring already showing folds them away and everything below moves up.
+   Not remembered between sessions: the app opens with them in view. */
+var rackOpen = true;
 
 function buildRack(){
   rack.innerHTML = "";
@@ -1717,12 +1838,28 @@ function buildRack(){
     t.title = "Ring " + (i+1);
     t.setAttribute("aria-label", t.title);
     t.innerHTML = '<span class="tabdot"></span><span class="tabword">Ring </span><span>' + (i+1) + '</span>';
+    t.dataset.open = (i === S.active && rackOpen) ? "1" : "0";
+    t.title = (i === S.active)
+      ? (rackOpen ? "Ring " + (i+1) + " - tap to fold the settings away"
+                  : "Ring " + (i+1) + " - tap to show the settings")
+      : "Ring " + (i+1);
+    t.setAttribute("aria-label", t.title);
     t.addEventListener("click", function(){
-      if(S.active === i) return;
-      S.active = i;
-      buildRack(); paintRack();
       /* a ring only listens while you are on its own tab */
       if(S.tapMode === "record"){ recEnd(true); return; }
+      if(!rackOpen){                 /* folded away: any tab brings it back */
+        rackOpen = true;
+        S.active = i;
+        buildRack(); paintRack();
+        return;
+      }
+      if(S.active === i){            /* the one already showing folds it away */
+        rackOpen = false;
+        buildRack(); paintRack();
+        return;
+      }
+      S.active = i;
+      buildRack(); paintRack();
       /* the practice aims at the ring you are looking at: same mode, fresh count */
       if(S.tapMode){
         var m = S.tapMode;
@@ -1751,6 +1888,7 @@ function buildRack(){
        the mode stayed on while its state still pointed at the old ring. */
     var carryRec = (S.tapMode === "record");
     if(carryRec) recEnd(true);
+    rackOpen = true;               /* a new ring is one you have come to shape */
     var i = S.rings.length;
     var used = S.rings.map(function(r){ return r.div; });
     var cand = [5,7,2,3,6,8].filter(function(d){ return used.indexOf(d) < 0; });
@@ -1765,7 +1903,7 @@ function buildRack(){
   tabs.appendChild(add);
   rack.appendChild(tabs);
 
-  [S.rings[S.active]].forEach(function(r){
+  (rackOpen ? [S.rings[S.active]] : []).forEach(function(r){
     var i = S.active;
     var card = document.createElement("div");
     card.className = "ring-card";
@@ -1773,16 +1911,12 @@ function buildRack(){
     card.dataset.mute = r.mute ? "1" : "0";
     card.innerHTML =
       '<div class="rc-top">' +
-        '<span class="rc-side">' +
-          '<span class="swatch"></span>' +
-          '<span class="rc-name">Ring ' + (i+1) + '</span>' +
-          '<span class="chip' + (i===0 ? ' ref' : '') + '" data-chip></span>' +
-        '</span>' +
-        '<button class="btn sm tapbtn" data-taprec>Tap pattern</button>' +
-        '<span class="rc-side end">' +
-          '<button class="icobtn" data-mute title="Mute ring" aria-label="Mute ring"></button>' +
-          (i > 0 ? '<button class="icobtn" data-del title="Remove ring">&times;</button>' : '') +
-        '</span>' +
+        '<span class="swatch"></span>' +
+        '<span class="rc-name">Ring ' + (i+1) + '</span>' +
+        '<span class="chip' + (i===0 ? ' ref' : '') + '" data-chip></span>' +
+        '<span class="spacer"></span>' +
+        '<button class="icobtn" data-mute title="Mute ring" aria-label="Mute ring"></button>' +
+        (i > 0 ? '<button class="icobtn" data-del title="Remove ring">&times;</button>' : '') +
       '</div>' +
       '<div class="div-row">' +
         '<button class="stepbtn sm" data-divdown aria-label="One division fewer">&minus;</button>' +
@@ -1796,6 +1930,9 @@ function buildRack(){
         '</span>' +
       '</div>' +
       '<input type="range" data-div min="1" max="32" step="1" style="margin-top:4px" aria-label="Divisions for ring ' + (i+1) + '">' +
+      '<div class="tap-row">' +
+        '<button class="btn sm tapbtn" data-taprec>Tap pattern</button>' +
+      '</div>' +
       '<div class="off-head">' +
         '<span class="lbl">Offset</span>' +
         '<span class="off-val mono" data-offval></span>' +
@@ -1849,7 +1986,17 @@ function buildRack(){
 
     var offR = card.querySelector("[data-off]");
     offR.value = Math.round(r.off * 12);
+    var lightOn = function(){ slideRing = i; };
+    var lightOff = function(){ if(slideRing === i) slideRing = -1; };
+    offR.addEventListener("pointerdown", lightOn);
+    offR.addEventListener("focus", lightOn);
+    offR.addEventListener("pointerup", lightOff);
+    offR.addEventListener("pointercancel", lightOff);
+    offR.addEventListener("blur", lightOff);
+    /* a keyboard nudge has no pointer to end it, so let it fade on its own */
+    offR.addEventListener("keyup", function(){ setTimeout(lightOff, 500); });
     offR.addEventListener("input", function(){
+      slideRing = i;
       rebase();
       r.off = parseInt(offR.value, 10) / 12;
       r.flash = [];
@@ -2682,10 +2829,22 @@ var RHYTHM_GROUPS = [
 ];
 
 var rgrid = document.getElementById("rgrid");
-RHYTHM_GROUPS.forEach(function(g){
-  var h = document.createElement("p");
+/* The regions are built as the script loads, which is before the saved state is
+   read back, so their painters are kept to be run again once it has been. */
+var rgroupPainters = [];
+function paintRhythmGroups(){ rgroupPainters.forEach(function(f){ f(); }); }
+
+RHYTHM_GROUPS.forEach(function(g, gi){
+  var h = document.createElement("button");
+  h.type = "button";
   h.className = "rgroup";
-  h.textContent = g.group;
+  h.innerHTML =
+    '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+      '<path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" ' +
+      'stroke-linecap="round" stroke-linejoin="round"></path>' +
+    '</svg>' +
+    '<span class="rgname">' + g.group + '</span>' +
+    '<span class="rgcount">' + g.items.length + '</span>';
   rgrid.appendChild(h);
 
   var grid = document.createElement("div");
@@ -2711,6 +2870,36 @@ RHYTHM_GROUPS.forEach(function(g){
     grid.appendChild(b);
   });
   rgrid.appendChild(grid);
+
+  /* The first region stays open and the rest start closed, so the pane reads as
+     an index with one region already showing - enough to make plain what the
+     headings do, without the whole list arriving at once. */
+  var closedByDefault = gi > 0;
+  function isFolded(){
+    var stored = S.rfold[g.group];
+    return (stored === undefined) ? closedByDefault : !!stored;
+  }
+  function paintGroup(){
+    var folded = isFolded();
+    h.dataset.fold = folded ? "1" : "0";
+    h.setAttribute("aria-expanded", folded ? "false" : "true");
+    h.title = (folded ? "Show " : "Hide ") + g.group;
+    grid.hidden = folded;
+  }
+  var downY = null;
+  h.addEventListener("pointerdown", function(e){ downY = e.clientY; });
+  h.addEventListener("click", function(e){
+    var y = downY; downY = null;
+    /* the same guards as the panels: a halted fling is not a tap, and neither
+       is a drag that happened to end on a heading */
+    if(performance.now() - lastScrollAt < 320) return;
+    if(y !== null && Math.abs(e.clientY - y) > 10) return;
+    S.rfold[g.group] = !isFolded();
+    paintGroup();
+    queueSave();
+  });
+  rgroupPainters.push(paintGroup);
+  paintGroup();
 });
 
 var pgrid = document.getElementById("pgrid");
@@ -2744,7 +2933,10 @@ function sessionSnapshot(){
     ptab: S.ptab,
     seq: S.seq,
     sess: {from:sFrom.value, to:sTo.value, step:sStep.value, per:sPer.value,
-           pat:sPat.value, sil:sSil.value},
+           pat:sPat.value, sil:sSil.value,
+           loop:S.sessLoop ? 1 : 0, pong:S.sessPong ? 1 : 0},
+    fold: S.fold,
+    rfold: S.rfold,
     rings: S.rings.map(function(r){
       return {div:r.div, sub:r.sub, sound:r.sound, vol:r.vol, off:r.off,
               mute:r.mute, steps:r.steps.slice()};
@@ -2792,6 +2984,12 @@ function applySession(c){
   });
   S.active = Math.max(0, Math.min(S.rings.length - 1, c.active || 0));
   if(c.ptab === "mine" || c.ptab === "classic" || c.ptab === "rhythms") S.ptab = c.ptab;
+  if(c.fold && typeof c.fold === "object"){
+    FOLD_KEYS.forEach(function(k){ S.fold[k] = !!c.fold[k]; });
+  }
+  if(c.rfold && typeof c.rfold === "object"){
+    Object.keys(c.rfold).forEach(function(k){ S.rfold[k] = !!c.rfold[k]; });
+  }
   if(Array.isArray(c.seq)){
     S.seq = c.seq.filter(function(st){
       return st && typeof st.name === "string" && Array.isArray(st.rings) && st.rings.length;
@@ -2804,6 +3002,8 @@ function applySession(c){
     if(c.sess.per)  sPer.value  = c.sess.per;
     if(c.sess.pat)  sPat.value  = c.sess.pat;
     if(c.sess.sil !== undefined) sSil.value = c.sess.sil;
+    if(c.sess.loop !== undefined) S.sessLoop = !!c.sess.loop;
+    if(c.sess.pong !== undefined) S.sessPong = !!c.sess.pong;
   }
   masterEl.value = S.master;
 }
@@ -3105,6 +3305,7 @@ function paintPlan(){
       ' · loop <b>' + (run.cur + 1) + ' of ' + run.plan.loops.length + '</b>' +
       ' · <b>' + l.bpm + ' bpm</b>' +
       (sil ? ' · <b>silent</b>' : '') +
+      ((run.pass || 1) > 1 ? ' · pass <b>' + run.pass + '</b>' : '') +
       (run.plan.names.length ? '<br><span class="ladder">' +
          run.plan.names[l.stage] + '</span>' : '');
     if(!planSheet.hidden) paintPlanSheet();   /* so the marked stage keeps up */
@@ -3114,7 +3315,9 @@ function paintPlan(){
   var p = sessPlan, c = p.cfg;
 
   var silCount = p.silent.filter(Boolean).length;
-  var html = planSummary(p);
+  var html = planSummary(p) +
+    (S.sessPong ? ' · <b>out and back</b>' : '') +
+    (S.sessLoop ? ' · <b>repeating</b>' : '');
   if(!p.names.length && c.pat === "seq"){
     html += '<br>The sequence is empty, so your own setup plays throughout.';
   }
@@ -3201,13 +3404,23 @@ function swapRings(cfg){
   buildRack(); paintRack(); paintTransport();
 }
 
+/* The order is a list rather than a count, because ping-pong plays the plan
+   backwards on the way home and nothing downstream should have to know which
+   way round it is going. Pattern swaps therefore key off the stage actually
+   changing, not off the loop number rising. */
+function loopOrder(n){
+  var seq = [], i;
+  for(i = 0; i < n; i++) seq.push(i);
+  if(S.sessPong) for(i = n - 2; i > 0; i--) seq.push(i);   /* back without repeating the ends */
+  return seq;
+}
 function applyLoop(idx){
   var l = run.plan.loops[idx];
-  var prev = idx > 0 ? run.plan.loops[idx-1] : null;
 
-  if(run.plan.patterns && (!prev || prev.stage !== l.stage)){
+  if(run.plan.patterns && run.lastStage !== l.stage){
     swapRings(run.plan.patterns[l.stage]);   /* the pattern's own bpm is ignored */
   }
+  run.lastStage = l.stage;
   if(S.bpm !== l.bpm){
     S.bpm = l.bpm;
     paintTransport();
@@ -3225,10 +3438,12 @@ function startSession(){
   /* the plan on screen is the plan that plays - reshuffling here would make the
      preview a lie */
   var plan = sessPlan || buildPlan();
-  run = { plan: plan, cur: 0, off: 0, snapshot: sessionSnapshot(), scale: null };
+  run = { plan: plan, seq: loopOrder(plan.loops.length), i: 0, cur: 0, base: 0,
+          pass: 1, lastStage: -1, snapshot: sessionSnapshot(), scale: null };
   sessBtn.textContent = "Stop";
   sessBtn.dataset.on = "1";
   syncSessBtn();
+  paintFolds();
   applyLoop(0);
   start();
   paintPlan();
@@ -3244,6 +3459,7 @@ function finishSession(){
   sessBtn.textContent = "Start";
   sessBtn.dataset.on = "0";
   syncSessBtn();
+  paintFolds();
   clearSessNow();
   applySession(snap);            /* hand back the setup the session borrowed */
   buildRack(); paintTransport(); paintRack(); paintCount();
@@ -3255,23 +3471,42 @@ function finishSession(){
 function sessionTick(t){
   if(!run || !S.playing) return;
   var cd = cycleDur();
-  var nextPhase = (run.cur - run.off) + 1;      /* phase of the coming boundary */
+  var nextPhase = run.base + 1;                 /* phase of the coming boundary */
   var tB = refTime + (nextPhase - refPhase) * cd;
   if(t + LOOKAHEAD < tB) return;               /* boundary not in range yet */
 
-  if(run.cur + 1 >= run.plan.loops.length){
-    stop();
-    finishSession();                            /* the plan is done */
-    return;
+  var ni = run.i + 1;
+  if(ni >= run.seq.length){
+    if(!S.sessLoop){
+      stop();
+      finishSession();                          /* the plan is done */
+      return;
+    }
+    ni = 0;                                     /* round again, on the boundary */
+    run.pass = (run.pass || 1) + 1;
   }
   refPhase = nextPhase;                         /* pin the clock to the boundary */
   refTime = tB;
-  run.cur = run.cur + 1;
+  run.base = nextPhase;
+  run.i = ni;
+  run.cur = run.seq[ni];
   applyLoop(run.cur);
+}
+
+/* which loop of the plan a phase belongs to, counted along the playing order so
+   a backwards leg reads the same way a forwards one does */
+function loopAtPhase(phase){
+  if(!run) return -1;
+  var j = run.i + Math.floor(phase - run.base), L = run.seq.length;
+  if(S.sessLoop) j = ((j % L) + L) % L;         /* a repeating order wraps */
+  if(j < 0 || j >= L) return -1;
+  return run.seq[j];
 }
 function loopIsSilent(phase){
   if(!run || phase < 0) return false;           /* negative is the count-in */
-  var i = run.off + Math.floor(phase);
+  /* Asked per tick, with that tick's own phase, so the lookahead across a
+     boundary is attributed to the loop it will actually sound in. */
+  var i = loopAtPhase(phase);
   return i >= 0 && !!run.plan.silent[i];
 }
 
@@ -3484,6 +3719,7 @@ function recStart(){
   if(S.playing) stop();
   var r = S.rings[S.active];
   if(!r) return;
+  rackOpen = true;               /* you cannot tap a ring in without its card */
   recPrev = {div:r.div, sub:r.sub, steps:r.steps.slice(), bpm:S.bpm};
   recTaps = [];
   recTotal = 1;
@@ -3497,6 +3733,7 @@ function recStart(){
   if(ctx && ctx.state === "suspended") ctx.resume();
   document.documentElement.dataset.rec = "1";
   syncSessBtn();
+  paintFolds();
   document.documentElement.style.setProperty("--reclc", "var(--c" + (S.active + 1) + ")");
   /* whatever was on the ring goes: it is waiting to be played, not edited */
   reshape(r, 1, 1);
@@ -3534,6 +3771,7 @@ function recEnd(keep){
   S.tapMode = "";
   document.documentElement.dataset.rec = "0";
   syncSessBtn();
+  paintFolds();
   tapNow.hidden = true;
   tapBar.hidden = true;
   dialHint.hidden = !!run;
@@ -3543,21 +3781,15 @@ function recEnd(keep){
   queueSave();
 }
 
-/* The dot is heard as it is made. It arrives about 96ms after the finger, which
-   is why nothing else in the app answers a tap with sound - but here it confirms
-   what was placed rather than marking time, so being late costs little. Played
-   at full level even on a subdivision step: it is a confirmation, not the beat. */
+/* Nothing sounds on the tap itself. It was tried, and at about 96ms behind the
+   finger it pulled against the beat you are trying to hold - the dot flashing on
+   the wheel says the same thing without arguing with the pulse. */
+
 /* A session cannot be started into a ring with no pattern yet. Only Start is
    barred - were one already running, Stop has to stay reachable rather than
    trapping it. */
 function syncSessBtn(){
   sessBtn.disabled = (S.tapMode === "record" && sessBtn.dataset.on !== "1");
-}
-
-function recSound(r){
-  if(!ctx || r.mute) return;     /* a silenced ring stays silenced */
-  if(ctx.state === "suspended") ctx.resume();
-  voice(r.sound, acNow(), r.vol, false);
 }
 
 function recTap(perfMs){
@@ -3574,7 +3806,6 @@ function recTap(perfMs){
     if(div !== r.div || r.sub !== 1) reshape(r, div, 1);
     r.steps = filled(total(r));
     r.flash[div - 1] = performance.now();
-    recSound(r);
     paintRack(); paintTapNow();
     return;
   }
@@ -3589,7 +3820,6 @@ function recTap(perfMs){
     recOn = [0];
     recShape();
     r.flash[0] = performance.now();
-    recSound(r);
     paintRack(); paintTapNow();
     return;
   }
@@ -3605,10 +3835,7 @@ function recTap(perfMs){
   var removed = (ph - recStartPhase >= 1) && recRemove(frac);
   var placed = removed ? -1 : recAdd(frac);
   recShape();
-  if(placed >= 0 && placed < total(r)){
-    r.flash[placed] = performance.now();
-    recSound(r);                 /* taking a dot off stays silent - it is a removal */
-  }
+  if(placed >= 0 && placed < total(r)) r.flash[placed] = performance.now();
   paintRack(); paintTapNow();
 }
 
@@ -3636,6 +3863,16 @@ function tapSpread(a){
   return q(0.75) - q(0.25);
 }
 
+/* one line, shrunk if the sentence needs it - the slot is a fixed height and a
+   second line would simply be cut off */
+function fitTapNow(){
+  if(tapNow.hidden) return;
+  tapNowIn.style.fontSize = "";
+  var avail = tapNow.clientWidth - 2, w = tapNowIn.scrollWidth;
+  if(w > avail && w > 0){
+    tapNowIn.style.fontSize = (16 * Math.max(0.62, avail / w)).toFixed(2) + "px";
+  }
+}
 function paintTapNow(){
   if(!S.tapMode){ return; }
   var r = S.rings[S.active], lbl = function(t){ return '<span class="k">'+t+'</span>'; };
@@ -3643,8 +3880,11 @@ function paintTapNow(){
   if(S.tapMode === "record"){
     var bpm = recBpm();
     if(!recTaps.length){
-      tapNowIn.innerHTML = lbl("ring") + " " + (S.active+1) + "  " +
-        lbl(S.active === 0 ? "tap the pulse on the wheel" : "tap in time on the wheel");
+      /* no ring number here: the readout is already in the ring's colour, and
+         the room is better spent finishing the sentence */
+      tapNowIn.innerHTML = lbl(S.active === 0
+        ? "tap the number of beats in time"
+        : "tap to start the clock and add beats");
     } else {
       if(S.active === 0){
         tapNowIn.innerHTML = lbl("divisions") + " " + recTaps.length +
@@ -3656,6 +3896,7 @@ function paintTapNow(){
           on + " " + lbl(on === 1 ? "dot" : "dots");
       }
     }
+    fitTapNow();
     return;
   }
 
@@ -3665,6 +3906,7 @@ function paintTapNow(){
   else if(Math.abs(med) < 8) drift = lbl("on the beat");
   else drift = Math.round(Math.abs(med)) + " ms " + lbl(med < 0 ? "early" : "late");
   tapNowIn.innerHTML = drift + (sp === null ? "" : "  " + lbl("spread") + " " + Math.round(sp) + " ms");
+  fitTapNow();
 
   tbMain.textContent = tapStat.streak ? String(tapStat.streak) : "TAP";
   tbSub.textContent = tapStat.n
@@ -3687,6 +3929,7 @@ function setTapMode(mode){
   tapStat = {offs:[], streak:0, best:0, n:0, tight:0};
 
   if(mode) releasePress(null);     /* let go of any drag caught by the switch */
+  paintFolds();
   tapFollow.dataset.on = (mode === "follow") ? "1" : "0";
   tapBar.hidden = !mode;
   tapBar.dataset.grade = "";
@@ -3727,6 +3970,67 @@ tapBar.addEventListener("pointerdown", function(e){
   tapAt(e.timeStamp || performance.now());
 });
 
+/* ------------------------------------------------------- folding sections --
+   A section folds down to its own name, which is the fastest way to shorten a
+   page that has grown four panels deep. Two things make it safe on a phone:
+   only the caret folds an open section, so a tap near its controls cannot; and
+   a tap that arrives during or just after a scroll is ignored, because on a
+   phone that is a fling being stopped, not a choice. */
+var FOLDS = [
+  {key:"session",  el:"sessionPanel", live:function(){ return !!run; }},
+  {key:"tapping",  el:"tapPanel",     live:function(){ return !!S.tapMode; }},
+  {key:"sequence", el:"seqPanel",     live:function(){ return false; }},
+  {key:"patterns", el:"patPanel",     live:function(){ return pickSlot !== null; }}
+];
+var FOLD_KEYS = FOLDS.map(function(f){ return f.key; });
+
+var lastScrollAt = -1e9;
+addEventListener("scroll", function(){ lastScrollAt = performance.now(); }, {passive:true});
+
+function paintFolds(){
+  FOLDS.forEach(function(f){
+    var sec = document.getElementById(f.el);
+    if(!sec) return;
+    var folded = !!S.fold[f.key];
+    sec.dataset.fold = folded ? "1" : "0";
+    sec.dataset.live = (folded && f.live()) ? "1" : "0";
+    var c = sec.querySelector("[data-fold-toggle]");
+    if(c){
+      c.setAttribute("aria-expanded", folded ? "false" : "true");
+      c.title = folded ? "Open this section" : "Fold this section";
+      c.setAttribute("aria-label", c.title);
+    }
+  });
+}
+function setFold(key, folded){
+  S.fold[key] = !!folded;
+  paintFolds();
+  queueSave();
+}
+function unfold(key){
+  if(S.fold[key]) setFold(key, false);
+}
+
+FOLDS.forEach(function(f){
+  var sec = document.getElementById(f.el);
+  if(!sec) return;
+  var head = sec.querySelector(".sess-head");
+  if(!head) return;
+  var downY = null;
+  head.addEventListener("pointerdown", function(e){ downY = e.clientY; });
+  head.addEventListener("click", function(e){
+    var y = downY; downY = null;
+    /* a fling being halted, not a tap */
+    if(performance.now() - lastScrollAt < 320) return;
+    if(y !== null && Math.abs(e.clientY - y) > 10) return;
+    var folded = sec.dataset.fold === "1";
+    var onCaret = e.target.closest && e.target.closest("[data-fold-toggle]");
+    /* open, only the caret folds it: a tap by the buttons must not */
+    if(!folded && !onCaret) return;
+    setFold(f.key, !folded);
+  });
+});
+
 /* --------------------------------------------------------------- session UI */
 var sessBtn = document.getElementById("sessBtn");
 var sFrom = document.getElementById("sFrom"), sTo = document.getElementById("sTo");
@@ -3738,6 +4042,32 @@ var planSum = document.getElementById("planSum");
 var planBody = document.getElementById("planBody");
 var planNoteEl = document.getElementById("planNote");
 var planBtn = document.getElementById("planBtn");
+var sessLoop = document.getElementById("sessLoop");
+var sessPong = document.getElementById("sessPong");
+function paintSessLoop(){
+  sessLoop.dataset.on = S.sessLoop ? "1" : "0";
+  sessLoop.setAttribute("aria-pressed", S.sessLoop ? "true" : "false");
+  sessLoop.title = S.sessLoop
+    ? "Repeating: the plan starts again each time it finishes"
+    : "Repeat the plan for as long as you like";
+  sessPong.dataset.on = S.sessPong ? "1" : "0";
+  sessPong.setAttribute("aria-pressed", S.sessPong ? "true" : "false");
+  sessPong.title = S.sessPong
+    ? (S.sessLoop ? "Out and back, over and over" : "Out to the end, then back to the start")
+    : "Play the plan out and back again";
+}
+sessLoop.addEventListener("click", function(){
+  S.sessLoop = !S.sessLoop;
+  paintSessLoop();
+  if(!run) paintPlan();
+  queueSave();
+});
+sessPong.addEventListener("click", function(){
+  S.sessPong = !S.sessPong;
+  paintSessLoop();
+  if(!run) paintPlan();
+  queueSave();
+});
 function showPlanSheet(on){
   if(on) paintPlanSheet();
   planSheet.hidden = !on;
@@ -3801,6 +4131,7 @@ function seqRender(){
 /* ------------------------------------------------------------- filling a step */
 function startPick(i){
   pickSlot = i;
+  unfold("patterns");            /* the chips are the whole point of picking */
   pickMsg.textContent = (i < 0)
     ? "Choose a pattern for step " + (S.seq.length + 1)
     : "Choose a pattern for step " + (i + 1) + " - now " + S.seq[i].name;
@@ -3811,6 +4142,7 @@ function startPick(i){
 function endPick(){
   pickSlot = null;
   pickBar.hidden = true;
+  paintFolds();
 }
 /* every chip in the three libraries comes through here */
 function chipHit(name, cfg){
@@ -4011,6 +4343,9 @@ buildRack();
 applyMaster();
 paintCount();      /* a restored count-in has to show on its button */
 paintPtabs();
+paintFolds();
+paintRhythmGroups();     /* the saved region states have arrived by now */
+paintSessLoop();
 seqRender();
 tapHint.textContent = TAP_IDLE_TEXT;
 paintPlan();
@@ -4033,7 +4368,7 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "2026-09-02 21:37";
+  var BUILD = "2026-09-03 17:15";
   window.POLY_BUILD = BUILD;
 
   var deferred = null;          /* the captured beforeinstallprompt event */

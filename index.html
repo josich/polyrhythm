@@ -117,7 +117,10 @@ button,input,select{font:inherit;color:inherit;-webkit-tap-highlight-color:trans
   font-weight:600;font-size:clamp(23px,4vw,36px);line-height:1.05;letter-spacing:-.015em;margin:0;
 }
 .nameplate h1 span{color:var(--ink-3)}
-.np-right{display:flex;align-items:center;gap:14px;flex:none}
+/* three buttons no longer share a line with the title on a phone; when they
+   wrap they stay on the right, under the title, not at the left edge */
+.np-right{display:flex;align-items:center;gap:10px;flex:none;margin-left:auto}
+.np-right .btn.mode{padding:7px 12px}
 .btn.skin{display:inline-flex;align-items:center;gap:7px;padding:7px 12px}
 .btn.skin svg{width:15px;height:15px;flex:none}
 .tagline{color:var(--ink-2);font-size:13px;max-width:52ch;margin:7px 0 0}
@@ -142,6 +145,23 @@ button,input,select{font:inherit;color:inherit;-webkit-tap-highlight-color:trans
 }
 .fold-bpm .fb-unit{font-size:9px;font-weight:600;letter-spacing:.13em;color:var(--ink-3)}
 .jump.mini{width:32px;height:28px;border-radius:9px;font-size:11px;line-height:1}
+/* The note a click is worth: one row of glyphs under the tempo, drawn rather
+   than typed, because the music glyphs a phone font ships with cannot be relied
+   on. The chosen one repeats beside the tempo number, so the readout reads
+   the way a score does. */
+.transport > .note-row{grid-column:1/-1;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.note-btns{display:flex;gap:6px}
+.notebtn{
+  width:34px;height:34px;border-radius:9px;cursor:pointer;padding:0;
+  border:1px solid var(--line-2);background:var(--sunk);color:var(--ink-2);
+  display:grid;place-items:center;
+}
+.notebtn svg{width:17px;height:23px;display:block}
+.notebtn:hover{border-color:var(--ink-3);color:var(--ink)}
+.notebtn[data-on="1"]{border-color:var(--c1);color:var(--ink);background:color-mix(in srgb,var(--c1) 14%,transparent)}
+.bpm-note{display:inline-block;width:20px;height:30px;color:var(--ink-2);flex:none;align-self:center}
+.bpm-note svg{width:100%;height:100%;display:block}
+.fold-bpm .bpm-note{width:13px;height:19px}
 /* centred in the dial's hub, sized off the dial so it never crowds the
    innermost ring, and out of the way while the count-in owns that spot */
 .play{
@@ -209,14 +229,15 @@ button,input,select{font:inherit;color:inherit;-webkit-tap-highlight-color:trans
 /* Two stacked toggles beside one big tap pad, with the volume spanning both
    underneath. Every control lands on a shared height scale (44 for a toggle,
    two rows for the pad, 30 for the icon) so nothing sits a stray few pixels
-   off its neighbour, and the pad is unmistakably the largest thing to hit. */
+   off its neighbour, and the pad is unmistakably the largest thing to hit.
+   Rows are 32 rather than 44: the two tall buttons were a quarter taller than
+   a thumb needs, and the panel is fought for. */
 .tools{
   display:grid;gap:10px;
   grid-template-columns:112px 118px 200px;
-  grid-template-rows:44px 44px;
+  grid-template-rows:32px 32px;
 }
-.tools .count{grid-area:1/1/2/2}
-.tools .mode {grid-area:2/1/3/2}
+.tools .count{grid-area:1/1/3/2}
 .tools .tap  {grid-area:1/2/3/3}
 .tools .vol  {grid-area:1/3/3/4}
 .btn{
@@ -256,10 +277,10 @@ button,input,select{font:inherit;color:inherit;-webkit-tap-highlight-color:trans
 :root[data-ui="simple"] .adv-only{display:none}
 /* one toggle instead of two: the row keeps its height so the tap pad stays the
    same size, and the lone button centres against it rather than stretching */
-:root[data-ui="simple"] .tools{grid-template-rows:98px}
-:root[data-ui="simple"] .tools .mode{grid-area:1/1/2/2;align-self:center;height:44px}
-:root[data-ui="simple"] .tools .tap{grid-area:1/2/2/3}
-:root[data-ui="simple"] .tools .vol{grid-area:1/3/2/4}
+:root[data-ui="simple"] .tools{grid-template-columns:118px 200px;grid-template-rows:74px}
+:root[data-ui="simple"] .tools .tap{grid-area:1/1/2/2}
+:root[data-ui="simple"] .tools .vol{grid-area:1/2/2/3}
+:root[data-ui="simple"] .note-row{display:none}
 
 .vol{display:flex;flex-direction:column;gap:3px;justify-content:center}
 .vol-row{display:flex;align-items:center;gap:9px}
@@ -315,31 +336,6 @@ input[type=range]::-moz-range-thumb{
    readouts either side shrink to make room - see fitHead(). */
 .metric.pat{color:var(--ink-3)}
 
-/* Tapping practice. The bar answers each tap on its own border - teal tight,
-   gold close, pink out - because a number you have to read is no use while you
-   are still tapping. */
-.tapbar{
-  margin-top:12px; width:100%; min-height:84px; border-radius:12px;
-  border:1px solid var(--line-2); background:var(--sunk);
-  display:grid; place-items:center; align-content:center; gap:3px;
-  text-align:center; padding:10px; cursor:pointer;
-  touch-action:none;                  /* nothing may arbitrate before the tap lands */
-  user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent;
-  transition:border-color .12s linear, background-color .12s linear;
-}
-.tapbar .tb-main{
-  font-family:var(--title); font-stretch:var(--title-stretch);
-  font-weight:700; font-size:26px; line-height:1; color:var(--ink); letter-spacing:-.01em;
-  font-variant-numeric:tabular-nums;
-}
-.tapbar .tb-sub{
-  font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--ink-3);
-  letter-spacing:.06em;
-}
-.tapbar[data-grade="c2"]{border-color:var(--c2); background:color-mix(in srgb,var(--c2) 17%,var(--sunk))}
-.tapbar[data-grade="c1"]{border-color:var(--c1); background:color-mix(in srgb,var(--c1) 17%,var(--sunk))}
-.tapbar[data-grade="c3"]{border-color:var(--c3); background:color-mix(in srgb,var(--c3) 17%,var(--sunk))}
-@media (prefers-reduced-motion:reduce){ .tapbar{transition:none} }
 .tapnow .k{color:var(--ink-3)}
 /* set from the active ring so the readout belongs to the same thing the card does */
 :root[data-rec="1"] #tapNowIn{color:var(--reclc,var(--ink))}
@@ -356,6 +352,19 @@ input[type=range]::-moz-range-thumb{
    the same size and carries the name only - the row is meant to be read as an
    order at a glance, not studied. */
 .seq-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seq-foot{display:flex;justify-content:flex-end;margin-top:10px}
+/* the score: one bar per pattern, one staff line per ring. The SVG is drawn at
+   the sheet's own width so the notation keeps its size on a phone instead of
+   shrinking with the page. */
+.score-sheet{max-width:640px}
+.score{margin:12px 0 0}
+.score + .score{padding-top:12px;border-top:1px dashed var(--line)}
+.score-title{display:flex;align-items:baseline;gap:10px;margin:0 0 2px;flex-wrap:wrap}
+.score-title b{font-size:13.5px;color:var(--ink)}
+.score-title .tempo{display:inline-flex;align-items:center;gap:4px;font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-2)}
+.score-title .tempo svg{width:11px;height:15px;display:block}
+.score svg.staff{width:100%;height:auto;display:block;color:var(--ink);overflow:visible}
+.score .snote{font-size:11px;color:var(--ink-3);margin:2px 0 0}
 .seq-note{font-size:11.5px;color:var(--ink-3)}
 .seq-box,.seq-add{width:94px;height:40px;flex:none;border-radius:9px;padding:0 6px}
 .seq-box{
@@ -371,7 +380,13 @@ input[type=range]::-moz-range-thumb{
   font-size:12px;font-weight:500;color:var(--ink);line-height:1.15;
   max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-.seq-box[data-drag="1"]{opacity:.4;border-style:dashed}
+/* the chip being carried lifts and lights up, so a hold that has armed a drag
+   is unmistakable; the one it hovers over answers in teal */
+.seq-box{transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease}
+.seq-box[data-drag="1"]{
+  transform:scale(1.08);position:relative;z-index:2;border-color:var(--c1);
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--c1) 40%,transparent),0 8px 20px -8px rgba(0,0,0,.65);
+}
 .seq-box[data-over="1"]{border-color:var(--c2);box-shadow:0 0 0 2px color-mix(in srgb,var(--c2) 22%,transparent)}
 .seq-add{
   border:1px dashed var(--line-2);background:transparent;color:var(--ink-3);
@@ -387,6 +402,11 @@ input[type=range]::-moz-range-thumb{
 .btn.sm{padding:5px 10px;font-size:11.5px}
 /* the repeat toggle: a square button carrying the two-arrow loop */
 .btn.sm.icon{padding:5px;width:29px;height:29px;display:grid;place-items:center;flex:none}
+/* a small button that leads with a glyph: a notebook for the plan, an eighth
+   for the score */
+.btn.sm.lead{display:inline-flex;align-items:center;gap:6px;padding-left:8px}
+.btn.sm.lead svg{width:13px;height:13px;flex:none;display:block}
+.btn.sm.lead svg.note{width:11px;height:15px}
 .btn.sm.icon svg{width:16px;height:16px;display:block}
 
 /* While a session runs, where you are in it matters more than a tip you have
@@ -430,6 +450,8 @@ input[type=range]::-moz-range-thumb{
   padding:16px 20px 20px;
 }
 .sheet-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:4px}
+/* which copy this is - two phones disagreeing is nearly always two builds */
+.build{margin:0 0 10px;font-size:10.5px;color:var(--ink-3);letter-spacing:.04em}
 .sheet h2{
   font-family:var(--title);font-stretch:var(--title-stretch);
   font-weight:600;font-size:19px;margin:0;letter-spacing:-.01em;
@@ -441,6 +463,8 @@ input[type=range]::-moz-range-thumb{
 .sheet ul{margin:0;padding-left:18px;color:var(--ink-2);font-size:13px;line-height:1.6}
 .sheet li{margin:3px 0}
 .sheet b{color:var(--ink);font-weight:600}
+/* a drawn note in the help text, because a phone font may not have the glyph */
+.sheet .hnote{width:9px;height:13px;display:inline-block;vertical-align:-2px;color:var(--ink)}
 .canvas-hold{position:relative;width:100%;max-width:min(100%,64vh,560px);aspect-ratio:1/1;margin:0 auto}
 canvas{
   width:100%;height:100%;display:block;touch-action:manipulation;
@@ -453,11 +477,13 @@ canvas{
 /* side room so it can never run under the info button in the corner */
 /* minmax(0,1fr), not the default auto: a nowrap readout would otherwise set the
    column's min-content width and widen the whole panel instead of scaling down */
+/* tall enough for the tip on two lines - a phone wraps it - and never clipped;
+   the readouts that replace it are fitted to one line, so the slot holds still */
 .dial-foot{
-  height:26px;margin-top:8px;overflow:hidden;
+  min-height:30px;margin-top:8px;
   display:grid;grid-template-columns:minmax(0,1fr);justify-items:center;align-items:center;
 }
-.hint{color:var(--ink-3);font-size:11.5px;text-align:center;margin:0;padding:0 12px}
+.hint{color:var(--ink-3);font-size:11.5px;line-height:1.3;text-align:center;margin:0;padding:0 12px}
 
 .rack{display:flex;flex-direction:column;gap:12px}
 .ring-card{
@@ -485,6 +511,16 @@ canvas{
 #sessBtn:disabled{opacity:.32; cursor:not-allowed}
 #sessBtn:disabled:hover{border-color:var(--line-2); color:var(--ink-2)}
 :root[data-rec="1"] canvas{cursor:pointer}
+/* The game owns the wheel: the play button steps aside, the rest of the app
+   waits, and the readout answers in colour */
+:root[data-game="1"] .play{display:none}
+:root[data-game="1"] canvas{cursor:pointer}
+:root[data-game="1"] :is(#rack,#sessionPanel,#seqPanel,#patPanel,.bpm-block,.bpm-row,.note-row,#tap,#countBtn){opacity:.45;pointer-events:none}
+#tapNowIn[data-grade="c2"]{color:var(--c2)}
+#tapNowIn[data-grade="c3"]{color:var(--c3)}
+/* the score line under the buttons while the game runs */
+.tap-hint b{color:var(--ink);font-weight:600}
+.tap-hint .k{color:var(--ink-3)}
 .ring-card[data-rec="1"] [data-divdown],
 .ring-card[data-rec="1"] [data-divup],
 .ring-card[data-rec="1"] .div-sub,
@@ -721,17 +757,21 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
   /* tempo above, tools below, each spanning the panel */
   .transport{grid-template-columns:1fr;row-gap:16px}
   .tools{grid-template-columns:minmax(112px,1fr) minmax(118px,1.1fr) minmax(170px,1.5fr)}
+  :root[data-ui="simple"] .tools{grid-template-columns:minmax(118px,1fr) minmax(170px,1.5fr)}
 }
 @media (max-width:620px){
   /* the tempo number gets its own line so the four jump buttons sit
      together on a single comfortable row beneath it */
   .bpm-block{gap:8px}
   .bpm-read{flex:0 0 100%;order:-1}
+  /* six glyphs are the row: the word beside them would only push them down */
+  .note-row > .lbl{display:none}
   /* too narrow for three columns: the volume drops to its own full-width row */
-  .tools{grid-template-columns:1fr 1.15fr;grid-template-rows:44px 44px auto}
+  .tools{grid-template-columns:1fr 1.15fr;grid-template-rows:32px 32px auto}
   .tools .vol{grid-area:3/1/4/3;justify-content:flex-end}
-  :root[data-ui="simple"] .tools{grid-template-rows:98px auto}
-  :root[data-ui="simple"] .tools .vol{grid-area:2/1/3/3}
+  :root[data-ui="simple"] .tools{grid-template-columns:1fr;grid-template-rows:74px auto}
+  :root[data-ui="simple"] .tools .tap{grid-area:1/1/2/2}
+  :root[data-ui="simple"] .tools .vol{grid-area:2/1/3/2}
 }
 /* no physical keyboard to speak of, so the shortcut legend is just clutter */
 @media (max-width:760px), (pointer:coarse){
@@ -744,6 +784,7 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
   <header class="nameplate">
     <h1>Polyrhythm <span>Circle</span></h1>
     <div class="np-right">
+      <button class="btn mode" id="uiBtn">Advanced</button>
       <button class="info" id="infoBtn" title="How this works" aria-label="How this works">i</button>
       <button class="btn skin" id="skin" title="Switch skin">
         <svg id="skinIcon" viewBox="0 0 24 24" aria-hidden="true"></svg>
@@ -760,6 +801,7 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
            so tapping it opens the panel, and the two nudges do not -->
       <span class="fold-bpm">
         <button class="jump mini" id="fbDown5" data-fold-keep aria-label="Tempo down 5">&minus;5</button>
+        <span class="bpm-note" id="fbNote" aria-hidden="true"></span>
         <span class="fb-num" id="fbNum">96</span>
         <span class="fb-unit">BPM</span>
         <button class="jump mini" id="fbUp5" data-fold-keep aria-label="Tempo up 5">+5</button>
@@ -772,6 +814,7 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
           <button class="jump" id="bpmDown5" aria-label="Tempo down 5">&minus;5</button>
         </span>
         <span class="bpm-read">
+          <span class="bpm-note" id="bpmNote" aria-hidden="true"></span>
           <button class="bpm-num" id="bpmNum" title="Click to type a tempo">96</button>
           <input class="bpm-in mono" id="bpmIn" type="number" min="1" max="660" step="1"
                  inputmode="numeric" aria-label="Type a tempo" hidden>
@@ -793,7 +836,6 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
     <div class="tools">
       <button class="btn count" id="countBtn" data-on="0" aria-pressed="false"
               title="Play three counting beats before the rings start">Count-in</button>
-      <button class="btn mode" id="uiBtn">Simple</button>
       <button class="btn tap" id="tap" data-armed="0"><span id="tapTxt">Tap tempo</span></button>
       <div class="vol">
         <span class="lbl">Volume</span>
@@ -802,6 +844,19 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
           <input type="range" id="master" min="0" max="1" step="0.01" value="0.9" aria-label="Volume">
         </div>
       </div>
+    </div>
+    <!-- what one click of ring 1 is worth. The tempo number is the speed of
+         this note, so the readout reads like a score marking -->
+    <div class="note-row" id="noteRow">
+      <span class="lbl">Note</span>
+      <span class="note-btns" role="group" aria-label="What one click is worth">
+        <button class="notebtn" data-den="1" aria-label="Whole note"></button>
+        <button class="notebtn" data-den="2" aria-label="Half note"></button>
+        <button class="notebtn" data-den="4" aria-label="Quarter note"></button>
+        <button class="notebtn" data-den="8" aria-label="Eighth note"></button>
+        <button class="notebtn" data-den="16" aria-label="Sixteenth note"></button>
+        <button class="notebtn dot" id="noteDotBtn" aria-label="Dotted" aria-pressed="false"></button>
+      </span>
     </div>
   </section>
 
@@ -821,14 +876,9 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
       </div>
       <!-- one fixed-height slot, so swapping tip for readout cannot resize the dial -->
       <div class="dial-foot">
-        <p class="hint" id="dialHint">Click a dot to silence it.<span class="adv-only"> Drag a ring to offset it.</span></p>
+        <p class="hint" id="dialHint">Tap a dot: on &middot; silent &middot; accent.<span class="adv-only"> Drag a ring to offset it.</span></p>
         <p class="sessnow" id="sessNow" hidden><span class="mono" id="sessNowIn"></span></p>
         <p class="sessnow tapnow" id="tapNow" hidden><span class="mono" id="tapNowIn"></span></p>
-      </div>
-      <!-- the target sits below the dial so your thumb never covers the beat -->
-      <div class="tapbar" id="tapBar" hidden data-grade="">
-        <span class="tb-main" id="tbMain">TAP</span>
-        <span class="tb-sub" id="tbSub"></span>
       </div>
     </section>
 
@@ -903,7 +953,7 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
 
     <div class="sess-foot">
       <p class="sess-plan" id="sPlan"></p>
-      <button class="btn sm" id="planBtn">Plan</button>
+      <button class="btn sm lead" id="planBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="4" width="13" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.5 4v16M4.5 8.5h4M4.5 12h4M4.5 15.5h4M12.5 9h4M12.5 12.5h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Plan</button>
     </div>
   </section>
 
@@ -911,7 +961,7 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
     <div class="sess-head">
       <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
       <span class="lbl">Tapping</span>
-      <button class="btn sm" id="tapFollow" data-on="0">Tap along</button>
+      <button class="btn sm" id="tapGame" data-on="0" title="Clear the dots by tapping them in time">Game</button>
     </div>
     <p class="tap-hint" id="tapHint"></p>
   </section>
@@ -923,6 +973,8 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
       <span class="seq-note" id="seqNote"></span>
     </div>
     <div class="seq-row" id="seqRow"></div>
+    <!-- the way into the notation sits bottom right, like the plan does -->
+    <div class="seq-foot"><button class="btn sm lead" id="scoreBtn"><svg class="note" viewBox="0 0 22 30" aria-hidden="true"><ellipse cx="8" cy="22.5" rx="5.4" ry="3.7" transform="rotate(-22 8 22.5)" fill="currentColor"/><path d="M12.9 21.6V3.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M12.9 3.5c3.6 2.2 6 5.2 4.4 10.2" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg>Score</button></div>
   </section>
 
   <section class="presets foldsec" id="patPanel">
@@ -981,82 +1033,93 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
   </div>
 </div>
 
+<div class="modal" id="scoreSheet" hidden>
+  <div class="sheet score-sheet" role="dialog" aria-modal="true" aria-labelledby="scoreTitle">
+    <div class="sheet-head">
+      <h2 id="scoreTitle">Score</h2>
+      <button class="icobtn" id="scoreClose" title="Close" aria-label="Close">&times;</button>
+    </div>
+    <p class="plan-sum" id="scoreSum"></p>
+    <div id="scoreBody"></div>
+  </div>
+</div>
+
 <div class="modal" id="help" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
     <div class="sheet-head">
       <h2 id="helpTitle">How this works</h2>
       <button class="icobtn" id="helpClose" title="Close" aria-label="Close">&times;</button>
     </div>
+    <p class="build mono" id="buildTag"></p>
 
     <h3>The rings</h3>
     <ul>
-      <li><b>Ring 1</b> is the click.</li>
-      <li>It ticks at the <b>BPM</b> you set.</li>
-      <li>A <b>polyrhythm</b> can be created adding more <b>rings</b>. Four rings maximum.</li>
+      <li><b>Ring 1</b> is the click, at the <b>tempo</b> you set.</li>
+      <li>More <b>rings</b> make a <b>polyrhythm</b>. Four at most.</li>
     </ul>
 
     <h3>The dial</h3>
     <ul>
-      <li>Click a <b>dot</b> to <b>silence</b> that beat.</li>
-      <li>Hold and <b>Drag</b> a ring to <b>offset</b> it.</li>
+      <li>Tap a <b>dot</b> to cycle it: <b>on</b> &rarr; <b>silent</b> &rarr; <b>accent</b> &rarr; on.</li>
+      <li>An <b>accent</b> plays louder and brighter, and is drawn with a ring.</li>
+      <li>Hold and <b>drag</b> a ring to <b>offset</b> it.</li>
+      <li>The <b>middle</b> starts and stops.</li>
     </ul>
 
     <h3>Tempo</h3>
     <ul>
-      <li>Click the number to type a <b>tempo</b>.</li>
+      <li>Tap the <b>number</b> to type a tempo.</li>
+      <li>The <b>slider</b> gives half its length to 1&ndash;120.</li>
+      <li>The <b>note</b> row says what one click is worth: <svg class="hnote" viewBox="0 0 22 30" role="img" aria-label="eighth note"><ellipse cx="8" cy="22.5" rx="5.4" ry="3.7" transform="rotate(-22 8 22.5)" fill="currentColor"/><path d="M12.9 21.6V3.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M12.9 3.5c3.6 2.2 6 5.2 4.4 10.2" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg> = 200 is 200 eighths a minute.</li>
+      <li>Switching notes keeps the speed and <b>converts</b> the number.</li>
       <li><b>Tap tempo</b> sets it by feel.</li>
-      <li><b>Count-in</b> plays three beats before the rings.</li>
+      <li><b>Count-in</b> plays three beats first.</li>
     </ul>
 
     <h3>Per ring</h3>
     <ul>
-      <li>Sets the number of <b>divisions</b>.</li>
-      <li>&times;2 &times;3 &times;4 <b>subdivide</b> to create accents.</li>
-      <li>A <b>subdivision</b> sounds on its own, beat off or not.</li>
-      <li><b>Offset</b> nudges it off the beat.</li>
+      <li><b>Divisions</b> per rotation.</li>
+      <li>&times;2 &times;3 &times;4 <b>subdivide</b> each beat.</li>
+      <li>A <b>subdivision</b> sounds on its own, beat on or off.</li>
+      <li><b>Offset</b> nudges the ring off the beat.</li>
       <li>Each ring has its own <b>sound</b>, level and mute.</li>
-      <li>Tap the <b>tab</b> already showing to fold these away.</li>
+      <li>Tap the <b>tab</b> already open to fold the card away.</li>
     </ul>
 
     <h3>Practice session</h3>
     <ul>
-      <li>Change <b>tempo</b> by small <b>increments</b> each amount of <b>loops</b>.</li>
+      <li>Raises the <b>tempo</b> by a step every few <b>loops</b>.</li>
       <li>Random <b>silent</b> loops.</li>
-      <li><b>Patterns</b> played randomly each increment of time.</li>
-      <li>The <b>repeat</b> button plays the whole plan over again.</li>
-      <li><b>Out and back</b> runs it to the end and home again.</li>
+      <li>Swaps <b>patterns</b> each step.</li>
+      <li><b>Plan</b> shows what is scheduled.</li>
+      <li><b>Repeat</b> plays the plan again; <b>out and back</b> runs it there and home.</li>
+      <li>The <b>middle</b> pauses; <b>Stop</b> ends it.</li>
     </ul>
 
     <h3>Sequence</h3>
     <ul>
-      <li>The practice session plays the <b>sequence</b> in order.</li>
-      <li>Press <b>+</b> to put a <b>pattern</b> in the row.</li>
-      <li><b>Drag</b> one box onto another to <b>swap</b> them.</li>
-      <li>Tap a box to <b>change</b> or remove that step.</li>
+      <li>The session plays the <b>sequence</b> in order.</li>
+      <li><b>+</b> adds a pattern. Tap a box to <b>change</b> it.</li>
+      <li><b>Drag</b> a box onto another to <b>swap</b>.</li>
+      <li><b>Score</b> writes it out as notation, one bar each. Empty sequence: the wheel.</li>
     </ul>
 
     <h3>Tapping</h3>
     <ul>
-      <li>Practise a rhythm with no instrument at all.</li>
-      <li><b>Tap along</b> grades every tap on the bar under the dial.</li>
-      <li>Teal is <b>tight</b>, gold is close, pink is <b>off</b>.</li>
-      <li>Your taps stay on the dial, so you can see if you run <b>early</b>.</li>
-      <li><b>Tap pattern</b> on a ring builds it instead: tap the <b>wheel</b>.</li>
-      <li>On <b>ring 1</b> the count sets the divisions and the speed the <b>tempo</b>.</li>
-      <li>On the others each tap drops a <b>dot</b> where the hand is.</li>
-      <li>The <b>grid</b> works itself out, and placed dots never move.</li>
-      <li>After the first loop, tapping a dot again takes it <b>off</b>.</li>
-      <li>Press it again to keep them.</li>
+      <li><b>Game</b>: listen to one loop, then tap the wheel on every dot before it ends.</li>
+      <li>A stray tap or a dot left over costs the loop; clear it to climb. 100 levels, 3 rhythms each.</li>
+      <li><b>Tap pattern</b> builds a ring: tap the <b>wheel</b>.</li>
+      <li>On <b>ring 1</b> the count sets divisions and the speed sets <b>tempo</b>.</li>
+      <li>On others each tap drops a <b>dot</b> where the hand is.</li>
+      <li>Placed dots never move. Tap one again to remove it.</li>
     </ul>
 
     <h3>Keeping it</h3>
     <ul>
-      <li>Between sessions <b>autosave</b>.</li>
-      <li><b>Advanced</b> buttons shows/hide some features.</li>
-      <li><b>Preset</b> chips are classic ratios; name your own below.</li>
-      <li>The <b>triangle</b> folds a section down to its name.</li>
-      <li>A folded section <b>blinks</b> while something inside it runs.</li>
-      <li>Each <b>region</b> of rhythms opens and closes the same way.</li>
+      <li>Everything <b>autosaves</b>.</li>
+      <li><b>Advanced</b> shows or hides the extras.</li>
+      <li><b>Presets</b>: classic ratios, rhythms by region, and your own.</li>
+      <li>The <b>triangle</b> folds a section; a folded one <b>blinks</b> while it runs.</li>
     </ul>
   </div>
 </div>
@@ -1072,6 +1135,7 @@ var SOUNDS = [
   {id:"hihat", name:"Hi-hat"},
   {id:"wood",  name:"Wood block"},
   {id:"click", name:"Click"},
+  {id:"clap",  name:"Clap"},
   {id:"beep",  name:"Beep"},
   {id:"bell",  name:"Bell"},
   {id:"rim",   name:"Rim"}
@@ -1085,12 +1149,13 @@ var BPM_MIN = 1, BPM_MAX = 660;
 
 var S = {
   bpm: 96,
+  noteDen: 4, noteDot: false,  /* what one click of ring 1 is worth, as a note */
   master: 0.9,
   muted: false,
   active: 0,       /* which ring's card the tab strip is showing */
   ptab: "mine",
   seq: [],
-  tapMode: "",                 /* "", "follow" or "record" - never persisted */
+  tapMode: "",                 /* "", "record" or "game" - never persisted */
   sessLoop: false,             /* repeat the practice plan instead of ending */
   sessPong: false,             /* and run it out and back rather than only out */
   fold: {},                    /* which sections are folded away, by key */
@@ -1124,7 +1189,19 @@ function mkRing(i, div){
     flash: []
   };
 }
-function filled(n){ var a=[],i; for(i=0;i<n;i++) a.push(true); return a; }
+/* A step is 0 (silent), 1 (on) or 2 (accented). A fresh ring starts with beat 1
+   accented, which is what the dial has always drawn and the speaker played -
+   only now it is a value on the dot, so any dot can carry it and beat 1 can
+   give it up. */
+function filled(n){ var a=[],i; for(i=0;i<n;i++) a.push(i === 0 ? 2 : 1); return a; }
+/* Saved patterns from before accents were per-dot are arrays of booleans: they
+   meant "on" everywhere, with the accent implied on beat 1. Numbers pass through. */
+function normSteps(arr){
+  var legacy = arr.some(function(v){ return typeof v === "boolean"; });
+  var out = arr.map(function(v){ return v === 2 ? 2 : (v ? 1 : 0); });
+  if(legacy && out[0]) out[0] = 2;
+  return out;
+}
 function gcd(a,b){ while(b){ var t=b; b=a%b; a=t; } return a; }
 
 function total(r){ return r.div * r.sub; }
@@ -1136,6 +1213,7 @@ function isMain(r, k){ return (k % r.sub) === 0; }
    land it between main beats. It still sounds AS a subdivision: quieter and a
    fifth up, as they always have. */
 function audible(r, k){ return !!r.steps[k]; }
+function accented(r, k){ return r.steps[k] === 2; }
 /* largest subdivision no greater than `want` that still fits the step budget */
 function fitSub(div, want){
   var opts = [4,3,2,1], i;
@@ -1267,6 +1345,20 @@ function voice(kind, t, v, accent){
     tone(t, 0.260, 0.40*v*a, 470*k, 0, "triangle");
     tone(t, 0.150, 0.10*v*a, 1270*k, 0, "sine");
     noise(t, 0.012, 0.12*v*a, 3600, 1, "highpass");
+  } else if(kind === "clap"){
+    /* Hands, not one hand. Palmas are several strikes a few milliseconds apart,
+       so three short bursts stagger in before a longer one carries the room -
+       the flam is what makes it read as a clap rather than a snare. Band-passed
+       around 1.5 kHz, which a phone speaker still throws well. The accent brings
+       the hands in a little tighter and brighter rather than pitching them up. */
+    /* The loudest hand lands first, with a bright crack on top, and the flam
+       trails off behind it: a burst that grew louder over 30ms read as dragged. */
+    var ck = accent ? 1.12 : 1, sp = accent ? 0.005 : 0.006;
+    noise(t,          0.010, 0.55*v*a, 3200*ck, 0.8, "highpass");
+    noise(t,          0.016, 0.95*v*a, 1700*ck, 1.3);
+    noise(t + sp,     0.014, 0.70*v*a, 1500*ck, 1.4);
+    noise(t + 2*sp,   0.014, 0.55*v*a, 1900*ck, 1.4);
+    noise(t + 2*sp,   0.075, 0.60*v*a, 1400*ck, 0.9);
   } else { /* rim */
     tone(t, 0.024, 1.00*v*a, accent ? 1950 : 1500, 0, "square");
     noise(t, 0.018, 0.60*v*a, 3400, 2);
@@ -1304,7 +1396,10 @@ function start(){
 
   var t0 = ctx.currentTime + 0.12;
   var beat = 60 / S.bpm;
-  ciRun = !!S.countIn && S.tapMode !== "record";
+  /* the game counts itself in once, when it is started, whatever the toggle
+     says; a ring being tapped in never counts */
+  if(S.tapMode === "game"){ ciRun = !!(game && game.countIn); if(game) game.countIn = false; }
+  else ciRun = !!S.countIn && S.tapMode !== "record";
   var lead = ciRun ? COUNT_BEATS * beat : 0;
 
   refPhase = 0;
@@ -1341,6 +1436,7 @@ function stop(){
   S.rings.forEach(function(r){ r.lastTick = null; r.flash = []; });
   paintTransport();
   if(S.tapMode === "record") recEnd(true);    /* stopping is the other way to keep it */
+  if(S.tapMode === "game" && !gameHold) gameEnd();  /* and the way out of the game */
 }
 function toggle(){ S.playing ? stop() : start(); }
 
@@ -1362,10 +1458,10 @@ function schedule(){
         /* which loop this tick belongs to decides whether it is heard at all */
         if(!r.mute && audible(r, idx) && !loopIsSilent(r.nextTick / tot + oph)){
           if(isMain(r, idx)){
-            voice(r.sound, tickTime, r.vol, idx === 0);
+            voice(r.sound, tickTime, r.vol, accented(r, idx));
           } else {
             PITCH = SUB_PITCH;
-            voice(r.sound, tickTime, r.vol * SUB_LEVEL, false);
+            voice(r.sound, tickTime, r.vol * SUB_LEVEL, accented(r, idx));
             PITCH = 1;
           }
         }
@@ -1446,6 +1542,7 @@ function draw(){
   var R = Math.min(W,H) * 0.43;
   var gap = R * (n <= 2 ? 0.20 : n === 3 ? 0.185 : 0.168);
   var tnow = performance.now();
+  if(S.tapMode === "game") gameTick(p, tnow);
 
   /* A silent loop has to be silent to the eye as well: the flash halo lands on
      the beat, so leaving it running would just hand the answer back. */
@@ -1470,31 +1567,6 @@ function draw(){
   geom.cx = cx; geom.cy = cy; geom.gap = gap; geom.radii = [];
   for(var gi=0; gi<n; gi++) geom.radii.push(R - (n - 1 - gi)*gap);
 
-  /* Every tap leaves a tick on a track just outside the ring being followed, so
-     a few bars of tapping become a picture of where you actually sit against the
-     dots rather than a number you have to trust. */
-  if(S.tapMode === "follow" && tapHits.length && geom.radii[S.active] != null){
-    var trR = geom.radii[S.active] + gap * 0.30;
-    g2.save();
-    g2.strokeStyle = THEME["--grid"]; g2.lineWidth = 1;
-    g2.beginPath(); g2.arc(cx, cy, trR, 0, Math.PI*2); g2.stroke();
-    for(var ti = 0; ti < tapHits.length; ti++){
-      var h = tapHits[ti];
-      var age = (p - h.at) / TAP_TRAIL;            /* in rotations, so it tracks tempo */
-      if(age < 0 || age > 1) continue;
-      var a2 = -Math.PI/2 + h.ph * Math.PI * 2;
-      g2.globalAlpha = 0.20 + 0.75 * (1 - age);
-      g2.strokeStyle = THEME["--c" + h.grade.slice(1)] || THEME["--ink"];
-      g2.lineWidth = 2;
-      g2.beginPath();
-      g2.moveTo(cx + Math.cos(a2) * (trR - 5), cy + Math.sin(a2) * (trR - 5));
-      g2.lineTo(cx + Math.cos(a2) * (trR + 5), cy + Math.sin(a2) * (trR + 5));
-      g2.stroke();
-    }
-    g2.restore();
-    g2.globalAlpha = 1;
-  }
-
   /* nudging the offset by slider is the same act as dragging the ring round, so
      it lights the ring the same way rather than changing it out of sight */
   var armedRing = (press && press.armed) ? press.ring : (slideRing >= 0 ? slideRing : -1);
@@ -1507,7 +1579,7 @@ function draw(){
      opacity the button would otherwise show the hand and the wedge through itself */
   /* the play button is out of the way while a ring listens, so the hand and the
      wedge can run all the way in */
-  var innerR = (S.tapMode === "record") ? 0 : hubR + 5;
+  var innerR = (S.tapMode === "record" || S.tapMode === "game") ? 0 : hubR + 5;
   var counting = S.playing && ciRun && p < 0;
   var listening = (S.tapMode === "record");
   /* Ring 1 has no rotation to show until its taps give it one. An outer ring is
@@ -1573,10 +1645,12 @@ function draw(){
       var a = -Math.PI/2 + (s/tot + oph) * Math.PI * 2;
       var x = cx + Math.cos(a)*rad, y = cy + Math.sin(a)*rad;
       var on = audible(r, s);
-      var accent = (s === 0);
+      var accent = accented(r, s);
       var base = (main ? dotR : subR) * grab;
       var rr = base;
-      if(accent) rr = Math.max(base, Math.min(base * 1.55, accentCap - 2.2));
+      /* a main beat grows for its accent; a subdivision stays small and lets the
+         circle alone say it, or it would read as another main beat */
+      if(accent && main) rr = Math.max(base, Math.min(base * 1.55, accentCap - 2.2));
       hitmap.push({x:x, y:y, r:Math.max(main ? 11 : 8, rr+6), ring:i, step:s});
 
       /* flash halo */
@@ -1593,14 +1667,22 @@ function draw(){
       }
 
       if(on && !r.mute){
-        g2.fillStyle = col;
-        g2.globalAlpha = (main ? 1 : 0.62) * (hushed ? 0.30 : 1);
-        g2.beginPath(); g2.arc(x, y, rr, 0, Math.PI*2); g2.fill();
-        g2.globalAlpha = 1;
-        if(accent){
-          g2.strokeStyle = col; g2.lineWidth = 1.2;
-          g2.globalAlpha = hushed ? 0.30 : 1;
-          g2.beginPath(); g2.arc(x, y, Math.min(rr + 3.4, accentCap), 0, Math.PI*2); g2.stroke();
+        /* in the game a dot is grey while you listen, and one you have cleared
+           swells and fades; a restored one fades back in */
+        var gfx = (S.tapMode === "game" && i === 0) ? gameFx(s, tnow) : null;
+        var dcol = (gfx && gfx.grey) ? THEME["--ink-3"] : col;
+        var dalpha = (main ? 1 : 0.62) * (hushed ? 0.30 : 1) * (gfx ? gfx.a : 1);
+        var drr = rr * (gfx ? gfx.k : 1);
+        if(dalpha > 0.005){
+          g2.fillStyle = dcol;
+          g2.globalAlpha = dalpha;
+          g2.beginPath(); g2.arc(x, y, drr, 0, Math.PI*2); g2.fill();
+          g2.globalAlpha = 1;
+        }
+        if(accent && dalpha > 0.005){
+          g2.strokeStyle = dcol; g2.lineWidth = 1.2;
+          g2.globalAlpha = dalpha;
+          g2.beginPath(); g2.arc(x, y, Math.min(drr + (main ? 3.4 : 2.6), accentCap), 0, Math.PI*2); g2.stroke();
           g2.globalAlpha = 1;
         }
       } else if(main || r.steps[s]){
@@ -1637,6 +1719,11 @@ function draw(){
     var cn = Math.max(1, Math.ceil(left - 1e-9));
     countNumber(cx, cy, scale, String(cn), Math.min(1, Math.max(0, cn - left)));
   }
+  /* the game announces each level in the hub while its grey loop plays */
+  if(S.tapMode === "game" && game && S.playing && p >= 0){
+    if(game.state === "listen") gameHub(cx, cy, scale, pos);
+    else if(game.failed) gameMissed(cx, cy, scale, tnow);
+  }
 
   requestAnimationFrame(draw);
 }
@@ -1663,6 +1750,41 @@ function recCentre(cx, cy, scale, col){
     g2.translate(cx, cy);
     g2.scale(1 + 2.2 * age, 1 + 2.2 * age);
     g2.fillText("TAP PATTERN", 0, 0);
+  }
+  g2.restore();
+  g2.globalAlpha = 1;
+}
+/* The level number, the way the count-in shows its beats: it holds through
+   most of the listening loop, then swells and fades so the hub is clear by
+   the time the loop turns and the tapping begins. */
+function gameHub(cx, cy, scale, pos){
+  var t = pos < 0.7 ? 0 : (pos - 0.7) / 0.3;
+  var alpha = 1 - t;
+  if(alpha <= 0.01) return;
+  g2.save();
+  g2.globalAlpha = alpha * 0.85;
+  g2.textAlign = "center"; g2.textBaseline = "middle";
+  g2.fillStyle = THEME["--ink-3"];
+  g2.font = "600 " + Math.round(scale * 0.030) + 'px "Archivo", sans-serif';
+  g2.fillText("LEVEL", cx, cy - scale * 0.058);
+  g2.restore();
+  countNumber(cx, cy + scale * 0.012, scale, String(game.level), t);
+}
+/* A lost loop: the dots have gone grey, and MISSED sits in the hub until the
+   bar line, having swelled out of the centre the instant the tap went wrong. */
+function gameMissed(cx, cy, scale, tnow){
+  g2.save();
+  g2.textAlign = "center"; g2.textBaseline = "middle";
+  g2.fillStyle = THEME["--c3"];
+  g2.font = "700 " + Math.round(scale * 0.052) + 'px "Archivo", sans-serif';
+  g2.globalAlpha = 0.7;
+  g2.fillText("MISSED", cx, cy);
+  var age = (tnow - (game.missAt || 0)) / 560;
+  if(age >= 0 && age < 1){
+    g2.globalAlpha = (1 - age) * 0.85;
+    g2.translate(cx, cy);
+    g2.scale(1 + 2.0 * age, 1 + 2.0 * age);
+    g2.fillText("MISSED", 0, 0);
   }
   g2.restore();
   g2.globalAlpha = 1;
@@ -1695,7 +1817,7 @@ cv.addEventListener("click", function(e){
   /* While a ring listens the wheel is the tap target. pointerdown already took
      the tap, but the click that follows it would land here and silence whichever
      dot it happened to hit. */
-  if(S.tapMode === "record") return;
+  if(S.tapMode === "record" || S.tapMode === "game") return;
   var rect = cv.getBoundingClientRect();
   var x = e.clientX - rect.left, y = e.clientY - rect.top;
   var best = null, bd = Infinity;
@@ -1704,9 +1826,12 @@ cv.addEventListener("click", function(e){
     if(d < h.r && d < bd){ bd = d; best = h; }
   });
   if(!best) return;
-  var r = S.rings[best.ring];
-  r.steps[best.step] = !r.steps[best.step];
+  var r = S.rings[best.ring], v = r.steps[best.step];
+  /* one tap silences, as it always did; a second brings it back louder than
+     before; a third settles it back to plain. */
+  r.steps[best.step] = (v === 2) ? 1 : (v ? 0 : 2);
   paintRack();
+  paintTransport();                 /* the grouping label reads the accents */
 });
 
 /* ------------------------------------------------------- drag a ring round */
@@ -1878,6 +2003,7 @@ function buildRack(){
     t.addEventListener("click", function(){
       /* a ring only listens while you are on its own tab */
       if(S.tapMode === "record"){ recEnd(true); return; }
+      if(S.tapMode === "game") return;          /* the game holds the one ring it plays */
       if(!rackOpen){                 /* folded away: any tab brings it back */
         rackOpen = true;
         S.active = i;
@@ -1891,12 +2017,6 @@ function buildRack(){
       }
       S.active = i;
       buildRack(); paintRack();
-      /* the practice aims at the ring you are looking at: same mode, fresh count */
-      if(S.tapMode){
-        var m = S.tapMode;
-        S.tapMode = "";              /* so setTapMode does not read this as a toggle off */
-        setTapMode(m);
-      }
     });
     tabs.appendChild(t);
   });
@@ -2161,6 +2281,70 @@ var playBtn = document.getElementById("play");
 var playIcon = document.getElementById("playIcon");
 var bpmNum = document.getElementById("bpmNum");
 var fbNum = document.getElementById("fbNum");   /* the same number, on the folded bar */
+
+/* What one click of ring 1 is worth, as a note. The tempo number is the speed
+   of that note, so the readout reads like a score marking - an eighth and 200
+   is the 200 eighths a minute a 5/8 wants. Switching notes keeps the music's
+   speed and converts the number: a quarter at 100 becomes an eighth at 200,
+   and the clicks double to match. Rings 2 to 4 are untouched - they divide
+   the rotation, whatever a click is called. */
+var NOTE_NAMES = {1:"whole", 2:"half", 4:"quarter", 8:"eighth", 16:"sixteenth"};
+function noteLen(den, dot){ return (4 / den) * (dot ? 1.5 : 1); }   /* in quarter notes */
+function noteName(plural){
+  var n = (S.noteDot ? "dotted " : "") + NOTE_NAMES[S.noteDen];
+  return plural ? n + "s" : n;
+}
+/* The glyphs are drawn, not typed: a hollow or filled head, a stem, then one
+   flag per halving past the quarter, and the dot where a copyist puts it. */
+function noteSvg(den, dot){
+  var head = '<ellipse cx="8" cy="22.5" rx="5.4" ry="3.7" transform="rotate(-22 8 22.5)"' +
+    (den <= 2 ? ' fill="none" stroke="currentColor" stroke-width="2"/>' : ' fill="currentColor"/>');
+  var stem = den >= 2 ? '<path d="M12.9 21.6V3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>' : '';
+  var flags = '';
+  if(den >= 8)  flags += '<path d="M12.9 3.5c3.6 2.2 6 5.2 4.4 10.2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>';
+  if(den >= 16) flags += '<path d="M12.9 8.5c3.6 2.2 6 5.2 4.4 10.2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>';
+  var d = dot ? '<circle cx="17.4" cy="24.4" r="1.7" fill="currentColor"/>' : '';
+  return '<svg viewBox="0 0 22 30" aria-hidden="true">' + head + stem + flags + d + '</svg>';
+}
+var DOT_SVG = '<svg viewBox="0 0 22 30" aria-hidden="true"><circle cx="11" cy="16" r="3" fill="currentColor"/></svg>';
+
+var bpmNote = document.getElementById("bpmNote"), fbNote = document.getElementById("fbNote");
+var noteBtnEls = [].slice.call(document.querySelectorAll(".notebtn[data-den]"));
+var noteDotBtn = document.getElementById("noteDotBtn");
+function paintNote(){
+  var svg = noteSvg(S.noteDen, S.noteDot);
+  bpmNote.innerHTML = svg;
+  fbNote.innerHTML = svg;
+  noteBtnEls.forEach(function(b){
+    var den = parseInt(b.dataset.den, 10);
+    b.innerHTML = noteSvg(den, S.noteDot);      /* the row shows the dot too */
+    b.dataset.on = (den === S.noteDen) ? "1" : "0";
+    b.setAttribute("aria-pressed", den === S.noteDen ? "true" : "false");
+  });
+  noteDotBtn.innerHTML = DOT_SVG;
+  noteDotBtn.dataset.on = S.noteDot ? "1" : "0";
+  noteDotBtn.setAttribute("aria-pressed", S.noteDot ? "true" : "false");
+}
+/* The exact speed in quarters a minute, remembered from the last time the tempo
+   was set. Converting from it, rather than from the rounded number on show,
+   means any path through the notes comes back to where it started: 100 as
+   quarters, through eighths and dotted eighths and dotted quarters, is 100
+   again - not 101. */
+var noteQpm = null, noteQpmBpm = null;
+function setNote(den, dot){
+  if(den === S.noteDen && dot === S.noteDot) return;
+  if(noteQpm === null || noteQpmBpm !== S.bpm) noteQpm = S.bpm * noteLen(S.noteDen, S.noteDot);
+  S.noteDen = den; S.noteDot = dot;
+  /* same music, new unit: a shorter note means more of them a minute */
+  setBpm(Math.round(noteQpm / noteLen(den, dot)));
+  noteQpmBpm = S.bpm;
+  paintNote();
+  paintTransport();
+}
+noteBtnEls.forEach(function(b){
+  b.addEventListener("click", function(){ setNote(parseInt(b.dataset.den, 10), S.noteDot); });
+});
+noteDotBtn.addEventListener("click", function(){ setNote(S.noteDen, !S.noteDot); });
 var bpmRange = document.getElementById("bpmRange");
 var cycleLine = document.getElementById("cycleLine");
 var bpmIn = document.getElementById("bpmIn");
@@ -2199,6 +2383,21 @@ function fitHead(){
   fitOne(posLbl, 13);
 }
 
+/* How ring 1's accents cut the rotation: accents on 1 and 4 of five is 3+2.
+   Only main beats count, the bar has to start on an accent for the sum to
+   mean anything, and a lone accent on 1 says nothing worth printing. */
+function groupLabel(){
+  var r = S.rings[0], acc = [], k;
+  if(!r) return "";
+  for(k = 0; k < r.div; k++) if(r.steps[k * r.sub] === 2) acc.push(k);
+  if(acc.length < 2 || acc[0] !== 0) return "";
+  var parts = [];
+  for(k = 0; k < acc.length; k++){
+    var next = (k + 1 < acc.length) ? acc[k + 1] : r.div;
+    parts.push(next - acc[k]);
+  }
+  return parts.join("+");
+}
 function paintTransport(){
   playBtn.dataset.on = S.playing ? "1" : "0";
   playBtn.setAttribute("aria-label", S.playing ? "Stop" : "Play");
@@ -2210,7 +2409,9 @@ function paintTransport(){
   if(posToBpm(parseInt(bpmRange.value, 10)) !== S.bpm) bpmRange.value = bpmToPos(S.bpm);
   bpmRange.setAttribute("aria-valuetext", S.bpm + " BPM");
   var beats = baseBeats();
-  cycleLine.textContent = "One rotation · " + beats + (beats === 1 ? " beat · " : " beats · ") +
+  var grp = groupLabel();
+  cycleLine.textContent = "One rotation · " + beats + " " + noteName(beats !== 1) +
+    (grp ? " · " + grp : "") + " · " +
     cycleDur().toFixed(2) + " s · Ring 1 is the click";
   queueSave();
 }
@@ -2428,7 +2629,7 @@ function setUiMode(mode, store){
       var s = advSnap.rings[i];
       if(!s || s.div !== r.div) return;    /* divisions changed meanwhile: leave it */
       if(s.sub !== r.sub) reshape(r, r.div, fitSub(r.div, s.sub));
-      if(s.steps.length === total(r)) r.steps = s.steps.slice();
+      if(s.steps.length === total(r)) r.steps = normSteps(s.steps);
       r.off = s.off;
       realign(r);
     });
@@ -2451,12 +2652,20 @@ uiBtn.addEventListener("click", function(){
 /* ---- tutorial sheet ---------------------------------------------------- */
 var help = document.getElementById("help");
 var infoBtn = document.getElementById("infoBtn");
+var buildTag = document.getElementById("buildTag");
+/* the shell stamps window.POLY_BUILD when it builds the installable copy; the
+   bare source has no stamp, and says so */
+function paintBuild(){
+  buildTag.textContent = window.POLY_BUILD ? "Build " + window.POLY_BUILD : "Preview · unbuilt copy";
+}
+paintBuild();
 function showHelp(on){
   help.hidden = !on;
   if(on) document.getElementById("helpClose").focus();
   else infoBtn.focus();
 }
-infoBtn.addEventListener("click", function(){ showHelp(true); });
+/* the shell has stamped the build by the time anyone can press this */
+infoBtn.addEventListener("click", function(){ paintBuild(); showHelp(true); });
 document.getElementById("helpClose").addEventListener("click", function(){ showHelp(false); });
 /* the scrim closes it, the sheet itself does not */
 help.addEventListener("click", function(e){ if(e.target === help) showHelp(false); });
@@ -2554,7 +2763,14 @@ function applyConfig(cfg){
   if(run){ stop(); finishSession(); }
   var wasPlaying = S.playing;
   if(wasPlaying) stop();
-  if(cfg.bpm) S.bpm = Math.max(BPM_MIN, Math.min(BPM_MAX, cfg.bpm));
+  if(cfg.bpm){
+    S.bpm = Math.max(BPM_MIN, Math.min(BPM_MAX, cfg.bpm));
+    /* the tempo comes with its note - one saved before notes existed was in
+       quarters. A swap inside a session brings no tempo and keeps your unit. */
+    S.noteDen = NOTE_NAMES[cfg.noteDen] ? cfg.noteDen : 4;
+    S.noteDot = !!cfg.noteDot;
+    paintNote();
+  }
   S.rings = (cfg.rings || []).slice(0,4).map(function(rc, i){
     var r = mkRing(i, Math.max(1, Math.min(32, rc.div || 4)));
     if(rc.sound) r.sound = rc.sound;
@@ -2563,7 +2779,7 @@ function applyConfig(cfg){
     r.mute = !!rc.mute;
     r.sub = fitSub(r.div, Math.max(1, Math.min(4, rc.sub || 1)));
     r.steps = filled(total(r));
-    if(Array.isArray(rc.steps) && rc.steps.length === total(r)) r.steps = rc.steps.slice();
+    if(Array.isArray(rc.steps) && rc.steps.length === total(r)) r.steps = normSteps(rc.steps);
     return r;
   });
   if(!S.rings.length) S.rings = [ mkRing(0,4) ];
@@ -2607,19 +2823,20 @@ ptabEls.forEach(function(t){
    additive count for the Balkan metres.
    Patterns are written on the grid of that ring: "x" sounds, "." is silent. */
 function pat(str){
-  var a = [], i;
-  for(i=0;i<str.length;i++) a.push(str.charAt(i) !== ".");
+  var a = [], i, c;
+  for(i=0;i<str.length;i++){ c = str.charAt(i); a.push(c === "X" ? 2 : (c === "." ? 0 : 1)); }
+  if(str.indexOf("X") < 0 && a[0]) a[0] = 2;   /* no accents written: the downbeat takes it */
   return a;
 }
 
 var RHYTHM_GROUPS = [
   { group:"Cuba & the Caribbean", items:[
-    { name:"Rumba", note:"clave 3-2", bpm:100, rings:[
+    { name:"Rumba", note:"clave 3-2", bpm:100, den:8, rings:[
       { div:8,  sound:"wood", vol:0.42, pattern:"xxxxxxxx" },
       { div:16, sound:"rim",  vol:1.00, pattern:"x..x...x..x.x..." },
       { div:8,  sound:"kick", vol:0.70, pattern:"x...x..." }
     ]},
-    { name:"Mambo", note:"bell + clave 2-3", bpm:106, rings:[
+    { name:"Mambo", note:"bell + clave 2-3", bpm:106, den:8, rings:[
       { div:8,  sound:"bell", vol:0.70, pattern:"xxxxxxxx" },
       { div:16, sound:"rim",  vol:0.95, pattern:"..x.x...x..x..x." },
       { div:8,  sound:"kick", vol:0.70, pattern:"x...x..." }
@@ -2657,7 +2874,7 @@ var RHYTHM_GROUPS = [
       { div:16, sound:"rim",   vol:0.85, pattern:"x..x..x...x.x..." },
       { div:4,  sound:"hihat", vol:0.50, off:0.5, pattern:"xxxx" }
     ]},
-    { name:"Bossa nova", note:"bossa clave", bpm:128, rings:[
+    { name:"Bossa nova", note:"bossa clave", bpm:128, den:8, rings:[
       { div:8,  sound:"wood", vol:0.35, pattern:"xxxxxxxx" },
       { div:16, sound:"rim",  vol:0.90, pattern:"x..x..x...x..x.." },
       { div:8,  sound:"kick", vol:0.60, pattern:"x.x.x.x." }
@@ -2682,88 +2899,80 @@ var RHYTHM_GROUPS = [
       { div:8, sound:"kick", vol:0.95, pattern:"x..x..x." },
       { div:4, sound:"rim",  vol:0.55, pattern:".x.x" }
     ]},
-    { name:"Landó", note:"12/8 · Afro-Peruvian", bpm:150, rings:[
-      { div:12, sound:"wood",  vol:0.28, pattern:"xxxxxxxxxxxx" },
-      { div:12, sound:"click", vol:0.92, pattern:"x..x..xx..x." },
+    { name:"Landó", note:"12/8 · Afro-Peruvian", bpm:150, den:8, rings:[
+      { div:12, sound:"click", vol:0.62, pattern:"XxxXxxXXxxXx" },
       { div:12, sound:"kick",  vol:0.70, pattern:"x.....x....." }
     ]}
   ]},
 
   { group:"Flamenco", items:[
-    { name:"Soleá", note:"12 · accents 12 3 6 8 10", bpm:80, rings:[
-      { div:12, sound:"wood", vol:0.30, pattern:"xxxxxxxxxxxx" },
-      { div:12, sound:"wood", vol:1.00, pattern:"x..x..x.x.x." },
+    { name:"Soleá", note:"12 · accents 12 3 6 8 10", bpm:80, den:8, rings:[
+      { div:12, sound:"clap", vol:0.62, pattern:"XxxXxxXxXxXx" },
       { div:12, sound:"kick", vol:0.65, pattern:"x.....x....." }
     ]},
-    { name:"Bulerías", note:"same 12, fast", bpm:210, rings:[
-      { div:12, sound:"wood",  vol:0.30, pattern:"xxxxxxxxxxxx" },
-      { div:12, sound:"click", vol:1.00, pattern:"x..x..x.x.x." },
+    { name:"Bulerías", note:"same 12, fast", bpm:210, den:8, rings:[
+      { div:12, sound:"clap", vol:0.62, pattern:"XxxXxxXxXxXx" },
       { div:12, sound:"kick",  vol:0.60, pattern:"x.....x....." }
     ]},
-    { name:"Alegrías", note:"same 12, bright", bpm:180, rings:[
-      { div:12, sound:"wood",  vol:0.30, pattern:"xxxxxxxxxxxx" },
-      { div:12, sound:"click", vol:0.98, pattern:"x..x..x.x.x." },
+    { name:"Alegrías", note:"same 12, bright", bpm:180, den:8, rings:[
+      { div:12, sound:"clap", vol:0.62, pattern:"XxxXxxXxXxXx" },
       { div:12, sound:"kick",  vol:0.62, pattern:"x.....x....." }
     ]},
-    { name:"Seguiriya", note:"12 · accents 1 3 5 8 11", bpm:130, rings:[
-      { div:12, sound:"wood",  vol:0.28, pattern:"xxxxxxxxxxxx" },
-      { div:12, sound:"click", vol:0.95, pattern:"x.x.x..x..x." },
+    { name:"Seguiriya", note:"12 · accents 1 3 5 8 11", bpm:130, den:8, rings:[
+      { div:12, sound:"clap", vol:0.62, pattern:"XxXxXxxXxxXx" },
       { div:12, sound:"kick",  vol:0.62, pattern:"x......x...." }
     ]},
     { name:"Tangos", note:"flamenco 4/4", bpm:110, rings:[
       { div:4, sound:"wood",  vol:0.32, pattern:"xxxx" },
-      { div:4, sound:"click", vol:0.90, pattern:".x.x" },
+      { div:4, sound:"clap", vol:0.90, pattern:".x.x" },
       { div:8, sound:"kick",  vol:0.78, pattern:"x..x.x.." }
     ]},
     { name:"Rumba flamenca", note:"3+3+2 + off-beat palmas", bpm:100, rings:[
       { div:4, sound:"wood",  vol:0.30, pattern:"xxxx" },
-      { div:8, sound:"click", vol:0.92, pattern:"x..x..x." },
+      { div:8, sound:"clap", vol:0.92, pattern:"x..x..x." },
       { div:4, sound:"rim",   vol:0.60, off:0.5, pattern:"xxxx" }
     ]},
-    { name:"Tanguillo", note:"2/4 · 16th tresillo", bpm:130, rings:[
+    { name:"Tanguillo", note:"2/4 · 16th tresillo", bpm:130, den:8, rings:[
       { div:4,  sound:"wood",  vol:0.30, pattern:"xxxx" },
-      { div:16, sound:"click", vol:0.92, pattern:"x..x..x.x..x..x." },
+      { div:16, sound:"clap", vol:0.92, pattern:"x..x..x.x..x..x." },
       { div:4,  sound:"kick",  vol:0.70, pattern:"x.x." }
     ]}
   ]},
 
   { group:"Spain · folk", items:[
     { name:"Jota", note:"3/4 · castanet subdivisions", bpm:150, rings:[
-      { div:3, sub:2, sound:"wood",  vol:0.50, pattern:"xxxxxx" },
-      { div:3, sound:"click", vol:0.92, pattern:"x.." },
+      { div:3, sub:2, sound:"wood",  vol:0.55, pattern:"Xxxxxx" },
       { div:3, sound:"kick",  vol:0.65, pattern:"x.x" }
     ]},
-    { name:"Fandango", note:"6 pulses · 3 against 2", bpm:180, rings:[
+    { name:"Fandango", note:"6 pulses · 3 against 2", bpm:180, den:8, rings:[
       { div:6, sound:"wood",  vol:0.30, pattern:"xxxxxx" },
       { div:3, sound:"click", vol:0.85, pattern:"xxx" },
       { div:2, sound:"kick",  vol:0.80, pattern:"xx" }
     ]},
     { name:"Sevillanas", note:"3/4 · palmas on 2 and 3", bpm:150, rings:[
-      { div:3, sub:2, sound:"wood",  vol:0.45, pattern:"xxxxxx" },
-      { div:3, sound:"click", vol:0.90, pattern:".xx" },
+      { div:3, sub:2, sound:"wood",  vol:0.55, pattern:"xxXxXx" },
       { div:3, sound:"kick",  vol:0.70, pattern:"x.." }
     ]}
   ]},
 
   { group:"Africa", items:[
-    { name:"Ewe", note:"12/8 · seven-stroke bell", bpm:210, rings:[
+    { name:"Ewe", note:"12/8 · seven-stroke bell", bpm:210, den:8, rings:[
       { div:12, sound:"wood", vol:0.25, pattern:"xxxxxxxxxxxx" },
       { div:12, sound:"bell", vol:1.00, pattern:"x.x.xx.x.x.x" },
       { div:4,  sound:"kick", vol:0.60, pattern:"xxxx" }
     ]},
-    { name:"Mandinga", note:"12/8 · five-stroke bell", bpm:200, rings:[
+    { name:"Mandinga", note:"12/8 · five-stroke bell", bpm:200, den:8, rings:[
       { div:12, sound:"wood", vol:0.28, pattern:"xxxxxxxxxxxx" },
       { div:12, sound:"bell", vol:0.95, pattern:"x.x..x.x..x." },
       { div:4,  sound:"kick", vol:0.60, pattern:"xxxx" }
     ]},
-    { name:"Foli", note:"12 pulses · three on four", bpm:190, rings:[
+    { name:"Foli", note:"12 pulses · three on four", bpm:190, den:8, rings:[
       { div:12, sound:"wood", vol:0.25, pattern:"xxxxxxxxxxxx" },
       { div:4,  sound:"kick", vol:0.85, pattern:"xxxx" },
       { div:3,  sound:"rim",  vol:0.80, pattern:"xxx" }
     ]},
-    { name:"Gnawa", note:"6/8 · qraqeb", bpm:190, rings:[
-      { div:6, sound:"wood",  vol:0.30, pattern:"xxxxxx" },
-      { div:6, sound:"click", vol:0.92, pattern:"x.xx.x" },
+    { name:"Gnawa", note:"6/8 · qraqeb", bpm:190, den:8, rings:[
+      { div:6, sound:"click", vol:0.62, pattern:"XxXXxX" },
       { div:6, sound:"kick",  vol:0.80, pattern:"x..x.." }
     ]},
     { name:"Mbalax", note:"sabar · 4/4 syncopation", bpm:130, rings:[
@@ -2784,7 +2993,7 @@ var RHYTHM_GROUPS = [
       { div:8, sound:"kick", vol:0.95, pattern:"x...x..." },
       { div:8, sound:"rim",  vol:0.80, pattern:".x.x..x." }
     ]},
-    { name:"Samai", note:"10/8 · 3+2+2+3", bpm:120, rings:[
+    { name:"Samai", note:"10/8 · 3+2+2+3", bpm:120, den:8, rings:[
       { div:10, sound:"wood", vol:0.30, pattern:"xxxxxxxxxx" },
       { div:10, sound:"kick", vol:0.95, pattern:"x....xx..." },
       { div:10, sound:"rim",  vol:0.80, pattern:"...x....x." }
@@ -2797,20 +3006,14 @@ var RHYTHM_GROUPS = [
   ]},
 
   { group:"Balkans & Europe", items:[
-    { name:"Aksak", note:"9/8 · 2+2+2+3", bpm:260, rings:[
-      { div:9, sound:"wood",  vol:0.30, pattern:"xxxxxxxxx" },
-      { div:9, sound:"click", vol:0.95, pattern:"x.x.x.x.." },
-      { div:9, sound:"kick",  vol:0.65, pattern:"x........" }
+    { name:"Aksak", note:"9/8 · 2+2+2+3", bpm:260, den:8, rings:[
+      { div:9, sound:"click", vol:0.62, pattern:"XxXxXxXxx" }
     ]},
-    { name:"Kopačka", note:"11/16 · 2+2+3+2+2", bpm:240, rings:[
-      { div:11, sound:"wood",  vol:0.30, pattern:"xxxxxxxxxxx" },
-      { div:11, sound:"click", vol:0.95, pattern:"x.x.x..x.x." },
-      { div:11, sound:"kick",  vol:0.65, pattern:"x.........." }
+    { name:"Kopačka", note:"11/16 · 2+2+3+2+2", bpm:240, den:16, rings:[
+      { div:11, sound:"click", vol:0.62, pattern:"XxXxXxxXxXx" }
     ]},
-    { name:"Kalamatianós", note:"7/8 · 3+2+2", bpm:220, rings:[
-      { div:7, sound:"wood",  vol:0.30, pattern:"xxxxxxx" },
-      { div:7, sound:"click", vol:0.95, pattern:"x..x.x." },
-      { div:7, sound:"kick",  vol:0.68, pattern:"x......" }
+    { name:"Kalamatianós", note:"7/8 · 3+2+2", bpm:220, den:8, rings:[
+      { div:7, sound:"click", vol:0.62, pattern:"XxxXxXx" }
     ]},
     { name:"Csárdás", note:"2/4 · esztam off-beat", bpm:132, rings:[
       { div:2, sound:"wood", vol:0.35, pattern:"xx" },
@@ -2822,7 +3025,7 @@ var RHYTHM_GROUPS = [
       { div:16, sound:"click", vol:0.85, pattern:"x..xx..xx..xx..x" },
       { div:4,  sound:"kick",  vol:0.72, pattern:"x.x." }
     ]},
-    { name:"Tarantella", note:"6/8 · tambourine", bpm:200, rings:[
+    { name:"Tarantella", note:"6/8 · tambourine", bpm:200, den:8, rings:[
       { div:6, sound:"wood",  vol:0.28, pattern:"xxxxxx" },
       { div:6, sound:"hihat", vol:0.50, pattern:"xxxxxx" },
       { div:6, sound:"kick",  vol:0.88, pattern:"x..x.." }
@@ -2911,7 +3114,7 @@ var RHYTHM_GROUPS = [
       { div:4, sound:"kick",  vol:0.92, pattern:"x.x." },
       { div:4, sound:"snare", vol:0.82, pattern:".x.x" }
     ]},
-    { name:"Math rock", note:"7/8 · 3+2+2", bpm:150, rings:[
+    { name:"Math rock", note:"7/8 · 3+2+2", bpm:150, den:8, rings:[
       { div:7, sound:"wood",  vol:0.28, pattern:"xxxxxxx" },
       { div:7, sound:"kick",  vol:0.92, pattern:"x..x..." },
       { div:7, sound:"snare", vol:0.85, pattern:"..x..x." }
@@ -2949,7 +3152,7 @@ RHYTHM_GROUPS.forEach(function(g, gi){
     b.title = rh.note;
     b.addEventListener("click", function(){
       chipHit(rh.name, {
-        bpm: rh.bpm,
+        bpm: rh.bpm, noteDen: rh.den || 4,
         rings: rh.rings.map(function(rc){
           return {
             div: rc.div, sub: rc.sub || 1, off: rc.off || 0,
@@ -3001,6 +3204,7 @@ BUILTIN.forEach(function(p){
   b.addEventListener("click", function(){
     chipHit(p.label, {
       bpm: S.bpm,
+      noteDen: S.noteDen, noteDot: S.noteDot,
       rings: p.divs.map(function(d,i){ return {div:d, sound:DEFAULT_SOUND[i], vol: i===0?0.95:0.8}; })
     });
   });
@@ -3017,6 +3221,7 @@ var saveTimer = null;
 function sessionSnapshot(){
   return {
     bpm: S.bpm,
+    noteDen: S.noteDen, noteDot: S.noteDot,
     master: S.master,
     muted: S.muted,
     countIn: S.countIn,
@@ -3056,6 +3261,8 @@ function applySession(c){
   if(!c || !Array.isArray(c.rings) || !c.rings.length) return;
 
   if(typeof c.bpm === "number") S.bpm = Math.max(BPM_MIN, Math.min(BPM_MAX, Math.round(c.bpm)));
+  S.noteDen = NOTE_NAMES[c.noteDen] ? c.noteDen : 4;
+  S.noteDot = !!c.noteDot;
   if(typeof c.master === "number") S.master = Math.max(0, Math.min(1, c.master));
   S.muted = !!c.muted;
   S.countIn = !!c.countIn;
@@ -3069,7 +3276,7 @@ function applySession(c){
     r.sub = fitSub(r.div, Math.max(1, Math.min(4, rc.sub || 1)));
     r.steps = filled(total(r));
     if(Array.isArray(rc.steps) && rc.steps.length === total(r)){
-      r.steps = rc.steps.map(function(v){ return !!v; });
+      r.steps = normSteps(rc.steps);
     }
     return r;
   });
@@ -3144,6 +3351,7 @@ document.getElementById("psave").addEventListener("click", function(){
   arr.unshift({
     name: name.slice(0,28),
     bpm: S.bpm,
+    noteDen: S.noteDen, noteDot: S.noteDot,
     rings: S.rings.map(function(r){
       return {div:r.div, sub:r.sub, sound:r.sound, vol:r.vol, off:r.off,
               mute:r.mute, steps:r.steps.slice()};
@@ -3514,7 +3722,7 @@ function swapRings(cfg){
     r.mute = !!rc.mute;
     r.sub = fitSub(r.div, Math.max(1, Math.min(4, rc.sub || 1)));
     r.steps = filled(total(r));
-    if(Array.isArray(rc.steps) && rc.steps.length === total(r)) r.steps = rc.steps.slice();
+    if(Array.isArray(rc.steps) && rc.steps.length === total(r)) r.steps = normSteps(rc.steps);
     return r;
   });
   if(!S.rings.length) S.rings = [ mkRing(0,4) ];
@@ -3629,28 +3837,18 @@ function loopIsSilent(phase){
   return i >= 0 && !!run.plan.silent[i];
 }
 
-/* ================================================= tapping practice =======
-   Two modes over one tap surface, because they are the same measurement:
+/* ================================================= tapping ==================
+   Two ways of tapping the wheel, one measurement under both: the phase you
+   were HEARING when the finger landed, so the output delay of the phone does
+   not count against you.
 
-   - follow: judge each tap against the active ring's strokes and show where it
-     landed. The bar flashes the grade so you get an answer instantly; the dial
-     keeps the last few bars of taps as ticks, so the drift you cannot feel
-     becomes a shape you can see.
    - record: quantise each tap to the nearest step of the active ring and turn
      it on, so a pattern can be played in rather than dialled in.
+   - game: clear the dots of a set pattern by tapping them in time.
 
    Nothing here plays a sound on the tap. Measured on a phone, tap to sound is
    about 96ms - late enough to feel detached and nothing can shorten it. The
-   backing pattern is scheduled ahead of time, so it is unaffected; only the
-   reaction would have suffered, and it is visual instead. */
-
-var TAP_TIGHT = 20;        /* ms - inside this is a hit worth calling tight */
-var TAP_FINE  = 50;        /* ms - outside this is a miss, not a loose hit */
-var TAP_TRAIL = 4;         /* rotations a tick stays on the dial before fading */
-var TAP_KEEP  = 24;        /* offsets kept for the drift and spread readout */
-
-var tapHits = [];          /* {ph, ms, grade, at} - what the dial draws */
-var tapStat = {offs:[], streak:0, best:0, n:0, tight:0};
+   backing pattern is scheduled ahead of time, so it is unaffected. */
 
 /* The phase you were hearing at that moment. getOutputTimestamp maps the page
    clock onto the audio being played out, which folds in the output delay - the
@@ -3666,49 +3864,10 @@ function heardPhase(perfMs){
   return phaseAt(at);
 }
 
-/* nearest audible stroke of a ring to a phase, as a signed rotation distance */
-function nearestStroke(r, ph){
-  var tot = total(r), oph = offPhase(r), best = null;
-  for(var k = 0; k < tot; k++){
-    if(!isMain(r, k) || !audible(r, k)) continue;
-    var d = ph - (k / tot + oph);
-    d -= Math.round(d);                 /* wrap to the nearer side of the circle */
-    if(best === null || Math.abs(d) < Math.abs(best.d)) best = {k:k, d:d};
-  }
-  return best;
-}
-
 function tapAt(perfMs){
   if(!S.tapMode) return;
-  var r = S.rings[S.active];
-  if(!r) return;
   if(S.tapMode === "record"){ recTap(perfMs); return; }
-  if(!S.playing){ start(); return; }    /* first tap starts the transport */
-
-  var ph = heardPhase(perfMs);
-  if(ph === null) return;
-  var frac = ph - Math.floor(ph);
-
-  /* follow */
-  var near = nearestStroke(r, ph);
-  if(!near){ flashBar("c3"); return; }  /* every step silenced: nothing to aim at */
-  var ms = near.d * cycleDur() * 1000;
-  var grade = Math.abs(ms) <= TAP_TIGHT ? "c2" : (Math.abs(ms) <= TAP_FINE ? "c1" : "c3");
-
-  tapStat.n++;
-  if(grade === "c2"){ tapStat.tight++; tapStat.streak++;
-    if(tapStat.streak > tapStat.best) tapStat.best = tapStat.streak;
-  } else { tapStat.streak = 0; }
-  /* Every tap counts toward the drift, misses included. Filtering them out hid
-     the number from exactly the player who needs it - somebody consistently
-     60ms late grades every tap a miss and would have been told nothing. The
-     median carries the outliers on its own. */
-  tapStat.offs.push(ms);
-  if(tapStat.offs.length > TAP_KEEP) tapStat.offs.shift();
-  tapHits.push({ph:frac, ms:ms, grade:grade, at:ph});
-  if(tapHits.length > 64) tapHits.shift();
-  flashBar(grade);
-  paintTapNow();
+  if(S.tapMode === "game"){ gameTap(perfMs); return; }
 }
 
 
@@ -3769,7 +3928,7 @@ function recShape(){
   }
   var steps = [];
   for(var k = 0; k < total(r); k++) steps.push(false);
-  recOn.forEach(function(k){ if(k >= 0 && k < steps.length) steps[k] = true; });
+  recOn.forEach(function(k){ if(k >= 0 && k < steps.length) steps[k] = (k === 0 ? 2 : 1); });
   r.steps = steps;
   /* the ring is audible while it is being tapped, so its tick counter has to be
      put back against the current phase whenever the grid underneath it changes */
@@ -3827,7 +3986,7 @@ function recRemove(frac){
 
 function recStart(){
   if(!S.rings[S.active]) return;
-  if(S.tapMode === "follow") setTapMode("");
+  if(S.tapMode === "game") gameEnd();
   /* A practice session borrows the whole setup and drives the tempo, which is
      the opposite of what tapping a ring in needs, so it ends here rather than
      merely pausing. It hands the setup back as it goes - and that resets which
@@ -3861,7 +4020,6 @@ function recStart(){
   tapNow.hidden = false;
   sessNow.hidden = true;
   dialHint.hidden = true;
-  tapBar.hidden = true;              /* the wheel itself is the target now */
   buildRack(); paintRack(); paintTapNow();
 }
 
@@ -3892,7 +4050,6 @@ function recEnd(keep){
   syncSessBtn();
   paintFolds();
   tapNow.hidden = true;
-  tapBar.hidden = true;
   dialHint.hidden = !!run;
   S.rings.forEach(function(rr){ realign(rr); });
   buildRack(); paintTransport(); paintRack();
@@ -3908,7 +4065,7 @@ function recEnd(keep){
    barred - were one already running, Stop has to stay reachable rather than
    trapping it. */
 function syncSessBtn(){
-  sessBtn.disabled = (S.tapMode === "record" && sessBtn.dataset.on !== "1");
+  sessBtn.disabled = ((S.tapMode === "record" || S.tapMode === "game") && sessBtn.dataset.on !== "1");
 }
 
 function recTap(perfMs){
@@ -3968,20 +4125,6 @@ function recBpm(){
   return Math.round(Math.max(BPM_MIN, Math.min(BPM_MAX, 60 / mean)));
 }
 
-/* ------------------------------------------------------------------ readout */
-function tapMedian(a){
-  if(!a.length) return null;
-  var s = a.slice().sort(function(x,y){ return x-y; }), n = s.length;
-  return n % 2 ? s[(n-1)/2] : (s[n/2-1] + s[n/2]) / 2;
-}
-function tapSpread(a){
-  if(a.length < 4) return null;
-  var s = a.slice().sort(function(x,y){ return x-y; });
-  var q = function(p){ var i = (s.length-1)*p, lo = Math.floor(i), hi = Math.ceil(i);
-    return s[lo] + (s[hi]-s[lo]) * (i-lo); };
-  return q(0.75) - q(0.25);
-}
-
 /* one line, shrunk if the sentence needs it - the slot is a fixed height and a
    second line would simply be cut off */
 function fitTapNow(){
@@ -3994,6 +4137,7 @@ function fitTapNow(){
 }
 function paintTapNow(){
   if(!S.tapMode){ return; }
+  if(S.tapMode === "game"){ paintGame(); return; }
   var r = S.rings[S.active], lbl = function(t){ return '<span class="k">'+t+'</span>'; };
 
   if(S.tapMode === "record"){
@@ -4019,75 +4163,336 @@ function paintTapNow(){
     return;
   }
 
-  var med = tapMedian(tapStat.offs), sp = tapSpread(tapStat.offs);
-  var drift;
-  if(med === null) drift = lbl("drift") + " &mdash;";
-  else if(Math.abs(med) < 8) drift = lbl("on the beat");
-  else drift = Math.round(Math.abs(med)) + " ms " + lbl(med < 0 ? "early" : "late");
-  tapNowIn.innerHTML = drift + (sp === null ? "" : "  " + lbl("spread") + " " + Math.round(sp) + " ms");
+}
+
+/* =========================================================== the game =======
+   Follow the pattern. One ring, one bar. The first loop is shown grey and
+   played; from the next loop the wheel is the target, and every dot you tap
+   in time swells and fades out - the pattern keeps sounding, it is the dots
+   that go. Clear them all inside one loop and the next level starts after a
+   breath; a tap that lands on nothing, or a loop that ends with dots left,
+   puts them all back for another go. Levels are a ladder that starts with one
+   hit a bar and climbs through claves, aksaks and compas, then comes round
+   again faster.
+
+   Timing is judged the way tap-along judges it: against the phase you were
+   HEARING when the finger landed, so the output delay of the phone does not
+   count against you. The window narrows a little with each level. */
+/* The ladder is built from a pool of real rhythms - claves, bells, aksaks, the
+   compas, the figures of a solfege class - each at five tempos. Every entry is
+   scored for difficulty (hits, grid, off-beats, subdivision, hits a second,
+   an odd count) and the three hundred are sorted, three to a level, so a
+   hundred levels climb without a step being skipped. Three choices at each
+   level, drawn at random, so no level plays the same way twice. */
+var GAME_POOL = [
+  {name:"one hit",        div:4,  sub:1, p:"X...",             bpm:80},
+  {name:"two hits",       div:4,  sub:1, p:"X.x.",             bpm:80},
+  {name:"three in a bar", div:3,  sub:1, p:"Xxx",              bpm:90},
+  {name:"four on the floor", div:4, sub:1, p:"Xxxx",           bpm:92},
+  {name:"one gap",        div:4,  sub:1, p:"Xx.x",             bpm:92},
+  {name:"gap on two",     div:4,  sub:1, p:"X.xx",             bpm:92},
+  {name:"rest on four",   div:4,  sub:1, p:"Xxx.",             bpm:92},
+  {name:"pick-up",        div:4,  sub:1, p:"xX.x",             bpm:96},
+  {name:"backbeat",       div:4,  sub:1, p:".x.x",             bpm:96},
+  {name:"waltz lift",     div:3,  sub:1, p:"X.x",              bpm:100},
+  {name:"eighths",        div:8,  sub:1, p:"Xxxxxxxx",         bpm:170},
+  {name:"tresillo",       div:8,  sub:1, p:"X..x..x.",         bpm:160},
+  {name:"cinquillo",      div:8,  sub:1, p:"Xx.xx.x.",         bpm:168},
+  {name:"habanera",       div:8,  sub:1, p:"X..xx.x.",         bpm:160},
+  {name:"baiao",          div:16, sub:1, p:"X..x..x.x..x..x.", bpm:300},
+  {name:"and of two",     div:8,  sub:1, p:"X.xx.x.x",         bpm:168},
+  {name:"cumbia",         div:8,  sub:1, p:".x.x.x.x",         bpm:168},
+  {name:"charleston",     div:8,  sub:1, p:"X..x....",         bpm:150},
+  {name:"bossa",          div:16, sub:1, p:"X..x..x...x..x..", bpm:290},
+  {name:"son clave",      div:16, sub:1, p:"X..x..x...x.x...", bpm:300},
+  {name:"rumba clave",    div:16, sub:1, p:"X..x...x..x.x...", bpm:300},
+  {name:"clave 2-3",      div:16, sub:1, p:"..x.x...x..x..x.", bpm:300},
+  {name:"shuffle",        div:4,  sub:3, p:"X.xx.xx.xx.x",     bpm:100},
+  {name:"tumbao",         div:16, sub:1, p:"..x.x..x..x.x..x", bpm:300},
+  {name:"dembow snare",   div:16, sub:1, p:"...x..x....x..x.", bpm:300},
+  {name:"backbeat eighths", div:8, sub:1, p:"x.X.x.X.",        bpm:176},
+  {name:"6/8 pulse",      div:6,  sub:1, p:"X..x..",           bpm:170},
+  {name:"qraqeb",         div:6,  sub:1, p:"X.xx.x",           bpm:170},
+  {name:"tarantella",     div:6,  sub:1, p:"Xx.Xx.",           bpm:174},
+  {name:"Ewe bell",       div:12, sub:1, p:"X.x.xx.x.x.x",     bpm:220},
+  {name:"five-stroke bell", div:12, sub:1, p:"X.x..x.x..x.",   bpm:220},
+  {name:"solea",          div:12, sub:1, p:"X..x..x.x.x.",     bpm:225},
+  {name:"seguiriya",      div:12, sub:1, p:"X.x.x..x..x.",     bpm:225},
+  {name:"triplets",       div:4,  sub:3, p:"Xxxxxxxxxxxx",     bpm:96},
+  {name:"swing",          div:4,  sub:3, p:"X.xX.xX.xX.x",     bpm:100},
+  {name:"trap hats",      div:4,  sub:3, p:"X..x.xx..x..",     bpm:100},
+  {name:"5/8 in 3+2",     div:5,  sub:1, p:"X..X.",            bpm:170},
+  {name:"5/8 in 2+3",     div:5,  sub:1, p:"X.X..",            bpm:170},
+  {name:"five straight",  div:5,  sub:1, p:"Xxxxx",            bpm:180},
+  {name:"7/8 in 3+2+2",   div:7,  sub:1, p:"X..X.X.",          bpm:190},
+  {name:"7/8 in 2+2+3",   div:7,  sub:1, p:"X.X.X..",          bpm:190},
+  {name:"seven, dense",   div:7,  sub:1, p:"Xx.xx.x",          bpm:200},
+  {name:"aksak",          div:9,  sub:1, p:"X.x.x.x..",        bpm:240},
+  {name:"nine in threes", div:9,  sub:1, p:"X..x..x..",        bpm:230},
+  {name:"samai",          div:10, sub:1, p:"X..x.xx.x.",       bpm:220},
+  {name:"kopacka",        div:11, sub:1, p:"X.x.x..x.x.",      bpm:260},
+  {name:"sevillanas",     div:3,  sub:2, p:"xxXxXx",           bpm:150},
+  {name:"sixteenths",     div:4,  sub:4, p:"Xxxxxxxxxxxxxxxx", bpm:100},
+  {name:"gallop",         div:4,  sub:4, p:"X..xX..xX..xX..x", bpm:104},
+  {name:"verbunkos",      div:16, sub:1, p:"X..xx..xx..xx..x", bpm:320},
+  {name:"mbalax",         div:16, sub:1, p:"X..x..xx..x..x..", bpm:320},
+  {name:"sixteenth mix",  div:4,  sub:4, p:"X.xxx..xx.x.xx.x", bpm:112},
+  {name:"amen kick",      div:16, sub:1, p:"X....x....x.....", bpm:340},
+  {name:"two-step",       div:16, sub:1, p:"X...x.....x.x...", bpm:320},
+  {name:"funky drummer",  div:16, sub:1, p:"X.....x...x.....", bpm:330},
+  {name:"syncopa",        div:4,  sub:4, p:"Xx.xXx.xXx.xXx.x", bpm:108},
+  {name:"dotted pairs",   div:4,  sub:4, p:"X.x.X.x.Xx.xXx.x", bpm:108},
+  {name:"twelve, dense",  div:12, sub:1, p:"X.xx.x.x.xx.",     bpm:250},
+  {name:"clave and tumbao", div:16, sub:1, p:"X.xx.xx.x.xx.xx.", bpm:310},
+  {name:"fast seven",     div:7,  sub:1, p:"XxxXxXx",          bpm:230}
+];
+var GAME_TEMPOS = [0.8, 0.9, 1.0, 1.12, 1.25];
+var GAME_LEVELS = (function(){
+  var all = [], i, t;
+  GAME_POOL.forEach(function(d, id){
+    var grid = d.div * d.sub, hits = 0, off = 0, k;
+    /* the beat the ear counts: subdivisions, quarters in a 16, threes in a 12 */
+    var unit = d.sub > 1 ? d.sub : (grid % 4 === 0 && grid >= 8 ? grid / 4 : (grid % 3 === 0 && grid >= 6 ? grid / 3 : 1));
+    for(k = 0; k < grid; k++) if(d.p.charAt(k) !== "."){ hits++; if(k % unit !== 0) off++; }
+    var odd = [3,4,6,8,12,16].indexOf(grid) < 0 ? 1 : 0;
+    var noDown = d.p.charAt(0) === "." ? 1 : 0;      /* nothing on one is harder to hold */
+    for(t = 0; t < GAME_TEMPOS.length; t++){
+      var bpm = Math.min(BPM_MAX, Math.round(d.bpm * GAME_TEMPOS[t]));
+      var perSec = hits * bpm / 60 / grid;
+      all.push({id:id, name:d.name, div:d.div, sub:d.sub, pattern:d.p, bpm:bpm,
+        d: hits + grid * 0.25 + off * 1.4 + (d.sub > 1 ? 2.5 : 0) + odd * 2 + noDown * 1.5 + perSec * 3});
+    }
+  });
+  all.sort(function(a, b){ return a.d - b.d || a.id - b.id; });
+  /* three to a level, and not the same rhythm twice in one unless nothing else
+     is left - so the count comes out exactly at a hundred */
+  var levels = [];
+  while(all.length){
+    var lvl = [], j = 0;
+    while(lvl.length < 3 && all.length){
+      if(j >= all.length){ j = 0; lvl.push(all.splice(0, 1)[0]); continue; }
+      var e = all[j];
+      if(lvl.some(function(x){ return x.id === e.id; })){ j++; continue; }
+      lvl.push(e); all.splice(j, 1);
+    }
+    levels.push(lvl);
+  }
+  return levels;
+})();
+var GAME_KEY = "polyrhythm-circle:game:v1";
+var game = null;          /* {level, state, loop, cleared[], restoreAt, prev, attempt, failed, pick} */
+var gameHold = false;     /* true while the game itself stops the transport */
+var gameBest = 0;
+try{ gameBest = parseInt(localStorage.getItem(GAME_KEY), 10) || 0; } catch(err){}
+
+/* one of the three at this level, drawn when the level is entered; past the
+   last level the ladder comes round again, fifteen percent faster each time */
+function gameLevel(n){
+  var L = GAME_LEVELS.length, i = (n - 1) % L, round = Math.floor((n - 1) / L);
+  var v = GAME_LEVELS[i], d = v[Math.floor(Math.random() * v.length)];
+  return {name:d.name, div:d.div, sub:d.sub, pattern:d.pattern,
+          bpm:Math.min(BPM_MAX, Math.round(d.bpm * (1 + 0.15 * round)))};
+}
+/* the window a tap has to land in, in rotations: 110ms at first, 50ms by level 20 */
+function gameTol(){
+  var ms = Math.max(50, 110 - (game.level - 1) * 3);
+  return ms / 1000 / cycleDur();
+}
+function gameSetLevel(n){
+  var d = gameLevel(n), r = S.rings[0];
+  game.level = n; game.name = d.name; game.attempt = 1; game.failed = false;
+  reshape(r, d.div, d.sub);
+  r.steps = pat(d.pattern);
+  r.flash = [];
+  game.cleared = [];
+  game.restoreAt = 0;
+  S.bpm = d.bpm;
+  buildRack(); paintTransport(); paintRack();
+}
+function gameStart(){
+  if(S.tapMode === "record") recEnd(true);
+  if(run){ stop(); finishSession(); }
+  if(S.playing) stop();
+  /* the wheel is borrowed whole and handed back at the end */
+  game = {prev:{rings:S.rings, bpm:S.bpm, noteDen:S.noteDen, noteDot:S.noteDot, active:S.active, rackOpen:rackOpen},
+          level:1, state:"listen", loop:-1, cleared:[], restoreAt:0};
+  var r = mkRing(0, 4);
+  r.sound = "wood"; r.vol = 0.9;
+  S.rings = [r];
+  S.active = 0; rackOpen = false;
+  S.noteDen = 4; S.noteDot = false;
+  S.tapMode = "game";
+  initAudio();
+  if(ctx && ctx.state === "suspended") ctx.resume();
+  document.documentElement.dataset.game = "1";
+  tapGame.dataset.on = "1";
+  syncSessBtn(); paintFolds(); paintNote();
+  tapNow.hidden = false; sessNow.hidden = true; dialHint.hidden = true;
+  gameSetLevel(1);
+  paintGame();
+  game.countIn = true;               /* three beats before the first listening loop */
+  start();
+  /* the wheel is the whole game now, so bring it to the middle of the screen -
+     the Game button sits well below it on a phone */
+  var dial = document.querySelector(".dial");
+  if(dial && dial.scrollIntoView){
+    var calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    dial.scrollIntoView({behavior: calm ? "auto" : "smooth", block:"center"});
+  }
+}
+function gameEnd(){
+  if(!game) return;
+  var prev = game.prev;
+  game = null;
+  S.tapMode = "";
+  gameHold = true;
+  if(S.playing) stop();
+  gameHold = false;
+  S.rings = prev.rings;
+  S.bpm = prev.bpm; S.noteDen = prev.noteDen; S.noteDot = prev.noteDot;
+  S.active = Math.min(prev.active, S.rings.length - 1); rackOpen = prev.rackOpen;
+  S.rings.forEach(function(rr){ realign(rr); });
+  document.documentElement.dataset.game = "0";
+  tapGame.dataset.on = "0";
+  tapNowIn.dataset.grade = "";
+  syncSessBtn(); paintFolds(); paintNote();
+  tapNow.hidden = true; dialHint.hidden = !!run;
+  paintGameBest();
+  buildRack(); paintTransport(); paintRack();
+  queueSave();
+}
+/* where the dots go and come back */
+function gameFx(s, tnow){
+  var grey = (game.state === "listen") || game.failed;   /* lost loops go grey too */
+  var t = game.cleared[s];
+  if(t){
+    /* a cleared dot bursts: it grows to well over three times its size while
+       it fades, over a third of a second - the reward should be seen */
+    var age = Math.min(1, (tnow - t) / 380);
+    return {a:(1 - age) * (1 - age * 0.35), k:1 + age * 2.6, grey:false};
+  }
+  var back = game.restoreAt ? Math.min(1, (tnow - game.restoreAt) / 320) : 1;
+  return {a:back, k:1, grey:grey};
+}
+function gameAllClear(){
+  var r = S.rings[0], tot = total(r), k;
+  for(k = 0; k < tot; k++) if(r.steps[k] && !game.cleared[k]) return false;
+  return true;
+}
+/* a lost loop: the dots come back at the bar line, and the count goes up */
+function gameRestore(tnow){
+  game.cleared = [];
+  game.restoreAt = tnow;
+  game.failed = false;
+  game.attempt++;
+  paintGame();
+}
+var gameFlashTimer = null;
+function gameFlash(grade){
+  tapNowIn.dataset.grade = grade;
+  clearTimeout(gameFlashTimer);
+  gameFlashTimer = setTimeout(function(){ tapNowIn.dataset.grade = ""; }, 260);
+}
+/* once per frame: notice the loop turning over */
+function gameTick(p, tnow){
+  if(!game || !S.playing || p < 0) return;
+  var loop = Math.floor(p);
+  if(loop === game.loop) return;
+  var first = (game.loop < 0);
+  game.loop = loop;
+  if(first){ game.state = "listen"; paintGame(); return; }
+  if(game.state === "listen"){ game.state = "play"; paintGame(); return; }
+  if(game.state === "play"){
+    if(!game.failed && gameAllClear()) gameClear(tnow);
+    else gameRestore(tnow);
+  }
+}
+function gameClear(tnow){
+  game.state = "cleared";
+  if(game.level > gameBest){
+    gameBest = game.level;
+    try{ localStorage.setItem(GAME_KEY, String(gameBest)); } catch(err){}
+    paintGameBest();
+  }
+  gameFlash("c2");
+  paintGame();
+  /* a breath, then the next one starts from its listening loop */
+  gameHold = true; stop(); gameHold = false;
+  var lvl = game.level;
+  setTimeout(function(){
+    if(!game || game.level !== lvl) return;
+    gameSetLevel(lvl + 1);
+    game.state = "listen"; game.loop = -1;
+    paintGame();
+    start();
+  }, 900);
+}
+/* A wrong tap gets a short, quiet buzz: two rough tones a fifth apart dropping
+   in pitch over a sixth of a second. It is a reaction, not a beat, so the
+   phone's delay does not matter here. Through the master, so it minds the mute. */
+function gameBuzz(){
+  if(!ctx) return;
+  var t = ctx.currentTime + 0.004;
+  tone(t, 0.16, 0.14, 190, 140, "square");
+  tone(t, 0.16, 0.10, 127, 95, "sawtooth");
+}
+/* a tap: clear the dot you were hearing, or lose the loop */
+function gameTap(perfMs){
+  if(!game || !S.playing || game.state !== "play") return;
+  var ph = heardPhase(perfMs);
+  if(ph === null) return;
+  var r = S.rings[0], tot = total(r), oph = offPhase(r), tol = gameTol();
+  var best = null, k;
+  for(k = 0; k < tot; k++){
+    if(!r.steps[k]) continue;
+    var d = ph - (k / tot + oph);
+    d -= Math.round(d);
+    if(Math.abs(d) > tol) continue;
+    if(best === null || Math.abs(d) < Math.abs(best.d)) best = {k:k, d:d};
+  }
+  var tnow = performance.now();
+  if(game.failed) return;                        /* the loop is already lost; it plays out */
+  /* a tap on nothing loses the loop - but the dots stay until the bar line,
+     so what you did stays visible and the pattern is not yanked mid-bar */
+  if(best === null){ game.failed = true; game.missAt = tnow; gameFlash("c3"); gameBuzz(); paintGame(); return; }
+  if(game.cleared[best.k]) return;               /* the same dot twice: nothing */
+  game.cleared[best.k] = tnow;
+  r.flash[best.k] = 0;                           /* the swell says it, not the halo */
+  paintGame();
+}
+/* under the dial: what to do now. Under the buttons: the score. */
+function paintGame(){
+  if(!game) return;
+  var lbl = function(t){ return '<span class="k">' + t + '</span>'; };
+  var r = S.rings[0], tot = total(r), n = 0, c = 0, k;
+  for(k = 0; k < tot; k++) if(r.steps[k]){ n++; if(game.cleared[k]) c++; }
+  var txt;
+  if(game.state === "listen") txt = lbl("listen");
+  else if(game.state === "play") txt = game.failed ? lbl("missed - the loop plays out") : lbl("tap") + " " + c + "/" + n;
+  else txt = lbl("cleared");
+  tapNowIn.innerHTML = txt;
   fitTapNow();
-
-  tbMain.textContent = tapStat.streak ? String(tapStat.streak) : "TAP";
-  tbSub.textContent = tapStat.n
-    ? "tight in a row · best " + tapStat.best + " · " + tapStat.tight + " of " + tapStat.n
-    : "with ring " + (S.active+1);
+  tapHint.innerHTML = "<b>Level " + game.level + "</b> " + lbl("of " + GAME_LEVELS.length) +
+    " &middot; " + escapeHtml(game.name) +
+    " &middot; " + lbl("attempt") + " " + game.attempt +
+    (gameBest ? " &middot; " + lbl("best") + " " + gameBest : "");
 }
-
-var barTimer = null;
-function flashBar(grade){
-  tapBar.dataset.grade = grade;
-  clearTimeout(barTimer);
-  barTimer = setTimeout(function(){ tapBar.dataset.grade = ""; }, 190);
+var tapGame = document.getElementById("tapGame");
+/* between games the section text is the invitation, with the best level on the end */
+function paintGameBest(){
+  if(game) return;
+  tapHint.innerHTML = escapeHtml(TAP_IDLE_TEXT) + (gameBest ? " Best so far: <b>level " + gameBest + "</b>." : "");
 }
-
-/* --------------------------------------------------------------- mode switch */
-function setTapMode(mode){
-  if(S.tapMode === mode) mode = "";        /* the buttons toggle */
-  S.tapMode = mode;
-  tapHits = [];
-  tapStat = {offs:[], streak:0, best:0, n:0, tight:0};
-
-  if(mode) releasePress(null);     /* let go of any drag caught by the switch */
-  paintFolds();
-  tapFollow.dataset.on = (mode === "follow") ? "1" : "0";
-  tapBar.hidden = !mode;
-  tapBar.dataset.grade = "";
-  tapNow.hidden = !mode;
-  if(mode){
-    sessNow.hidden = true;       /* only one of the two readouts fits the slot */
-    dialHint.hidden = true;
-  } else {
-    dialHint.hidden = !!run;
-    if(run) paintPlan();         /* hand the slot back to a running session */
-  }
-
-  if(mode){
-    tapHint.textContent = "Tap the bar under the dial in time with ring " + (S.active+1) +
-      ". Your taps stay on the dial as ticks, so you can see whether you run early or late.";
-    if(!S.playing) start();
-    paintTapNow();
-  } else {
-    tapHint.textContent = TAP_IDLE_TEXT;
-  }
-}
+tapGame.addEventListener("click", function(){ if(game) gameEnd(); else gameStart(); });
 
 /* ------------------------------------------------------------------- tap UI */
-var TAP_IDLE_TEXT = "Practise a rhythm with nothing but the phone. Tap along to see how close " +
-  "you are. To build a ring by tapping instead, use Tap pattern on the ring itself.";
+var TAP_IDLE_TEXT = "Follow the pattern: press Game, listen to one loop, then tap the wheel on every " +
+  "dot before the loop ends. Clear it to climb a level; a stray tap or a dot left over costs the loop.";
 var tapPanel = document.getElementById("tapPanel");
 var tapHint = document.getElementById("tapHint");
-var tapFollow = document.getElementById("tapFollow");
-var tapBar = document.getElementById("tapBar");
 var tapNow = document.getElementById("tapNow");
 var tapNowIn = document.getElementById("tapNowIn");
-var tbMain = document.getElementById("tbMain");
-var tbSub = document.getElementById("tbSub");
-
-tapFollow.addEventListener("click", function(){ setTapMode("follow"); });
-tapBar.addEventListener("pointerdown", function(e){
-  e.preventDefault();
-  tapAt(e.timeStamp || performance.now());
-});
+paintGameBest();                 /* the invitation, and the best level so far */
 
 /* ------------------------------------------------------- folding sections --
    A section folds down to its own name, which is the fastest way to shorten a
@@ -4199,6 +4604,318 @@ function showPlanSheet(on){
 planBtn.addEventListener("click", function(){ showPlanSheet(true); });
 document.getElementById("planClose").addEventListener("click", function(){ showPlanSheet(false); });
 planSheet.addEventListener("click", function(e){ if(e.target === planSheet) showPlanSheet(false); });
+
+/* ======================================================= the score ==========
+   The wheel written out. Every ring is a list of onsets on a grid, ring 1's
+   note value is the beat, and its division count over that note is the time
+   signature - 5 eighths is 5/8 - so the notation is all there already; this
+   only draws it. Each pattern is one bar between repeat signs, which is what
+   a loop is. Notes are drum hits, not sustains: a hit is written with the
+   value that reaches to the next hit, as drum parts are, and nothing is ever
+   tied - a hit that runs past a beat line is its value up to the line, then
+   rests. A ring whose grid will not sit on the beat - three against a 4/4 bar
+   - is written as a tuplet across the bar, which is what a copyist would do.
+
+   Time is counted in ticks, 96 to a whole note, so every value down to a
+   thirty-second and every triplet is a whole number. */
+var TICK = 96;
+var VALUES = [
+  {t:96, hollow:1, stem:0, beams:0},          /* whole */
+  {t:72, hollow:1, stem:1, beams:0, dot:1},   /* dotted half */
+  {t:48, hollow:1, stem:1, beams:0},          /* half */
+  {t:36, stem:1, beams:0, dot:1},             /* dotted quarter */
+  {t:24, stem:1, beams:0},                    /* quarter */
+  {t:18, stem:1, beams:1, dot:1},             /* dotted eighth */
+  {t:12, stem:1, beams:1},                    /* eighth */
+  {t:9,  stem:1, beams:2, dot:1},             /* dotted sixteenth */
+  {t:6,  stem:1, beams:2},                    /* sixteenth */
+  {t:3,  stem:1, beams:3}                     /* thirty-second */
+];
+function valueFor(t){ for(var i = 0; i < VALUES.length; i++) if(VALUES[i].t === t) return VALUES[i]; return null; }
+function isWhole(x){ return Math.abs(x - Math.round(x)) < 1e-6; }
+function scoreUnit(cfg){ return Math.round(TICK / (cfg.noteDen || 4) * (cfg.noteDot ? 1.5 : 1)); }
+function soundName(id){ for(var i = 0; i < SOUNDS.length; i++) if(SOUNDS[i].id === id) return SOUNDS[i].name; return id; }
+
+/* a duration as written values, largest first; null when no set of them fits */
+function scoreSplit(d){
+  var out = [], i = 0;
+  while(d > 0 && i < VALUES.length){
+    if(VALUES[i].t <= d){ out.push(VALUES[i]); d -= VALUES[i].t; } else i++;
+  }
+  return d === 0 ? out : null;
+}
+
+/* the ring on the beat grid: items to draw, or {tuplet:true} when it will not
+   sit. The grid is a list of beat starts, so beats need not be equal: an
+   additive metre beams by its accent groups, 3+2+2 in 7/8. */
+function scoreRing(r, barT, grid){
+  var T = r.div * r.sub, i, k;
+  var nextB = function(t){ for(var b = 0; b < grid.length; b++) if(grid[b] > t + 1e-6) return grid[b]; return barT; };
+  var isB = function(t){ if(Math.abs(t - barT) < 1e-6) return true; for(var b = 0; b < grid.length; b++) if(Math.abs(grid[b] - t) < 1e-6) return true; return false; };
+  /* the slot grid has to nest with the beat grid, or the bar is a tuplet */
+  var slot = barT / T;
+  if(!isWhole(slot)) return {tuplet:true};
+  var nest = grid.every(function(g){ return isWhole(g / slot); });
+  if(!nest){ nest = true; for(k = 0; k < T; k++) if(!isB(k * slot)) nest = false; }
+  if(!nest) return {tuplet:true};
+  var on = [];
+  for(k = 0; k < T; k++){
+    if(!r.steps[k]) continue;
+    var f = k / T + (r.off || 0) / r.div;
+    f -= Math.floor(f);
+    var t = f * barT;
+    if(!isWhole(t)) return {tuplet:true};
+    on.push({t:Math.round(t), acc:r.steps[k] === 2});
+  }
+  if(!on.length) return null;
+  on.sort(function(a, b){ return a.t - b.t; });
+  var spans = [];
+  if(on[0].t > 0) spans.push({t0:0, t1:on[0].t, rest:true});
+  for(i = 0; i < on.length; i++) spans.push({t0:on[i].t, t1:(i + 1 < on.length ? on[i + 1].t : barT), acc:on[i].acc});
+  /* cut at the beat lines; only the first piece of a hit is the hit, what
+     follows a beat line is rest */
+  var pieces = [];
+  spans.forEach(function(s){
+    var t = s.t0, first = true;
+    while(t < s.t1){
+      var e = Math.min(nextB(t), s.t1);
+      pieces.push({t0:t, t1:e, rest:!!s.rest || !first, acc:first && !!s.acc, span:s});
+      first = false; t = e;
+    }
+  });
+  /* whole beats held on from a note fold back into one longer value where one exists */
+  var merged = [];
+  for(i = 0; i < pieces.length; i++){
+    var p = pieces[i];
+    if(isB(p.t0) && p.t1 === nextB(p.t0)){
+      var j = i, end = p.t1;
+      while(j + 1 < pieces.length && pieces[j + 1].span === p.span && isB(pieces[j + 1].t0) &&
+            pieces[j + 1].t1 === nextB(pieces[j + 1].t0) && valueFor(pieces[j + 1].t1 - p.t0)){
+        j++; end = pieces[j].t1;
+      }
+      merged.push({t0:p.t0, t1:end, rest:p.rest, acc:p.acc, span:p.span});
+      i = j;
+    } else merged.push(p);
+  }
+  /* beat by beat: straight, a triplet, a sextuplet, or give up on the grid */
+  var items = [], tuplets = [], b;
+  for(b = 0; b < grid.length; b++){
+    var b0 = grid[b], b1 = nextB(b0), L = b1 - b0;
+    var inBeat = merged.filter(function(q){ return q.t0 >= b0 && q.t0 < b1; });
+    if(!inBeat.length) continue;
+    var bounds = [];
+    inBeat.forEach(function(q){ bounds.push(q.t0 - b0); bounds.push(Math.min(q.t1, b1) - b0); });
+    var tup = 0, scale = 1;
+    if(!bounds.every(function(x){ return x % 3 === 0; })){
+      if(bounds.every(function(x){ return isWhole(x / (L / 3)); })){ tup = 3; scale = 1.5; }
+      else if(bounds.every(function(x){ return isWhole(x / (L / 6)); })){ tup = 6; scale = 1.5; }
+      else return {tuplet:true};
+    }
+    for(i = 0; i < inBeat.length; i++){
+      var q = inBeat[i], vals = scoreSplit(Math.round((q.t1 - q.t0) * scale));
+      if(!vals) return {tuplet:true};
+      var at = q.t0;
+      for(k = 0; k < vals.length; k++){
+        /* a duration that needs two values is a hit and then a rest, never a tie */
+        items.push({t:at, val:vals[k], rest:q.rest || k > 0, acc:q.acc && k === 0, beat:b, tup:tup});
+        at += vals[k].t / scale;
+      }
+    }
+    if(tup) tuplets.push({t0:b0, t1:b1, n:tup});
+  }
+  return {items:items, tuplets:tuplets};
+}
+
+/* the whole bar as one tuplet: T equal notes in the time of the largest power
+   of two below T - three halves for 3 over 4/4, five quarters for 5 */
+function scoreTupletRing(r, barT){
+  var T = r.div * r.sub, m = 1, i, k;
+  while(m * 2 <= T) m *= 2;
+  var unit = barT / m, val = VALUES[VALUES.length - 1];
+  for(i = 0; i < VALUES.length; i++) if(VALUES[i].t <= unit && !VALUES[i].dot){ val = VALUES[i]; break; }
+  var items = [];
+  for(k = 0; k < T; k++){
+    var f = k / T + (r.off || 0) / r.div;
+    f -= Math.floor(f);
+    items.push({t:f * barT, val:val, rest:!r.steps[k], acc:r.steps[k] === 2, beat:0, tup:T});
+  }
+  items.sort(function(a, b){ return a.t - b.t; });
+  return {items:items, tuplets:[{t0:0, t1:barT, n:T}], approx:T};
+}
+
+/* ------------------------------------------------------------------ drawing */
+var SC = {LM:54, TS:26, LH:58, STEM:24};
+function scoreSvg(cfg){
+  var width = Math.max(300, scoreBody.clientWidth - 2);
+  var U = scoreUnit(cfg), barT = cfg.rings[0].div * U;
+  /* The signature the wheel implies, written the way a musician would: eight
+     eighths is 4/4 with the beams in pairs, twelve eighths is 12/8 with the
+     beams in threes. Powers of two are written in quarters; a count of threes
+     is compound and keeps its eighths but beats in dotted quarters; 5/8, 7/8
+     and 11/16 stay as they are, one beat per note. */
+  var num = cfg.rings[0].div * (cfg.noteDot ? 3 : 1), den = (cfg.noteDen || 4) * (cfg.noteDot ? 2 : 1);
+  var pow2 = num > 0 && (num & (num - 1)) === 0;
+  while(pow2 && den > 4 && num % 2 === 0){ num /= 2; den /= 2; U *= 2; }
+  /* The beat grid. Ring 1 says how an eighth-based bar groups: its accents are
+     the beats, so 5/8 beams as 3+2, Aksak 9/8 as 2+2+2+3 and the flamenco 12
+     as 3+3+2+2+2. With no accents to go by, a count of threes is compound and
+     beats in dotted quarters; anything else beats one note at a time. */
+  var grid = [], gi, r1 = cfg.rings[0], U0 = scoreUnit(cfg), acc = [];
+  if(!pow2 && den >= 8){
+    for(gi = 0; gi < r1.div; gi++) if(r1.steps[gi * r1.sub] === 2) acc.push(gi * U0);
+  }
+  if(acc.length >= 2 && acc[0] === 0){ grid = acc; }
+  else {
+    if(!pow2 && den >= 8 && num % 3 === 0 && num >= 3) U *= 3;
+    var nb = Math.round(barT / U);
+    for(gi = 0; gi < nb; gi++) grid.push(gi * U);
+  }
+  var rings = cfg.rings.filter(function(r){ return !r.mute; });
+  var x0 = SC.LM + SC.TS + 16, x1 = width - 24, W = x1 - x0;
+  var X = function(t){ return x0 + t / barT * W; };
+  var h = rings.length * SC.LH + 8, s = [], notes = [];
+  s.push('<svg class="staff" viewBox="0 0 ' + width + ' ' + h + '" width="' + width + '" height="' + h + '" role="img" aria-label="' + escapeHtml(cfg.name) + ' as notation">');
+  if(!rings.length){
+    s.push('<text x="' + SC.LM + '" y="30" font-size="12" fill="var(--ink-3)">Every ring is muted.</text></svg>');
+    return {svg:s.join(""), notes:[]};
+  }
+  rings.forEach(function(r, ri){
+    var y = 44 + ri * SC.LH, idx = cfg.rings.indexOf(r), yt = y - SC.STEM;
+    s.push('<text x="4" y="' + (y - 2) + '" font-size="10" font-weight="600" fill="var(--c' + (idx + 1) + ')">Ring ' + (idx + 1) + '</text>');
+    s.push('<text x="4" y="' + (y + 11) + '" font-size="9.5" fill="var(--ink-3)">' + escapeHtml(soundName(r.sound)) + '</text>');
+    if(ri === 0){
+      var tsx = SC.LM + SC.TS / 2 + 2, tsf = 'font-size="16" font-weight="700" font-family="Archivo,sans-serif" text-anchor="middle" fill="currentColor"';
+      s.push('<text x="' + tsx + '" y="' + (y - 1) + '" ' + tsf + '>' + num + '</text>');
+      s.push('<text x="' + tsx + '" y="' + (y + 15) + '" ' + tsf + '>' + den + '</text>');
+    }
+    /* repeat signs: the loop, written */
+    var rp = function(x, left){
+      var d = left ? 1 : -1;
+      s.push('<rect x="' + (x - 1.5) + '" y="' + (y - 15) + '" width="3" height="30" fill="currentColor"/>');
+      s.push('<rect x="' + (x + 4 * d - 0.5) + '" y="' + (y - 15) + '" width="1" height="30" fill="currentColor"/>');
+      s.push('<circle cx="' + (x + 8.5 * d) + '" cy="' + (y - 5) + '" r="1.7" fill="currentColor"/>');
+      s.push('<circle cx="' + (x + 8.5 * d) + '" cy="' + (y + 5) + '" r="1.7" fill="currentColor"/>');
+    };
+    rp(x0 - 12, true); rp(x1 + 12, false);
+
+    var sc = scoreRing(r, barT, grid);
+    if(!sc){ s.push('<text x="' + (x0 + 6) + '" y="' + (y - 8) + '" font-size="10.5" fill="var(--ink-3)">silent</text>'); return; }
+    if(sc.tuplet){ sc = scoreTupletRing(r, barT); notes.push("Ring " + (idx + 1) + " does not sit on the beat, so it is written as " + sc.approx + " in the time of the bar."); }
+
+    var it = sc.items, i;
+    var sx = function(x){ return x + 4.2; };           /* the stem is on the right of the head */
+    for(i = 0; i < it.length; i++){
+      var n = it[i], x = X(n.t), v = n.val;
+      if(n.rest){
+        if(v.t >= 48){
+          s.push('<rect x="' + (x - 4.5) + '" y="' + (v.t >= 96 ? y : y - 3.5) + '" width="9" height="3.5" fill="currentColor"/>');
+        } else if(v.beams === 0){
+          s.push('<path d="M' + (x - 2) + ' ' + (y - 9) + 'l4.5 4.5l-4.5 4.5l4.5 4.5c-3.5 -1.5 -5.5 0.5 -3 3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>');
+        } else {
+          var f;
+          for(f = 0; f < v.beams; f++) s.push('<circle cx="' + (x - 1.6 - 1.4 * f) + '" cy="' + (y - 6 + 5 * f) + '" r="1.9" fill="currentColor"/>');
+          s.push('<line x1="' + (x + 2.4) + '" y1="' + (y - 6) + '" x2="' + (x - 1.6 - 1.4 * v.beams) + '" y2="' + (y + 5) + '" stroke="currentColor" stroke-width="1.4"/>');
+        }
+        if(v.dot) s.push('<circle cx="' + (x + 7.5) + '" cy="' + (y - 2.5) + '" r="1.3" fill="currentColor"/>');
+        continue;
+      }
+      /* the head, its stem, its dot */
+      s.push('<ellipse cx="' + x + '" cy="' + y + '" rx="4.4" ry="3.1" transform="rotate(-22 ' + x + ' ' + y + ')" ' +
+        (v.hollow ? 'fill="none" stroke="currentColor" stroke-width="1.7"' : 'fill="currentColor"') + '/>');
+      if(v.stem) s.push('<line x1="' + sx(x) + '" y1="' + (y - 1) + '" x2="' + sx(x) + '" y2="' + yt + '" stroke="currentColor" stroke-width="1.4"/>');
+      if(v.dot) s.push('<circle cx="' + (x + 8) + '" cy="' + (y - 2.5) + '" r="1.3" fill="currentColor"/>');
+      if(n.acc) s.push('<path d="M' + (x - 4) + ' ' + (yt - 12) + 'l8 3l-8 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>');
+    }
+    /* beams: notes shorter than a quarter, side by side inside one beat */
+    var g = [];
+    var flush = function(){
+      if(!g.length) return;
+      if(g.length === 1){
+        var o = g[0], ox = sx(X(o.t)), f;
+        for(f = 0; f < o.val.beams; f++)
+          s.push('<path d="M' + ox + ' ' + (yt + 5 * f) + 'c4.5 2 6.5 5 4.5 10.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>');
+      } else {
+        var xa = sx(X(g[0].t)), xb = sx(X(g[g.length - 1].t)), j;
+        s.push('<rect x="' + (xa - 0.7) + '" y="' + yt + '" width="' + (xb - xa + 1.4) + '" height="2.8" fill="currentColor"/>');
+        for(var lvl = 2; lvl <= 3; lvl++){
+          for(j = 0; j < g.length; j++){
+            if(g[j].val.beams < lvl) continue;
+            var cx = sx(X(g[j].t)), yy = yt + 5 * (lvl - 1);
+            if(j + 1 < g.length && g[j + 1].val.beams >= lvl){
+              s.push('<rect x="' + (cx - 0.7) + '" y="' + yy + '" width="' + (sx(X(g[j + 1].t)) - cx + 1.4) + '" height="2.8" fill="currentColor"/>');
+            } else if(!(j > 0 && g[j - 1].val.beams >= lvl)){
+              /* a lone short note in the group: a stub, pointing into the group */
+              var left = (j === g.length - 1);
+              s.push('<rect x="' + (left ? cx - 8 : cx - 0.7) + '" y="' + yy + '" width="8.7" height="2.8" fill="currentColor"/>');
+            }
+          }
+        }
+      }
+      g = [];
+    };
+    for(i = 0; i < it.length; i++){
+      var m = it[i];
+      if(m.rest || m.val.beams === 0 || (g.length && (g[0].beat !== m.beat || g[0].tup !== m.tup))) flush();
+      if(!m.rest && m.val.beams > 0) g.push(m);
+    }
+    flush();
+    /* tuplet brackets, with the number in a gap */
+    sc.tuplets.forEach(function(tp){
+      var inside = it.filter(function(n){ return n.t >= tp.t0 && n.t < tp.t1; });
+      if(!inside.length) return;
+      var xa = X(inside[0].t) - 2, xb = sx(X(inside[inside.length - 1].t)) + 2, yb = yt - 9, mid = (xa + xb) / 2;
+      s.push('<path d="M' + xa + ' ' + (yb + 4) + 'V' + yb + 'H' + (mid - 7) + 'M' + (mid + 7) + ' ' + yb + 'H' + xb + 'V' + (yb + 4) + '" fill="none" stroke="currentColor" stroke-width="1.1"/>');
+      s.push('<text x="' + mid + '" y="' + (yb + 3.5) + '" font-size="9.5" font-style="italic" text-anchor="middle" fill="currentColor">' + tp.n + '</text>');
+    });
+  });
+  s.push('</svg>');
+  return {svg:s.join(""), notes:notes};
+}
+
+/* ----------------------------------------------------------------- the sheet */
+var scoreSheet = document.getElementById("scoreSheet");
+var scoreBody = document.getElementById("scoreBody"), scoreSum = document.getElementById("scoreSum");
+var scoreBtn = document.getElementById("scoreBtn");
+function scoreCfgFromWheel(){
+  return { name:"On the wheel", bpm:S.bpm, noteDen:S.noteDen, noteDot:S.noteDot,
+    rings:S.rings.map(function(r){ return {div:r.div, sub:r.sub, off:r.off, sound:r.sound, mute:!!r.mute, steps:r.steps.slice()}; }) };
+}
+/* a sequence step, as saved by any version of the app, in the shape the drawing wants */
+function scoreCfgFromStep(step){
+  return { name:step.name, bpm:step.bpm || S.bpm,
+    noteDen:NOTE_NAMES[step.noteDen] ? step.noteDen : 4, noteDot:!!step.noteDot,
+    rings:(step.rings || []).map(function(r){
+      var sub = r.sub || 1, steps = Array.isArray(r.steps) && r.steps.length === r.div * sub ? normSteps(r.steps) : filled(r.div * sub);
+      return {div:r.div, sub:sub, off:r.off || 0, sound:r.sound, mute:!!r.mute, steps:steps};
+    }) };
+}
+function paintScore(){
+  var cfgs = S.seq.length ? S.seq.map(scoreCfgFromStep) : [scoreCfgFromWheel()];
+  scoreSum.textContent = S.seq.length
+    ? cfgs.length + (cfgs.length === 1 ? " pattern" : " patterns") + ", in the order of the sequence. One bar each, as it loops."
+    : "The sequence is empty, so this is what is on the wheel. One bar, as it loops.";
+  scoreBody.innerHTML = "";
+  cfgs.forEach(function(cfg, i){
+    var card = document.createElement("div");
+    card.className = "score";
+    var head = '<p class="score-title">' + (cfgs.length > 1 ? '<span class="lbl">' + (i + 1) + '</span>' : '') +
+      '<b>' + escapeHtml(cfg.name) + '</b>' +
+      '<span class="tempo">' + noteSvg(cfg.noteDen, cfg.noteDot) + ' = ' + cfg.bpm + '</span></p>';
+    card.innerHTML = head;
+    scoreBody.appendChild(card);            /* attached first, so the width is real */
+    var out = scoreSvg(cfg);
+    card.insertAdjacentHTML("beforeend", out.svg);
+    out.notes.forEach(function(t){ card.insertAdjacentHTML("beforeend", '<p class="snote">' + escapeHtml(t) + '</p>'); });
+  });
+}
+function showScore(on){
+  scoreSheet.hidden = !on;                  /* visible first: the drawing measures the sheet */
+  if(on){ paintScore(); document.getElementById("scoreClose").focus(); }
+  else scoreBtn.focus();
+}
+scoreBtn.addEventListener("click", function(){ showScore(true); });
+document.getElementById("scoreClose").addEventListener("click", function(){ showScore(false); });
+scoreSheet.addEventListener("click", function(e){ if(e.target === scoreSheet) showScore(false); });
 /* ==================================================== the sequence ==========
    Patterns in the order you want to practise them, which the practice session
    can then walk through instead of picking at random.
@@ -4269,7 +4986,12 @@ function endPick(){
 /* every chip in the three libraries comes through here */
 function chipHit(name, cfg){
   if(pickSlot === null){ applyConfig(cfg); return; }
-  var step = { name: name, rings: (cfg.rings || []).map(function(r){
+  var step = { name: name,
+    /* the score prints a tempo marking: the pattern's own, or the wheel's */
+    bpm: cfg.bpm || S.bpm,
+    noteDen: cfg.bpm ? (NOTE_NAMES[cfg.noteDen] ? cfg.noteDen : 4) : S.noteDen,
+    noteDot: cfg.bpm ? !!cfg.noteDot : S.noteDot,
+    rings: (cfg.rings || []).map(function(r){
     return {div:r.div, sub:r.sub || 1, off:r.off || 0, sound:r.sound,
             vol:r.vol, mute:!!r.mute, steps:Array.isArray(r.steps) ? r.steps.slice() : null};
   })};
@@ -4410,6 +5132,12 @@ function tickLabel(){
        the seconds are already on the transport's own line a few pixels above */
     wantRatio = ratioString();
   }
+  /* in the game the header is the scoreboard: the level on the left, the
+     attempt on the right - the count-in keeps its three beats */
+  if(S.tapMode === "game" && game){
+    wantRatio = "Level " + game.level;
+    if(!counting) posLbl.textContent = "Attempt " + game.attempt;
+  }
   /* refitting 16 times a second would measure the same string over and over */
   if(wantRatio !== dialRatio.textContent || posLbl.textContent !== lastPos){
     dialRatio.textContent = wantRatio;
@@ -4472,6 +5200,7 @@ seqRender();
 tapHint.textContent = TAP_IDLE_TEXT;
 paintPlan();
 paintTransport();
+paintNote();
 paintRack();
 paintMine();
 tickLabel();
@@ -4490,8 +5219,10 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "2026-09-04 10:42";
+  var BUILD = "v39";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-04 17:59";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
+  if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 
   var deferred = null;          /* the captured beforeinstallprompt event */
   var promptFired = false;
@@ -4584,6 +5315,7 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
   var localhost = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
   var secureOrigin = (location.protocol === "https:") || localhost;
   say("build", BUILD);
+  say("built", BUILT);
   say("url", location.href);
   say("protocol", location.protocol +
     (secureOrigin ? (localhost ? "  OK (localhost counts as secure)" : "  OK")

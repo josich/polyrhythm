@@ -125,9 +125,23 @@ button,input,select{font:inherit;color:inherit;-webkit-tap-highlight-color:trans
 .transport{
   background:var(--panel);border:1px solid var(--line);border-radius:14px;
   box-shadow:var(--shadow);padding:16px 18px;margin-bottom:18px;
-  display:grid;gap:22px;align-items:center;
+  display:grid;column-gap:22px;row-gap:9px;align-items:center;
   grid-template-columns:minmax(260px,1fr) auto;
 }
+/* The tempo panel folds like the rest, but a metronome's tempo cannot go away
+   with it. Folded, the heading carries the number and a smaller pair of nudges,
+   so the control you reach for most is still one tap away - and the number is
+   text rather than a field, so tapping it opens the panel, not the keyboard. */
+.transport > .sess-head{grid-column:1/-1;margin-bottom:0}
+.fold-bpm{display:none;align-items:center;gap:7px;flex:none}
+.foldsec[data-fold="1"] .fold-bpm{display:flex}
+.fold-bpm .fb-num{
+  font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;
+  font-size:20px;font-weight:500;line-height:1;letter-spacing:-.02em;
+  color:var(--ink);min-width:3ch;text-align:center;
+}
+.fold-bpm .fb-unit{font-size:9px;font-weight:600;letter-spacing:.13em;color:var(--ink-3)}
+.jump.mini{width:32px;height:28px;border-radius:9px;font-size:11px;line-height:1}
 /* centred in the dial's hub, sized off the dial so it never crowds the
    innermost ring, and out of the way while the count-in owns that spot */
 .play{
@@ -624,16 +638,16 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 }
 .caret svg{width:15px;height:15px;display:block;transition:transform .16s ease}
 .caret:hover{color:var(--ink)}
-.presets[data-fold="1"]{padding-top:13px;padding-bottom:13px;cursor:pointer}
-.presets[data-fold="1"] > *:not(.sess-head){display:none}
-.presets[data-fold="1"] .sess-head{margin-bottom:0}
-.presets[data-fold="1"] .sess-head > *:not(.caret):not(.lbl){display:none}
-.presets[data-fold="1"] .caret svg{transform:rotate(-90deg)}
+.foldsec[data-fold="1"]{padding-top:13px;padding-bottom:13px;cursor:pointer}
+.foldsec[data-fold="1"] > *:not(.sess-head){display:none}
+.foldsec[data-fold="1"] .sess-head{margin-bottom:0}
+.foldsec[data-fold="1"] .sess-head > *:not(.caret):not(.lbl):not(.fold-bpm){display:none}
+.foldsec[data-fold="1"] .caret svg{transform:rotate(-90deg)}
 @media (prefers-reduced-motion:reduce){ .caret svg{transition:none} }
 
 /* Something is running in there: the bar breathes so a folded section cannot
    quietly keep playing. Same sine stops as the + hint on the rings. */
-.presets[data-fold="1"][data-live="1"]{animation:secPulse 2s linear infinite}
+.foldsec[data-fold="1"][data-live="1"]{animation:secPulse 2s linear infinite}
 @keyframes secPulse{
   0%,100%    {border-color:var(--line);                                  background:var(--panel)}
   12.5%,87.5%{border-color:color-mix(in srgb,var(--c1) 38%,var(--line)); background:color-mix(in srgb,var(--c1) 4%,var(--panel))}
@@ -641,7 +655,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
   37.5%,62.5%{border-color:color-mix(in srgb,var(--c1) 92%,var(--line)); background:color-mix(in srgb,var(--c1) 9%,var(--panel))}
   50%        {border-color:var(--c1);                                    background:color-mix(in srgb,var(--c1) 10%,var(--panel))}
 }
-@media (prefers-reduced-motion:reduce){ .presets[data-fold="1"][data-live="1"]{animation:none} }
+@media (prefers-reduced-motion:reduce){ .foldsec[data-fold="1"][data-live="1"]{animation:none} }
 .sess-head .lbl{margin-right:auto}
 /* the plan, stage by stage: one line each, tempo first */
 .plan-sum{font-size:12.5px;color:var(--ink-2);line-height:1.6;margin:0 0 12px;
@@ -738,7 +752,19 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
     </div>
   </header>
 
-  <section class="transport">
+  <section class="transport foldsec" id="tempoPanel">
+    <div class="sess-head">
+      <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+      <span class="lbl">Tempo</span>
+      <!-- folded, the heading carries the tempo itself: the number reads only,
+           so tapping it opens the panel, and the two nudges do not -->
+      <span class="fold-bpm">
+        <button class="jump mini" id="fbDown5" data-fold-keep aria-label="Tempo down 5">&minus;5</button>
+        <span class="fb-num" id="fbNum">96</span>
+        <span class="fb-unit">BPM</span>
+        <button class="jump mini" id="fbUp5" data-fold-keep aria-label="Tempo up 5">+5</button>
+      </span>
+    </div>
     <div>
       <div class="bpm-block">
         <span class="jump-pair">
@@ -747,7 +773,7 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
         </span>
         <span class="bpm-read">
           <button class="bpm-num" id="bpmNum" title="Click to type a tempo">96</button>
-          <input class="bpm-in mono" id="bpmIn" type="number" min="20" max="330" step="1"
+          <input class="bpm-in mono" id="bpmIn" type="number" min="1" max="660" step="1"
                  inputmode="numeric" aria-label="Type a tempo" hidden>
           <span class="bpm-unit">BPM</span>
         </span>
@@ -758,7 +784,7 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
       </div>
       <div class="bpm-row">
         <button class="stepbtn" id="bpmDown" aria-label="Tempo down 1">&minus;</button>
-        <input type="range" id="bpmRange" min="20" max="330" step="1" value="96" aria-label="Tempo in beats per minute">
+        <input type="range" id="bpmRange" min="0" max="2000" step="1" value="798" aria-label="Tempo in beats per minute">
         <button class="stepbtn" id="bpmUp" aria-label="Tempo up 1">+</button>
       </div>
       <p class="cycle-line" id="cycleLine"></p>
@@ -809,7 +835,7 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
     <section class="rack" id="rack"></section>
   </div>
 
-  <section class="presets" id="sessionPanel">
+  <section class="presets foldsec" id="sessionPanel">
     <div class="sess-head">
       <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
       <span class="lbl">Practice session</span>
@@ -844,9 +870,9 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
 
     <div class="sess-row">
       <span class="sess-txt">Tempo from</span>
-      <input class="sess-in mono" id="sFrom" type="number" min="20" max="330" step="1" value="100" aria-label="Starting tempo">
+      <input class="sess-in mono" id="sFrom" type="number" min="1" max="660" step="1" value="100" aria-label="Starting tempo">
       <span class="sess-txt">to</span>
-      <input class="sess-in mono" id="sTo" type="number" min="20" max="330" step="1" value="120" aria-label="Target tempo">
+      <input class="sess-in mono" id="sTo" type="number" min="1" max="660" step="1" value="120" aria-label="Target tempo">
       <span class="sess-txt">in steps of</span>
       <input class="sess-in mono" id="sStep" type="number" min="1" max="60" step="1" value="5" aria-label="Tempo step">
       <span class="sess-txt">every</span>
@@ -881,7 +907,7 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
     </div>
   </section>
 
-  <section class="presets" id="tapPanel">
+  <section class="presets foldsec" id="tapPanel">
     <div class="sess-head">
       <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
       <span class="lbl">Tapping</span>
@@ -890,7 +916,7 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
     <p class="tap-hint" id="tapHint"></p>
   </section>
 
-  <section class="presets" id="seqPanel">
+  <section class="presets foldsec" id="seqPanel">
     <div class="sess-head">
       <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
       <span class="lbl">Sequence</span>
@@ -899,7 +925,7 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
     <div class="seq-row" id="seqRow"></div>
   </section>
 
-  <section class="presets" id="patPanel">
+  <section class="presets foldsec" id="patPanel">
     <div class="sess-head">
       <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
       <span class="lbl">Patterns</span>
@@ -1051,6 +1077,11 @@ var SOUNDS = [
   {id:"rim",   name:"Rim"}
 ];
 var DEFAULT_SOUND = ["kick","wood","beep","rim"];
+
+/* The tempo range. One beat a minute is a four-second gap between clicks -
+   slow enough to practise holding a bar on your own - and 660 covers the fast
+   end of double-time practice with room to spare. */
+var BPM_MIN = 1, BPM_MAX = 660;
 
 var S = {
   bpm: 96,
@@ -2129,6 +2160,7 @@ function paintRack(){
 var playBtn = document.getElementById("play");
 var playIcon = document.getElementById("playIcon");
 var bpmNum = document.getElementById("bpmNum");
+var fbNum = document.getElementById("fbNum");   /* the same number, on the folded bar */
 var bpmRange = document.getElementById("bpmRange");
 var cycleLine = document.getElementById("cycleLine");
 var bpmIn = document.getElementById("bpmIn");
@@ -2172,14 +2204,56 @@ function paintTransport(){
   playBtn.setAttribute("aria-label", S.playing ? "Stop" : "Play");
   playIcon.setAttribute("d", S.playing ? "M7 6h4v12H7zm6 0h4v12h-4z" : "M8 5.5v13l11-6.5z");
   bpmNum.textContent = S.bpm;
-  bpmRange.value = S.bpm;
+  fbNum.textContent = S.bpm;
+  /* the thumb stays where a finger is holding it if that spot already reads
+     this tempo - rewriting the position mid-drag would tug it back a pixel */
+  if(posToBpm(parseInt(bpmRange.value, 10)) !== S.bpm) bpmRange.value = bpmToPos(S.bpm);
+  bpmRange.setAttribute("aria-valuetext", S.bpm + " BPM");
   var beats = baseBeats();
   cycleLine.textContent = "One rotation · " + beats + (beats === 1 ? " beat · " : " beats · ") +
     cycleDur().toFixed(2) + " s · Ring 1 is the click";
   queueSave();
 }
+/* The tempo slider does not run evenly. Nearly all practice happens between 60
+   and 160, and spreading 1..660 evenly across the bar leaves that band inside a
+   fifth of it - hopeless to place with a thumb, worse on a phone. So the LEFT
+   HALF of the bar carries 1..120 evenly, and the right half stretches 120..660
+   with each further beat costing less and less travel:
+
+       left    bpm = 1 + LOW * 2p
+       right   bpm = 120 + LOW*t + (HIGH-LOW)*t*t,   t = 2p - 1
+
+   Both halves meet at the same gradient, so the thumb does not change pace as it
+   crosses the middle. The right side is a square on purpose: it inverts exactly,
+   so a tempo typed or tapped in puts the thumb back in one step. */
+var BPM_MID   = 120;                 /* the tempo that sits under the middle */
+var BPM_STOPS = 2000;                /* slider positions: fine enough that every
+                                        tempo in the range is reachable by drag */
+var BPM_LOW   = BPM_MID - BPM_MIN;   /* what the left half carries */
+var BPM_HIGH  = BPM_MAX - BPM_MID;   /* and what the right half has to fit */
+
+function posToBpm(pos){
+  var p = Math.max(0, Math.min(1, (pos || 0) / BPM_STOPS));
+  if(p <= 0.5) return Math.round(BPM_MIN + BPM_LOW * 2 * p);
+  var t = 2 * p - 1;
+  return Math.round(BPM_MID + BPM_LOW * t + (BPM_HIGH - BPM_LOW) * t * t);
+}
+function bpmToPos(bpm){
+  var p;
+  if(bpm <= BPM_MID){
+    p = (bpm - BPM_MIN) / BPM_LOW / 2;
+  } else {
+    var a = BPM_HIGH - BPM_LOW, b = BPM_LOW, c = BPM_MID - bpm;
+    /* the same curve read backwards; a is 0 only if the two halves span the
+       same range, and then the right side is plain linear too */
+    var t = a > 0 ? (-b + Math.sqrt(b * b - 4 * a * c)) / (2 * a) : -c / b;
+    p = (t + 1) / 2;
+  }
+  return Math.round(Math.max(0, Math.min(1, p)) * BPM_STOPS);
+}
+
 function setBpm(v){
-  v = Math.max(20, Math.min(330, Math.round(v)));
+  v = Math.max(BPM_MIN, Math.min(BPM_MAX, Math.round(v)));
   if(v === S.bpm) return;
   rebase();
   S.bpm = v;
@@ -2187,13 +2261,29 @@ function setBpm(v){
 }
 
 playBtn.addEventListener("click", toggle);
-bpmRange.addEventListener("input", function(){ setBpm(parseInt(bpmRange.value,10)); });
+bpmRange.addEventListener("input", function(){ setBpm(posToBpm(parseInt(bpmRange.value, 10))); });
+/* A slider step is a slice of the bar now, not a beat, so the arrow keys would
+   crawl at the low end. On this slider they mean beats. */
+bpmRange.addEventListener("keydown", function(e){
+  var d = 0;
+  if(e.key === "ArrowRight" || e.key === "ArrowUp") d = 1;
+  else if(e.key === "ArrowLeft" || e.key === "ArrowDown") d = -1;
+  else if(e.key === "PageUp") d = 10;
+  else if(e.key === "PageDown") d = -10;
+  else if(e.key === "Home"){ e.preventDefault(); setBpm(BPM_MIN); return; }
+  else if(e.key === "End"){ e.preventDefault(); setBpm(BPM_MAX); return; }
+  else return;
+  e.preventDefault();
+  setBpm(S.bpm + d);
+});
 document.getElementById("bpmUp").addEventListener("click", function(){ setBpm(S.bpm + 1); });
 document.getElementById("bpmDown").addEventListener("click", function(){ setBpm(S.bpm - 1); });
 document.getElementById("bpmUp5").addEventListener("click", function(){ setBpm(S.bpm + 5); });
 document.getElementById("bpmDown5").addEventListener("click", function(){ setBpm(S.bpm - 5); });
 document.getElementById("bpmUp10").addEventListener("click", function(){ setBpm(S.bpm + 10); });
 document.getElementById("bpmDown10").addEventListener("click", function(){ setBpm(S.bpm - 10); });
+document.getElementById("fbUp5").addEventListener("click", function(){ setBpm(S.bpm + 5); });
+document.getElementById("fbDown5").addEventListener("click", function(){ setBpm(S.bpm - 5); });
 
 /* type a tempo: the number swaps for a field, Enter or blur commits, Esc backs out */
 function openBpmEntry(){
@@ -2229,6 +2319,7 @@ function applyMaster(){
   muteBtn.title = S.muted ? "Unmute" : "Mute";
   muteBtn.setAttribute("aria-label", muteBtn.title);
   muteBtn.setAttribute("aria-pressed", S.muted ? "true" : "false");
+  paintFolds();                 /* muted behind a folded bar has to show somewhere */
   queueSave();
 }
 masterEl.addEventListener("input", function(){
@@ -2463,7 +2554,7 @@ function applyConfig(cfg){
   if(run){ stop(); finishSession(); }
   var wasPlaying = S.playing;
   if(wasPlaying) stop();
-  if(cfg.bpm) S.bpm = Math.max(20, Math.min(330, cfg.bpm));
+  if(cfg.bpm) S.bpm = Math.max(BPM_MIN, Math.min(BPM_MAX, cfg.bpm));
   S.rings = (cfg.rings || []).slice(0,4).map(function(rc, i){
     var r = mkRing(i, Math.max(1, Math.min(32, rc.div || 4)));
     if(rc.sound) r.sound = rc.sound;
@@ -2964,7 +3055,7 @@ function restoreSession(){
 function applySession(c){
   if(!c || !Array.isArray(c.rings) || !c.rings.length) return;
 
-  if(typeof c.bpm === "number") S.bpm = Math.max(20, Math.min(330, Math.round(c.bpm)));
+  if(typeof c.bpm === "number") S.bpm = Math.max(BPM_MIN, Math.min(BPM_MAX, Math.round(c.bpm)));
   if(typeof c.master === "number") S.master = Math.max(0, Math.min(1, c.master));
   S.muted = !!c.muted;
   S.countIn = !!c.countIn;
@@ -3086,8 +3177,8 @@ var run = null;        /* the live session: {plan, cur, snapshot} */
 
 function sessInputs(){
   return {
-    from: clampNum(sFrom.value, 20, 330, 100),
-    to:   clampNum(sTo.value,   20, 330, 120),
+    from: clampNum(sFrom.value, BPM_MIN, BPM_MAX, 100),
+    to:   clampNum(sTo.value, BPM_MIN, BPM_MAX, 120),
     step: clampNum(sStep.value,  1,  60,   5),
     per:  clampNum(sPer.value,   1,  32,   4),
     pat:  sPat.value,
@@ -3099,6 +3190,34 @@ function clampNum(v, lo, hi, dflt){
   if(isNaN(n)) return dflt;
   return Math.max(lo, Math.min(hi, n));
 }
+
+/* Typed boxes cannot be left holding a number the app will not use. Rather than
+   refuse what you typed, the box pulls it to the nearest number it accepts, so
+   -20 becomes the minimum and 6600 becomes the maximum, and a box left empty
+   goes back to what it started as. It happens on the way out, never per
+   keystroke: pulling "1" up to the minimum while you are still typing "120"
+   would make the box impossible to use. */
+function clampField(el){
+  var lo = parseFloat(el.min), hi = parseFloat(el.max), st = parseFloat(el.step);
+  var raw = String(el.value).trim(), n = parseFloat(raw);
+  if(raw === "" || isNaN(n)) n = parseFloat(el.defaultValue);
+  if(isNaN(n)) return;
+  if(!isNaN(st) && st > 0){                  /* land on a step the box allows */
+    var base = isNaN(lo) ? 0 : lo;
+    n = Math.round((base + Math.round((n - base) / st) * st) * 1e6) / 1e6;
+  }
+  if(!isNaN(lo)) n = Math.max(lo, n);
+  if(!isNaN(hi)) n = Math.min(hi, n);
+  if(String(n) === el.value) return;
+  el.value = String(n);
+  el.dispatchEvent(new Event("input", {bubbles:true}));   /* whoever reads it re-reads it */
+}
+/* Every number box in the app, except the tempo field: that one has its own
+   commit path, and setBpm already refuses anything out of range. */
+[].forEach.call(document.querySelectorAll('input[type="number"]:not(#bpmIn)'), function(el){
+  el.addEventListener("change", function(){ clampField(el); });
+  el.addEventListener("blur",   function(){ clampField(el); });
+});
 
 /* the ladder of tempos, with the target always landed on exactly */
 function tempoLadder(from, to, step){
@@ -3757,7 +3876,7 @@ function recEnd(keep){
        settled and the taps only say where the dots go. */
     if(S.active === 0){
       var mean = (recTaps[n-1] - recTaps[0]) / (n - 1) / 1000;
-      S.bpm = Math.max(20, Math.min(330, Math.round(60 / mean)));
+      S.bpm = Math.max(BPM_MIN, Math.min(BPM_MAX, Math.round(60 / mean)));
     }
   } else if(recPrev){
     reshape(r, recPrev.div, recPrev.sub);
@@ -3846,7 +3965,7 @@ function recBpm(){
   if(n < 2) return null;
   var mean = (recTaps[n-1] - recTaps[0]) / (n - 1) / 1000;
   if(mean <= 0) return null;
-  return Math.round(Math.max(20, Math.min(330, 60 / mean)));
+  return Math.round(Math.max(BPM_MIN, Math.min(BPM_MAX, 60 / mean)));
 }
 
 /* ------------------------------------------------------------------ readout */
@@ -3977,6 +4096,7 @@ tapBar.addEventListener("pointerdown", function(e){
    a tap that arrives during or just after a scroll is ignored, because on a
    phone that is a fling being stopped, not a choice. */
 var FOLDS = [
+  {key:"tempo",    el:"tempoPanel",   live:function(){ return S.muted; }},
   {key:"session",  el:"sessionPanel", live:function(){ return !!run; }},
   {key:"tapping",  el:"tapPanel",     live:function(){ return !!S.tapMode; }},
   {key:"sequence", el:"seqPanel",     live:function(){ return false; }},
@@ -4023,6 +4143,8 @@ FOLDS.forEach(function(f){
     /* a fling being halted, not a tap */
     if(performance.now() - lastScrollAt < 320) return;
     if(y !== null && Math.abs(e.clientY - y) > 10) return;
+    /* a control that stays live on the folded bar: it does its own job */
+    if(e.target.closest && e.target.closest("[data-fold-keep]")) return;
     var folded = sec.dataset.fold === "1";
     var onCaret = e.target.closest && e.target.closest("[data-fold-toggle]");
     /* open, only the caret folds it: a tap by the buttons must not */
@@ -4368,7 +4490,7 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "2026-09-03 17:15";
+  var BUILD = "2026-09-04 10:42";
   window.POLY_BUILD = BUILD;
 
   var deferred = null;          /* the captured beforeinstallprompt event */

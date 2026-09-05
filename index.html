@@ -388,7 +388,36 @@ input[type=range]::-moz-range-thumb{
   box-shadow:0 0 0 2px color-mix(in srgb,var(--c1) 40%,transparent),0 8px 20px -8px rgba(0,0,0,.65);
 }
 .seq-box[data-over="1"]{border-color:var(--c2);box-shadow:0 0 0 2px color-mix(in srgb,var(--c2) 22%,transparent)}
-.seq-add{
+/* The level list: one row a level, loaded onto the wheel by its name, moved
+   with the arrows. Rows are plain so a hundred of them still read. */
+.lvl-list{display:flex;flex-direction:column;gap:6px}
+.lvl-row{
+  display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;align-items:center;
+  padding:6px 8px;border:1px solid var(--line);border-radius:9px;background:var(--sunk);
+}
+.lvl-row[data-on="1"]{border-color:var(--c1);box-shadow:0 0 0 2px color-mix(in srgb,var(--c1) 22%,transparent)}
+.lvl-row .n{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--ink-3);text-align:right}
+.lvl-row .body{min-width:0;display:flex;flex-direction:column;gap:2px;cursor:pointer}
+.lvl-row input.nm{
+  width:100%;min-width:0;border:0;background:transparent;color:var(--ink);padding:0;
+  font-size:12.5px;font-weight:500;font-family:inherit;
+}
+.lvl-row input.nm:focus{outline:none;border-bottom:1px dashed var(--line-2)}
+.lvl-row .sum{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lvl-row .ops{display:flex;gap:4px}
+.lvl-row .ops button{
+  width:26px;height:26px;border-radius:7px;border:1px solid var(--line-2);background:var(--panel);
+  color:var(--ink-2);cursor:pointer;font-size:12px;line-height:1;padding:0;
+}
+.lvl-row .ops button:hover{border-color:var(--ink-3);color:var(--ink)}
+.lvl-row .ops button:disabled{opacity:.3;cursor:default}
+.lvl-foot{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.lvl-share{margin-top:10px}
+.lvl-share textarea{
+  width:100%;box-sizing:border-box;resize:vertical;border:1px solid var(--line-2);border-radius:9px;
+  background:var(--sunk);color:var(--ink);font-family:"IBM Plex Mono",monospace;font-size:11px;padding:8px;
+}
+.lvl-empty{font-size:12.5px;color:var(--ink-3);margin:0}
   border:1px dashed var(--line-2);background:transparent;color:var(--ink-3);
   font-size:19px;line-height:1;cursor:pointer;display:grid;place-items:center;
 }
@@ -515,7 +544,7 @@ canvas{
    waits, and the readout answers in colour */
 :root[data-game="1"] .play{display:none}
 :root[data-game="1"] canvas{cursor:pointer}
-:root[data-game="1"] :is(#rack,#sessionPanel,#seqPanel,#patPanel,.bpm-block,.bpm-row,.note-row,#tap,#countBtn){opacity:.45;pointer-events:none}
+:root[data-game="1"] :is(#rack,#sessionPanel,#seqPanel,#lvlPanel,#patPanel,.bpm-block,.bpm-row,.note-row,#tap,#countBtn){opacity:.45;pointer-events:none}
 #tapNowIn[data-grade="c2"]{color:var(--c2)}
 #tapNowIn[data-grade="c3"]{color:var(--c3)}
 /* the score line under the buttons while the game runs */
@@ -738,7 +767,8 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 /* the whole panel is an advanced-only feature */
 :root[data-ui="simple"] #sessionPanel,
 :root[data-ui="simple"] #tapPanel,
-:root[data-ui="simple"] #seqPanel{display:none}
+:root[data-ui="simple"] #seqPanel,
+:root[data-ui="simple"] #lvlPanel{display:none}
 .pchip{border:1px solid var(--line-2);background:var(--sunk);border-radius:8px;padding:7px 12px;cursor:pointer;font-family:"IBM Plex Mono",monospace;font-size:12.5px;font-weight:500}
 .pchip:hover{border-color:var(--ink);color:var(--ink)}
 .pchip small{font-family:"Archivo",sans-serif;color:var(--ink-3);margin-left:7px;font-size:10.5px}
@@ -966,6 +996,29 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
     <p class="tap-hint" id="tapHint"></p>
   </section>
 
+  <section class="presets foldsec" id="lvlPanel">
+    <div class="sess-head">
+      <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+      <span class="lbl">Levels</span>
+      <span class="seq-note" id="lvlNote"></span>
+    </div>
+    <!-- the wheel is the editor: set up one or two rings, listen, then add it -->
+    <div class="lvl-list" id="lvlList"></div>
+    <div class="lvl-foot">
+      <button class="btn sm" id="lvlAdd" title="Add what is on the wheel as a new level">+ Add the wheel</button>
+      <button class="btn sm" id="lvlUpdate" hidden title="Save the wheel back into the level you loaded">Update</button>
+      <button class="btn sm" id="lvlSort" title="Order the list from easiest to hardest">Sort by difficulty</button>
+      <button class="btn sm" id="lvlShare" title="Copy the list as text, or paste one in">Copy / paste</button>
+    </div>
+    <div class="lvl-share" id="lvlShareBox" hidden>
+      <textarea id="lvlText" rows="4" spellcheck="false" aria-label="The level list as text"></textarea>
+      <div class="lvl-foot">
+        <button class="btn sm" id="lvlCopy">Copy to clipboard</button>
+        <button class="btn sm" id="lvlUse">Use this list</button>
+      </div>
+    </div>
+  </section>
+
   <section class="presets foldsec" id="seqPanel">
     <div class="sess-head">
       <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
@@ -1108,6 +1161,8 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
     <ul>
       <li><b>Game</b>: listen to one loop, then tap the wheel on every dot before it ends.</li>
       <li>A stray tap or a dot left over costs the loop; clear it to climb. 100 levels, 3 rhythms each.</li>
+      <li><b>Levels</b> builds your own ladder: set the wheel up, listen, <b>Add</b>. Up to two rings; dots that coincide clear together.</li>
+      <li>Tap a level to load it back, <b>Update</b> after changes, arrows to reorder, <b>Copy / paste</b> to move the list to another device.</li>
       <li><b>Tap pattern</b> builds a ring: tap the <b>wheel</b>.</li>
       <li>On <b>ring 1</b> the count sets divisions and the speed sets <b>tempo</b>.</li>
       <li>On others each tap drops a <b>dot</b> where the hand is.</li>
@@ -1155,6 +1210,7 @@ var S = {
   active: 0,       /* which ring's card the tab strip is showing */
   ptab: "mine",
   seq: [],
+  levels: [],                  /* the game ladder you build yourself; empty means the built-in one */
   tapMode: "",                 /* "", "record" or "game" - never persisted */
   sessLoop: false,             /* repeat the practice plan instead of ending */
   sessPong: false,             /* and run it out and back rather than only out */
@@ -1669,7 +1725,7 @@ function draw(){
       if(on && !r.mute){
         /* in the game a dot is grey while you listen, and one you have cleared
            swells and fades; a restored one fades back in */
-        var gfx = (S.tapMode === "game" && i === 0) ? gameFx(s, tnow) : null;
+        var gfx = (S.tapMode === "game" && game) ? gameFx(i, s, tnow) : null;
         var dcol = (gfx && gfx.grey) ? THEME["--ink-3"] : col;
         var dalpha = (main ? 1 : 0.62) * (hushed ? 0.30 : 1) * (gfx ? gfx.a : 1);
         var drr = rr * (gfx ? gfx.k : 1);
@@ -3228,6 +3284,7 @@ function sessionSnapshot(){
     active: S.active,
     ptab: S.ptab,
     seq: S.seq,
+    levels: S.levels,
     sess: {from:sFrom.value, to:sTo.value, step:sStep.value, per:sPer.value,
            pat:sPat.value, sil:sSil.value,
            loop:S.sessLoop ? 1 : 0, pong:S.sessPong ? 1 : 0},
@@ -3287,6 +3344,11 @@ function applySession(c){
   }
   if(c.rfold && typeof c.rfold === "object"){
     Object.keys(c.rfold).forEach(function(k){ S.rfold[k] = !!c.rfold[k]; });
+  }
+  if(Array.isArray(c.levels)){
+    S.levels = c.levels.filter(function(l){
+      return l && Array.isArray(l.rings) && l.rings.length;
+    }).slice(0, 400);
   }
   if(Array.isArray(c.seq)){
     S.seq = c.seq.filter(function(st){
@@ -4285,12 +4347,20 @@ var gameHold = false;     /* true while the game itself stops the transport */
 var gameBest = 0;
 try{ gameBest = parseInt(localStorage.getItem(GAME_KEY), 10) || 0; } catch(err){}
 
-/* one of the three at this level, drawn when the level is entered; past the
+/* The ladder the game climbs: the levels you built, if there are any, else the
+   built-in one. A level is a tempo, a note and one or two rings. */
+function gameLadder(){
+  if(S.levels.length) return S.levels.map(function(l){ return [l]; });
+  return GAME_LEVELS;
+}
+/* one of the choices at this level, drawn when the level is entered; past the
    last level the ladder comes round again, fifteen percent faster each time */
 function gameLevel(n){
-  var L = GAME_LEVELS.length, i = (n - 1) % L, round = Math.floor((n - 1) / L);
-  var v = GAME_LEVELS[i], d = v[Math.floor(Math.random() * v.length)];
-  return {name:d.name, div:d.div, sub:d.sub, pattern:d.pattern,
+  var lad = gameLadder(), L = lad.length, i = (n - 1) % L, round = Math.floor((n - 1) / L);
+  var v = lad[i], d = v[Math.floor(Math.random() * v.length)];
+  var rings = d.rings ? d.rings : [{div:d.div, sub:d.sub, steps:pat(d.pattern), sound:"wood", vol:0.9, off:0}];
+  return {name:d.name || ("Level " + n), noteDen:d.noteDen || 4, noteDot:!!d.noteDot,
+          rings:rings.slice(0, 2),
           bpm:Math.min(BPM_MAX, Math.round(d.bpm * (1 + 0.15 * round)))};
 }
 /* the window a tap has to land in, in rotations: 110ms at first, 50ms by level 20 */
@@ -4299,15 +4369,21 @@ function gameTol(){
   return ms / 1000 / cycleDur();
 }
 function gameSetLevel(n){
-  var d = gameLevel(n), r = S.rings[0];
+  var d = gameLevel(n);
   game.level = n; game.name = d.name; game.attempt = 1; game.failed = false;
-  reshape(r, d.div, d.sub);
-  r.steps = pat(d.pattern);
-  r.flash = [];
-  game.cleared = [];
+  S.rings = d.rings.map(function(rc, i){
+    var r = mkRing(i, rc.div || 4);
+    reshape(r, rc.div || 4, rc.sub || 1);
+    r.steps = Array.isArray(rc.steps) && rc.steps.length === total(r) ? normSteps(rc.steps) : filled(total(r));
+    r.sound = rc.sound || "wood"; r.vol = typeof rc.vol === "number" ? rc.vol : 0.9;
+    r.off = rc.off || 0;
+    return r;
+  });
+  S.active = 0;
+  game.cleared = S.rings.map(function(){ return []; });
   game.restoreAt = 0;
-  S.bpm = d.bpm;
-  buildRack(); paintTransport(); paintRack();
+  S.bpm = d.bpm; S.noteDen = d.noteDen; S.noteDot = d.noteDot;
+  buildRack(); paintTransport(); paintNote(); paintRack();
 }
 function gameStart(){
   if(S.tapMode === "record") recEnd(true);
@@ -4316,11 +4392,8 @@ function gameStart(){
   /* the wheel is borrowed whole and handed back at the end */
   game = {prev:{rings:S.rings, bpm:S.bpm, noteDen:S.noteDen, noteDot:S.noteDot, active:S.active, rackOpen:rackOpen},
           level:1, state:"listen", loop:-1, cleared:[], restoreAt:0};
-  var r = mkRing(0, 4);
-  r.sound = "wood"; r.vol = 0.9;
-  S.rings = [r];
+  S.rings = [mkRing(0, 4)];
   S.active = 0; rackOpen = false;
-  S.noteDen = 4; S.noteDot = false;
   S.tapMode = "game";
   initAudio();
   if(ctx && ctx.state === "suspended") ctx.resume();
@@ -4362,9 +4435,9 @@ function gameEnd(){
   queueSave();
 }
 /* where the dots go and come back */
-function gameFx(s, tnow){
+function gameFx(ri, s, tnow){
   var grey = (game.state === "listen") || game.failed;   /* lost loops go grey too */
-  var t = game.cleared[s];
+  var t = game.cleared[ri] ? game.cleared[ri][s] : 0;
   if(t){
     /* a cleared dot bursts: it grows to well over three times its size while
        it fades, over a third of a second - the reward should be seen */
@@ -4375,13 +4448,16 @@ function gameFx(s, tnow){
   return {a:back, k:1, grey:grey};
 }
 function gameAllClear(){
-  var r = S.rings[0], tot = total(r), k;
-  for(k = 0; k < tot; k++) if(r.steps[k] && !game.cleared[k]) return false;
+  var ri, k;
+  for(ri = 0; ri < S.rings.length; ri++){
+    var r = S.rings[ri], tot = total(r);
+    for(k = 0; k < tot; k++) if(r.steps[k] && !game.cleared[ri][k]) return false;
+  }
   return true;
 }
 /* a lost loop: the dots come back at the bar line, and the count goes up */
 function gameRestore(tnow){
-  game.cleared = [];
+  game.cleared = S.rings.map(function(){ return []; });
   game.restoreAt = tnow;
   game.failed = false;
   game.attempt++;
@@ -4441,47 +4517,203 @@ function gameTap(perfMs){
   if(!game || !S.playing || game.state !== "play") return;
   var ph = heardPhase(perfMs);
   if(ph === null) return;
-  var r = S.rings[0], tot = total(r), oph = offPhase(r), tol = gameTol();
-  var best = null, k;
-  for(k = 0; k < tot; k++){
-    if(!r.steps[k]) continue;
-    var d = ph - (k / tot + oph);
-    d -= Math.round(d);
-    if(Math.abs(d) > tol) continue;
-    if(best === null || Math.abs(d) < Math.abs(best.d)) best = {k:k, d:d};
+  /* every uncleared dot on every ring inside the window, nearest first */
+  var tol = gameTol(), hits = [], ri, k;
+  for(ri = 0; ri < S.rings.length; ri++){
+    var r = S.rings[ri], tot = total(r), oph = offPhase(r);
+    for(k = 0; k < tot; k++){
+      if(!r.steps[k] || game.cleared[ri][k]) continue;
+      var d = ph - (k / tot + oph);
+      d -= Math.round(d);
+      if(Math.abs(d) <= tol) hits.push({ri:ri, k:k, d:d, at:ph - d});
+    }
   }
+  hits.sort(function(a, b){ return Math.abs(a.d) - Math.abs(b.d); });
   var tnow = performance.now();
   if(game.failed) return;                        /* the loop is already lost; it plays out */
-  /* a tap on nothing loses the loop - but the dots stay until the bar line,
-     so what you did stays visible and the pattern is not yanked mid-bar */
-  if(best === null){ game.failed = true; game.missAt = tnow; gameFlash("c3"); gameBuzz(); paintGame(); return; }
-  if(game.cleared[best.k]) return;               /* the same dot twice: nothing */
-  game.cleared[best.k] = tnow;
-  r.flash[best.k] = 0;                           /* the swell says it, not the halo */
+  if(!hits.length){
+    /* a tap that finds nothing to clear: on a dot already gone it is nothing;
+       on nothing at all it loses the loop - but the dots stay until the bar
+       line, so what you did stays visible and the pattern is not yanked mid-bar */
+    for(ri = 0; ri < S.rings.length; ri++){
+      var rr = S.rings[ri], tt = total(rr), op = offPhase(rr);
+      for(k = 0; k < tt; k++){ if(!rr.steps[k]) continue; var dd = ph - (k / tt + op); dd -= Math.round(dd); if(Math.abs(dd) <= tol) return; }
+    }
+    game.failed = true; game.missAt = tnow; gameFlash("c3"); gameBuzz(); paintGame(); return;
+  }
+  /* the nearest dot goes - and so does any dot on another ring that shares its
+     moment, since one tap is all two coincident hits ask for */
+  var best = hits[0];
+  hits.forEach(function(h){
+    if(h === best || Math.abs(h.at - best.at) < 1e-4){
+      game.cleared[h.ri][h.k] = tnow;
+      S.rings[h.ri].flash[h.k] = 0;              /* the swell says it, not the halo */
+    }
+  });
   paintGame();
 }
 /* under the dial: what to do now. Under the buttons: the score. */
 function paintGame(){
   if(!game) return;
   var lbl = function(t){ return '<span class="k">' + t + '</span>'; };
-  var r = S.rings[0], tot = total(r), n = 0, c = 0, k;
-  for(k = 0; k < tot; k++) if(r.steps[k]){ n++; if(game.cleared[k]) c++; }
+  var n = 0, c = 0, ri, k;
+  for(ri = 0; ri < S.rings.length; ri++){
+    var r = S.rings[ri], tot = total(r);
+    for(k = 0; k < tot; k++) if(r.steps[k]){ n++; if(game.cleared[ri] && game.cleared[ri][k]) c++; }
+  }
   var txt;
   if(game.state === "listen") txt = lbl("listen");
   else if(game.state === "play") txt = game.failed ? lbl("missed - the loop plays out") : lbl("tap") + " " + c + "/" + n;
   else txt = lbl("cleared");
   tapNowIn.innerHTML = txt;
   fitTapNow();
-  tapHint.innerHTML = "<b>Level " + game.level + "</b> " + lbl("of " + GAME_LEVELS.length) +
+  tapHint.innerHTML = "<b>Level " + game.level + "</b> " + lbl("of " + gameLadder().length) +
     " &middot; " + escapeHtml(game.name) +
     " &middot; " + lbl("attempt") + " " + game.attempt +
     (gameBest ? " &middot; " + lbl("best") + " " + gameBest : "");
 }
+/* ======================================================= level editor ========
+   The wheel is the editor. Set up one or two rings, a tempo and a note, listen
+   to it turning, and add it; load a level back onto the wheel by its name to
+   hear it again or change it, then Update. The list is the ladder the game
+   climbs, in this order; the arrows move a level, Sort orders by the same
+   difficulty score the built-in ladder uses, and Copy / paste moves the list
+   between devices as text. */
+var lvlList = document.getElementById("lvlList"), lvlNote = document.getElementById("lvlNote");
+var lvlAdd = document.getElementById("lvlAdd"), lvlUpdate = document.getElementById("lvlUpdate");
+var lvlSort = document.getElementById("lvlSort"), lvlShare = document.getElementById("lvlShare");
+var lvlShareBox = document.getElementById("lvlShareBox"), lvlText = document.getElementById("lvlText");
+var lvlEditing = -1;         /* which level the wheel was loaded from, or -1 */
+
+/* what is on the wheel, as a level: its first two rings */
+function lvlFromWheel(name){
+  return { name:name, bpm:S.bpm, noteDen:S.noteDen, noteDot:S.noteDot,
+    rings:S.rings.slice(0, 2).map(function(r){
+      return {div:r.div, sub:r.sub, off:r.off, sound:r.sound, vol:r.vol, steps:r.steps.slice()};
+    }) };
+}
+function lvlSummary(l){
+  return l.rings.map(function(r){
+    var s = "";
+    for(var k = 0; k < r.steps.length; k++) s += r.steps[k] === 2 ? "X" : (r.steps[k] ? "x" : ".");
+    return r.div + (r.sub > 1 ? "×" + r.sub : "") + " " + s;
+  }).join("  |  ") + "  ·  " + l.bpm;
+}
+/* the difficulty score of the built-in ladder, summed over the rings */
+function lvlScore(l){
+  var d = 0;
+  l.rings.forEach(function(r){
+    var grid = r.div * r.sub, hits = 0, off = 0, k;
+    var unit = r.sub > 1 ? r.sub : (grid % 4 === 0 && grid >= 8 ? grid / 4 : (grid % 3 === 0 && grid >= 6 ? grid / 3 : 1));
+    for(k = 0; k < grid; k++) if(r.steps[k]){ hits++; if(k % unit !== 0) off++; }
+    var odd = [3,4,6,8,12,16].indexOf(grid) < 0 ? 1 : 0;
+    var noDown = r.steps[0] ? 0 : 1;
+    d += hits + grid * 0.25 + off * 1.4 + (r.sub > 1 ? 2.5 : 0) + odd * 2 + noDown * 1.5 + (hits * l.bpm / 60 / grid) * 3;
+  });
+  return d + (l.rings.length > 1 ? 3 : 0);
+}
+function paintLevels(){
+  lvlList.innerHTML = "";
+  if(!S.levels.length){
+    lvlList.innerHTML = '<p class="lvl-empty">No levels of your own yet: the game plays its built-in ladder. Set the wheel up and add it.</p>';
+  }
+  S.levels.forEach(function(l, i){
+    var row = document.createElement("div");
+    row.className = "lvl-row";
+    row.dataset.on = (i === lvlEditing) ? "1" : "0";
+    row.innerHTML = '<span class="n">' + (i + 1) + '</span>' +
+      '<div class="body"><input class="nm" value="' + escapeHtml(l.name || "") + '" aria-label="Level name" placeholder="Level ' + (i + 1) + '">' +
+      '<span class="sum" title="Load onto the wheel">' + escapeHtml(lvlSummary(l)) + '</span></div>' +
+      '<span class="ops">' +
+        '<button type="button" data-up title="Move up" aria-label="Move up"' + (i === 0 ? " disabled" : "") + '>▲</button>' +
+        '<button type="button" data-down title="Move down" aria-label="Move down"' + (i === S.levels.length - 1 ? " disabled" : "") + '>▼</button>' +
+        '<button type="button" data-del title="Remove" aria-label="Remove">×</button>' +
+      '</span>';
+    row.querySelector("input.nm").addEventListener("change", function(e){ l.name = e.target.value.slice(0, 32); queueSave(); });
+    row.querySelector(".sum").addEventListener("click", function(){ lvlLoad(i); });
+    row.querySelector("[data-up]").addEventListener("click", function(){ lvlMove(i, -1); });
+    row.querySelector("[data-down]").addEventListener("click", function(){ lvlMove(i, 1); });
+    row.querySelector("[data-del]").addEventListener("click", function(){
+      S.levels.splice(i, 1);
+      if(lvlEditing === i) lvlEditing = -1; else if(lvlEditing > i) lvlEditing--;
+      paintLevels(); queueSave();
+    });
+    lvlList.appendChild(row);
+  });
+  lvlNote.textContent = S.levels.length
+    ? S.levels.length + (S.levels.length === 1 ? " level" : " levels") + " · the game plays these"
+    : "";
+  lvlUpdate.hidden = (lvlEditing < 0);
+  lvlUpdate.textContent = "Update " + (lvlEditing + 1);
+  lvlSort.disabled = S.levels.length < 2;
+  /* the invitation under Game names the ladder; at boot that text is painted
+     later by its own block, so only refresh it once it exists */
+  if(!game && typeof tapHint !== "undefined" && tapHint) paintGameBest();
+}
+function lvlMove(i, dir){
+  var j = i + dir;
+  if(j < 0 || j >= S.levels.length) return;
+  var t = S.levels[i]; S.levels[i] = S.levels[j]; S.levels[j] = t;
+  if(lvlEditing === i) lvlEditing = j; else if(lvlEditing === j) lvlEditing = i;
+  paintLevels(); queueSave();
+}
+/* onto the wheel, to hear it or change it; the ring cards stay editable */
+function lvlLoad(i){
+  var l = S.levels[i];
+  if(!l) return;
+  if(game) gameEnd();
+  applyConfig({ bpm:l.bpm, noteDen:l.noteDen, noteDot:l.noteDot, rings:l.rings.map(function(r){
+    return {div:r.div, sub:r.sub, off:r.off, sound:r.sound, vol:r.vol, steps:r.steps.slice()};
+  }) });
+  lvlEditing = i;
+  paintLevels();
+  document.querySelector(".dial").scrollIntoView({behavior:"smooth", block:"center"});
+}
+lvlAdd.addEventListener("click", function(){
+  if(game) gameEnd();
+  S.levels.push(lvlFromWheel("Level " + (S.levels.length + 1)));
+  lvlEditing = S.levels.length - 1;
+  paintLevels(); queueSave();
+});
+lvlUpdate.addEventListener("click", function(){
+  if(lvlEditing < 0 || !S.levels[lvlEditing]) return;
+  var keep = S.levels[lvlEditing].name;
+  S.levels[lvlEditing] = lvlFromWheel(keep);
+  paintLevels(); queueSave();
+});
+lvlSort.addEventListener("click", function(){
+  var cur = S.levels[lvlEditing];
+  S.levels.sort(function(a, b){ return lvlScore(a) - lvlScore(b); });
+  lvlEditing = cur ? S.levels.indexOf(cur) : -1;
+  paintLevels(); queueSave();
+});
+lvlShare.addEventListener("click", function(){
+  lvlShareBox.hidden = !lvlShareBox.hidden;
+  if(!lvlShareBox.hidden) lvlText.value = JSON.stringify(S.levels);
+});
+document.getElementById("lvlCopy").addEventListener("click", function(){
+  lvlText.value = JSON.stringify(S.levels);
+  lvlText.select();
+  try{ navigator.clipboard.writeText(lvlText.value); } catch(err){ document.execCommand("copy"); }
+});
+document.getElementById("lvlUse").addEventListener("click", function(){
+  var arr;
+  try{ arr = JSON.parse(lvlText.value); } catch(err){ arr = null; }
+  if(!Array.isArray(arr)){ lvlText.value = "That is not a level list. Paste what Copy gave you."; return; }
+  S.levels = arr.filter(function(l){ return l && Array.isArray(l.rings) && l.rings.length; }).slice(0, 400);
+  lvlEditing = -1;
+  paintLevels(); queueSave();
+  lvlShareBox.hidden = true;
+});
+paintLevels();
+
 var tapGame = document.getElementById("tapGame");
 /* between games the section text is the invitation, with the best level on the end */
 function paintGameBest(){
   if(game) return;
-  tapHint.innerHTML = escapeHtml(TAP_IDLE_TEXT) + (gameBest ? " Best so far: <b>level " + gameBest + "</b>." : "");
+  tapHint.innerHTML = escapeHtml(TAP_IDLE_TEXT) +
+    (S.levels.length ? " Your own " + S.levels.length + " levels." : "") +
+    (gameBest ? " Best so far: <b>level " + gameBest + "</b>." : "");
 }
 tapGame.addEventListener("click", function(){ if(game) gameEnd(); else gameStart(); });
 
@@ -4504,6 +4736,7 @@ var FOLDS = [
   {key:"tempo",    el:"tempoPanel",   live:function(){ return S.muted; }},
   {key:"session",  el:"sessionPanel", live:function(){ return !!run; }},
   {key:"tapping",  el:"tapPanel",     live:function(){ return !!S.tapMode; }},
+  {key:"levels",   el:"lvlPanel",     live:function(){ return false; }},
   {key:"sequence", el:"seqPanel",     live:function(){ return false; }},
   {key:"patterns", el:"patPanel",     live:function(){ return pickSlot !== null; }}
 ];
@@ -5219,8 +5452,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v39";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-04 17:59";          /* and when it was built, for ?diag */
+  var BUILD = "v40";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-05 07:45";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

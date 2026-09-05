@@ -357,6 +357,12 @@ input[type=range]::-moz-range-thumb{
    the sheet's own width so the notation keeps its size on a phone instead of
    shrinking with the page. */
 .score-sheet{max-width:640px}
+/* a two-way switch in the sheet head: the wheel as it stands, or the sequence */
+.seg{display:inline-flex;border:1px solid var(--line-2);border-radius:8px;overflow:hidden;margin-left:auto;margin-right:10px}
+.seg button{border:0;background:var(--sunk);color:var(--ink-3);font-size:11px;font-weight:600;padding:5px 9px;cursor:pointer;font-family:inherit}
+.seg button + button{border-left:1px solid var(--line-2)}
+.seg button[data-on="1"]{background:color-mix(in srgb,var(--c1) 16%,var(--sunk));color:var(--ink)}
+.seg button:disabled{opacity:.4;cursor:default}
 .score{margin:12px 0 0}
 .score + .score{padding-top:12px;border-top:1px dashed var(--line)}
 .score-title{display:flex;align-items:baseline;gap:10px;margin:0 0 2px;flex-wrap:wrap}
@@ -411,8 +417,16 @@ input[type=range]::-moz-range-thumb{
 }
 .lvl-row .ops button:hover{border-color:var(--ink-3);color:var(--ink)}
 .lvl-row .ops button:disabled{opacity:.3;cursor:default}
-.lvl-foot{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.lvl-share{margin-top:10px}
+.lvl-foot{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}
+.lvl-share{margin:0 0 10px}
+.lvl-share .lvl-foot{margin:8px 0 0}
+/* a row being carried lifts and lights up; the row it will land on answers in teal */
+.lvl-row{transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease}
+.lvl-row[data-drag="1"]{
+  transform:scale(1.03);position:relative;z-index:2;border-color:var(--c1);
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--c1) 40%,transparent),0 8px 20px -8px rgba(0,0,0,.65);
+}
+.lvl-row[data-over="1"]{border-color:var(--c2);box-shadow:0 0 0 2px color-mix(in srgb,var(--c2) 22%,transparent)}
 .lvl-share textarea{
   width:100%;box-sizing:border-box;resize:vertical;border:1px solid var(--line-2);border-radius:9px;
   background:var(--sunk);color:var(--ink);font-family:"IBM Plex Mono",monospace;font-size:11px;padding:8px;
@@ -549,6 +563,20 @@ canvas{
 #tapNowIn[data-grade="c3"]{color:var(--c3)}
 /* the score line under the buttons while the game runs */
 .tap-hint b{color:var(--ink);font-weight:600}
+/* the best run: two figures on one strip, the way a scoreboard puts them */
+.best{
+  display:flex;align-items:baseline;gap:8px 14px;flex-wrap:wrap;margin-top:10px;
+  padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);
+}
+.best .best-k{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.best .best-v{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink-2);margin-right:6px}
+.best .best-v b{font-size:17px;font-weight:600;color:var(--c1)}
+.best .best-reset{margin-left:auto;background:none;border:0;color:var(--ink-3);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;padding:2px 4px}
+.best .best-reset:hover{color:var(--c3)}
+/* effects that must not be cut by the wheel's edge - the burst of a killed dot,
+   the fireworks - draw on a canvas laid over the whole screen, above the panels
+   and beneath the sheets, letting touches straight through */
+.fxcv{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:40}
 .tap-hint .k{color:var(--ink-3)}
 .ring-card[data-rec="1"] [data-divdown],
 .ring-card[data-rec="1"] [data-divup],
@@ -706,7 +734,16 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .foldsec[data-fold="1"]{padding-top:13px;padding-bottom:13px;cursor:pointer}
 .foldsec[data-fold="1"] > *:not(.sess-head){display:none}
 .foldsec[data-fold="1"] .sess-head{margin-bottom:0}
-.foldsec[data-fold="1"] .sess-head > *:not(.caret):not(.lbl):not(.fold-bpm){display:none}
+.foldsec[data-fold="1"] .sess-head > *:not(.caret):not(.lbl):not(.fold-bpm):not(.fold-ico){display:none}
+/* a folded bar carries a glyph for what is inside: a clock for the session, a
+   note for the sequence, a controller for play time */
+.fold-ico{display:none;width:15px;height:15px;color:var(--ink-3);flex:none;margin-left:auto}
+.fold-ico svg{width:100%;height:100%;display:block}
+.fold-ico.note{width:11px;height:15px}
+.foldsec[data-fold="1"] .fold-ico{display:block}
+.foldsec[data-fold="1"] .sess-head .lbl{margin-right:0}
+/* the level editor is a maker's tool: hidden unless this device has been let in */
+:root:not([data-editor="1"]) #lvlPanel{display:none}
 .foldsec[data-fold="1"] .caret svg{transform:rotate(-90deg)}
 @media (prefers-reduced-motion:reduce){ .caret svg{transition:none} }
 
@@ -919,6 +956,7 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
     <div class="sess-head">
       <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
       <span class="lbl">Practice session</span>
+      <span class="fold-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
       <button class="btn sm icon" id="sessPong" data-on="0"
               title="Play the plan out and back again"
               aria-label="Out and back" aria-pressed="false">
@@ -990,10 +1028,17 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
   <section class="presets foldsec" id="tapPanel">
     <div class="sess-head">
       <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
-      <span class="lbl">Tapping</span>
-      <button class="btn sm" id="tapGame" data-on="0" title="Clear the dots by tapping them in time">Game</button>
+      <span class="lbl">Play time</span>
+      <span class="fold-ico" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg></span>
+      <button class="btn sm lead" id="tapGame" data-on="0" title="Clear the dots by tapping them in time"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg> Game</button>
     </div>
     <p class="tap-hint" id="tapHint"></p>
+    <!-- the best run, as a card that stays whatever the game is doing -->
+    <div class="best" id="bestCard" hidden>
+      <span class="best-k">Best</span><span class="best-v">Level <b id="bestLvl">0</b></span>
+      <span class="best-k">Total attempts</span><span class="best-v"><b id="bestTries">0</b></span>
+      <button type="button" class="best-reset" id="bestReset" title="Forget the best run">reset</button>
+    </div>
   </section>
 
   <section class="presets foldsec" id="lvlPanel">
@@ -1002,8 +1047,9 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
       <span class="lbl">Levels</span>
       <span class="seq-note" id="lvlNote"></span>
     </div>
-    <!-- the wheel is the editor: set up one or two rings, listen, then add it -->
-    <div class="lvl-list" id="lvlList"></div>
+    <!-- the wheel is the editor: set up one or two rings, listen, then add it.
+         The buttons lead; the list grows beneath them, and a row can be dragged
+         to a new place the way a sequence box can -->
     <div class="lvl-foot">
       <button class="btn sm" id="lvlAdd" title="Add what is on the wheel as a new level">+ Add the wheel</button>
       <button class="btn sm" id="lvlUpdate" hidden title="Save the wheel back into the level you loaded">Update</button>
@@ -1017,12 +1063,14 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
         <button class="btn sm" id="lvlUse">Use this list</button>
       </div>
     </div>
+    <div class="lvl-list" id="lvlList"></div>
   </section>
 
   <section class="presets foldsec" id="seqPanel">
     <div class="sess-head">
       <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
       <span class="lbl">Sequence</span>
+      <span class="fold-ico note" aria-hidden="true"><svg viewBox="0 0 22 30"><ellipse cx="8" cy="22.5" rx="5.4" ry="3.7" transform="rotate(-22 8 22.5)" fill="currentColor"/><path d="M12.9 21.6V3.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M12.9 3.5c3.6 2.2 6 5.2 4.4 10.2" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg></span>
       <span class="seq-note" id="seqNote"></span>
     </div>
     <div class="seq-row" id="seqRow"></div>
@@ -1034,6 +1082,8 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
     <div class="sess-head">
       <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
       <span class="lbl">Patterns</span>
+      <!-- a ring with three dots: the app icon in one line -->
+      <span class="fold-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.2" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="3.8" r="2" fill="currentColor"/><circle cx="19.1" cy="16.1" r="2" fill="currentColor"/><circle cx="4.9" cy="16.1" r="2" fill="currentColor"/></svg></span>
     </div>
     <!-- shown only while a sequence step is waiting to be filled -->
     <div class="pickbar" id="pickBar" hidden>
@@ -1090,6 +1140,9 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
   <div class="sheet score-sheet" role="dialog" aria-modal="true" aria-labelledby="scoreTitle">
     <div class="sheet-head">
       <h2 id="scoreTitle">Score</h2>
+      <span class="seg" id="scoreSrc" role="group" aria-label="What to write out">
+        <button type="button" data-src="wheel">Wheel</button><button type="button" data-src="seq">Sequence</button>
+      </span>
       <button class="icobtn" id="scoreClose" title="Close" aria-label="Close">&times;</button>
     </div>
     <p class="plan-sum" id="scoreSum"></p>
@@ -1157,7 +1210,7 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
       <li><b>Score</b> writes it out as notation, one bar each. Empty sequence: the wheel.</li>
     </ul>
 
-    <h3>Tapping</h3>
+    <h3>Play time</h3>
     <ul>
       <li><b>Game</b>: listen to one loop, then tap the wheel on every dot before it ends.</li>
       <li>A stray tap or a dot left over costs the loop; clear it to climb. 100 levels, 3 rhythms each.</li>
@@ -1461,7 +1514,9 @@ function start(){
   refPhase = 0;
   refTime = t0 + lead;      /* phase runs negative through the count-in */
 
-  if(S.countIn){
+  /* the ticks go with the lead, never without it: the toggle alone used to put
+     three beats over the first loop of anything that started with no count */
+  if(ciRun){
     DEST = ciGain;
     for(var i=0;i<COUNT_BEATS;i++){
       voice(COUNT_SOUND, t0 + i * beat, 0.85, i === 0);
@@ -1729,13 +1784,17 @@ function draw(){
         var dcol = (gfx && gfx.grey) ? THEME["--ink-3"] : col;
         var dalpha = (main ? 1 : 0.62) * (hushed ? 0.30 : 1) * (gfx ? gfx.a : 1);
         var drr = rr * (gfx ? gfx.k : 1);
-        if(dalpha > 0.005){
+        if(gfx && gfx.k > 1){
+          /* a dot in the middle of its burst is drawn on the overlay, where the
+             wheel's edge cannot cut it off */
+          if(dalpha > 0.005) fxDots.push({x:x, y:y, r:drr, col:dcol, a:dalpha});
+        } else if(dalpha > 0.005){
           g2.fillStyle = dcol;
           g2.globalAlpha = dalpha;
           g2.beginPath(); g2.arc(x, y, drr, 0, Math.PI*2); g2.fill();
           g2.globalAlpha = 1;
         }
-        if(accent && dalpha > 0.005){
+        if(accent && dalpha > 0.005 && !(gfx && gfx.k > 1)){
           g2.strokeStyle = dcol; g2.lineWidth = 1.2;
           g2.globalAlpha = dalpha;
           g2.beginPath(); g2.arc(x, y, Math.min(drr + (main ? 3.4 : 2.6), accentCap), 0, Math.PI*2); g2.stroke();
@@ -1780,6 +1839,7 @@ function draw(){
     if(game.state === "listen") gameHub(cx, cy, scale, pos);
     else if(game.failed) gameMissed(cx, cy, scale, tnow);
   }
+  drawOverlay(tnow);
 
   requestAnimationFrame(draw);
 }
@@ -4341,11 +4401,27 @@ var GAME_LEVELS = (function(){
   }
   return levels;
 })();
-var GAME_KEY = "polyrhythm-circle:game:v1";
+var GAME_KEY = "polyrhythm-circle:game:v2";   /* v1 counted differently; it is not read */
 var game = null;          /* {level, state, loop, cleared[], restoreAt, prev, attempt, failed, pick} */
 var gameHold = false;     /* true while the game itself stops the transport */
-var gameBest = 0;
-try{ gameBest = parseInt(localStorage.getItem(GAME_KEY), 10) || 0; } catch(err){}
+var gameBest = 0, gameBestTries = 0;   /* the highest level cleared, and the attempts the run took to get there */
+try{
+  var gbRaw = localStorage.getItem(GAME_KEY), gb = gbRaw ? JSON.parse(gbRaw) : 0;
+  if(typeof gb === "number") gameBest = gb;
+  else if(gb){ gameBest = gb.level | 0; gameBestTries = gb.attempts | 0; }
+} catch(err){ try{ gameBest = parseInt(localStorage.getItem(GAME_KEY), 10) || 0; } catch(e2){} }
+var bestCard = document.getElementById("bestCard");
+document.getElementById("bestReset").addEventListener("click", function(){
+  if(!confirm("Forget the best run?")) return;
+  gameBest = 0; gameBestTries = 0;
+  try{ localStorage.removeItem(GAME_KEY); } catch(err){}
+  paintBestCard();
+});
+function paintBestCard(){
+  bestCard.hidden = !gameBest;
+  document.getElementById("bestLvl").textContent = gameBest;
+  document.getElementById("bestTries").textContent = gameBestTries;
+}
 
 /* The ladder the game climbs: the levels you built, if there are any, else the
    built-in one. A level is a tempo, a note and one or two rings. */
@@ -4391,7 +4467,7 @@ function gameStart(){
   if(S.playing) stop();
   /* the wheel is borrowed whole and handed back at the end */
   game = {prev:{rings:S.rings, bpm:S.bpm, noteDen:S.noteDen, noteDot:S.noteDot, active:S.active, rackOpen:rackOpen},
-          level:1, state:"listen", loop:-1, cleared:[], restoreAt:0};
+          level:1, state:"listen", loop:-1, cleared:[], restoreAt:0, total:0};
   S.rings = [mkRing(0, 4)];
   S.active = 0; rackOpen = false;
   S.tapMode = "game";
@@ -4441,8 +4517,8 @@ function gameFx(ri, s, tnow){
   if(t){
     /* a cleared dot bursts: it grows to well over three times its size while
        it fades, over a third of a second - the reward should be seen */
-    var age = Math.min(1, (tnow - t) / 380);
-    return {a:(1 - age) * (1 - age * 0.35), k:1 + age * 2.6, grey:false};
+    var age = Math.min(1, (tnow - t) / 260);
+    return {a:(1 - age) * (1 - age * 0.3), k:1 + age * 9, grey:false};
   }
   var back = game.restoreAt ? Math.min(1, (tnow - game.restoreAt) / 320) : 1;
   return {a:back, k:1, grey:grey};
@@ -4485,11 +4561,15 @@ function gameTick(p, tnow){
 }
 function gameClear(tnow){
   game.state = "cleared";
-  if(game.level > gameBest){
-    gameBest = game.level;
-    try{ localStorage.setItem(GAME_KEY, String(gameBest)); } catch(err){}
-    paintGameBest();
+  /* the run's attempts so far, this level's included; a new best is a higher
+     level, or the same level reached in fewer attempts overall */
+  game.total = (game.total || 0) + game.attempt;
+  if(game.level > gameBest || (game.level === gameBest && (!gameBestTries || game.total < gameBestTries))){
+    gameBest = game.level; gameBestTries = game.total;
+    try{ localStorage.setItem(GAME_KEY, JSON.stringify({level:gameBest, attempts:gameBestTries})); } catch(err){}
+    paintBestCard();                 /* the card updates mid-game; the idle text waits */
   }
+  if(game.attempt === 1) fireworks(3);   /* the show is for a clean first go */
   gameFlash("c2");
   paintGame();
   /* a breath, then the next one starts from its listening loop */
@@ -4552,6 +4632,75 @@ function gameTap(perfMs){
   });
   paintGame();
 }
+/* Fireworks: a few bursts of small dots in the ring colours over the wheel,
+   each on its own moment, so they read as three shots and not one flash. */
+var fxBursts = [], fxDots = [], fxDirty = false;
+var fxcv = document.createElement("canvas"), gx = fxcv.getContext("2d");
+fxcv.className = "fxcv"; fxcv.setAttribute("aria-hidden", "true");
+document.body.appendChild(fxcv);
+/* The bitmap is sized from the box the overlay actually occupies, not from
+   innerWidth: on a desktop that counts the scrollbar, which stretched the
+   bitmap a percent or two and pushed every burst a few pixels off its dot. */
+var fxBox = {w:0, h:0, left:0, top:0};
+function sizeOverlay(){
+  var b = fxcv.getBoundingClientRect();
+  fxBox = {w:b.width, h:b.height, left:b.left, top:b.top};
+  var w = Math.round(b.width * DPR), h = Math.round(b.height * DPR);
+  if(fxcv.width !== w || fxcv.height !== h){ fxcv.width = w; fxcv.height = h; }
+  gx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+/* everything on the overlay is placed from the wheel: a point in the wheel's
+   own pixels goes to the screen by the wheel's rectangle */
+function drawOverlay(tnow){
+  var busy = fxDots.length || fxBursts.length;
+  if(!busy){ if(fxDirty){ sizeOverlay(); gx.clearRect(0, 0, fxBox.w, fxBox.h); fxDirty = false; } return; }
+  sizeOverlay();
+  gx.clearRect(0, 0, fxBox.w, fxBox.h);
+  fxDirty = true;
+  /* a wheel point goes to the overlay through both boxes, so it stays on its
+     dot even if the fixed layer is not flush with the viewport */
+  var rect = cv.getBoundingClientRect(), ox = rect.left - fxBox.left, oy = rect.top - fxBox.top;
+  fxDots.forEach(function(d){
+    gx.globalAlpha = d.a; gx.fillStyle = d.col;
+    gx.beginPath(); gx.arc(ox + d.x, oy + d.y, d.r, 0, Math.PI * 2); gx.fill();
+  });
+  fxDots = [];
+  drawFx(tnow, W, H, ox, oy);
+  gx.globalAlpha = 1;
+}
+function fireworks(count){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var t0 = performance.now(), i, j;
+  for(i = 0; i < count; i++){
+    var parts = [], n = 16 + Math.floor(Math.random() * 7);
+    for(j = 0; j < n; j++){
+      parts.push({a:Math.random() * Math.PI * 2, sp:0.35 + Math.random() * 0.6,
+                  r:1.5 + Math.random() * 1.9, col:"--c" + (1 + Math.floor(Math.random() * 4))});
+    }
+    fxBursts.push({at:t0 + i * 240 + Math.random() * 110, x:0.15 + Math.random() * 0.7,
+                   y:0.15 + Math.random() * 0.55, parts:parts, life:1000});
+  }
+}
+function drawFx(tnow, Wd, Hd, ox, oy){
+  if(!fxBursts.length) return;
+  var keep = [], reach = Math.min(Wd, Hd) * 0.4;
+  fxBursts.forEach(function(b){
+    var age = (tnow - b.at) / b.life;
+    if(age < 0){ keep.push(b); return; }
+    if(age >= 1) return;
+    keep.push(b);
+    var ease = 1 - Math.pow(1 - age, 2.2), bx = b.x * Wd, by = b.y * Hd;
+    b.parts.forEach(function(p){
+      var d = ease * p.sp * reach;
+      var x = ox + bx + Math.cos(p.a) * d, y = oy + by + Math.sin(p.a) * d + age * age * reach * 0.35;
+      gx.globalAlpha = (1 - age) * 0.95;
+      gx.fillStyle = THEME[p.col] || THEME["--ink"];
+      gx.beginPath(); gx.arc(x, y, p.r * (1 - age * 0.45), 0, Math.PI * 2); gx.fill();
+    });
+  });
+  gx.globalAlpha = 1;
+  fxBursts = keep;
+}
 /* under the dial: what to do now. Under the buttons: the score. */
 function paintGame(){
   if(!game) return;
@@ -4570,7 +4719,7 @@ function paintGame(){
   tapHint.innerHTML = "<b>Level " + game.level + "</b> " + lbl("of " + gameLadder().length) +
     " &middot; " + escapeHtml(game.name) +
     " &middot; " + lbl("attempt") + " " + game.attempt +
-    (gameBest ? " &middot; " + lbl("best") + " " + gameBest : "");
+    " &middot; " + lbl("run") + " " + ((game.total || 0) + (game.state === "cleared" ? 0 : game.attempt));
 }
 /* ======================================================= level editor ========
    The wheel is the editor. Set up one or two rings, a tempo and a note, listen
@@ -4584,6 +4733,32 @@ var lvlAdd = document.getElementById("lvlAdd"), lvlUpdate = document.getElementB
 var lvlSort = document.getElementById("lvlSort"), lvlShare = document.getElementById("lvlShare");
 var lvlShareBox = document.getElementById("lvlShareBox"), lvlText = document.getElementById("lvlText");
 var lvlEditing = -1;         /* which level the wheel was loaded from, or -1 */
+
+/* The editor shows only where it has been switched on: open the app once with
+   ?editor on the address, or tap the build line under (i) seven times. The
+   choice is kept on the device; ?editor=0 or seven more taps hide it again. */
+var EDITOR_KEY = "polyrhythm-circle:editor", editorOn = false;
+try{ editorOn = localStorage.getItem(EDITOR_KEY) === "1"; } catch(err){}
+(function(){
+  var m = /[?&]editor(=([^&]*))?/.exec(location.search);
+  if(!m) return;
+  editorOn = (m[2] !== "0");
+  try{ localStorage.setItem(EDITOR_KEY, editorOn ? "1" : "0"); } catch(err){}
+})();
+function paintEditor(){ document.documentElement.dataset.editor = editorOn ? "1" : "0"; }
+paintEditor();
+var buildTaps = 0, buildTapAt = 0;
+buildTag.addEventListener("click", function(){
+  var t = performance.now();
+  buildTaps = (t - buildTapAt < 900) ? buildTaps + 1 : 1;
+  buildTapAt = t;
+  if(buildTaps < 7) return;
+  buildTaps = 0;
+  editorOn = !editorOn;
+  try{ localStorage.setItem(EDITOR_KEY, editorOn ? "1" : "0"); } catch(err){}
+  paintEditor();
+  buildTag.textContent = buildTag.textContent.split(" · editor")[0] + (editorOn ? " · editor on" : " · editor off");
+});
 
 /* what is on the wheel, as a level: its first two rings */
 function lvlFromWheel(name){
@@ -4630,7 +4805,11 @@ function paintLevels(){
         '<button type="button" data-del title="Remove" aria-label="Remove">×</button>' +
       '</span>';
     row.querySelector("input.nm").addEventListener("change", function(e){ l.name = e.target.value.slice(0, 32); queueSave(); });
-    row.querySelector(".sum").addEventListener("click", function(){ lvlLoad(i); });
+    row.querySelector(".sum").addEventListener("click", function(){
+      if(lvlNoClick){ lvlNoClick = false; return; }
+      lvlLoad(i);
+    });
+    row.addEventListener("pointerdown", function(e){ lvlDown(e, i, row); });
     row.querySelector("[data-up]").addEventListener("click", function(){ lvlMove(i, -1); });
     row.querySelector("[data-down]").addEventListener("click", function(){ lvlMove(i, 1); });
     row.querySelector("[data-del]").addEventListener("click", function(){
@@ -4700,20 +4879,97 @@ document.getElementById("lvlUse").addEventListener("click", function(){
   var arr;
   try{ arr = JSON.parse(lvlText.value); } catch(err){ arr = null; }
   if(!Array.isArray(arr)){ lvlText.value = "That is not a level list. Paste what Copy gave you."; return; }
-  S.levels = arr.filter(function(l){ return l && Array.isArray(l.rings) && l.rings.length; }).slice(0, 400);
+  /* a pasted list is repaired on the way in: every ring gets a grid it can
+     hold and a step list exactly that long, so nothing pasted can sound a
+     beat the level does not show */
+  S.levels = arr.filter(function(l){ return l && Array.isArray(l.rings) && l.rings.length; }).slice(0, 400)
+    .map(function(l){
+      var rings = l.rings.slice(0, 2).map(function(rc){
+        var div = Math.max(1, Math.min(32, parseInt(rc.div, 10) || 4));
+        var sub = fitSub(div, Math.max(1, Math.min(4, parseInt(rc.sub, 10) || 1)));
+        var src = Array.isArray(rc.steps) ? rc.steps : [], steps = [], k;
+        for(k = 0; k < div * sub; k++) steps.push(src[k] === 2 ? 2 : (src[k] ? 1 : 0));
+        return {div:div, sub:sub, off:typeof rc.off === "number" ? rc.off : 0,
+                sound:typeof rc.sound === "string" ? rc.sound : "wood",
+                vol:typeof rc.vol === "number" ? rc.vol : 0.9, steps:steps};
+      });
+      return {name:String(l.name || ""), bpm:Math.max(BPM_MIN, Math.min(BPM_MAX, parseInt(l.bpm, 10) || 96)),
+              noteDen:NOTE_NAMES[l.noteDen] ? l.noteDen : 4, noteDot:!!l.noteDot, rings:rings};
+    });
   lvlEditing = -1;
   paintLevels(); queueSave();
   lvlShareBox.hidden = true;
 });
 paintLevels();
 
+/* Dragging a row to a new place: the same split as the sequence boxes - a
+   mouse arms on the smallest movement, a finger has to hold, so a finger that
+   starts on a row can still scroll the page. The row lands where it is dropped;
+   the others close up around it. */
+var lvlDrag = null, lvlNoClick = false;
+function lvlDown(e, i, row){
+  if(!e.isPrimary) return;
+  if(e.target.closest && e.target.closest("input,button")) return;   /* the name and the arrows are their own controls */
+  lvlDrag = {i:i, row:row, x:e.clientX, y:e.clientY, armed:false, dead:false, over:-1};
+  if(e.pointerType === "touch"){
+    lvlDrag.timer = setTimeout(function(){
+      if(lvlDrag && !lvlDrag.dead) lvlArm(row, e.pointerId);
+    }, DRAG_HOLD);
+  }
+}
+function lvlArm(row, id){
+  lvlDrag.armed = true;
+  row.dataset.drag = "1";
+  try{ row.setPointerCapture(id); } catch(err){}
+}
+function lvlMoveEv(e){
+  if(!lvlDrag || lvlDrag.dead) return;
+  var dx = e.clientX - lvlDrag.x, dy = e.clientY - lvlDrag.y, dist = Math.sqrt(dx*dx + dy*dy);
+  if(!lvlDrag.armed){
+    if(e.pointerType === "touch"){ if(dist > TAP_SLOP) lvlEndEv(true); }
+    else if(dist > MOUSE_SLOP) lvlArm(lvlDrag.row, e.pointerId);
+    return;
+  }
+  e.preventDefault();
+  var t = document.elementFromPoint(e.clientX, e.clientY);
+  var over = t && t.closest ? t.closest(".lvl-row") : null;
+  var rowsAll = [].slice.call(lvlList.querySelectorAll(".lvl-row"));
+  var j = over ? rowsAll.indexOf(over) : -1;
+  if(j === lvlDrag.i) j = -1;
+  if(j !== lvlDrag.over){
+    rowsAll.forEach(function(r){ delete r.dataset.over; });
+    if(j >= 0) rowsAll[j].dataset.over = "1";
+    lvlDrag.over = j;
+  }
+}
+function lvlEndEv(cancel){
+  if(!lvlDrag) return;
+  var d = lvlDrag;
+  lvlDrag = null;
+  d.dead = true;
+  if(d.timer) clearTimeout(d.timer);
+  delete d.row.dataset.drag;
+  [].forEach.call(lvlList.querySelectorAll(".lvl-row"), function(r){ delete r.dataset.over; });
+  if(!d.armed) return;
+  lvlNoClick = true;                       /* the pointerup was a drag, not a tap */
+  if(cancel || d.over < 0 || d.over >= S.levels.length) return;
+  var moved = S.levels.splice(d.i, 1)[0], cur = S.levels[lvlEditing];
+  S.levels.splice(d.over, 0, moved);
+  if(lvlEditing === d.i) lvlEditing = d.over;
+  else if(cur) lvlEditing = S.levels.indexOf(cur);
+  paintLevels(); queueSave();
+}
+window.addEventListener("pointermove", lvlMoveEv);
+window.addEventListener("pointerup", function(){ lvlEndEv(false); });
+window.addEventListener("pointercancel", function(){ lvlEndEv(true); });
+
 var tapGame = document.getElementById("tapGame");
 /* between games the section text is the invitation, with the best level on the end */
 function paintGameBest(){
   if(game) return;
   tapHint.innerHTML = escapeHtml(TAP_IDLE_TEXT) +
-    (S.levels.length ? " Your own " + S.levels.length + " levels." : "") +
-    (gameBest ? " Best so far: <b>level " + gameBest + "</b>." : "");
+    (S.levels.length ? " Your own " + S.levels.length + " levels." : "");
+  paintBestCard();
 }
 tapGame.addEventListener("click", function(){ if(game) gameEnd(); else gameStart(); });
 
@@ -5122,11 +5378,26 @@ function scoreCfgFromStep(step){
       return {div:r.div, sub:sub, off:r.off || 0, sound:r.sound, mute:!!r.mute, steps:steps};
     }) };
 }
+var scoreSrc = "seq", scoreSrcPicked = false;   /* the sequence when there is one, unless you chose */
+var scoreSrcBtns = [].slice.call(document.querySelectorAll("#scoreSrc button"));
+function paintScoreSrc(){
+  var haveSeq = S.seq.length > 0;
+  if(!haveSeq) scoreSrc = "wheel";
+  scoreSrcBtns.forEach(function(b){
+    b.dataset.on = (b.dataset.src === scoreSrc) ? "1" : "0";
+    b.disabled = (b.dataset.src === "seq" && !haveSeq);
+  });
+}
+scoreSrcBtns.forEach(function(b){
+  b.addEventListener("click", function(){ scoreSrc = b.dataset.src; scoreSrcPicked = true; paintScore(); });
+});
 function paintScore(){
-  var cfgs = S.seq.length ? S.seq.map(scoreCfgFromStep) : [scoreCfgFromWheel()];
-  scoreSum.textContent = S.seq.length
+  paintScoreSrc();
+  var useSeq = (scoreSrc === "seq" && S.seq.length > 0);
+  var cfgs = useSeq ? S.seq.map(scoreCfgFromStep) : [scoreCfgFromWheel()];
+  scoreSum.textContent = useSeq
     ? cfgs.length + (cfgs.length === 1 ? " pattern" : " patterns") + ", in the order of the sequence. One bar each, as it loops."
-    : "The sequence is empty, so this is what is on the wheel. One bar, as it loops.";
+    : (S.seq.length ? "What is on the wheel now. One bar, as it loops." : "The sequence is empty, so this is what is on the wheel. One bar, as it loops.");
   scoreBody.innerHTML = "";
   cfgs.forEach(function(cfg, i){
     var card = document.createElement("div");
@@ -5143,6 +5414,7 @@ function paintScore(){
 }
 function showScore(on){
   scoreSheet.hidden = !on;                  /* visible first: the drawing measures the sheet */
+  if(on && !scoreSrcPicked) scoreSrc = S.seq.length ? "seq" : "wheel";
   if(on){ paintScore(); document.getElementById("scoreClose").focus(); }
   else scoreBtn.focus();
 }
@@ -5452,8 +5724,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v40";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-05 07:45";          /* and when it was built, for ?diag */
+  var BUILD = "v48";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-05 20:10";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

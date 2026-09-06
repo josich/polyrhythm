@@ -1319,6 +1319,13 @@ function gcd(a,b){ while(b){ var t=b; b=a%b; a=t; } return a; }
 
 function total(r){ return r.div * r.sub; }
 function offPhase(r){ return r.off / r.div; }   /* offset stays in MAIN steps */
+/* An offset lives in [0, 1) of a step: a whole step round is the same music as
+   none, so it wraps. It used to stop at 1, which left a ring that had been
+   dragged a full step (or its slider pushed to the end) unable to move
+   clockwise ever again - it sat on the clamp, reading "aligned". */
+function normOff(x){ x = Math.round((+x || 0) * 12) / 12; return x - Math.floor(x); }
+/* the tapping mode, readable from CSS and from the ?diag page */
+function paintTapMode(){ document.documentElement.dataset.tapmode = S.tapMode || ""; }
 function isMain(r, k){ return (k % r.sub) === 0; }
 /* Every dot that is on sounds, subdivision or not. A subdivision used to need
    its parent beat on as well, which made an off-beat impossible to write on its
@@ -2053,12 +2060,8 @@ cv.addEventListener("pointermove", function(e){
   press.acc += dp;
   press.lastPhase = ph;
 
-  /* offset is measured in this ring's own steps and stops at nought and one */
-  var raw = press.startOff + press.acc * r.div;
-  if(raw < 0){ press.acc = -press.startOff / r.div; raw = 0; }
-  else if(raw > 1){ press.acc = (1 - press.startOff) / r.div; raw = 1; }
-
-  var snapped = Math.round(raw * 12) / 12;
+  /* offset is measured in this ring's own steps and goes round and round */
+  var snapped = normOff(press.startOff + press.acc * r.div);
   if(snapped !== r.off){
     rebase();
     r.off = snapped;
@@ -2209,7 +2212,7 @@ function buildRack(){
         '<span class="off-val mono" data-offval></span>' +
         '<button class="offbtn" data-offhalf title="Jump to half a step">Half</button>' +
       '</div>' +
-      '<input type="range" data-off min="0" max="12" step="1" aria-label="Offset for ring ' + (i+1) + ', in twelfths of a step">' +
+      '<input type="range" data-off min="0" max="11" step="1" aria-label="Offset for ring ' + (i+1) + ', in twelfths of a step">' +
       '<div class="grid2">' +
         '<div class="field"><span class="lbl">Sound</span>' +
           '<select class="snd" data-snd>' + SOUNDS.map(function(s){
@@ -2269,7 +2272,7 @@ function buildRack(){
     offR.addEventListener("input", function(){
       slideRing = i;
       rebase();
-      r.off = parseInt(offR.value, 10) / 12;
+      r.off = normOff(parseInt(offR.value, 10) / 12);
       r.flash = [];
       r.lastTick = null;
       realign(r);
@@ -2750,7 +2753,7 @@ function setUiMode(mode, store){
       if(!s || s.div !== r.div) return;    /* divisions changed meanwhile: leave it */
       if(s.sub !== r.sub) reshape(r, r.div, fitSub(r.div, s.sub));
       if(s.steps.length === total(r)) r.steps = normSteps(s.steps);
-      r.off = s.off;
+      r.off = normOff(s.off);
       realign(r);
     });
     S.countIn = advSnap.countIn;
@@ -2895,7 +2898,7 @@ function applyConfig(cfg){
     var r = mkRing(i, Math.max(1, Math.min(32, rc.div || 4)));
     if(rc.sound) r.sound = rc.sound;
     if(typeof rc.vol === "number") r.vol = rc.vol;
-    if(typeof rc.off === "number") r.off = Math.max(0, Math.min(1, Math.round(rc.off * 12) / 12));
+    if(typeof rc.off === "number") r.off = normOff(rc.off);
     r.mute = !!rc.mute;
     r.sub = fitSub(r.div, Math.max(1, Math.min(4, rc.sub || 1)));
     r.steps = filled(total(r));
@@ -3392,7 +3395,7 @@ function applySession(c){
     var r = mkRing(i, Math.max(1, Math.min(32, rc.div || 4)));
     if(typeof rc.sound === "string") r.sound = rc.sound;
     if(typeof rc.vol === "number") r.vol = Math.max(0, Math.min(1, rc.vol));
-    if(typeof rc.off === "number") r.off = Math.max(0, Math.min(1, Math.round(rc.off * 12) / 12));
+    if(typeof rc.off === "number") r.off = normOff(rc.off);
     r.mute = !!rc.mute;
     r.sub = fitSub(r.div, Math.max(1, Math.min(4, rc.sub || 1)));
     r.steps = filled(total(r));
@@ -3845,7 +3848,7 @@ function swapRings(cfg){
     var r = mkRing(i, Math.max(1, Math.min(32, rc.div || 4)));
     if(rc.sound) r.sound = rc.sound;
     if(typeof rc.vol === "number") r.vol = rc.vol;
-    if(typeof rc.off === "number") r.off = Math.max(0, Math.min(1, Math.round(rc.off * 12) / 12));
+    if(typeof rc.off === "number") r.off = normOff(rc.off);
     r.mute = !!rc.mute;
     r.sub = fitSub(r.div, Math.max(1, Math.min(4, rc.sub || 1)));
     r.steps = filled(total(r));
@@ -4131,7 +4134,7 @@ function recStart(){
   recOn = [];
   recStartPhase = 0;
   recPulse = -1e9;
-  S.tapMode = "record";
+  S.tapMode = "record"; paintTapMode();
   /* the taps are heard back, so the context has to be live even on ring 1,
      where nothing starts the transport - this click is the gesture that allows it */
   initAudio();
@@ -4172,7 +4175,7 @@ function recEnd(keep){
   recTaps = [];
   recOn = [];
   recTotal = 1;
-  S.tapMode = "";
+  S.tapMode = ""; paintTapMode();
   document.documentElement.dataset.rec = "0";
   syncSessBtn();
   paintFolds();
@@ -4362,7 +4365,7 @@ function gameSetLevel(n){
     reshape(r, rc.div || 4, rc.sub || 1);
     r.steps = Array.isArray(rc.steps) && rc.steps.length === total(r) ? normSteps(rc.steps) : filled(total(r));
     r.sound = rc.sound || "wood"; r.vol = typeof rc.vol === "number" ? rc.vol : 0.9;
-    r.off = rc.off || 0;
+    r.off = normOff(rc.off);
     return r;
   });
   S.active = 0;
@@ -4380,7 +4383,7 @@ function gameStart(){
           level:1, state:"listen", loop:-1, cleared:[], restoreAt:0, total:0};
   S.rings = [mkRing(0, 4)];
   S.active = 0; rackOpen = false;
-  S.tapMode = "game";
+  S.tapMode = "game"; paintTapMode();
   initAudio();
   if(ctx && ctx.state === "suspended") ctx.resume();
   document.documentElement.dataset.game = "1";
@@ -4404,7 +4407,7 @@ function gameEnd(){
   if(!game) return;
   var prev = game.prev;
   game = null;
-  S.tapMode = "";
+  S.tapMode = ""; paintTapMode();
   gameHold = true;
   if(S.playing) stop();
   gameHold = false;
@@ -5690,8 +5693,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v56";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-06 11:44";          /* and when it was built, for ?diag */
+  var BUILD = "v57";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-06 20:50";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 
@@ -5782,6 +5785,42 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   var lines = [];
   function say(k, v){ lines.push(k + ": " + v); box.textContent = lines.join("\n"); }
+
+  /* The wheel's pointer events, counted live. Both the ring drag and Tap
+     pattern begin with a pointerdown on the wheel, so when a phone says they do
+     nothing, tapping the wheel here shows whether the touches arrive at all. */
+  var cvEl = document.getElementById("cv");
+  if(cvEl){
+    var tc = {down:0, touch:0, mouse:0, pen:0, up:0, cancel:0, move:0, nonPrimary:0};
+    var tIdx = lines.length;
+    lines.push("");
+    var topEl = function(){
+      var r = cvEl.getBoundingClientRect();
+      var el = document.elementFromPoint(r.left + r.width / 2, r.top + r.height * 0.12);
+      return el ? (el.id || el.className || el.tagName) : "nothing (wheel off screen)";
+    };
+    var paintTouch = function(){
+      lines[tIdx] = "wheel touches (tap and hold the wheel, then read): down " + tc.down +
+        " (touch " + tc.touch + ", mouse " + tc.mouse + ", pen " + tc.pen + ") · move " + tc.move +
+        " · up " + tc.up + " · cancel " + tc.cancel + " · non-primary " + tc.nonPrimary +
+        "\n  tap mode: " + (document.documentElement.dataset.tapmode || "none") +
+        " · touch-action: " + getComputedStyle(cvEl).touchAction +
+        " · on top of the wheel: " + topEl() +
+        " · pointer: " + (matchMedia("(pointer:coarse)").matches ? "coarse" : "fine") +
+        " · dpr " + (window.devicePixelRatio || 1);
+      box.textContent = lines.join("\n");
+    };
+    ["pointerdown", "pointerup", "pointercancel", "pointermove"].forEach(function(t){
+      cvEl.addEventListener(t, function(e){
+        if(t === "pointerdown"){ tc.down++; tc[e.pointerType] = (tc[e.pointerType] || 0) + 1; if(!e.isPrimary) tc.nonPrimary++; }
+        else if(t === "pointerup") tc.up++;
+        else if(t === "pointercancel") tc.cancel++;
+        else tc.move++;
+        paintTouch();
+      }, true);
+    });
+    paintTouch();
+  }
 
   var localhost = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
   var secureOrigin = (location.protocol === "https:") || localhost;

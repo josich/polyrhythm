@@ -1329,6 +1329,7 @@ function offPhase(r){ return r.off / r.div; }   /* offset stays in MAIN steps */
    dragged a full step (or its slider pushed to the end) unable to move
    clockwise ever again - it sat on the clamp, reading "aligned". */
 function normOff(x){ x = Math.round((+x || 0) * 12) / 12; return x - Math.floor(x); }
+var OFF_MAX = 11 / 12;   /* the last offset the slider (and so the drag) can reach */
 /* the tapping mode, readable from CSS and from the ?diag page */
 function paintTapMode(){ document.documentElement.dataset.tapmode = S.tapMode || ""; }
 function isMain(r, k){ return (k % r.sub) === 0; }
@@ -2085,8 +2086,13 @@ cv.addEventListener("pointermove", function(e){
   press.lastPhase = ph;
 
   /* offset is measured in this ring's own steps, jumps by twelfths like the
-     slider, and goes round and round: a full step is aligned again */
-  var snapped = normOff(press.startOff + press.acc * r.div);
+     slider, and stops where the slider stops: nought and eleven twelfths. It
+     wrapped for one build, and the accent leaping back to the start every time
+     the ring passed the last twelfth read as the dots reordering themselves. */
+  var raw = press.startOff + press.acc * r.div;
+  if(raw < 0){ press.acc = -press.startOff / r.div; raw = 0; }
+  else if(raw > OFF_MAX){ press.acc = (OFF_MAX - press.startOff) / r.div; raw = OFF_MAX; }
+  var snapped = Math.round(raw * 12) / 12;
   if(snapped !== r.off){
     rebase();
     r.off = snapped;
@@ -5735,8 +5741,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v60";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-06 23:02";          /* and when it was built, for ?diag */
+  var BUILD = "v61";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-06 23:18";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

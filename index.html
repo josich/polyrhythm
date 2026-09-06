@@ -515,6 +515,7 @@ input[type=range]::-moz-range-thumb{
 .canvas-hold{position:relative;width:100%;max-width:min(100%,64vh,560px);aspect-ratio:1/1;margin:0 auto}
 canvas{
   width:100%;height:100%;display:block;touch-action:manipulation;
+  -webkit-touch-callout:none;         /* no long-press sheet: the hold is ours */
   /* a mouse-drag across the dial must not start selecting the page */
   user-select:none;-webkit-user-select:none;-webkit-user-drag:none;
   /* Chrome on Android paints a blue box over anything it thinks is tappable,
@@ -1648,7 +1649,7 @@ var geom = {cx:0, cy:0, gap:0, radii:[]};
    still first, or every attempt to switch a dot off would nudge the ring
    instead; a mouse drags immediately, because a click is already a precise,
    deliberate gesture and waiting half a second for it feels broken. */
-var DRAG_HOLD = 500;   /* ms a finger must hold before the ring becomes draggable */
+var DRAG_HOLD = 350;   /* ms a finger must hold before the ring becomes draggable */
 var TAP_SLOP = 12;     /* px of finger movement that still counts as a tap */
 var MOUSE_SLOP = 4;    /* px of mouse movement that starts a drag */
 var press = null;      /* {ring, id, touch, x0, y0, t0, armed, lastPhase, acc, startOff} */
@@ -2086,6 +2087,18 @@ cv.addEventListener("pointercancel", releasePress);
 cv.addEventListener("touchmove", function(e){
   if(press && press.armed) e.preventDefault();
 }, {passive:false});
+/* Android fires its long-press at about half a second and, when nothing stops
+   the context menu, cancels the pointer with it - which killed the ring drag on
+   the phone in 28 holds out of 67 (the ?diag counters). The hold arms sooner
+   than that now, and the menu is refused on the wheel and on the two lists that
+   are dragged the same way; the name field keeps its own menu. */
+cv.addEventListener("contextmenu", function(e){ e.preventDefault(); });
+document.addEventListener("contextmenu", function(e){
+  var t = e.target;
+  if(!t || !t.closest) return;
+  if(t.closest("input,textarea")) return;
+  if(t.closest(".seq-box,.lvl-row")) e.preventDefault();
+});
 
 /* -------------------------------------------------------------------- rack */
 var rack = document.getElementById("rack");
@@ -5693,8 +5706,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v57";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-06 20:50";          /* and when it was built, for ?diag */
+  var BUILD = "v58";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-06 22:11";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 
@@ -5791,7 +5804,7 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
      nothing, tapping the wheel here shows whether the touches arrive at all. */
   var cvEl = document.getElementById("cv");
   if(cvEl){
-    var tc = {down:0, touch:0, mouse:0, pen:0, up:0, cancel:0, move:0, nonPrimary:0};
+    var tc = {down:0, touch:0, mouse:0, pen:0, up:0, cancel:0, move:0, nonPrimary:0, menu:0};
     var tIdx = lines.length;
     lines.push("");
     var topEl = function(){
@@ -5802,7 +5815,7 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
     var paintTouch = function(){
       lines[tIdx] = "wheel touches (tap and hold the wheel, then read): down " + tc.down +
         " (touch " + tc.touch + ", mouse " + tc.mouse + ", pen " + tc.pen + ") · move " + tc.move +
-        " · up " + tc.up + " · cancel " + tc.cancel + " · non-primary " + tc.nonPrimary +
+        " · up " + tc.up + " · cancel " + tc.cancel + " · non-primary " + tc.nonPrimary + " · long-press menu " + tc.menu +
         "\n  tap mode: " + (document.documentElement.dataset.tapmode || "none") +
         " · touch-action: " + getComputedStyle(cvEl).touchAction +
         " · on top of the wheel: " + topEl() +
@@ -5810,6 +5823,7 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
         " · dpr " + (window.devicePixelRatio || 1);
       box.textContent = lines.join("\n");
     };
+    cvEl.addEventListener("contextmenu", function(e){ tc.menu++; paintTouch(); }, true);
     ["pointerdown", "pointerup", "pointercancel", "pointermove"].forEach(function(t){
       cvEl.addEventListener(t, function(e){
         if(t === "pointerdown"){ tc.down++; tc[e.pointerType] = (tc[e.pointerType] || 0) + 1; if(!e.isPrimary) tc.nonPrimary++; }

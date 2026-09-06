@@ -5154,7 +5154,7 @@ function scoreRing(r, barT, grid){
       var at = q.t0;
       for(k = 0; k < vals.length; k++){
         /* a duration that needs two values is a hit and then a rest, never a tie */
-        items.push({t:at, val:vals[k], rest:q.rest || k > 0, acc:q.acc && k === 0, beat:b, tup:tup});
+        items.push({t:at, val:vals[k], ticks:vals[k].t / scale, rest:q.rest || k > 0, acc:q.acc && k === 0, beat:b, tup:tup});
         at += vals[k].t / scale;
       }
     }
@@ -5174,7 +5174,7 @@ function scoreTupletRing(r, barT){
   for(k = 0; k < T; k++){
     var f = k / T + (r.off || 0) / r.div;
     f -= Math.floor(f);
-    items.push({t:f * barT, val:val, rest:!r.steps[k], acc:r.steps[k] === 2, beat:0, tup:T});
+    items.push({t:f * barT, val:val, ticks:barT / T, rest:!r.steps[k], acc:r.steps[k] === 2, beat:0, tup:T});
   }
   items.sort(function(a, b){ return a.t - b.t; });
   return {items:items, tuplets:[{t0:0, t1:barT, n:T}], approx:T};
@@ -5208,7 +5208,7 @@ function scoreSvg(cfg){
     for(gi = 0; gi < nb; gi++) grid.push(gi * U);
   }
   var rings = cfg.rings.filter(function(r){ return !r.mute; });
-  var x0 = SC.LM + SC.TS + 16, x1 = width - 24, W = x1 - x0;
+  var x0 = SC.LM + SC.TS + 26, x1 = width - 24, W = x1 - x0;   /* room for the repeat sign before beat 1 */
   var X = function(t){ return x0 + t / barT * W; };
   var h = rings.length * SC.LH + 8, s = [], notes = [];
   s.push('<svg class="staff" viewBox="0 0 ' + width + ' ' + h + '" width="' + width + '" height="' + h + '" role="img" aria-label="' + escapeHtml(cfg.name) + ' as notation">');
@@ -5228,42 +5228,49 @@ function scoreSvg(cfg){
     /* repeat signs: the loop, written */
     var rp = function(x, left){
       var d = left ? 1 : -1;
-      s.push('<rect x="' + (x - 1.5) + '" y="' + (y - 15) + '" width="3" height="30" fill="currentColor"/>');
-      s.push('<rect x="' + (x + 4 * d - 0.5) + '" y="' + (y - 15) + '" width="1" height="30" fill="currentColor"/>');
-      s.push('<circle cx="' + (x + 8.5 * d) + '" cy="' + (y - 5) + '" r="1.7" fill="currentColor"/>');
-      s.push('<circle cx="' + (x + 8.5 * d) + '" cy="' + (y + 5) + '" r="1.7" fill="currentColor"/>');
+      s.push('<rect x="' + (x - 1) + '" y="' + (y - 15) + '" width="2" height="30" fill="currentColor"/>');
+      s.push('<rect x="' + (x + 4 * d - 0.4) + '" y="' + (y - 15) + '" width="0.8" height="30" fill="currentColor"/>');
+      s.push('<circle cx="' + (x + 8.5 * d) + '" cy="' + (y - 5) + '" r="1.5" fill="currentColor"/>');
+      s.push('<circle cx="' + (x + 8.5 * d) + '" cy="' + (y + 5) + '" r="1.5" fill="currentColor"/>');
     };
-    rp(x0 - 12, true); rp(x1 + 12, false);
+    rp(x0 - 20, true); rp(x1 + 12, false);
 
     var sc = scoreRing(r, barT, grid);
     if(!sc){ s.push('<text x="' + (x0 + 6) + '" y="' + (y - 8) + '" font-size="10.5" fill="var(--ink-3)">silent</text>'); return; }
     if(sc.tuplet){ sc = scoreTupletRing(r, barT); notes.push("Ring " + (idx + 1) + " does not sit on the beat, so it is written as " + sc.approx + " in the time of the bar."); }
 
     var it = sc.items, i;
-    var sx = function(x){ return x + 4.2; };           /* the stem is on the right of the head */
+    /* a crowded grid gets smaller glyphs: on a 24-slot bar a slot is under 9px,
+       and a full-size flag would reach the rest in the next slot */
+    var k = Math.max(0.6, Math.min(1, (W / Math.max(1, total(r))) / 12));
+    var sx = function(x){ return x + 4.2 * k; };       /* the stem is on the right of the head */
     for(i = 0; i < it.length; i++){
-      var n = it[i], x = X(n.t), v = n.val;
+      var n = it[i], v = n.val;
+      /* a note sits on its onset; a rest marks a span, so it sits in the middle
+         of it - which also keeps it clear of the flag on the note before */
+      var x = n.rest ? X(n.t + (n.ticks || 0) / 2) : X(n.t);
       if(n.rest){
         if(v.t >= 48){
-          s.push('<rect x="' + (x - 4.5) + '" y="' + (v.t >= 96 ? y : y - 3.5) + '" width="9" height="3.5" fill="currentColor"/>');
+          s.push('<rect x="' + (x - 4.5 * k) + '" y="' + (v.t >= 96 ? y : y - 3.5) + '" width="' + (9 * k) + '" height="3.5" fill="currentColor"/>');
         } else if(v.beams === 0){
           s.push('<path d="M' + (x - 2) + ' ' + (y - 9) + 'l4.5 4.5l-4.5 4.5l4.5 4.5c-3.5 -1.5 -5.5 0.5 -3 3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>');
         } else {
           var f;
-          for(f = 0; f < v.beams; f++) s.push('<circle cx="' + (x - 1.6 - 1.4 * f) + '" cy="' + (y - 6 + 5 * f) + '" r="1.9" fill="currentColor"/>');
-          s.push('<line x1="' + (x + 2.4) + '" y1="' + (y - 6) + '" x2="' + (x - 1.6 - 1.4 * v.beams) + '" y2="' + (y + 5) + '" stroke="currentColor" stroke-width="1.4"/>');
+          /* a narrow glyph: in a tight grid a rest has a slot and a half to itself */
+          for(f = 0; f < v.beams; f++) s.push('<circle cx="' + (x - (1.0 + 1.2 * f) * k) + '" cy="' + (y - 6 + 5 * f) + '" r="' + (1.8 * k) + '" fill="currentColor"/>');
+          s.push('<line x1="' + (x + 1.4 * k) + '" y1="' + (y - 6) + '" x2="' + (x - (1.0 + 1.2 * v.beams) * k) + '" y2="' + (y + 4.5) + '" stroke="currentColor" stroke-width="' + (1.4 * k) + '"/>');
         }
-        if(v.dot) s.push('<circle cx="' + (x + 7.5) + '" cy="' + (y - 2.5) + '" r="1.3" fill="currentColor"/>');
+        if(v.dot) s.push('<circle cx="' + (x + 7.5 * k) + '" cy="' + (y - 2.5) + '" r="' + (1.3 * k) + '" fill="currentColor"/>');
         continue;
       }
       /* the head, its stem, its dot */
-      s.push('<ellipse cx="' + x + '" cy="' + y + '" rx="4.4" ry="3.1" transform="rotate(-22 ' + x + ' ' + y + ')" ' +
+      s.push('<ellipse cx="' + x + '" cy="' + y + '" rx="' + (4.4 * k) + '" ry="' + (3.1 * k) + '" transform="rotate(-22 ' + x + ' ' + y + ')" ' +
         (v.hollow ? 'fill="none" stroke="currentColor" stroke-width="1.7"' : 'fill="currentColor"') + '/>');
       if(v.stem) s.push('<line x1="' + sx(x) + '" y1="' + (y - 1) + '" x2="' + sx(x) + '" y2="' + yt + '" stroke="currentColor" stroke-width="1.4"/>');
-      if(v.dot) s.push('<circle cx="' + (x + 8) + '" cy="' + (y - 2.5) + '" r="1.3" fill="currentColor"/>');
+      if(v.dot) s.push('<circle cx="' + (x + 8 * k) + '" cy="' + (y - 2.5) + '" r="' + (1.3 * k) + '" fill="currentColor"/>');
       /* the accent goes under the head, as it does with stems up - above, it ran
          into beams and into the number on a tuplet bracket */
-      if(n.acc) s.push('<path d="M' + (x - 4) + ' ' + (y + 9) + 'l8 3l-8 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>');
+      if(n.acc) s.push('<path d="M' + (x - 4 * k) + ' ' + (y + 9) + 'l' + (8 * k) + ' 3l-' + (8 * k) + ' 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>');
     }
     /* beams: notes shorter than a quarter, side by side inside one beat */
     var g = [];
@@ -5272,7 +5279,7 @@ function scoreSvg(cfg){
       if(g.length === 1){
         var o = g[0], ox = sx(X(o.t)), f;
         for(f = 0; f < o.val.beams; f++)
-          s.push('<path d="M' + ox + ' ' + (yt + 5 * f) + 'c4.5 2 6.5 5 4.5 10.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>');
+          s.push('<path d="M' + ox + ' ' + (yt + 5 * f) + 'c' + (4.5 * k) + ' 2 ' + (6.5 * k) + ' 5 ' + (4.5 * k) + ' 10.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>');
       } else {
         var xa = sx(X(g[0].t)), xb = sx(X(g[g.length - 1].t)), j;
         s.push('<rect x="' + (xa - 0.7) + '" y="' + yt + '" width="' + (xb - xa + 1.4) + '" height="2.8" fill="currentColor"/>');
@@ -5285,7 +5292,7 @@ function scoreSvg(cfg){
             } else if(!(j > 0 && g[j - 1].val.beams >= lvl)){
               /* a lone short note in the group: a stub, pointing into the group */
               var left = (j === g.length - 1);
-              s.push('<rect x="' + (left ? cx - 8 : cx - 0.7) + '" y="' + yy + '" width="8.7" height="2.8" fill="currentColor"/>');
+              s.push('<rect x="' + (left ? cx - 8 * k : cx - 0.7) + '" y="' + yy + '" width="' + (8.7 * k) + '" height="2.8" fill="currentColor"/>');
             }
           }
         }
@@ -5328,7 +5335,7 @@ function scoreCfgFromStep(step){
       return {div:r.div, sub:sub, off:r.off || 0, sound:r.sound, mute:!!r.mute, steps:steps};
     }) };
 }
-var scoreSrc = "seq", scoreSrcPicked = false;   /* the sequence when there is one, unless you chose */
+var scoreSrc = "wheel", scoreSrcPicked = false;   /* the wheel, until you choose otherwise this session */
 var scoreSrcBtns = [].slice.call(document.querySelectorAll("#scoreSrc button"));
 function paintScoreSrc(){
   var haveSeq = S.seq.length > 0;
@@ -5364,7 +5371,7 @@ function paintScore(){
 }
 function showScore(on){
   scoreSheet.hidden = !on;                  /* visible first: the drawing measures the sheet */
-  if(on && !scoreSrcPicked) scoreSrc = S.seq.length ? "seq" : "wheel";
+  if(on && !scoreSrcPicked) scoreSrc = "wheel";
   if(on){ paintScore(); document.getElementById("scoreClose").focus(); }
   else scoreBtn.focus();
 }
@@ -5674,8 +5681,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v53";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-06 10:09";          /* and when it was built, for ?diag */
+  var BUILD = "v55";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-06 10:27";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

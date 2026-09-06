@@ -317,12 +317,15 @@ input[type=range]::-moz-range-thumb{
   /* fit-content caps the middle track against the header's own width. A
      max-width on the item resolved against this track instead - which the item
      itself sizes - and collapsed the name to 46% of its own width. */
-  grid-template-columns:minmax(0,1fr) fit-content(46%) minmax(0,1fr);
+  grid-template-columns:minmax(0,1fr) fit-content(46%) minmax(0,1fr) auto;
   align-items:baseline;gap:8px;margin-bottom:2px;
 }
 #dialRatio{grid-column:1;text-align:left}
 #dialPat{grid-column:2;justify-self:stretch;text-align:center}
 #posLbl{grid-column:3;text-align:right}
+/* the note that opens the score: a small round button at the header's end */
+#scoreBtn{grid-column:4;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none}
+#scoreBtn svg.note{width:11px;height:15px;display:block}
 /* the readouts that used to sit in the hub - now the dial's headline, so they
    carry the weight the hub used to give them */
 /* the ratio may shrink and, in the worst case, clip with an ellipsis rather than
@@ -352,7 +355,6 @@ input[type=range]::-moz-range-thumb{
    the same size and carries the name only - the row is meant to be read as an
    order at a glance, not studied. */
 .seq-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.seq-foot{display:flex;justify-content:flex-end;margin-top:10px}
 /* the score: one bar per pattern, one staff line per ring. The SVG is drawn at
    the sheet's own width so the notation keeps its size on a phone instead of
    shrinking with the page. */
@@ -443,6 +445,7 @@ input[type=range]::-moz-range-thumb{
 }
 .pickbar .msg{font-size:12.5px;color:var(--ink)}
 .btn.sm{padding:5px 10px;font-size:11.5px}
+.btn.sm:disabled{opacity:.4;cursor:default}
 /* the repeat toggle: a square button carrying the two-arrow loop */
 .btn.sm.icon{padding:5px;width:29px;height:29px;display:grid;place-items:center;flex:none}
 /* a small button that leads with a glyph: a notebook for the plan, an eighth
@@ -933,6 +936,8 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
         <span class="metric mono" id="dialRatio">4 : 3</span>
         <span class="metric sub mono pat" id="dialPat" hidden></span>
         <span class="metric sub mono" id="posLbl">stopped</span>
+        <!-- the score is what the wheel writes out, so its button lives on the wheel -->
+        <button class="icobtn score-ico" id="scoreBtn" title="Write it out as notation" aria-label="Score"><svg class="note" viewBox="0 0 22 30" aria-hidden="true"><ellipse cx="8" cy="22.5" rx="5.4" ry="3.7" transform="rotate(-22 8 22.5)" fill="currentColor"/><path d="M12.9 21.6V3.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M12.9 3.5c3.6 2.2 6 5.2 4.4 10.2" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg></button>
       </div>
       <div class="canvas-hold">
         <canvas id="cv"></canvas>
@@ -1031,6 +1036,7 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
       <span class="lbl">Play time</span>
       <span class="fold-ico" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg></span>
       <button class="btn sm lead" id="tapGame" data-on="0" title="Clear the dots by tapping them in time"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg> Game</button>
+      <button class="btn sm" id="tapPause" disabled title="Pause the game">Pause</button>
     </div>
     <p class="tap-hint" id="tapHint"></p>
     <!-- the best run, as a card that stays whatever the game is doing -->
@@ -1074,8 +1080,6 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
       <span class="seq-note" id="seqNote"></span>
     </div>
     <div class="seq-row" id="seqRow"></div>
-    <!-- the way into the notation sits bottom right, like the plan does -->
-    <div class="seq-foot"><button class="btn sm lead" id="scoreBtn"><svg class="note" viewBox="0 0 22 30" aria-hidden="true"><ellipse cx="8" cy="22.5" rx="5.4" ry="3.7" transform="rotate(-22 8 22.5)" fill="currentColor"/><path d="M12.9 21.6V3.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M12.9 3.5c3.6 2.2 6 5.2 4.4 10.2" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg>Score</button></div>
   </section>
 
   <section class="presets foldsec" id="patPanel">
@@ -4300,107 +4304,10 @@ function paintTapNow(){
    Timing is judged the way tap-along judges it: against the phase you were
    HEARING when the finger landed, so the output delay of the phone does not
    count against you. The window narrows a little with each level. */
-/* The ladder is built from a pool of real rhythms - claves, bells, aksaks, the
-   compas, the figures of a solfege class - each at five tempos. Every entry is
-   scored for difficulty (hits, grid, off-beats, subdivision, hits a second,
-   an odd count) and the three hundred are sorted, three to a level, so a
-   hundred levels climb without a step being skipped. Three choices at each
-   level, drawn at random, so no level plays the same way twice. */
-var GAME_POOL = [
-  {name:"one hit",        div:4,  sub:1, p:"X...",             bpm:80},
-  {name:"two hits",       div:4,  sub:1, p:"X.x.",             bpm:80},
-  {name:"three in a bar", div:3,  sub:1, p:"Xxx",              bpm:90},
-  {name:"four on the floor", div:4, sub:1, p:"Xxxx",           bpm:92},
-  {name:"one gap",        div:4,  sub:1, p:"Xx.x",             bpm:92},
-  {name:"gap on two",     div:4,  sub:1, p:"X.xx",             bpm:92},
-  {name:"rest on four",   div:4,  sub:1, p:"Xxx.",             bpm:92},
-  {name:"pick-up",        div:4,  sub:1, p:"xX.x",             bpm:96},
-  {name:"backbeat",       div:4,  sub:1, p:".x.x",             bpm:96},
-  {name:"waltz lift",     div:3,  sub:1, p:"X.x",              bpm:100},
-  {name:"eighths",        div:8,  sub:1, p:"Xxxxxxxx",         bpm:170},
-  {name:"tresillo",       div:8,  sub:1, p:"X..x..x.",         bpm:160},
-  {name:"cinquillo",      div:8,  sub:1, p:"Xx.xx.x.",         bpm:168},
-  {name:"habanera",       div:8,  sub:1, p:"X..xx.x.",         bpm:160},
-  {name:"baiao",          div:16, sub:1, p:"X..x..x.x..x..x.", bpm:300},
-  {name:"and of two",     div:8,  sub:1, p:"X.xx.x.x",         bpm:168},
-  {name:"cumbia",         div:8,  sub:1, p:".x.x.x.x",         bpm:168},
-  {name:"charleston",     div:8,  sub:1, p:"X..x....",         bpm:150},
-  {name:"bossa",          div:16, sub:1, p:"X..x..x...x..x..", bpm:290},
-  {name:"son clave",      div:16, sub:1, p:"X..x..x...x.x...", bpm:300},
-  {name:"rumba clave",    div:16, sub:1, p:"X..x...x..x.x...", bpm:300},
-  {name:"clave 2-3",      div:16, sub:1, p:"..x.x...x..x..x.", bpm:300},
-  {name:"shuffle",        div:4,  sub:3, p:"X.xx.xx.xx.x",     bpm:100},
-  {name:"tumbao",         div:16, sub:1, p:"..x.x..x..x.x..x", bpm:300},
-  {name:"dembow snare",   div:16, sub:1, p:"...x..x....x..x.", bpm:300},
-  {name:"backbeat eighths", div:8, sub:1, p:"x.X.x.X.",        bpm:176},
-  {name:"6/8 pulse",      div:6,  sub:1, p:"X..x..",           bpm:170},
-  {name:"qraqeb",         div:6,  sub:1, p:"X.xx.x",           bpm:170},
-  {name:"tarantella",     div:6,  sub:1, p:"Xx.Xx.",           bpm:174},
-  {name:"Ewe bell",       div:12, sub:1, p:"X.x.xx.x.x.x",     bpm:220},
-  {name:"five-stroke bell", div:12, sub:1, p:"X.x..x.x..x.",   bpm:220},
-  {name:"solea",          div:12, sub:1, p:"X..x..x.x.x.",     bpm:225},
-  {name:"seguiriya",      div:12, sub:1, p:"X.x.x..x..x.",     bpm:225},
-  {name:"triplets",       div:4,  sub:3, p:"Xxxxxxxxxxxx",     bpm:96},
-  {name:"swing",          div:4,  sub:3, p:"X.xX.xX.xX.x",     bpm:100},
-  {name:"trap hats",      div:4,  sub:3, p:"X..x.xx..x..",     bpm:100},
-  {name:"5/8 in 3+2",     div:5,  sub:1, p:"X..X.",            bpm:170},
-  {name:"5/8 in 2+3",     div:5,  sub:1, p:"X.X..",            bpm:170},
-  {name:"five straight",  div:5,  sub:1, p:"Xxxxx",            bpm:180},
-  {name:"7/8 in 3+2+2",   div:7,  sub:1, p:"X..X.X.",          bpm:190},
-  {name:"7/8 in 2+2+3",   div:7,  sub:1, p:"X.X.X..",          bpm:190},
-  {name:"seven, dense",   div:7,  sub:1, p:"Xx.xx.x",          bpm:200},
-  {name:"aksak",          div:9,  sub:1, p:"X.x.x.x..",        bpm:240},
-  {name:"nine in threes", div:9,  sub:1, p:"X..x..x..",        bpm:230},
-  {name:"samai",          div:10, sub:1, p:"X..x.xx.x.",       bpm:220},
-  {name:"kopacka",        div:11, sub:1, p:"X.x.x..x.x.",      bpm:260},
-  {name:"sevillanas",     div:3,  sub:2, p:"xxXxXx",           bpm:150},
-  {name:"sixteenths",     div:4,  sub:4, p:"Xxxxxxxxxxxxxxxx", bpm:100},
-  {name:"gallop",         div:4,  sub:4, p:"X..xX..xX..xX..x", bpm:104},
-  {name:"verbunkos",      div:16, sub:1, p:"X..xx..xx..xx..x", bpm:320},
-  {name:"mbalax",         div:16, sub:1, p:"X..x..xx..x..x..", bpm:320},
-  {name:"sixteenth mix",  div:4,  sub:4, p:"X.xxx..xx.x.xx.x", bpm:112},
-  {name:"amen kick",      div:16, sub:1, p:"X....x....x.....", bpm:340},
-  {name:"two-step",       div:16, sub:1, p:"X...x.....x.x...", bpm:320},
-  {name:"funky drummer",  div:16, sub:1, p:"X.....x...x.....", bpm:330},
-  {name:"syncopa",        div:4,  sub:4, p:"Xx.xXx.xXx.xXx.x", bpm:108},
-  {name:"dotted pairs",   div:4,  sub:4, p:"X.x.X.x.Xx.xXx.x", bpm:108},
-  {name:"twelve, dense",  div:12, sub:1, p:"X.xx.x.x.xx.",     bpm:250},
-  {name:"clave and tumbao", div:16, sub:1, p:"X.xx.xx.x.xx.xx.", bpm:310},
-  {name:"fast seven",     div:7,  sub:1, p:"XxxXxXx",          bpm:230}
-];
-var GAME_TEMPOS = [0.8, 0.9, 1.0, 1.12, 1.25];
-var GAME_LEVELS = (function(){
-  var all = [], i, t;
-  GAME_POOL.forEach(function(d, id){
-    var grid = d.div * d.sub, hits = 0, off = 0, k;
-    /* the beat the ear counts: subdivisions, quarters in a 16, threes in a 12 */
-    var unit = d.sub > 1 ? d.sub : (grid % 4 === 0 && grid >= 8 ? grid / 4 : (grid % 3 === 0 && grid >= 6 ? grid / 3 : 1));
-    for(k = 0; k < grid; k++) if(d.p.charAt(k) !== "."){ hits++; if(k % unit !== 0) off++; }
-    var odd = [3,4,6,8,12,16].indexOf(grid) < 0 ? 1 : 0;
-    var noDown = d.p.charAt(0) === "." ? 1 : 0;      /* nothing on one is harder to hold */
-    for(t = 0; t < GAME_TEMPOS.length; t++){
-      var bpm = Math.min(BPM_MAX, Math.round(d.bpm * GAME_TEMPOS[t]));
-      var perSec = hits * bpm / 60 / grid;
-      all.push({id:id, name:d.name, div:d.div, sub:d.sub, pattern:d.p, bpm:bpm,
-        d: hits + grid * 0.25 + off * 1.4 + (d.sub > 1 ? 2.5 : 0) + odd * 2 + noDown * 1.5 + perSec * 3});
-    }
-  });
-  all.sort(function(a, b){ return a.d - b.d || a.id - b.id; });
-  /* three to a level, and not the same rhythm twice in one unless nothing else
-     is left - so the count comes out exactly at a hundred */
-  var levels = [];
-  while(all.length){
-    var lvl = [], j = 0;
-    while(lvl.length < 3 && all.length){
-      if(j >= all.length){ j = 0; lvl.push(all.splice(0, 1)[0]); continue; }
-      var e = all[j];
-      if(lvl.some(function(x){ return x.id === e.id; })){ j++; continue; }
-      lvl.push(e); all.splice(j, 1);
-    }
-    levels.push(lvl);
-  }
-  return levels;
-})();
+/* The ladder, as built by hand on the wheel and exported from the level editor
+   (game-levels.json keeps the same list beside the source). One choice per
+   level, in this order; a level is a tempo, a note and one or two rings. */
+var GAME_LEVELS = [{"name":"","bpm":67,"noteDen":4,"noteDot":true,"rings":[{"div":2,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,1]}]},{"name":"","bpm":160,"noteDen":8,"noteDot":false,"rings":[{"div":4,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,1,0]}]},{"name":"","bpm":100,"noteDen":4,"noteDot":false,"rings":[{"div":4,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,1,1]}]},{"name":"","bpm":107,"noteDen":8,"noteDot":true,"rings":[{"div":4,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,2,1]}]},{"name":"","bpm":80,"noteDen":4,"noteDot":false,"rings":[{"div":3,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,2]}]},{"name":"","bpm":80,"noteDen":4,"noteDot":false,"rings":[{"div":3,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,1]}]},{"name":"","bpm":80,"noteDen":4,"noteDot":false,"rings":[{"div":5,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,2,1,1]}]},{"name":"","bpm":160,"noteDen":8,"noteDot":false,"rings":[{"div":8,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,1,0,2,1,1,0]}]},{"name":"","bpm":160,"noteDen":8,"noteDot":false,"rings":[{"div":8,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,2,1,0,2,0,1,0]}]},{"name":"","bpm":160,"noteDen":8,"noteDot":false,"rings":[{"div":8,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,1,1,2,0,1,0]}]},{"name":"","bpm":160,"noteDen":8,"noteDot":false,"rings":[{"div":8,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,2,1,0,2,2,1,1]}]},{"name":"","bpm":160,"noteDen":8,"noteDot":false,"rings":[{"div":8,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,2,1,0,2,2,1,0]}]},{"name":"","bpm":160,"noteDen":8,"noteDot":false,"rings":[{"div":8,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,1,0,0,1,2,0]}]},{"name":"","bpm":160,"noteDen":8,"noteDot":false,"rings":[{"div":8,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,1,0,2,1,0,0]}]},{"name":"","bpm":107,"noteDen":8,"noteDot":true,"rings":[{"div":8,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,2,1,2,1,2,1]}]},{"name":"","bpm":160,"noteDen":8,"noteDot":false,"rings":[{"div":8,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,0,1,2,0,2,0]}]},{"name":"","bpm":160,"noteDen":8,"noteDot":false,"rings":[{"div":8,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,2,0,1,2,0,1]}]},{"name":"","bpm":107,"noteDen":8,"noteDot":true,"rings":[{"div":5,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,2,0,1]}]},{"name":"","bpm":107,"noteDen":8,"noteDot":true,"rings":[{"div":5,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,2,1,0]}]},{"name":"","bpm":160,"noteDen":8,"noteDot":false,"rings":[{"div":5,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,2,1]}]},{"name":"","bpm":160,"noteDen":8,"noteDot":false,"rings":[{"div":5,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,2,0,1]}]},{"name":"","bpm":107,"noteDen":8,"noteDot":true,"rings":[{"div":6,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,2,0,2,1,0]}]},{"name":"","bpm":107,"noteDen":8,"noteDot":true,"rings":[{"div":6,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,2,1,0]}]},{"name":"","bpm":160,"noteDen":8,"noteDot":false,"rings":[{"div":6,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,1,0,2,1]}]},{"name":"","bpm":160,"noteDen":8,"noteDot":false,"rings":[{"div":6,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,2,1,2,0]}]},{"name":"","bpm":160,"noteDen":8,"noteDot":false,"rings":[{"div":6,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,1,1,2,0]}]},{"name":"","bpm":160,"noteDen":8,"noteDot":false,"rings":[{"div":6,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,0,0,2,0]}]},{"name":"","bpm":160,"noteDen":8,"noteDot":false,"rings":[{"div":6,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[0,1,0,0,2,2]}]},{"name":"","bpm":213,"noteDen":16,"noteDot":true,"rings":[{"div":6,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,0,1,0]}]},{"name":"","bpm":213,"noteDen":16,"noteDot":true,"rings":[{"div":6,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,0,0,1]}]},{"name":"","bpm":160,"noteDen":8,"noteDot":false,"rings":[{"div":6,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,1,0,0,1]}]},{"name":"","bpm":160,"noteDen":8,"noteDot":false,"rings":[{"div":7,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,1,2,2,1,0]}]},{"name":"","bpm":160,"noteDen":8,"noteDot":false,"rings":[{"div":7,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,2,0,0,2,1]}]},{"name":"","bpm":160,"noteDen":8,"noteDot":false,"rings":[{"div":7,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,1,2,0,2,1]}]},{"name":"","bpm":160,"noteDen":8,"noteDot":false,"rings":[{"div":7,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,1,0,1,2,0]}]},{"name":"","bpm":160,"noteDen":8,"noteDot":false,"rings":[{"div":7,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,2,1,1,2,0]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":7,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,2,1,0,2,1]}]},{"name":"","bpm":200,"noteDen":8,"noteDot":false,"rings":[{"div":7,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,2,0,1,2,1]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":7,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,2,1,0,2,0]}]},{"name":"","bpm":200,"noteDen":8,"noteDot":false,"rings":[{"div":7,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,0,2,1,0]}]},{"name":"","bpm":200,"noteDen":8,"noteDot":false,"rings":[{"div":7,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,1,0,2,0,0]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":7,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,0,2,0,0]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":6,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,0,1,1,2,0,0,2,1,0]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":6,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,1,0,1,1,1,0,2,0,0,0]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":6,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,1,0,1,0,1,1,2,0,0,1]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":6,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,2,1,2,0,0,1,0,1,0,1,0]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":6,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,1,0,0,2,1,0,0,2,1,0]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":6,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,0,2,1,0,0,0,2,0,1]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":6,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[0,2,0,0,2,1,0,2,0,1,2,0]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":6,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,1,2,1,1,0,0,2,0,0,2]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":6,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,1,2,1,1,2,2,1,1,1,2]}]},{"name":"","bpm":100,"noteDen":4,"noteDot":false,"rings":[{"div":6,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,1,0,0,1,2,2,0,0,1,0]}]},{"name":"","bpm":100,"noteDen":4,"noteDot":false,"rings":[{"div":6,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[0,1,2,0,1,0,1,1,0,2,1,0]}]},{"name":"","bpm":200,"noteDen":8,"noteDot":false,"rings":[{"div":6,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[0,1,2,2,0,2,1,2,0,0,2,1]}]},{"name":"","bpm":200,"noteDen":8,"noteDot":false,"rings":[{"div":6,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[0,1,0,0,2,2,1,2,2,0,0,1]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":6,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[0,0,0,0,1,0,0,0,2,0,2,1,1,0,1,0,2,0,1,0,1,0,0,2]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":6,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,1,0,0,0,0,0,2,0,0,1,1,2,1,0,2,0,1,0,1,0,2,0]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":6,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,1,2,0,0,0,0,1,0,0,2,2,0,1,0,0,0,1,0,1,0,2,0]}]},{"name":"","bpm":100,"noteDen":4,"noteDot":false,"rings":[{"div":6,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,0,1,0,2,0,2,0,0,0,1,0,1,0,2,0,1,0,1,0,0,0]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":6,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,0,0,0,1,0,2,0,0,2,0,1,0,0,1,0,2,0,0,0,0,0]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":7,"sub":3,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,0,0,0,2,1,0,0,1,0,1,1,0,1,0,0,1,0,0]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":7,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,0,2,2,1,0,2,1,1,0,0,0,0]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":7,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,0,2,0,0,2,1,1,0,2,2,0,0]}]},{"name":"","bpm":120,"noteDen":8,"noteDot":true,"rings":[{"div":7,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[0,0,1,0,0,0,2,1,1,0,2,0,1,2]}]},{"name":"","bpm":120,"noteDen":8,"noteDot":true,"rings":[{"div":7,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,0,0,1,0,0,1,0,0,2,0,0]}]},{"name":"","bpm":120,"noteDen":8,"noteDot":true,"rings":[{"div":7,"sub":3,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,1,1,0,0,1,1,1,0,0,1,1,2,0,1,2,0,1,1]}]},{"name":"","bpm":120,"noteDen":8,"noteDot":true,"rings":[{"div":7,"sub":3,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,2,0,1,0,2,1,1,1,0,0,1,1,2,0,1,2,0,1,1]}]},{"name":"","bpm":120,"noteDen":8,"noteDot":true,"rings":[{"div":7,"sub":3,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,2,0,1,0,2,1,1,1,0,2,1,1,0,2,0,2,0,1,0]}]},{"name":"","bpm":120,"noteDen":8,"noteDot":true,"rings":[{"div":7,"sub":3,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,2,0,1,0,2,1,0,0,0,2,1,1,0,2,0,1,1,0,0]}]},{"name":"","bpm":130,"noteDen":8,"noteDot":true,"rings":[{"div":7,"sub":3,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,1,0,2,0,0,1,0,2,0,2,0,1,0,1,0,1,1,0,0]}]},{"name":"","bpm":65,"noteDen":4,"noteDot":true,"rings":[{"div":7,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1]}]},{"name":"","bpm":65,"noteDen":4,"noteDot":true,"rings":[{"div":7,"sub":3,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2,1,1,1,1,1]}]},{"name":"","bpm":65,"noteDen":4,"noteDot":true,"rings":[{"div":7,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,1,0,1,1,1,0,2,0,1,1,1,1,0,1,1,1,0,1,2,0,1,1,1,0,1,1]}]},{"name":"","bpm":98,"noteDen":4,"noteDot":false,"rings":[{"div":7,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,0,0,1,1,0,0,2,0,0,1,1,2,0,1,1,1,0,1,2,0,2,0,1,0,1,0]}]},{"name":"","bpm":98,"noteDen":4,"noteDot":false,"rings":[{"div":7,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,0,0,1,1,0,0,1,1,0,2,0,0,1,0,0,1,0,1,1,0,2,0,1,0,1,0]}]},{"name":"","bpm":195,"noteDen":8,"noteDot":false,"rings":[{"div":7,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,1,1,1,0,0,2,0,1,1,0,1,1]}]},{"name":"","bpm":65,"noteDen":4,"noteDot":true,"rings":[{"div":4,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,1,1,1,1,1,1]},{"div":4,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[0,1,1,0,1,1,0,1,1,0,1,1]}]},{"name":"","bpm":80,"noteDen":4,"noteDot":true,"rings":[{"div":4,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,1,1,1,1,1,1]},{"div":4,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[0,0,1,0,2,0,0,0,2,0,1,1]}]},{"name":"","bpm":65,"noteDen":4,"noteDot":true,"rings":[{"div":4,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1]},{"div":4,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[0,0,1,0,2,0,0,0,2,0,1,0]}]},{"name":"","bpm":65,"noteDen":4,"noteDot":true,"rings":[{"div":4,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,1,1,1,1,0,1,1,1,1,0,1,0,0,0]},{"div":4,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[0,0,0,0,0,0,0,0,2,0,2,2]}]},{"name":"","bpm":65,"noteDen":4,"noteDot":true,"rings":[{"div":4,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,1,1,0,0,0,1,1,2,1,1,0,0,0]},{"div":4,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[0,0,0,0,2,1,0,0,0,0,2,1]}]},{"name":"","bpm":98,"noteDen":4,"noteDot":false,"rings":[{"div":4,"sub":4,"off":0.16666666666666666,"sound":"wood","vol":0.9,"steps":[2,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0]},{"div":4,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[0,1,0,0,2,1,0,2,2,0,2,1]}]},{"name":"","bpm":70,"noteDen":4,"noteDot":true,"rings":[{"div":4,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,0,1,0,0,0,2,0,0,0,1,0,2,0]},{"div":4,"sub":3,"off":0.08333333333333333,"sound":"wood","vol":0.8,"steps":[0,1,0,0,2,1,0,2,0,0,0,1]}]},{"name":"","bpm":67,"noteDen":4,"noteDot":true,"rings":[{"div":4,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,2,0,1,0,2,0,1,0,2,0,1,0,2,0]},{"div":4,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[1,1,1,0,1,1,0,1,1,0,1,1]}]},{"name":"","bpm":67,"noteDen":4,"noteDot":true,"rings":[{"div":4,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,2,0,1,0,2,0,1,0,2,0,1,0,2,0]},{"div":4,"sub":3,"off":0.5,"sound":"wood","vol":0.8,"steps":[2,1,1,0,1,1,2,1,1,0,1,1]}]},{"name":"","bpm":67,"noteDen":4,"noteDot":true,"rings":[{"div":4,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,0,2,1,1,0,2,2,0,2,1,1,0,2,1]},{"div":4,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[2,0,0,0,0,0,0,1,0,0,1,0]}]},{"name":"","bpm":100,"noteDen":4,"noteDot":false,"rings":[{"div":4,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,2,1]},{"div":4,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[0,0,0,0,2,0,0,1,0,0,0,2]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":4,"sub":1,"off":0.5,"sound":"wood","vol":0.9,"steps":[0,0,2,1]},{"div":4,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[0,2,0,2,2,0,2,0,0,2,0,0]}]},{"name":"","bpm":100,"noteDen":4,"noteDot":false,"rings":[{"div":5,"sub":4,"off":0.5,"sound":"wood","vol":0.9,"steps":[2,0,0,0,1,0,0,0,2,1,0,0,1,0,1,0,0,0,0,0]},{"div":4,"sub":3,"off":0.5,"sound":"wood","vol":0.8,"steps":[0,2,0,2,0,0,2,0,0,2,2,1]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":6,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,1,1,1,1,1,1,2,1,1,1,1,1,2,0,2,0,2,1,1,1,1,1]}]},{"name":"","bpm":67,"noteDen":4,"noteDot":true,"rings":[{"div":6,"sub":3,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,0,1,0,1,0,0,0,2,0,2,0,0,0,0,0]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":6,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,0,0,2,0,1,0,2,0,2,1,1,1,0,0,2,0,1,2,2,0,2,0]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":6,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,0,1,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0,1,0,0,0]},{"div":7,"sub":3,"off":0.5,"sound":"wood","vol":0.8,"steps":[1,0,0,2,0,0,0,1,1,0,1,1,0,0,0,2,0,0,1,0,0]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":6,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,0,1,0,0,2,0,0,0,0,2,0,0,2,0,0,0,0,1,0,0,0]},{"div":7,"sub":3,"off":0.5,"sound":"wood","vol":0.8,"steps":[0,2,0,2,0,0,0,1,0,0,1,0,0,0,0,2,0,2,0,0,0]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":6,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0]},{"div":7,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[0,1,1,0,0,1,2,1,1,0,0,0,0,1,1,2,1,0,0,1,1]}]},{"name":"","bpm":100,"noteDen":4,"noteDot":false,"rings":[{"div":6,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0]},{"div":7,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[0,0,1,0,0,1,2,1,0,1,0,0,1,0,1,2,1,0,0,2,0]}]},{"name":"","bpm":200,"noteDen":8,"noteDot":false,"rings":[{"div":6,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,0,0,0,0,0,0,0,2,0,2,0,0,0,1,0,0,0,0,0,0,0]},{"div":5,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[0,0,1,0,2,0,0,0,0,0,0,1,1,0,2]}]},{"name":"","bpm":200,"noteDen":8,"noteDot":false,"rings":[{"div":6,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,0,0,0,2,0,0,0,0,0,2,0,0,0,1,0,0,0,0,0,0,0]},{"div":7,"sub":3,"off":0.16666666666666666,"sound":"wood","vol":0.8,"steps":[0,1,0,0,0,0,1,0,1,0,0,0,0,0,0,1,1,0,0,2,0]}]},{"name":"","bpm":267,"noteDen":16,"noteDot":true,"rings":[{"div":6,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0]},{"div":7,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,2,0]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":6,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":6,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,1,0,1,1,1,0,2,1,1,0,1,1,1,0,2,1,1,0,1,1,1,0]},{"div":6,"sub":1,"off":0.75,"sound":"wood","vol":0.8,"steps":[1,1,1,1,1,1]}]},{"name":"","bpm":200,"noteDen":8,"noteDot":false,"rings":[{"div":6,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0]},{"div":7,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[0,0,2,0,0,1,0,0,0,1,0,0,2,0,0,0,1,0,0,2,0]}]},{"name":"","bpm":267,"noteDen":16,"noteDot":true,"rings":[{"div":6,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,0,1,0,0,0,0,0,0,0,2,0,0,0,0,2,0,0,0,0,0,0]},{"div":7,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0]}]},{"name":"","bpm":115,"noteDen":4,"noteDot":false,"rings":[{"div":8,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,2,1,1,1,0,2,1,1,1,0,2,0,0,2,1,0,1,0,1,0,1,2,1,0,0,0,1,1,0,1]}]},{"name":"","bpm":110,"noteDen":4,"noteDot":false,"rings":[{"div":8,"sub":4,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,0,1,0,0,2,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,2,0,0,1,0,0,0]},{"div":11,"sub":1,"off":0,"sound":"wood","vol":0.8,"steps":[0,1,1,1,1,1,1,1,1,1,1]}]},{"name":"","bpm":110,"noteDen":4,"noteDot":false,"rings":[{"div":9,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,1,0,1,1,0,1,0,1,0,1,0,1,1,0,1,0]},{"div":11,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[0,0,1,0,0,0,1,0,0,0,0,1,0,0,0,2,0,0,1,0,0,0,1,0,0,0,0,1,0,0,0,1,0]}]},{"name":"","bpm":110,"noteDen":4,"noteDot":false,"rings":[{"div":9,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,1,0,1,1,0,1,0,1,0,1,0,1,1,0,1,0]},{"div":11,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[0,0,1,0,0,0,1,0,0,0,0,1,0,0,0,2,0,0,1,0,0,0,1,0,0,0,0,1,0,0,0,1,0]}]},{"name":"","bpm":128,"noteDen":8,"noteDot":true,"rings":[{"div":11,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,1,0,2,1,1,0,2,1,1,1,2,1,1,0,2,1,1,0,1,1]},{"div":11,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[0,0,0,0,0,1,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,2,0,0,0]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":11,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,1,0,2,1,1,0,2,1,1,0,0,0,1,0,1,1,2,0,1,1]},{"div":11,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[0,0,0,0,1,2,0,0,0,0,1,2,0,0,0,0,1,0,2,0,2,0,1,2,0,0,0,0,1,2,0,0,0]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":11,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,1,2,0,0,0,2,1,1,0,0,2,1,0,1,1,2,0,1,0]},{"div":11,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[0,2,0,0,0,0,0,0,1,0,2,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0]}]},{"name":"","bpm":67,"noteDen":4,"noteDot":true,"rings":[{"div":11,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,1,1,2,2,1,1,2,1,1,1,2,2,1,1,2,1,1,2,1,1]},{"div":11,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1]}]},{"name":"","bpm":200,"noteDen":8,"noteDot":false,"rings":[{"div":12,"sub":1,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,1,1,0,0,0,1,0,0,1,0]},{"div":12,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[0,0,2,0,0,0,0,0,0,0,0,0,0,1,2,0,0,0,0,2,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0]}]},{"name":"","bpm":267,"noteDen":16,"noteDot":true,"rings":[{"div":12,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[0,1,2,1,0,1,1,1,0,1,0,1,0,1,0,1,0,2,0,1,2,1,0,2]}]},{"name":"","bpm":267,"noteDen":16,"noteDot":true,"rings":[{"div":8,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[0,1,2,1,0,1,1,1,0,2,0,1,1,1,1,1]}]},{"name":"","bpm":133,"noteDen":8,"noteDot":true,"rings":[{"div":8,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[0,1,2,1,0,0,0,0,0,0,0,0,2,1,1,1]},{"div":8,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[0,0,0,0,0,0,0,1,2,0,1,1,0,2,1,0,0,0,0,0,0,0,0,0]}]},{"name":"","bpm":267,"noteDen":16,"noteDot":true,"rings":[{"div":8,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,1,0,0,0,0,0,2,0,0,0,1,2,0,0]},{"div":8,"sub":3,"off":0,"sound":"wood","vol":0.8,"steps":[0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0,0,0,1,0]}]},{"name":"","bpm":267,"noteDen":16,"noteDot":true,"rings":[{"div":8,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,1,0,0,2,0,0,2,0,0,2,0,0,1,0]},{"div":5,"sub":1,"off":0,"sound":"wood","vol":0.8,"steps":[0,1,1,1,1]}]},{"name":"","bpm":230,"noteDen":8,"noteDot":false,"rings":[{"div":8,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,0,0,2,1,0,0,0,1,2,0,0,0,0]},{"div":5,"sub":2,"off":0,"sound":"wood","vol":0.8,"steps":[0,0,1,0,0,1,0,0,1,0]}]},{"name":"","bpm":210,"noteDen":8,"noteDot":false,"rings":[{"div":7,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,0,0,0,1,2,1,1,1,1,0,0,1]},{"div":5,"sub":2,"off":0,"sound":"wood","vol":0.8,"steps":[0,0,1,0,0,0,0,0,1,0]}]},{"name":"","bpm":200,"noteDen":8,"noteDot":false,"rings":[{"div":7,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,0,0,2,0,0,2,0,0,2,0,0,0]},{"div":11,"sub":1,"off":0,"sound":"wood","vol":0.8,"steps":[0,1,2,0,1,0,0,1,0,1,1]}]},{"name":"","bpm":200,"noteDen":8,"noteDot":false,"rings":[{"div":7,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,1,0,0,1,1,0,0,0,2,1,0,1,0]},{"div":11,"sub":1,"off":0,"sound":"wood","vol":0.8,"steps":[0,0,2,0,0,2,2,0,0,0,0]}]},{"name":"","bpm":200,"noteDen":8,"noteDot":false,"rings":[{"div":7,"sub":2,"off":0,"sound":"wood","vol":0.9,"steps":[2,0,1,0,1,0,1,0,1,0,1,0,1,0]},{"div":11,"sub":2,"off":0,"sound":"wood","vol":0.8,"steps":[0,0,1,0,0,2,0,0,2,0,0,1,0,0,2,0,0,2,0,0,1,0]}]}].map(function(l){ return [l]; });
 var GAME_KEY = "polyrhythm-circle:game:v2";   /* v1 counted differently; it is not read */
 var game = null;          /* {level, state, loop, cleared[], restoreAt, prev, attempt, failed, pick} */
 var gameHold = false;     /* true while the game itself stops the transport */
@@ -4435,7 +4342,7 @@ function gameLevel(n){
   var lad = gameLadder(), L = lad.length, i = (n - 1) % L, round = Math.floor((n - 1) / L);
   var v = lad[i], d = v[Math.floor(Math.random() * v.length)];
   var rings = d.rings ? d.rings : [{div:d.div, sub:d.sub, steps:pat(d.pattern), sound:"wood", vol:0.9, off:0}];
-  return {name:d.name || ("Level " + n), noteDen:d.noteDen || 4, noteDot:!!d.noteDot,
+  return {name:isAutoName(d.name) ? "" : d.name, noteDen:d.noteDen || 4, noteDot:!!d.noteDot,
           rings:rings.slice(0, 2),
           bpm:Math.min(BPM_MAX, Math.round(d.bpm * (1 + 0.15 * round)))};
 }
@@ -4475,6 +4382,7 @@ function gameStart(){
   if(ctx && ctx.state === "suspended") ctx.resume();
   document.documentElement.dataset.game = "1";
   tapGame.dataset.on = "1";
+  tapPause.disabled = false; tapPause.textContent = "Pause";
   syncSessBtn(); paintFolds(); paintNote();
   tapNow.hidden = false; sessNow.hidden = true; dialHint.hidden = true;
   gameSetLevel(1);
@@ -4503,6 +4411,7 @@ function gameEnd(){
   S.rings.forEach(function(rr){ realign(rr); });
   document.documentElement.dataset.game = "0";
   tapGame.dataset.on = "0";
+  tapPause.disabled = true; tapPause.textContent = "Pause";
   tapNowIn.dataset.grade = "";
   syncSessBtn(); paintFolds(); paintNote();
   tapNow.hidden = true; dialHint.hidden = !!run;
@@ -4577,6 +4486,7 @@ function gameClear(tnow){
   var lvl = game.level;
   setTimeout(function(){
     if(!game || game.level !== lvl) return;
+    if(game.state === "paused"){ game.nextOnResume = lvl + 1; return; }   /* paused in the breath: next level waits */
     gameSetLevel(lvl + 1);
     game.state = "listen"; game.loop = -1;
     paintGame();
@@ -4712,14 +4622,18 @@ function paintGame(){
   }
   var txt;
   if(game.state === "listen") txt = lbl("listen");
+  else if(game.state === "paused") txt = lbl("paused");
   else if(game.state === "play") txt = game.failed ? lbl("missed - the loop plays out") : lbl("tap") + " " + c + "/" + n;
   else txt = lbl("cleared");
   tapNowIn.innerHTML = txt;
   fitTapNow();
   tapHint.innerHTML = "<b>Level " + game.level + "</b> " + lbl("of " + gameLadder().length) +
-    " &middot; " + escapeHtml(game.name) +
+    (game.name ? " &middot; " + escapeHtml(game.name) : "") +
     " &middot; " + lbl("attempt") + " " + game.attempt +
-    " &middot; " + lbl("run") + " " + ((game.total || 0) + (game.state === "cleared" ? 0 : game.attempt));
+    /* between a clear and the next level the finished attempts are already in the
+       total, so the current count is not added again - paused there or not */
+    " &middot; " + lbl("run") + " " + ((game.total || 0) +
+      ((game.state === "cleared" || (game.state === "paused" && game.before === "cleared")) ? 0 : game.attempt));
 }
 /* ======================================================= level editor ========
    The wheel is the editor. Set up one or two rings, a tempo and a note, listen
@@ -4733,6 +4647,16 @@ var lvlAdd = document.getElementById("lvlAdd"), lvlUpdate = document.getElementB
 var lvlSort = document.getElementById("lvlSort"), lvlShare = document.getElementById("lvlShare");
 var lvlShareBox = document.getElementById("lvlShareBox"), lvlText = document.getElementById("lvlText");
 var lvlEditing = -1;         /* which level the wheel was loaded from, or -1 */
+/* "Level 12" is the handle the editor gives a level when it is added; it is not
+   a name, and the number in it is not the position. Wherever a level is shown,
+   such a handle counts as no name and the position speaks. */
+function isAutoName(s){
+  s = String(s || "").trim().toLowerCase();
+  if(!s) return true;
+  if(s.indexOf("level ") !== 0) return false;
+  var rest = s.slice(6);
+  return rest.length > 0 && String(parseInt(rest, 10)) === rest;
+}
 
 /* The editor shows only where it has been switched on: open the app once with
    ?editor on the address, or tap the build line under (i) seven times. The
@@ -4797,7 +4721,7 @@ function paintLevels(){
     row.className = "lvl-row";
     row.dataset.on = (i === lvlEditing) ? "1" : "0";
     row.innerHTML = '<span class="n">' + (i + 1) + '</span>' +
-      '<div class="body"><input class="nm" value="' + escapeHtml(l.name || "") + '" aria-label="Level name" placeholder="Level ' + (i + 1) + '">' +
+      '<div class="body"><input class="nm" value="' + escapeHtml(isAutoName(l.name) ? "" : l.name) + '" aria-label="Level name" placeholder="Level ' + (i + 1) + '">' +
       '<span class="sum" title="Load onto the wheel">' + escapeHtml(lvlSummary(l)) + '</span></div>' +
       '<span class="ops">' +
         '<button type="button" data-up title="Move up" aria-label="Move up"' + (i === 0 ? " disabled" : "") + '>▲</button>' +
@@ -4850,7 +4774,7 @@ function lvlLoad(i){
 }
 lvlAdd.addEventListener("click", function(){
   if(game) gameEnd();
-  S.levels.push(lvlFromWheel("Level " + (S.levels.length + 1)));
+  S.levels.push(lvlFromWheel(""));            /* the row shows its position until you name it */
   lvlEditing = S.levels.length - 1;
   paintLevels(); queueSave();
 });
@@ -4879,6 +4803,7 @@ document.getElementById("lvlUse").addEventListener("click", function(){
   var arr;
   try{ arr = JSON.parse(lvlText.value); } catch(err){ arr = null; }
   if(!Array.isArray(arr)){ lvlText.value = "That is not a level list. Paste what Copy gave you."; return; }
+  if(game) gameEnd();                          /* the ladder is changing under it */
   /* a pasted list is repaired on the way in: every ring gets a grid it can
      hold and a step list exactly that long, so nothing pasted can sound a
      beat the level does not show */
@@ -4893,7 +4818,7 @@ document.getElementById("lvlUse").addEventListener("click", function(){
                 sound:typeof rc.sound === "string" ? rc.sound : "wood",
                 vol:typeof rc.vol === "number" ? rc.vol : 0.9, steps:steps};
       });
-      return {name:String(l.name || ""), bpm:Math.max(BPM_MIN, Math.min(BPM_MAX, parseInt(l.bpm, 10) || 96)),
+      return {name:isAutoName(l.name) ? "" : String(l.name), bpm:Math.max(BPM_MIN, Math.min(BPM_MAX, parseInt(l.bpm, 10) || 96)),
               noteDen:NOTE_NAMES[l.noteDen] ? l.noteDen : 4, noteDot:!!l.noteDot, rings:rings};
     });
   lvlEditing = -1;
@@ -4964,6 +4889,29 @@ window.addEventListener("pointerup", function(){ lvlEndEv(false); });
 window.addEventListener("pointercancel", function(){ lvlEndEv(true); });
 
 var tapGame = document.getElementById("tapGame");
+var tapPause = document.getElementById("tapPause");
+/* Pause stops the clock where it stands and keeps the level, the attempt count
+   and the run. Resume plays the level again from its listening loop - a bar
+   picked up mid-way would give no fair window for the first dots. */
+function gamePause(){
+  if(!game || game.state === "paused") return;
+  game.before = game.state;
+  gameHold = true; if(S.playing) stop(); gameHold = false;
+  game.state = "paused";
+  tapPause.textContent = "Resume";
+  paintGame();
+}
+function gameResume(){
+  if(!game || game.state !== "paused") return;
+  if(game.nextOnResume){ gameSetLevel(game.nextOnResume); game.nextOnResume = 0; }
+  game.cleared = S.rings.map(function(){ return []; });
+  game.failed = false; game.restoreAt = 0;
+  game.state = "listen"; game.loop = -1;
+  tapPause.textContent = "Pause";
+  paintGame();
+  start();
+}
+tapPause.addEventListener("click", function(){ if(game && game.state === "paused") gameResume(); else gamePause(); });
 /* between games the section text is the invitation, with the best level on the end */
 function paintGameBest(){
   if(game) return;
@@ -5313,7 +5261,9 @@ function scoreSvg(cfg){
         (v.hollow ? 'fill="none" stroke="currentColor" stroke-width="1.7"' : 'fill="currentColor"') + '/>');
       if(v.stem) s.push('<line x1="' + sx(x) + '" y1="' + (y - 1) + '" x2="' + sx(x) + '" y2="' + yt + '" stroke="currentColor" stroke-width="1.4"/>');
       if(v.dot) s.push('<circle cx="' + (x + 8) + '" cy="' + (y - 2.5) + '" r="1.3" fill="currentColor"/>');
-      if(n.acc) s.push('<path d="M' + (x - 4) + ' ' + (yt - 12) + 'l8 3l-8 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>');
+      /* the accent goes under the head, as it does with stems up - above, it ran
+         into beams and into the number on a tuplet bracket */
+      if(n.acc) s.push('<path d="M' + (x - 4) + ' ' + (y + 9) + 'l8 3l-8 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>');
     }
     /* beams: notes shorter than a quarter, side by side inside one beat */
     var g = [];
@@ -5724,8 +5674,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v48";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-05 20:10";          /* and when it was built, for ?diag */
+  var BUILD = "v53";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-06 10:09";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

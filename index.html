@@ -1176,7 +1176,7 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
     <ul>
       <li>Tap a <b>dot</b> to cycle it: <b>on</b> &rarr; <b>silent</b> &rarr; <b>accent</b> &rarr; on.</li>
       <li>An <b>accent</b> plays louder and brighter, and is drawn with a ring.</li>
-      <li><b>Drag</b> a ring round to <b>offset</b> it; it settles on the nearest twelfth of a step.</li>
+      <li>Hold a ring until it lights, then <b>drag</b> it round to <b>offset</b> it, a twelfth of a step at a time.</li>
       <li>The <b>middle</b> starts and stops.</li>
     </ul>
 
@@ -1649,15 +1649,19 @@ var FLASH_MS = 330;
    the two can never disagree about where a ring is. */
 var geom = {cx:0, cy:0, gap:0, radii:[]};
 
-/* Drag-to-offset: a ring starts turning as soon as the pointer moves past a slop
-   - a small one for a mouse, a wider one for a finger so a tap on a dot that
-   wobbles a little is still a tap. There is no hold any more: on Android the
-   hold raced the browser's own long-press and scroll detection and lost half the
-   time. DRAG_HOLD is left for the two lists, which scroll with the page. */
-var DRAG_HOLD = 350;   /* ms a finger must hold before a list row or chip becomes draggable */
+/* Drag-to-offset, with different rules per input device. A finger has to hold
+   still first, or every attempt to switch a dot off would nudge the ring
+   instead; a mouse drags immediately, because a click is already a precise,
+   deliberate gesture. The wheel is touch-action:none, so the browser never
+   competes for the finger: with "manipulation" Chrome on Android used to take a
+   drifting finger for a page scroll during the hold and cancel the pointer (half
+   of all drags on Oscar's phone). A finger that does move before the hold ends
+   pans the page by hand instead (see `pan`), so the wheel still scrolls. */
+var DRAG_HOLD = 350;   /* ms a finger must hold before the ring becomes draggable */
 var TAP_SLOP = 12;     /* px of finger movement that still counts as a tap */
 var MOUSE_SLOP = 4;    /* px of mouse movement that starts a drag */
 var press = null;      /* {ring, id, touch, x0, y0, t0, armed, lastPhase, acc, startOff} */
+var pan = null;        /* {id, y0, last, on}: a finger scrolling the page from the wheel */
 var slideRing = -1;    /* ring whose offset slider is being worked, for the dial */
 var hoverRing = -1;
 
@@ -1698,7 +1702,8 @@ function draw(){
   /* nudging the offset by slider is the same act as dragging the ring round, so
      it lights the ring the same way rather than changing it out of sight */
   var armedRing = (press && press.armed) ? press.ring : (slideRing >= 0 ? slideRing : -1);
-  var holdRing = -1, holdT = 0;          /* there is no hold to show any more */
+  var holdRing  = (press && !press.armed && press.touch) ? press.ring : -1;
+  var holdT = (holdRing >= 0) ? Math.min(1, (tnow - press.t0) / DRAG_HOLD) : 0;
 
   var ang = -Math.PI/2 + pos * Math.PI * 2;
   var outerR = R + gap*0.34;
@@ -2015,13 +2020,21 @@ cv.addEventListener("pointerdown", function(e){
   if(document.documentElement.getAttribute("data-ui") === "simple") return;  /* offsets are hidden */
   var p = localPoint(e);
   var ring = ringAt(p);
-  if(ring < 0) return;
+  if(ring < 0){
+    /* off the bands (hub, gaps, corners) a finger is scrolling the page */
+    if(e.pointerType !== "mouse") pan = {id:e.pointerId, y0:e.clientY, last:e.clientY, on:false};
+    return;
+  }
   press = {
     ring: ring, id: e.pointerId, touch: (e.pointerType !== "mouse"),
-    x0: p.x, y0: p.y, t0: performance.now(),
+    x0: p.x, y0: p.y, cy0: e.clientY, t0: performance.now(),
     armed: false, lastPhase: pointPhase(p), acc: 0,
     startOff: S.rings[ring].off
   };
+  /* only a finger waits; a mouse arms as soon as it actually moves */
+  if(press.touch){
+    press.timer = setTimeout(function(){ arm(null); }, DRAG_HOLD);
+  }
 });
 
 cv.addEventListener("pointermove", function(e){
@@ -2035,13 +2048,33 @@ cv.addEventListener("pointermove", function(e){
     }
     return;
   }
+  /* the hand-made page scroll: the wheel keeps the touch, so it moves the page
+     itself, following the finger (no fling - it stops when the finger does) */
+  if(pan && e.pointerId === pan.id){
+    if(!pan.on && Math.abs(e.clientY - pan.y0) > TAP_SLOP){ pan.on = true; suppressClick = true; }
+    if(pan.on) window.scrollBy(0, pan.last - e.clientY);
+    pan.last = e.clientY;
+    return;
+  }
   if(!press || e.pointerId !== press.id) return;
   var p = localPoint(e);
 
   if(!press.armed){
     var dist = Math.hypot(p.x - press.x0, p.y - press.y0);
-    if(dist > (press.touch ? TAP_SLOP : MOUSE_SLOP)){ suppressClick = true; arm(p); }
-    else return;
+    if(!press.touch){
+      if(dist > MOUSE_SLOP){ suppressClick = true; arm(p); }
+      else return;
+    } else {
+      /* a finger moving before the hold completes was scrolling, or a sloppy
+         tap: the press is dropped and the finger goes on to pan the page */
+      if(dist > TAP_SLOP){
+        clearTimeout(press.timer);
+        suppressClick = true;
+        pan = {id:press.id, y0:press.cy0, last:e.clientY, on:true};
+        endPress();
+      }
+      return;
+    }
   }
 
   var r = S.rings[press.ring];
@@ -2051,11 +2084,10 @@ cv.addEventListener("pointermove", function(e){
   press.acc += dp;
   press.lastPhase = ph;
 
-  /* offset is measured in this ring's own steps and goes round and round. It
-     follows the finger freely; the release settles it on the nearest twelfth. */
-  var raw = press.startOff + press.acc * r.div, live = raw - Math.floor(raw);
-  if(live !== r.off){
-    var snapped = live;
+  /* offset is measured in this ring's own steps, jumps by twelfths like the
+     slider, and goes round and round: a full step is aligned again */
+  var snapped = normOff(press.startOff + press.acc * r.div);
+  if(snapped !== r.off){
     rebase();
     r.off = snapped;
     r.flash = [];
@@ -2066,14 +2098,10 @@ cv.addEventListener("pointermove", function(e){
 });
 
 function releasePress(e){
+  if(pan && (!e || e.pointerId === pan.id)) pan = null;
   if(!press || (e && e.pointerId !== press.id)) return;
-  if(press.armed){
-    suppressClick = true;                 /* the drag is not also a dot tap */
-    var rr = S.rings[press.ring], settled = normOff(rr.off);
-    if(settled !== rr.off){               /* the magnet: onto the nearest twelfth */
-      rebase(); rr.off = settled; rr.flash = []; rr.lastTick = null; realign(rr); paintRack();
-    }
-  }
+  clearTimeout(press.timer);
+  if(press.armed) suppressClick = true;   /* the drag is not also a dot tap */
   endPress();
 }
 cv.addEventListener("pointerup", releasePress);
@@ -5707,8 +5735,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v59";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-06 22:31";          /* and when it was built, for ?diag */
+  var BUILD = "v60";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-06 23:02";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

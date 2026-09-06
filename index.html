@@ -324,7 +324,7 @@ input[type=range]::-moz-range-thumb{
 #dialPat{grid-column:2;justify-self:stretch;text-align:center}
 #posLbl{grid-column:3;text-align:right}
 /* the note that opens the score: a small round button at the header's end */
-#scoreBtn{grid-column:4;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none}
+#scoreBtn{grid-column:4;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none;border-color:var(--c1)}
 #scoreBtn svg.note{width:11px;height:15px;display:block}
 /* the readouts that used to sit in the hub - now the dial's headline, so they
    carry the weight the hub used to give them */
@@ -405,6 +405,7 @@ input[type=range]::-moz-range-thumb{
 }
 .lvl-row[data-on="1"]{border-color:var(--c1);box-shadow:0 0 0 2px color-mix(in srgb,var(--c1) 22%,transparent)}
 .lvl-row .n{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--ink-3);text-align:right}
+.lvl-row .n .new{color:var(--c1);font-weight:700;margin-left:1px}
 .lvl-row .body{min-width:0;display:flex;flex-direction:column;gap:2px;cursor:pointer}
 .lvl-row input.nm{
   width:100%;min-width:0;border:0;background:transparent;color:var(--ink);padding:0;
@@ -1059,14 +1060,12 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
     <div class="lvl-foot">
       <button class="btn sm" id="lvlAdd" title="Add what is on the wheel as a new level">+ Add the wheel</button>
       <button class="btn sm" id="lvlUpdate" hidden title="Save the wheel back into the level you loaded">Update</button>
-      <button class="btn sm" id="lvlSort" title="Order the list from easiest to hardest">Sort by difficulty</button>
-      <button class="btn sm" id="lvlShare" title="Copy the list as text, or paste one in">Copy / paste</button>
+      <button class="btn sm" id="lvlShare" title="Show the whole list as text, to send for the next build">Copy the list</button>
     </div>
     <div class="lvl-share" id="lvlShareBox" hidden>
       <textarea id="lvlText" rows="4" spellcheck="false" aria-label="The level list as text"></textarea>
       <div class="lvl-foot">
         <button class="btn sm" id="lvlCopy">Copy to clipboard</button>
-        <button class="btn sm" id="lvlUse">Use this list</button>
       </div>
     </div>
     <div class="lvl-list" id="lvlList"></div>
@@ -1267,7 +1266,8 @@ var S = {
   active: 0,       /* which ring's card the tab strip is showing */
   ptab: "mine",
   seq: [],
-  levels: [],                  /* the game ladder you build yourself; empty means the built-in one */
+  levels: [],                  /* the ladder as this device sees it: the build's levels plus its own additions */
+  levelsBuild: "",             /* which build's ladder that list was seeded from */
   tapMode: "",                 /* "", "record" or "game" - never persisted */
   sessLoop: false,             /* repeat the practice plan instead of ending */
   sessPong: false,             /* and run it out and back rather than only out */
@@ -3348,7 +3348,7 @@ function sessionSnapshot(){
     active: S.active,
     ptab: S.ptab,
     seq: S.seq,
-    levels: S.levels,
+    levels: S.levels, levelsBuild: S.levelsBuild,
     sess: {from:sFrom.value, to:sTo.value, step:sStep.value, per:sPer.value,
            pat:sPat.value, sil:sSil.value,
            loop:S.sessLoop ? 1 : 0, pong:S.sessPong ? 1 : 0},
@@ -3414,6 +3414,7 @@ function applySession(c){
       return l && Array.isArray(l.rings) && l.rings.length;
     }).slice(0, 400);
   }
+  if(typeof c.levelsBuild === "string") S.levelsBuild = c.levelsBuild;
   if(Array.isArray(c.seq)){
     S.seq = c.seq.filter(function(st){
       return st && typeof st.name === "string" && Array.isArray(st.rings) && st.rings.length;
@@ -4333,7 +4334,9 @@ function paintBestCard(){
 /* The ladder the game climbs: the levels you built, if there are any, else the
    built-in one. A level is a tempo, a note and one or two rings. */
 function gameLadder(){
-  if(S.levels.length) return S.levels.map(function(l){ return [l]; });
+  /* a list built on this device plays only while the editor is on; everyone
+     else gets the built-in ladder, whatever an old editing session left behind */
+  if(editorOn && S.levels.length) return S.levels.map(function(l){ return [l]; });
   return GAME_LEVELS;
 }
 /* one of the choices at this level, drawn when the level is entered; past the
@@ -4644,7 +4647,7 @@ function paintGame(){
    between devices as text. */
 var lvlList = document.getElementById("lvlList"), lvlNote = document.getElementById("lvlNote");
 var lvlAdd = document.getElementById("lvlAdd"), lvlUpdate = document.getElementById("lvlUpdate");
-var lvlSort = document.getElementById("lvlSort"), lvlShare = document.getElementById("lvlShare");
+var lvlShare = document.getElementById("lvlShare");
 var lvlShareBox = document.getElementById("lvlShareBox"), lvlText = document.getElementById("lvlText");
 var lvlEditing = -1;         /* which level the wheel was loaded from, or -1 */
 /* "Level 12" is the handle the editor gives a level when it is added; it is not
@@ -4681,6 +4684,9 @@ buildTag.addEventListener("click", function(){
   editorOn = !editorOn;
   try{ localStorage.setItem(EDITOR_KEY, editorOn ? "1" : "0"); } catch(err){}
   paintEditor();
+  if(game) gameEnd();                          /* the ladder changes with the editor */
+  if(editorOn) lvlSync();
+  paintLevels();
   buildTag.textContent = buildTag.textContent.split(" · editor")[0] + (editorOn ? " · editor on" : " · editor off");
 });
 
@@ -4711,16 +4717,44 @@ function lvlScore(l){
   });
   return d + (l.rings.length > 1 ? 3 : 0);
 }
+/* The build's ladder IS the list. A device can add levels to it (or reorder,
+   change, remove); the game plays that whole list while the editor is on, and
+   every player without the editor plays the build. Each new build re-seeds the
+   device: its levels in its order, then whatever this device had that the build
+   does not, starred - so nothing added here is lost, and nothing shipped can be
+   hidden by an old list. To ship additions, the whole list goes to Claude. */
+var LADDER_STAMP = (function(){
+  var s = JSON.stringify(GAME_LEVELS), h = 5381, i;
+  for(i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0;
+  return "b" + h.toString(36) + "-" + GAME_LEVELS.length;
+})();
+function lvlKey(l){
+  return JSON.stringify([l.bpm, l.noteDen, !!l.noteDot, l.rings.map(function(r){
+    return [r.div, r.sub, r.off || 0, r.sound, r.vol, r.steps];
+  })]);
+}
+var BUILT_KEYS = {};
+GAME_LEVELS.forEach(function(l){ BUILT_KEYS[lvlKey(l[0])] = true; });
+function lvlIsLocal(l){ return !BUILT_KEYS[lvlKey(l)]; }
+function lvlBuiltCopies(){ return GAME_LEVELS.map(function(l){ return JSON.parse(JSON.stringify(l[0])); }); }
+function lvlSync(){
+  if(S.levelsBuild === LADDER_STAMP && S.levels.length) return;
+  var own = S.levels.filter(lvlIsLocal);
+  S.levels = lvlBuiltCopies().concat(own);
+  S.levelsBuild = LADDER_STAMP;
+  lvlEditing = -1;
+  queueSave();
+}
 function paintLevels(){
   lvlList.innerHTML = "";
   if(!S.levels.length){
-    lvlList.innerHTML = '<p class="lvl-empty">No levels of your own yet: the game plays its built-in ladder. Set the wheel up and add it.</p>';
+    lvlList.innerHTML = '<p class="lvl-empty">No levels yet: set the wheel up and add it.</p>';
   }
   S.levels.forEach(function(l, i){
     var row = document.createElement("div");
     row.className = "lvl-row";
     row.dataset.on = (i === lvlEditing) ? "1" : "0";
-    row.innerHTML = '<span class="n">' + (i + 1) + '</span>' +
+    row.innerHTML = '<span class="n">' + (i + 1) + (lvlIsLocal(l) ? '<b class="new" title="Not in the build yet">*</b>' : '') + '</span>' +
       '<div class="body"><input class="nm" value="' + escapeHtml(isAutoName(l.name) ? "" : l.name) + '" aria-label="Level name" placeholder="Level ' + (i + 1) + '">' +
       '<span class="sum" title="Load onto the wheel">' + escapeHtml(lvlSummary(l)) + '</span></div>' +
       '<span class="ops">' +
@@ -4743,12 +4777,13 @@ function paintLevels(){
     });
     lvlList.appendChild(row);
   });
+  var own = S.levels.filter(lvlIsLocal).length;
   lvlNote.textContent = S.levels.length
-    ? S.levels.length + (S.levels.length === 1 ? " level" : " levels") + " · the game plays these"
+    ? S.levels.length + " levels · " + (own ? own + " new here (*), not in the build yet" : "all in the build")
     : "";
   lvlUpdate.hidden = (lvlEditing < 0);
   lvlUpdate.textContent = "Update " + (lvlEditing + 1);
-  lvlSort.disabled = S.levels.length < 2;
+  if(!lvlShareBox.hidden) lvlText.value = JSON.stringify(S.levels);   /* the text code follows every edit */
   /* the invitation under Game names the ladder; at boot that text is painted
      later by its own block, so only refresh it once it exists */
   if(!game && typeof tapHint !== "undefined" && tapHint) paintGameBest();
@@ -4784,12 +4819,6 @@ lvlUpdate.addEventListener("click", function(){
   S.levels[lvlEditing] = lvlFromWheel(keep);
   paintLevels(); queueSave();
 });
-lvlSort.addEventListener("click", function(){
-  var cur = S.levels[lvlEditing];
-  S.levels.sort(function(a, b){ return lvlScore(a) - lvlScore(b); });
-  lvlEditing = cur ? S.levels.indexOf(cur) : -1;
-  paintLevels(); queueSave();
-});
 lvlShare.addEventListener("click", function(){
   lvlShareBox.hidden = !lvlShareBox.hidden;
   if(!lvlShareBox.hidden) lvlText.value = JSON.stringify(S.levels);
@@ -4798,32 +4827,6 @@ document.getElementById("lvlCopy").addEventListener("click", function(){
   lvlText.value = JSON.stringify(S.levels);
   lvlText.select();
   try{ navigator.clipboard.writeText(lvlText.value); } catch(err){ document.execCommand("copy"); }
-});
-document.getElementById("lvlUse").addEventListener("click", function(){
-  var arr;
-  try{ arr = JSON.parse(lvlText.value); } catch(err){ arr = null; }
-  if(!Array.isArray(arr)){ lvlText.value = "That is not a level list. Paste what Copy gave you."; return; }
-  if(game) gameEnd();                          /* the ladder is changing under it */
-  /* a pasted list is repaired on the way in: every ring gets a grid it can
-     hold and a step list exactly that long, so nothing pasted can sound a
-     beat the level does not show */
-  S.levels = arr.filter(function(l){ return l && Array.isArray(l.rings) && l.rings.length; }).slice(0, 400)
-    .map(function(l){
-      var rings = l.rings.slice(0, 2).map(function(rc){
-        var div = Math.max(1, Math.min(32, parseInt(rc.div, 10) || 4));
-        var sub = fitSub(div, Math.max(1, Math.min(4, parseInt(rc.sub, 10) || 1)));
-        var src = Array.isArray(rc.steps) ? rc.steps : [], steps = [], k;
-        for(k = 0; k < div * sub; k++) steps.push(src[k] === 2 ? 2 : (src[k] ? 1 : 0));
-        return {div:div, sub:sub, off:typeof rc.off === "number" ? rc.off : 0,
-                sound:typeof rc.sound === "string" ? rc.sound : "wood",
-                vol:typeof rc.vol === "number" ? rc.vol : 0.9, steps:steps};
-      });
-      return {name:isAutoName(l.name) ? "" : String(l.name), bpm:Math.max(BPM_MIN, Math.min(BPM_MAX, parseInt(l.bpm, 10) || 96)),
-              noteDen:NOTE_NAMES[l.noteDen] ? l.noteDen : 4, noteDot:!!l.noteDot, rings:rings};
-    });
-  lvlEditing = -1;
-  paintLevels(); queueSave();
-  lvlShareBox.hidden = true;
 });
 paintLevels();
 
@@ -4916,7 +4919,11 @@ tapPause.addEventListener("click", function(){ if(game && game.state === "paused
 function paintGameBest(){
   if(game) return;
   tapHint.innerHTML = escapeHtml(TAP_IDLE_TEXT) +
-    (S.levels.length ? " Your own " + S.levels.length + " levels." : "");
+    (function(){
+      if(!editorOn) return "";
+      var own = S.levels.filter(lvlIsLocal).length;
+      return own ? " Plus " + own + " of your own, not in the build yet." : "";
+    })();
   paintBestCard();
 }
 tapGame.addEventListener("click", function(){ if(game) gameEnd(); else gameStart(); });
@@ -5659,7 +5666,9 @@ paintFolds();
 paintRhythmGroups();     /* the saved region states have arrived by now */
 paintSessLoop();
 seqRender();
-tapHint.textContent = TAP_IDLE_TEXT;
+if(editorOn) lvlSync();   /* seed or re-seed the editor's list from this build */
+paintLevels();            /* the restored list and the game invitation, now that S.levels is back */
+paintGameBest();
 paintPlan();
 paintTransport();
 paintNote();
@@ -5681,8 +5690,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v55";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-06 10:27";          /* and when it was built, for ?diag */
+  var BUILD = "v56";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-06 11:44";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

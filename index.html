@@ -823,6 +823,15 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .sess-plan .ladder{font-family:"IBM Plex Mono",monospace;color:var(--ink-3)}
 #sessBtn[data-on="1"]{border-color:var(--c3);color:var(--ink);
   background:color-mix(in srgb,var(--c3) 16%,transparent)}
+/* while a session is on - running or paused - its Stop button pulses, the way a
+   folded bar blinks for something live inside it, so the session cannot be lost
+   sight of below the fold */
+#sessBtn[data-on="1"]{animation:sessPulse 1.8s ease-in-out infinite}
+@keyframes sessPulse{
+  0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--c3) 0%,transparent)}
+  50%    {box-shadow:0 0 0 4px color-mix(in srgb,var(--c3) 45%,transparent)}
+}
+@media (prefers-reduced-motion:reduce){ #sessBtn[data-on="1"]{animation:none} }
 /* the whole panel is an advanced-only feature */
 :root[data-ui="simple"] #sessionPanel,
 :root[data-ui="simple"] #tapPanel,
@@ -1599,9 +1608,9 @@ function sessPauseHub(cx, cy, tnow){
   if(sp !== lastSessPause){ document.documentElement.dataset.sesspause = sp ? "1" : "0"; lastSessPause = sp; }
   if(!sp) return;
   var k = 1 + 0.10 * Math.sin(tnow / 420);          /* a gentle breath, about 2.6 s a cycle */
-  var h = hubR * 0.93 * k, w = hubR * 0.30 * k, gap = hubR * 0.24 * k;   /* half again as big as the first cut */
+  var h = hubR * 1.12 * k, w = hubR * 0.36 * k, gap = hubR * 0.29 * k;
   g2.save();
-  g2.globalAlpha = 0.85;
+  g2.globalAlpha = 0.5;                 /* half transparent: a sign, not a button */
   g2.fillStyle = THEME["--ink"];
   g2.fillRect(cx - gap / 2 - w, cy - h / 2, w, h);
   g2.fillRect(cx + gap / 2, cy - h / 2, w, h);
@@ -2056,8 +2065,6 @@ function arm(p){
 
 cv.addEventListener("pointerdown", function(e){
   if(!e.isPrimary) return;
-  /* a paused session: the whole wheel is the resume button */
-  if(sessPaused()){ e.preventDefault(); suppressClick = true; start(); return; }
   /* While tapping, the dial is a target rather than a set of controls - and this
      is tested before the `press` guard below, or a drag still in flight when the
      mode changed would swallow taps for as long as the finger stayed down. */
@@ -5983,8 +5990,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v67";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-07 14:26";          /* and when it was built, for ?diag */
+  var BUILD = "v68";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-07 14:51";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -435,10 +435,13 @@ input[type=range]::-moz-range-thumb{
   background:var(--sunk);color:var(--ink);font-family:"IBM Plex Mono",monospace;font-size:11px;padding:8px;
 }
 .lvl-empty{font-size:12.5px;color:var(--ink-3);margin:0}
+/* the + chip that adds a step: its selector line was lost when the level-list CSS
+   went in above it, and the chip fell back to a plain white button */
+.seq-add{
   border:1px dashed var(--line-2);background:transparent;color:var(--ink-3);
   font-size:19px;line-height:1;cursor:pointer;display:grid;place-items:center;
 }
-.seq-add:hover{border-color:var(--ink);color:var(--ink)}
+@media (hover:hover){ .seq-add:hover{border-color:var(--ink);color:var(--ink)} }   /* a finger has no hover, and a tapped chip used to keep the lit state */
 .pickbar{
   display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;
   padding:9px 12px;border:1px solid var(--c2);border-radius:10px;
@@ -582,6 +585,9 @@ canvas{
 .best .best-v b{font-size:17px;font-weight:600;color:var(--c1)}
 .best .best-reset{margin-left:auto;background:none;border:0;color:var(--ink-3);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;padding:2px 4px}
 .best .best-reset:hover{color:var(--c3)}
+.best .best-reset:disabled{opacity:.35;cursor:default}
+.cal-foot{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:10px}
+.cal-note{font-size:11.5px;color:var(--c1);text-align:right}
 /* effects that must not be cut by the wheel's edge - the burst of a killed dot,
    the fireworks - draw on a canvas laid over the whole screen, above the panels
    and beneath the sheets, letting touches straight through */
@@ -1051,6 +1057,11 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
       <span class="best-k">Total attempts</span><span class="best-v"><b id="bestTries">0</b></span>
       <button type="button" class="best-reset" id="bestReset" title="Forget the best run">reset</button>
     </div>
+    <!-- the device's own delay, measured with ten clicks; the note says why to run it again -->
+    <div class="cal-foot">
+      <span class="cal-note" id="calNote" hidden></span>
+      <button type="button" class="btn sm" id="calBtn" title="Measure this device's delay: ten clicks, tap along">Calibrate</button>
+    </div>
   </section>
 
   <section class="presets foldsec" id="lvlPanel">
@@ -1220,10 +1231,13 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
 
     <h3>Play time</h3>
     <ul>
-      <li><b>Game</b>: listen to one loop, then tap the wheel on every dot before it ends.</li>
-      <li>A stray tap or a dot left over costs the loop; clear it to climb. 100 levels, 3 rhythms each.</li>
-      <li><b>Levels</b> builds your own ladder: set the wheel up, listen, <b>Add</b>. Up to two rings; dots that coincide clear together.</li>
-      <li>Tap a level to load it back, <b>Update</b> after changes, arrows to reorder, <b>Copy / paste</b> to move the list to another device.</li>
+      <li><b>Game</b>: it counts you in and plays one grey loop. Listen.</li>
+      <li>Then tap the wheel on every dot before the loop ends.</li>
+      <li>Clear the loop to climb a level. Levels get faster and denser.</li>
+      <li>A stray tap or a dot left over costs the loop; the dots come back at the bar line.</li>
+      <li><b>Pause</b> stops the clock. Resume replays the level from its listening loop.</li>
+      <li><b>Best</b> keeps the highest level reached and the attempts of that run. <b>reset</b> forgets it.</li>
+      <li><b>Calibrate</b> measures the device's own delay: ten clicks, tap along. It runs by itself before the first game; run it again when the note asks.</li>
       <li><b>Tap pattern</b> builds a ring: tap the <b>wheel</b>.</li>
       <li>On <b>ring 1</b> the count sets divisions and the speed sets <b>tempo</b>.</li>
       <li>On others each tap drops a <b>dot</b> where the hand is.</li>
@@ -4027,21 +4041,25 @@ function loopIsSilent(phase){
 /* The phase you were hearing at that moment. getOutputTimestamp maps the page
    clock onto the audio being played out, which folds in the output delay - the
    84ms of it on this phone would otherwise read as 84ms of lateness. */
-function heardPhase(perfMs){
+/* the moment on the audio clock that was being HEARD when a tap landed */
+function heardTime(perfMs){
   if(!ctx) return null;
-  var ts = ctx.getOutputTimestamp ? ctx.getOutputTimestamp() : null, at;
+  var ts = ctx.getOutputTimestamp ? ctx.getOutputTimestamp() : null;
   if(ts && ts.contextTime != null && ts.performanceTime){
-    at = ts.contextTime + (perfMs - ts.performanceTime) / 1000;
-  } else {
-    at = ctx.currentTime - (ctx.outputLatency || 0) + (perfMs - performance.now()) / 1000;
+    return ts.contextTime + (perfMs - ts.performanceTime) / 1000;
   }
-  return phaseAt(at);
+  return ctx.currentTime - (ctx.outputLatency || 0) + (perfMs - performance.now()) / 1000;
+}
+function heardPhase(perfMs){
+  var at = heardTime(perfMs);
+  return at === null ? null : phaseAt(at);
 }
 
 function tapAt(perfMs){
   if(!S.tapMode) return;
   if(S.tapMode === "record"){ recTap(perfMs); return; }
   if(S.tapMode === "game"){ gameTap(perfMs); return; }
+  if(S.tapMode === "cal"){ calTap(perfMs); return; }
 }
 
 
@@ -4161,6 +4179,7 @@ function recRemove(frac){
 function recStart(){
   if(!S.rings[S.active]) return;
   if(S.tapMode === "game") gameEnd();
+  if(calRun) calAbort();
   /* A practice session borrows the whole setup and drives the tempo, which is
      the opposite of what tapping a ring in needs, so it ends here rather than
      merely pausing. It hands the setup back as it goes - and that resets which
@@ -4224,6 +4243,7 @@ function recEnd(keep){
   recOn = [];
   recTotal = 1;
   S.tapMode = ""; paintTapMode();
+  paintFolds();
   document.documentElement.dataset.rec = "0";
   syncSessBtn();
   paintFolds();
@@ -4316,6 +4336,7 @@ function fitTapNow(){
 function paintTapNow(){
   if(!S.tapMode){ return; }
   if(S.tapMode === "game"){ paintGame(); return; }
+  if(S.tapMode === "cal"){ return; }             /* the calibration writes its own line */
   var r = S.rings[S.active], lbl = function(t){ return '<span class="k">'+t+'</span>'; };
 
   if(S.tapMode === "record"){
@@ -4377,7 +4398,8 @@ document.getElementById("bestReset").addEventListener("click", function(){
   paintBestCard();
 });
 function paintBestCard(){
-  bestCard.hidden = !gameBest;
+  bestCard.hidden = false;                 /* the card is the section's face: zeros until a first run */
+  document.getElementById("bestReset").disabled = !gameBest;
   document.getElementById("bestLvl").textContent = gameBest;
   document.getElementById("bestTries").textContent = gameBestTries;
 }
@@ -4423,6 +4445,7 @@ function gameSetLevel(n){
   buildRack(); paintTransport(); paintNote(); paintRack();
 }
 function gameStart(){
+  if(calRun) calAbort();
   if(S.tapMode === "record") recEnd(true);
   if(run){ stop(); finishSession(); }
   if(S.playing) stop();
@@ -4432,6 +4455,7 @@ function gameStart(){
   S.rings = [mkRing(0, 4)];
   S.active = 0; rackOpen = false;
   S.tapMode = "game"; paintTapMode();
+  paintFolds();                  /* a folded Play time bar blinks while the game runs */
   initAudio();
   if(ctx && ctx.state === "suspended") ctx.resume();
   document.documentElement.dataset.game = "1";
@@ -4443,6 +4467,7 @@ function gameStart(){
   paintGame();
   game.countIn = true;               /* three beats before the first listening loop */
   start();
+  setTimeout(calCheck, 1500);        /* outputLatency reads 0 until audio has rendered */
   /* the wheel is the whole game now, so bring it to the middle of the screen -
      the Game button sits well below it on a phone */
   var dial = document.querySelector(".dial");
@@ -4456,6 +4481,7 @@ function gameEnd(){
   var prev = game.prev;
   game = null;
   S.tapMode = ""; paintTapMode();
+  paintFolds();
   gameHold = true;
   if(S.playing) stop();
   gameHold = false;
@@ -4559,7 +4585,7 @@ function gameBuzz(){
 /* a tap: clear the dot you were hearing, or lose the loop */
 function gameTap(perfMs){
   if(!game || !S.playing || game.state !== "play") return;
-  var ph = heardPhase(perfMs);
+  var ph = heardPhase(perfMs - calOffsetMs());   /* the device's own lateness, not the player's */
   if(ph === null) return;
   /* every uncleared dot on every ring inside the window, nearest first */
   var tol = gameTol(), hits = [], ri, k;
@@ -4681,6 +4707,7 @@ function paintGame(){
   else txt = lbl("cleared");
   tapNowIn.innerHTML = txt;
   fitTapNow();
+  tapHint.hidden = false;
   tapHint.innerHTML = "<b>Level " + game.level + "</b> " + lbl("of " + gameLadder().length) +
     (game.name ? " &middot; " + escapeHtml(game.name) : "") +
     " &middot; " + lbl("attempt") + " " + game.attempt +
@@ -4969,19 +4996,131 @@ tapPause.addEventListener("click", function(){ if(game && game.state === "paused
 /* between games the section text is the invitation, with the best level on the end */
 function paintGameBest(){
   if(game) return;
-  tapHint.innerHTML = escapeHtml(TAP_IDLE_TEXT) +
-    (function(){
-      if(!editorOn) return "";
-      var own = S.levels.filter(lvlIsLocal).length;
-      return own ? " Plus " + own + " of your own, not in the build yet." : "";
-    })();
+  /* between games the section shows the best run; the how-to lives under (i).
+     Only an author with unshipped levels gets a line of text here. */
+  var own = editorOn ? S.levels.filter(lvlIsLocal).length : 0;
+  tapHint.textContent = own ? "Plus " + own + " of your own, not in the build yet." : "";
+  tapHint.hidden = !own;
   paintBestCard();
 }
-tapGame.addEventListener("click", function(){ if(game) gameEnd(); else gameStart(); });
+tapGame.addEventListener("click", function(){
+  if(calRun) return;                             /* a calibration is ten seconds; let it finish */
+  if(game) gameEnd();
+  else if(!cal) calStart(true);                  /* the first game on this device measures it first */
+  else gameStart();
+});
+
+/* ------------------------------------------------------- calibration -------
+   The game judges taps against the audio clock, which already knows the output
+   path where the browser reports it. What it cannot know is the touch panel's
+   delay, an audio path the browser does not report (Bluetooth, Safari), and
+   how they add up on this device. Ten clicks, tap along, and the median
+   lateness is that sum - as long as it is lateness: hardware can only make a
+   tap look late, so an early median is the player, and the player is never
+   corrected. That is the whole point of the game. Numbers stay in storage;
+   the screen only ever says CALIBRATING, CALIBRATED, or why to run it again. */
+var CAL_KEY = "polyrhythm-circle:cal:v1";
+var CAL_N = 10, CAL_GAP = 0.6, CAL_MAX = 150;    /* clicks, seconds apart, ms of lateness at most */
+var cal = null;                                   /* {off, med, spread, outLat, ots, when, taps} */
+try{ cal = JSON.parse(localStorage.getItem(CAL_KEY) || "null"); } catch(err){ cal = null; }
+if(cal && typeof cal.off !== "number") cal = null;
+var calRun = null;                                /* {clicks, taps, end, thenGame} while measuring */
+function calOffsetMs(){ return cal ? cal.off : 0; }
+var calBtn = document.getElementById("calBtn"), calNote = document.getElementById("calNote");
+function calSay(text){ calNote.textContent = text || ""; calNote.hidden = !text; }
+function calLine(main, sub){
+  tapNowIn.innerHTML = '<b>' + main + '</b>' + (sub ? ' <span class="k">' + sub + '</span>' : '');
+  fitTapNow();
+}
+function calStart(thenGame){
+  if(calRun) return;
+  if(game) gameEnd();
+  if(S.tapMode === "record") recEnd(true);
+  if(run){ stop(); finishSession(); }
+  if(S.playing) stop();
+  initAudio();
+  if(ctx && ctx.state === "suspended") ctx.resume();
+  S.tapMode = "cal"; paintTapMode(); paintFolds();
+  tapNow.hidden = false; sessNow.hidden = true; dialHint.hidden = true;
+  calSay("");
+  calBtn.disabled = true;
+  var t0 = acNow() + 0.8, clicks = [], k;
+  for(k = 0; k < CAL_N; k++){ clicks.push(t0 + k * CAL_GAP); voice("wood", clicks[k], 0.9, false); }
+  calRun = {clicks:clicks, taps:[], thenGame:!!thenGame, timer:null};
+  calLine("CALIBRATING", "tap the wheel with each click");
+  calRun.timer = setTimeout(calFinish, Math.round((clicks[CAL_N - 1] - acNow() + 0.9) * 1000));
+  var dial = document.querySelector(".dial");
+  if(dial && dial.scrollIntoView){
+    var calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    dial.scrollIntoView({behavior: calm ? "auto" : "smooth", block:"center"});
+  }
+}
+function calTap(perfMs){
+  if(!calRun) return;
+  var at = heardTime(perfMs);
+  if(at === null) return;
+  var best = null, i;
+  for(i = 0; i < calRun.clicks.length; i++){
+    var d = (at - calRun.clicks[i]) * 1000;         /* ms; positive = the tap came after the click */
+    if(Math.abs(d) < CAL_GAP * 500 && (best === null || Math.abs(d) < Math.abs(best.d))) best = {i:i, d:d};
+  }
+  if(!best) return;
+  calRun.taps[best.i] = best.d;                     /* one tap per click; a second one replaces it */
+  var got = calRun.taps.filter(function(x){ return typeof x === "number"; }).length;
+  calLine("CALIBRATING", got + " / " + CAL_N);
+}
+function calAbort(){
+  if(!calRun) return;
+  clearTimeout(calRun.timer);
+  calRun = null;
+  calBtn.disabled = false;
+  S.tapMode = ""; paintTapMode(); paintFolds();
+  tapNow.hidden = true; dialHint.hidden = false;
+}
+function calFinish(){
+  if(!calRun) return;
+  var thenGame = calRun.thenGame;
+  /* the first two clicks are a run-up; the rest are the measurement */
+  var taps = calRun.taps.slice(2).filter(function(x){ return typeof x === "number"; });
+  calRun = null;
+  calBtn.disabled = false;
+  var outLat = (ctx && ctx.outputLatency) || 0, ots = !!(ctx && ctx.getOutputTimestamp);
+  if(taps.length < 4){
+    /* too few taps to trust: no correction, but the game is not held up again */
+    cal = {off:0, med:null, spread:null, outLat:outLat, ots:ots, when:Date.now(), taps:taps.length};
+    try{ localStorage.setItem(CAL_KEY, JSON.stringify(cal)); } catch(err){}
+    calLine("NOT ENOUGH TAPS", "no correction");
+  } else {
+    var s = taps.slice().sort(function(a, b){ return a - b; });
+    var med = s.length % 2 ? s[(s.length - 1) / 2] : (s[s.length / 2 - 1] + s[s.length / 2]) / 2;
+    var dev = s.map(function(x){ return Math.abs(x - med); }).sort(function(a, b){ return a - b; });
+    var spread = 1.4826 * (dev.length % 2 ? dev[(dev.length - 1) / 2] : (dev[dev.length / 2 - 1] + dev[dev.length / 2]) / 2);
+    /* only lateness is the machine's; an early median is the player, and stays */
+    var off = Math.max(0, Math.min(CAL_MAX, med));
+    cal = {off:Math.round(off), med:Math.round(med), spread:Math.round(spread), outLat:outLat, ots:ots, when:Date.now(), taps:taps.length};
+    try{ localStorage.setItem(CAL_KEY, JSON.stringify(cal)); } catch(err){}
+    calLine("CALIBRATED", "");
+  }
+  S.tapMode = ""; paintTapMode(); paintFolds();
+  setTimeout(function(){
+    if(S.tapMode) return;                           /* something else took the readout meanwhile */
+    if(thenGame){ gameStart(); return; }
+    tapNow.hidden = true; dialHint.hidden = false;
+  }, 900);
+}
+/* A change of sound path is the one reason to run it again: headphones plugged
+   in or paired, or taken off. The output latency the browser reports is read
+   once the game's audio is actually rendering, and compared with the one the
+   calibration saw. */
+function calCheck(){
+  if(!cal || !ctx || !ctx.outputLatency) return;
+  var lat = ctx.outputLatency;
+  if(Math.abs(lat - (cal.outLat || 0)) < 0.04) return;
+  calSay(lat > 0.12 ? "Wireless headphones detected. Need to calibrate." : "Sound path changed. Need to calibrate.");
+}
+calBtn.addEventListener("click", function(){ if(!calRun && !game) calStart(false); });
 
 /* ------------------------------------------------------------------- tap UI */
-var TAP_IDLE_TEXT = "Follow the pattern: press Game, listen to one loop, then tap the wheel on every " +
-  "dot before the loop ends. Clear it to climb a level; a stray tap or a dot left over costs the loop.";
 var tapPanel = document.getElementById("tapPanel");
 var tapHint = document.getElementById("tapHint");
 var tapNow = document.getElementById("tapNow");
@@ -4997,7 +5136,7 @@ paintGameBest();                 /* the invitation, and the best level so far */
 var FOLDS = [
   {key:"tempo",    el:"tempoPanel",   live:function(){ return S.muted; }},
   {key:"session",  el:"sessionPanel", live:function(){ return !!run; }},
-  {key:"tapping",  el:"tapPanel",     live:function(){ return !!S.tapMode; }},
+  {key:"tapping",  el:"tapPanel",     live:function(){ return S.tapMode === "game" || S.tapMode === "cal"; }},   /* Tap pattern is the rack's business, not the game's */
   {key:"levels",   el:"lvlPanel",     live:function(){ return false; }},
   {key:"sequence", el:"seqPanel",     live:function(){ return false; }},
   {key:"patterns", el:"patPanel",     live:function(){ return pickSlot !== null; }}
@@ -5741,8 +5880,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v61";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-06 23:18";          /* and when it was built, for ?diag */
+  var BUILD = "v63";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-07 11:46";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

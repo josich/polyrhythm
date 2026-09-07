@@ -515,6 +515,8 @@ input[type=range]::-moz-range-thumb{
 .sheet b{color:var(--ink);font-weight:600}
 /* a drawn note in the help text, because a phone font may not have the glyph */
 .sheet .hnote{width:9px;height:13px;display:inline-block;vertical-align:-2px;color:var(--ink)}
+.sheet .hico{width:14px;height:14px;display:inline-block;vertical-align:-2px;color:var(--ink);margin-right:2px}
+.sheet h3 .hico{width:15px;height:15px;vertical-align:-2px;margin-right:4px}
 .canvas-hold{position:relative;width:100%;max-width:min(100%,64vh,560px);aspect-ratio:1/1;margin:0 auto}
 canvas{
   /* touch-action none: the wheel keeps every touch. With "manipulation" Chrome on
@@ -568,8 +570,9 @@ canvas{
 :root[data-rec="1"] canvas{cursor:pointer}
 /* The game owns the wheel: the play button steps aside, the rest of the app
    waits, and the readout answers in colour */
-:root[data-game="1"] .play,:root[data-cal="1"] .play{display:none}
+:root[data-game="1"] .play,:root[data-cal="1"] .play,:root[data-sesspause="1"] .play{display:none}
 :root[data-game="1"] canvas{cursor:pointer}
+:is(:root[data-game="1"],:root[data-cal="1"]) #scoreBtn{opacity:.45;pointer-events:none}
 :is(:root[data-game="1"],:root[data-cal="1"]) :is(#rack,#sessionPanel,#seqPanel,#lvlPanel,#patPanel,.bpm-block,.bpm-row,.note-row,#tap,#countBtn){opacity:.45;pointer-events:none}
 #tapNowIn[data-grade="c2"]{color:var(--c2)}
 #tapNowIn[data-grade="c3"]{color:var(--c3)}
@@ -858,6 +861,18 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
 /* no physical keyboard to speak of, so the shortcut legend is just clutter */
 @media (max-width:760px), (pointer:coarse){
   .keys{display:none}
+}
+/* Fingers, not pointers: bigger targets where the phone showed 17-25 px ones.
+   The carets and the reset link grow only their tap zone (a transparent halo
+   drawn outside the layout), so nothing moves; the sub buttons, Half and the
+   ring sliders' thumbs grow for real, inside the ring card only. */
+@media (pointer:coarse){
+  .caret,.best .best-reset{position:relative}
+  .caret::after,.best .best-reset::after{content:"";position:absolute;inset:-9px;border-radius:12px}
+  .subbtn,.offbtn{min-height:32px;padding-top:0;padding-bottom:0}
+  .ring-card input[type=range]{height:26px}
+  .ring-card input[type=range]::-webkit-slider-thumb{width:22px;height:22px;margin-top:-9px}
+  .ring-card input[type=range]::-moz-range-thumb{width:20px;height:20px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -1177,79 +1192,66 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
     </div>
     <p class="build mono" id="buildTag"></p>
 
-    <h3>The rings</h3>
+    <h3>The wheel</h3>
     <ul>
-      <li><b>Ring 1</b> is the click, at the <b>tempo</b> you set.</li>
-      <li>More <b>rings</b> make a <b>polyrhythm</b>. Four at most.</li>
-    </ul>
-
-    <h3>The dial</h3>
-    <ul>
-      <li>Tap a <b>dot</b> to cycle it: <b>on</b> &rarr; <b>silent</b> &rarr; <b>accent</b> &rarr; on.</li>
-      <li>An <b>accent</b> plays louder and brighter, and is drawn with a ring.</li>
-      <li>Hold a ring until it lights, then <b>drag</b> it round to <b>offset</b> it, a twelfth of a step at a time.</li>
-      <li>The <b>middle</b> starts and stops.</li>
+      <li><b>Ring 1</b> is the click, at the tempo you set.</li>
+      <li>More <b>rings</b> make a polyrhythm. Four at most.</li>
+      <li><svg class="hnote" viewBox="0 0 22 30" role="img" aria-label="eighth note"><ellipse cx="8" cy="22.5" rx="5.4" ry="3.7" transform="rotate(-22 8 22.5)" fill="currentColor"/><path d="M12.9 21.6V3.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M12.9 3.5c3.6 2.2 6 5.2 4.4 10.2" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg> <b>Score</b> writes it out as notation, one bar each.</li>
+      <li>Tap a <b>dot</b> to cycle it: on &rarr; silent &rarr; accent &rarr; on.</li>
+      <li>To <b>offset</b> a ring, hold it until it lights, then drag.</li>
     </ul>
 
     <h3>Tempo</h3>
     <ul>
-      <li>Tap the <b>number</b> to type a tempo.</li>
-      <li>The <b>slider</b> gives half its length to 1&ndash;120.</li>
+      <li>Set the <b>BPM</b> between clicks of Ring 1.</li>
       <li>The <b>note</b> row says what one click is worth: <svg class="hnote" viewBox="0 0 22 30" role="img" aria-label="eighth note"><ellipse cx="8" cy="22.5" rx="5.4" ry="3.7" transform="rotate(-22 8 22.5)" fill="currentColor"/><path d="M12.9 21.6V3.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M12.9 3.5c3.6 2.2 6 5.2 4.4 10.2" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg> = 200 is 200 eighths a minute.</li>
-      <li>Switching notes keeps the speed and <b>converts</b> the number.</li>
+      <li>Switching notes keeps the speed and converts the number.</li>
       <li><b>Tap tempo</b> sets it by feel.</li>
       <li><b>Count-in</b> plays three beats first.</li>
     </ul>
 
-    <h3>Per ring</h3>
+    <h3>Ring tabs</h3>
     <ul>
       <li><b>Divisions</b> per rotation.</li>
       <li>&times;2 &times;3 &times;4 <b>subdivide</b> each beat.</li>
-      <li>A <b>subdivision</b> sounds on its own, beat on or off.</li>
       <li><b>Offset</b> nudges the ring off the beat.</li>
       <li>Each ring has its own <b>sound</b>, level and mute.</li>
-      <li>Tap the <b>tab</b> already open to fold the card away.</li>
+      <li><b>Tap pattern</b> creates the beats as you play them.</li>
     </ul>
 
-    <h3>Practice session</h3>
+    <h3><svg class="hico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Practice session</h3>
     <ul>
-      <li>Raises the <b>tempo</b> by a step every few <b>loops</b>.</li>
+      <li>Program a practice session.</li>
       <li>Random <b>silent</b> loops.</li>
       <li>Swaps <b>patterns</b> each step.</li>
-      <li><b>Plan</b> shows what is scheduled.</li>
-      <li><b>Repeat</b> plays the plan again; <b>out and back</b> runs it there and home.</li>
-      <li>The <b>middle</b> pauses; <b>Stop</b> ends it.</li>
+      <li><svg class="hico" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="4" width="13" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.5 4v16M4.5 8.5h4M4.5 12h4M4.5 15.5h4M12.5 9h4M12.5 12.5h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg> <b>Plan</b> shows what is scheduled.</li>
+      <li><b>Repeat</b> plays the plan again.</li>
+      <li><b>Out and back</b> runs it there and home.</li>
     </ul>
 
-    <h3>Sequence</h3>
+    <h3><svg class="hico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg> Play time</h3>
     <ul>
-      <li>The session plays the <b>sequence</b> in order.</li>
-      <li><b>+</b> adds a pattern. Tap a box to <b>change</b> it.</li>
-      <li><b>Drag</b> a box onto another to <b>swap</b>.</li>
-      <li><b>Score</b> writes it out as notation, one bar each. Empty sequence: the wheel.</li>
-    </ul>
-
-    <h3>Play time</h3>
-    <ul>
-      <li><b>Game</b>: it counts you in and plays one grey loop. Listen.</li>
+      <li><svg class="hico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg> <b>Game</b>: it counts you in and plays one grey loop. Listen.</li>
       <li>Then tap the wheel on every dot before the loop ends.</li>
-      <li>Clear the loop to climb a level. Levels get faster and denser.</li>
+      <li>Clear the loop to climb a level.</li>
       <li>A stray tap or a dot left over costs the loop; the dots come back at the bar line.</li>
-      <li><b>Pause</b> stops the clock. Resume replays the level from its listening loop.</li>
-      <li><b>Best</b> keeps the highest level reached and the attempts of that run. <b>reset</b> forgets it.</li>
-      <li><b>Calibrate</b> measures the device's own delay: ten clicks, tap along. It runs by itself before the first game; run it again when the note asks.</li>
-      <li><b>Tap pattern</b> builds a ring: tap the <b>wheel</b>.</li>
-      <li>On <b>ring 1</b> the count sets divisions and the speed sets <b>tempo</b>.</li>
-      <li>On others each tap drops a <b>dot</b> where the hand is.</li>
-      <li>Placed dots never move. Tap one again to remove it.</li>
+      <li><b>Pause</b> stops the clock.</li>
+      <li><b>Calibrate</b> measures the device's own delay: ten clicks, tap along. Run it again when the note asks.</li>
     </ul>
 
-    <h3>Keeping it</h3>
+    <h3><svg class="hnote" viewBox="0 0 22 30" role="img" aria-label="eighth note"><ellipse cx="8" cy="22.5" rx="5.4" ry="3.7" transform="rotate(-22 8 22.5)" fill="currentColor"/><path d="M12.9 21.6V3.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M12.9 3.5c3.6 2.2 6 5.2 4.4 10.2" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg> Sequence</h3>
+    <ul>
+      <li>The practice session can play the <b>sequence</b> in order.</li>
+      <li><b>+</b> adds a pattern. Tap a box to change it.</li>
+      <li><b>Drag</b> a box onto another to swap.</li>
+    </ul>
+
+    <h3><svg class="hico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.2" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="3.8" r="2" fill="currentColor"/><circle cx="19.1" cy="16.1" r="2" fill="currentColor"/><circle cx="4.9" cy="16.1" r="2" fill="currentColor"/></svg> Patterns</h3>
     <ul>
       <li>Everything <b>autosaves</b>.</li>
-      <li><b>Advanced</b> shows or hides the extras.</li>
-      <li><b>Presets</b>: classic ratios, rhythms by region, and your own.</li>
-      <li>The <b>triangle</b> folds a section; a folded one <b>blinks</b> while it runs.</li>
+      <li><b>Presets</b>: save your patterns.</li>
+      <li><b>Rhythms</b>: world patterns.</li>
+      <li><b>Classic ratios</b>: basic patterns to start from.</li>
     </ul>
   </div>
 </div>
@@ -1581,6 +1583,27 @@ function stop(){
   if(S.tapMode === "game" && !gameHold) gameEnd();  /* and the way out of the game */
 }
 function toggle(){ S.playing ? stop() : start(); }
+/* Stop during a practice session pauses it: the plan and its place are kept and
+   Play (or a tap on the wheel) carries on from the same loop. The session's own
+   button is the one that ends it. While paused the play button steps aside and
+   the hub breathes a pause sign, so a stopped session cannot pass for a stopped
+   metronome. */
+var lastSessPause = false;
+function sessPaused(){ return !!run && !S.playing && !S.tapMode; }
+function sessPauseHub(cx, cy, tnow){
+  var sp = sessPaused();
+  if(sp !== lastSessPause){ document.documentElement.dataset.sesspause = sp ? "1" : "0"; lastSessPause = sp; }
+  if(!sp) return;
+  var k = 1 + 0.10 * Math.sin(tnow / 420);          /* a gentle breath, about 2.6 s a cycle */
+  var h = hubR * 0.62 * k, w = hubR * 0.20 * k, gap = hubR * 0.16 * k;
+  g2.save();
+  g2.globalAlpha = 0.85;
+  g2.fillStyle = THEME["--ink"];
+  g2.fillRect(cx - gap / 2 - w, cy - h / 2, w, h);
+  g2.fillRect(cx + gap / 2, cy - h / 2, w, h);
+  g2.restore();
+  g2.globalAlpha = 1;
+}
 
 var LOOKAHEAD = 0.18;
 function schedule(){
@@ -1876,6 +1899,7 @@ function draw(){
     else if(game.failed) gameMissed(cx, cy, scale, tnow);
   }
   if(S.tapMode === "cal" || calDone) calHub(cx, cy, scale, tnow);
+  sessPauseHub(cx, cy, tnow);
   drawOverlay(tnow);
 
   requestAnimationFrame(draw);
@@ -1960,7 +1984,7 @@ function countNumber(cx, cy, scale, txt, t){
 /* listed outermost ring first, so the dial reads the way the ratio is written:
    5 over 4 shows as "5 : 4", with the 4 on the inner click ring */
 function ratioString(){
-  return S.rings.map(function(r){ return r.div; }).reverse().join(" : ");
+  return S.rings.map(function(r){ return r.div; }).join(" : ");   /* ring 1 first, like the tabs */
 }
 
 var suppressClick = false;
@@ -2028,6 +2052,8 @@ function arm(p){
 
 cv.addEventListener("pointerdown", function(e){
   if(!e.isPrimary) return;
+  /* a paused session: the whole wheel is the resume button */
+  if(sessPaused()){ e.preventDefault(); suppressClick = true; start(); return; }
   /* While tapping, the dial is a target rather than a set of controls - and this
      is tested before the `press` guard below, or a drag still in flight when the
      mode changed would swallow taps for as long as the finger stayed down. */
@@ -2537,7 +2563,7 @@ var dialRatio = document.getElementById("dialRatio");
    split evenly between the two readouts either side, and each shrinks its own
    type to fit rather than ellipsising - the numbers stay readable and, more to
    the point, the name stays centred. */
-var HEAD_MIN = 0.66;          /* about 10.5px: below this, clipping is kinder */
+var HEAD_MIN = 0.5;   /* the ratio may halve before it clips: four rings of 32 on a phone */
 var headProbe = null;
 function fitOne(el, full){
   var avail = el.clientWidth;
@@ -4281,6 +4307,8 @@ function recTap(perfMs){
     if(div !== r.div || r.sub !== 1) reshape(r, div, 1);
     r.steps = filled(total(r));
     r.flash[div - 1] = performance.now();
+    var liveBpm = recBpm();                  /* the Tempo number follows the taps as they land */
+    if(liveBpm) setBpm(liveBpm);
     paintRack(); paintTapNow();
     return;
   }
@@ -4462,6 +4490,8 @@ function gameStart(){
   document.documentElement.dataset.game = "1";
   tapGame.dataset.on = "1";
   tapPause.disabled = false; tapPause.textContent = "Pause";
+  document.getElementById("scoreBtn").disabled = true;    /* the wheel is the level now */
+  document.getElementById("countBtn").disabled = true;    /* the game counts itself in */
   syncSessBtn(); paintFolds(); paintNote();
   tapNow.hidden = false; sessNow.hidden = true; dialHint.hidden = true;
   gameSetLevel(1);
@@ -4479,6 +4509,8 @@ function gameStart(){
 }
 function gameEnd(){
   if(!game) return;
+  document.getElementById("scoreBtn").disabled = false;
+  document.getElementById("countBtn").disabled = false;
   var prev = game.prev;
   game = null;
   S.tapMode = ""; paintTapMode();
@@ -5047,6 +5079,8 @@ function calStart(thenGame){
   tapNow.hidden = false; sessNow.hidden = true; dialHint.hidden = true;
   calSay("");
   calBtn.disabled = true;
+  document.getElementById("scoreBtn").disabled = true;
+  document.getElementById("countBtn").disabled = true;
   /* the wheel is borrowed whole and emptied - one ring, no dots - so nothing on
      it competes with the countdown; the game does the same */
   calPrev = {rings:S.rings, active:S.active, rackOpen:rackOpen};
@@ -5094,6 +5128,8 @@ function calAbort(){
 /* the wheel goes back to what it was, and the hub verdict goes with it */
 function calRelease(){
   var prev = calPrev;
+  document.getElementById("scoreBtn").disabled = false;
+  document.getElementById("countBtn").disabled = false;
   calPrev = null; calDone = null;
   delete document.documentElement.dataset.cal;
   if(prev){
@@ -5943,8 +5979,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v63";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-07 12:13";          /* and when it was built, for ?diag */
+  var BUILD = "v66";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-07 13:49";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

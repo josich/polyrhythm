@@ -568,9 +568,9 @@ canvas{
 :root[data-rec="1"] canvas{cursor:pointer}
 /* The game owns the wheel: the play button steps aside, the rest of the app
    waits, and the readout answers in colour */
-:root[data-game="1"] .play{display:none}
+:root[data-game="1"] .play,:root[data-cal="1"] .play{display:none}
 :root[data-game="1"] canvas{cursor:pointer}
-:root[data-game="1"] :is(#rack,#sessionPanel,#seqPanel,#lvlPanel,#patPanel,.bpm-block,.bpm-row,.note-row,#tap,#countBtn){opacity:.45;pointer-events:none}
+:is(:root[data-game="1"],:root[data-cal="1"]) :is(#rack,#sessionPanel,#seqPanel,#lvlPanel,#patPanel,.bpm-block,.bpm-row,.note-row,#tap,#countBtn){opacity:.45;pointer-events:none}
 #tapNowIn[data-grade="c2"]{color:var(--c2)}
 #tapNowIn[data-grade="c3"]{color:var(--c3)}
 /* the score line under the buttons while the game runs */
@@ -1875,6 +1875,7 @@ function draw(){
     if(game.state === "listen") gameHub(cx, cy, scale, pos);
     else if(game.failed) gameMissed(cx, cy, scale, tnow);
   }
+  if(S.tapMode === "cal" || calDone) calHub(cx, cy, scale, tnow);
   drawOverlay(tnow);
 
   requestAnimationFrame(draw);
@@ -5024,7 +5025,9 @@ var CAL_N = 10, CAL_GAP = 0.6, CAL_MAX = 150;    /* clicks, seconds apart, ms of
 var cal = null;                                   /* {off, med, spread, outLat, ots, when, taps} */
 try{ cal = JSON.parse(localStorage.getItem(CAL_KEY) || "null"); } catch(err){ cal = null; }
 if(cal && typeof cal.off !== "number") cal = null;
-var calRun = null;                                /* {clicks, taps, end, thenGame} while measuring */
+var calRun = null;                                /* {clicks, perf, taps, thenGame, timer} while measuring */
+var calPrev = null;                               /* the wheel as it was, handed back afterwards */
+var calDone = null;                               /* {text, ok, at}: the verdict shown in the hub */
 function calOffsetMs(){ return cal ? cal.off : 0; }
 var calBtn = document.getElementById("calBtn"), calNote = document.getElementById("calNote");
 function calSay(text){ calNote.textContent = text || ""; calNote.hidden = !text; }
@@ -5044,10 +5047,21 @@ function calStart(thenGame){
   tapNow.hidden = false; sessNow.hidden = true; dialHint.hidden = true;
   calSay("");
   calBtn.disabled = true;
-  var t0 = acNow() + 0.8, clicks = [], k;
-  for(k = 0; k < CAL_N; k++){ clicks.push(t0 + k * CAL_GAP); voice("wood", clicks[k], 0.9, false); }
-  calRun = {clicks:clicks, taps:[], thenGame:!!thenGame, timer:null};
-  calLine("CALIBRATING", "tap the wheel with each click");
+  /* the wheel is borrowed whole and emptied - one ring, no dots - so nothing on
+     it competes with the countdown; the game does the same */
+  calPrev = {rings:S.rings, active:S.active, rackOpen:rackOpen};
+  var bare = mkRing(0, 1); bare.steps = [0];
+  S.rings = [bare]; S.active = 0; rackOpen = false;
+  document.documentElement.dataset.cal = "1";
+  buildRack(); paintRack(); paintTransport();
+  var t0 = acNow() + 0.8, clicks = [], perf = [], k, outLat = (ctx && ctx.outputLatency) || 0;
+  for(k = 0; k < CAL_N; k++){
+    clicks.push(t0 + k * CAL_GAP);
+    voice("wood", clicks[k], 0.9, false);
+    perf.push(performance.now() + (clicks[k] - acNow() + outLat) * 1000);   /* when each click is heard */
+  }
+  calRun = {clicks:clicks, perf:perf, taps:[], thenGame:!!thenGame, timer:null};
+  calLine("CALIBRATING", "");
   calRun.timer = setTimeout(calFinish, Math.round((clicks[CAL_N - 1] - acNow() + 0.9) * 1000));
   var dial = document.querySelector(".dial");
   if(dial && dial.scrollIntoView){
@@ -5075,6 +5089,18 @@ function calAbort(){
   calRun = null;
   calBtn.disabled = false;
   S.tapMode = ""; paintTapMode(); paintFolds();
+  calRelease();
+}
+/* the wheel goes back to what it was, and the hub verdict goes with it */
+function calRelease(){
+  var prev = calPrev;
+  calPrev = null; calDone = null;
+  delete document.documentElement.dataset.cal;
+  if(prev){
+    S.rings = prev.rings; S.active = prev.active; rackOpen = prev.rackOpen;
+    S.rings.forEach(function(r){ realign(r); });
+    buildRack(); paintRack(); paintTransport();
+  }
   tapNow.hidden = true; dialHint.hidden = false;
 }
 function calFinish(){
@@ -5089,7 +5115,7 @@ function calFinish(){
     /* too few taps to trust: no correction, but the game is not held up again */
     cal = {off:0, med:null, spread:null, outLat:outLat, ots:ots, when:Date.now(), taps:taps.length};
     try{ localStorage.setItem(CAL_KEY, JSON.stringify(cal)); } catch(err){}
-    calLine("NOT ENOUGH TAPS", "no correction");
+    calDone = {text:"Not calibrated", ok:false, at:performance.now()};
   } else {
     var s = taps.slice().sort(function(a, b){ return a - b; });
     var med = s.length % 2 ? s[(s.length - 1) / 2] : (s[s.length / 2 - 1] + s[s.length / 2]) / 2;
@@ -5099,14 +5125,15 @@ function calFinish(){
     var off = Math.max(0, Math.min(CAL_MAX, med));
     cal = {off:Math.round(off), med:Math.round(med), spread:Math.round(spread), outLat:outLat, ots:ots, when:Date.now(), taps:taps.length};
     try{ localStorage.setItem(CAL_KEY, JSON.stringify(cal)); } catch(err){}
-    calLine("CALIBRATED", "");
+    calDone = {text:"Calibrated", ok:true, at:performance.now()};
   }
   S.tapMode = ""; paintTapMode(); paintFolds();
+  calLine(calDone.ok ? "CALIBRATED" : "NOT CALIBRATED", "");
   setTimeout(function(){
-    if(S.tapMode) return;                           /* something else took the readout meanwhile */
-    if(thenGame){ gameStart(); return; }
-    tapNow.hidden = true; dialHint.hidden = false;
-  }, 900);
+    if(S.tapMode || !calDone) return;               /* something else took the wheel meanwhile */
+    calRelease();
+    if(thenGame) gameStart();
+  }, 1400);
 }
 /* A change of sound path is the one reason to run it again: headphones plugged
    in or paired, or taken off. The output latency the browser reports is read
@@ -5119,6 +5146,42 @@ function calCheck(){
   calSay(lat > 0.12 ? "Wireless headphones detected. Need to calibrate." : "Sound path changed. Need to calibrate.");
 }
 calBtn.addEventListener("click", function(){ if(!calRun && !game) calStart(false); });
+/* In the hub while calibrating: TAP over a number that counts the clicks down
+   from ten, each one swelling out of the centre as its click sounds, the way
+   the count-in does. Afterwards the verdict, in the app's good or bad colour. */
+function calHub(cx, cy, scale, tnow){
+  if(calDone){
+    var age = (tnow - calDone.at) / 500, k = Math.min(1, Math.max(0, age));
+    g2.save();
+    g2.textAlign = "center"; g2.textBaseline = "middle";
+    g2.fillStyle = THEME[calDone.ok ? "--c2" : "--c3"];
+    g2.font = "700 " + Math.round(scale * 0.050) + 'px "Archivo", sans-serif';
+    g2.globalAlpha = 0.92;
+    g2.fillText(calDone.text, cx, cy);
+    if(k < 1){
+      g2.globalAlpha = (1 - k) * 0.8;
+      g2.translate(cx, cy);
+      g2.scale(1 + 1.6 * k, 1 + 1.6 * k);
+      g2.fillText(calDone.text, 0, 0);
+    }
+    g2.restore();
+    g2.globalAlpha = 1;
+    return;
+  }
+  if(!calRun) return;
+  g2.save();
+  g2.textAlign = "center"; g2.textBaseline = "middle";
+  g2.fillStyle = THEME["--ink-3"];
+  g2.font = "700 " + Math.round(scale * 0.050) + 'px "Archivo", sans-serif';
+  g2.globalAlpha = 0.9;
+  g2.fillText("TAP", cx, cy - scale * 0.062);
+  g2.restore();
+  var i, cur = -1;
+  for(i = 0; i < calRun.perf.length; i++) if(tnow >= calRun.perf[i]) cur = i;
+  if(cur < 0){ countNumber(cx, cy + scale * 0.012, scale, String(CAL_N), 0); return; }
+  var t = Math.min(1, (tnow - calRun.perf[cur]) / (CAL_GAP * 1000));
+  countNumber(cx, cy + scale * 0.012, scale, String(CAL_N - cur), t);
+}
 
 /* ------------------------------------------------------------------- tap UI */
 var tapPanel = document.getElementById("tapPanel");
@@ -5881,7 +5944,7 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
   var BUILD = "v63";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-07 11:46";          /* and when it was built, for ?diag */
+  var BUILT = "2026-09-07 12:13";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

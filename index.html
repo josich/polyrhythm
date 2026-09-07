@@ -570,7 +570,11 @@ canvas{
 :root[data-rec="1"] canvas{cursor:pointer}
 /* The game owns the wheel: the play button steps aside, the rest of the app
    waits, and the readout answers in colour */
-:root[data-game="1"] .play,:root[data-cal="1"] .play,:root[data-sesspause="1"] .play{display:none}
+:root[data-game="1"] .play,:root[data-cal="1"] .play{display:none}
+/* a paused session keeps the play button in place but invisible: the centre stays
+   a plain Play press, and nothing appears under the finger when the session
+   resumes (hiding it made the resume tap land on a button that was not there) */
+:root[data-sesspause="1"] .play,:root[data-sesspause="1"] .play:hover{opacity:0;background:transparent;border-color:transparent}
 :root[data-game="1"] canvas{cursor:pointer}
 :is(:root[data-game="1"],:root[data-cal="1"]) #scoreBtn{opacity:.45;pointer-events:none}
 :is(:root[data-game="1"],:root[data-cal="1"]) :is(#rack,#sessionPanel,#seqPanel,#lvlPanel,#patPanel,.bpm-block,.bpm-row,.note-row,#tap,#countBtn){opacity:.45;pointer-events:none}
@@ -1595,7 +1599,7 @@ function sessPauseHub(cx, cy, tnow){
   if(sp !== lastSessPause){ document.documentElement.dataset.sesspause = sp ? "1" : "0"; lastSessPause = sp; }
   if(!sp) return;
   var k = 1 + 0.10 * Math.sin(tnow / 420);          /* a gentle breath, about 2.6 s a cycle */
-  var h = hubR * 0.62 * k, w = hubR * 0.20 * k, gap = hubR * 0.16 * k;
+  var h = hubR * 0.93 * k, w = hubR * 0.30 * k, gap = hubR * 0.24 * k;   /* half again as big as the first cut */
   g2.save();
   g2.globalAlpha = 0.85;
   g2.fillStyle = THEME["--ink"];
@@ -5979,8 +5983,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v66";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-07 13:49";          /* and when it was built, for ?diag */
+  var BUILD = "v67";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-07 14:26";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

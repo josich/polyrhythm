@@ -317,7 +317,7 @@ input[type=range]::-moz-range-thumb{
   /* fit-content caps the middle track against the header's own width. A
      max-width on the item resolved against this track instead - which the item
      itself sizes - and collapsed the name to 46% of its own width. */
-  grid-template-columns:minmax(0,1fr) fit-content(46%) minmax(0,1fr) auto;
+  grid-template-columns:minmax(0,1fr) fit-content(46%) minmax(0,1fr) auto auto;
   align-items:baseline;gap:8px;margin-bottom:2px;
 }
 #dialRatio{grid-column:1;text-align:left}
@@ -326,6 +326,12 @@ input[type=range]::-moz-range-thumb{
 /* the note that opens the score: a small round button at the header's end */
 #scoreBtn{grid-column:4;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none;border-color:var(--c1)}
 #scoreBtn svg.note{width:11px;height:15px;display:block}
+/* the share button beside it: greyed whenever a clip cannot be made */
+#shareBtn{grid-column:5;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none}
+#shareBtn svg{width:15px;height:15px;display:block}
+.icobtn:disabled{opacity:.4;cursor:default}
+.share-sheet{max-width:440px}
+.share-sheet .seg{margin-left:auto;margin-right:10px}
 /* the readouts that used to sit in the hub - now the dial's headline, so they
    carry the weight the hub used to give them */
 /* the ratio may shrink and, in the worst case, clip with an ellipsis rather than
@@ -682,8 +688,8 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .tab:hover:not(:disabled){border-color:var(--ink-3);color:var(--ink)}
 .tabdot{width:9px;height:9px;border-radius:50%;background:var(--lc);flex:none}
 .tabword{font-family:"Archivo",sans-serif;font-size:12.5px}
-@media (max-width:620px){
-  /* four tabs and a + will not fit spelled out on a phone */
+@media (max-width:940px){
+  /* four tabs and a + will not fit spelled out on a phone - or a tablet, which is laid out as one */
   .tabs[data-count="4"] .tabword{display:none}
 }
 .tab[data-on="1"]{
@@ -808,7 +814,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
    two dropdowns onto their own lines and broke the sentence */
 select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .sess-gap{margin-left:14px}
-@media (max-width:640px){ .sess-gap{margin-left:0} }
+@media (max-width:940px){ .sess-gap{margin-left:0} }
 /* the summary reads left, the way into the detail sits bottom right */
 .sess-foot{
   display:flex;align-items:flex-end;gap:12px;
@@ -851,13 +857,16 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(--line-2);border-bottom-width:2px;border-radius:5px;padding:1px 5px;color:var(--ink-2);background:var(--sunk)}
 
 @media (max-width:940px){
+  /* a tablet gets the phone layout, as one centred column: no wide two-column
+     stage, no stretched toggles - Oscar has no tablet to tune it on */
+  .wrap{max-width:620px}
   .stage{grid-template-columns:minmax(0,1fr)}
   /* tempo above, tools below, each spanning the panel */
   .transport{grid-template-columns:1fr;row-gap:16px}
   .tools{grid-template-columns:minmax(112px,1fr) minmax(118px,1.1fr) minmax(170px,1.5fr)}
   :root[data-ui="simple"] .tools{grid-template-columns:minmax(118px,1fr) minmax(170px,1.5fr)}
 }
-@media (max-width:620px){
+@media (max-width:940px){
   /* the tempo number gets its own line so the four jump buttons sit
      together on a single comfortable row beneath it */
   .bpm-block{gap:8px}
@@ -978,6 +987,7 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
         <span class="metric sub mono" id="posLbl">stopped</span>
         <!-- the score is what the wheel writes out, so its button lives on the wheel -->
         <button class="icobtn score-ico" id="scoreBtn" title="Write it out as notation" aria-label="Score"><svg class="note" viewBox="0 0 22 30" aria-hidden="true"><ellipse cx="8" cy="22.5" rx="5.4" ry="3.7" transform="rotate(-22 8 22.5)" fill="currentColor"/><path d="M12.9 21.6V3.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M12.9 3.5c3.6 2.2 6 5.2 4.4 10.2" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg></button>
+        <button class="icobtn" id="shareBtn" title="Share a clip of the wheel as audio" aria-label="Share a clip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="6" cy="12" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="19" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8.1 10.8l7.8-4.6M8.1 13.2l7.8 4.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
       </div>
       <div class="canvas-hold">
         <canvas id="cv"></canvas>
@@ -1194,6 +1204,20 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
     </div>
     <p class="plan-sum" id="scoreSum"></p>
     <div id="scoreBody"></div>
+  </div>
+</div>
+<!-- a clip of the wheel: one to eight loops, rendered offline, as a WAV -->
+<div class="modal" id="shareSheet" hidden>
+  <div class="sheet share-sheet" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
+    <div class="sheet-head">
+      <h2 id="shareTitle">Share a clip</h2>
+      <span class="seg" id="shareLoops" role="group" aria-label="How many loops">
+        <button type="button" data-loops="1">1</button><button type="button" data-loops="2">2</button><button type="button" data-loops="4">4</button><button type="button" data-loops="8">8</button>
+      </span>
+      <button class="icobtn" id="shareClose" title="Close" aria-label="Close">&times;</button>
+    </div>
+    <p class="plan-sum" id="shareSum"></p>
+    <div class="lvl-foot"><button class="btn" id="shareGo" disabled>Share</button></div>
   </div>
 </div>
 
@@ -1447,23 +1471,25 @@ function initAudio(){
 }
 var DEST = null;   /* where the next voice() lands; null means the master bus */
 var PITCH = 1;     /* multiplies every frequency in the next voice() */
+var RCTX = null, rNoise = null;   /* an offline context while a clip renders; the voices build into it */
+function ac(){ return RCTX || ctx; }
 function bus(){ return DEST || out; }
 
 function noise(t, dur, gain, freq, q, type){
-  var src = ctx.createBufferSource(); src.buffer = noiseBuf;
-  var bp = ctx.createBiquadFilter(); bp.type = type || "bandpass";
+  var src = ac().createBufferSource(); src.buffer = RCTX ? rNoise : noiseBuf;
+  var bp = ac().createBiquadFilter(); bp.type = type || "bandpass";
   bp.frequency.value = Math.min(freq * PITCH, 18000); bp.Q.value = q || 1;
-  var g = ctx.createGain();
+  var g = ac().createGain();
   g.gain.setValueAtTime(gain, t);
   g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
   src.connect(bp); bp.connect(g); g.connect(bus());
   src.start(t); src.stop(t + dur + 0.02);
 }
 function tone(t, dur, gain, f0, f1, type){
-  var o = ctx.createOscillator(); o.type = type || "sine";
+  var o = ac().createOscillator(); o.type = type || "sine";
   o.frequency.setValueAtTime(f0 * PITCH, t);
   if(f1 && f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1 * PITCH, t + dur);
-  var g = ctx.createGain();
+  var g = ac().createGain();
   g.gain.setValueAtTime(0.0001, t);
   g.gain.linearRampToValueAtTime(gain, t + 0.002);
   g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
@@ -1913,6 +1939,7 @@ function draw(){
   }
   if(S.tapMode === "cal" || calDone) calHub(cx, cy, scale, tnow);
   sessPauseHub(cx, cy, tnow);
+  paintShareBtn();
   drawOverlay(tnow);
 
   requestAnimationFrame(draw);
@@ -3049,293 +3076,325 @@ function pat(str){
 }
 
 var RHYTHM_GROUPS = [
+  /* Every entry: ring 1 is the pulse the time signature is read from (soft, so
+     the character rings speak), accents are written with X, palmas are the clap
+     voice, and subdivisions or offsets carry what a plain grid cannot. Each one
+     is meant to be a small demonstration of the tool as much as a template. */
   { group:"Cuba & the Caribbean", items:[
-    { name:"Rumba", note:"clave 3-2", bpm:100, den:8, rings:[
-      { div:8,  sound:"wood", vol:0.42, pattern:"xxxxxxxx" },
-      { div:16, sound:"rim",  vol:1.00, pattern:"x..x...x..x.x..." },
-      { div:8,  sound:"kick", vol:0.70, pattern:"x...x..." }
+    { name:"Rumba", note:"guaguancó · rumba clave 3-2, cáscara, tumbao", bpm:100, rings:[
+      { div:4,  sound:"wood",  vol:0.28, pattern:"Xxxx" },
+      { div:16, sound:"rim",   vol:0.95, pattern:"X..x...x..X.x..." },
+      { div:16, sound:"hihat", vol:0.40, pattern:"x.xx.x.xx.x.xx.x" },
+      { div:16, sound:"kick",  vol:0.75, pattern:"x...........x.x." }
     ]},
-    { name:"Mambo", note:"bell + clave 2-3", bpm:106, den:8, rings:[
-      { div:8,  sound:"bell", vol:0.70, pattern:"xxxxxxxx" },
-      { div:16, sound:"rim",  vol:0.95, pattern:"..x.x...x..x..x." },
-      { div:8,  sound:"kick", vol:0.70, pattern:"x...x..." }
+    { name:"Mambo", note:"mambo bell, son clave 2-3, tumbao", bpm:100, rings:[
+      { div:4,  sound:"wood",  vol:0.26, pattern:"Xxxx" },
+      { div:16, sound:"bell",  vol:0.70, pattern:"X.xx.xx.X.xx.xx." },
+      { div:16, sound:"rim",   vol:0.92, pattern:"..x.x...X..x..x." },
+      { div:16, sound:"kick",  vol:0.75, pattern:"x...........x.x." }
     ]},
-    { name:"Chachachá", note:"the 4-and-1 figure", bpm:120, rings:[
-      { div:4, sound:"wood",  vol:0.35, pattern:"xxxx" },
-      { div:8, sound:"click", vol:0.95, pattern:"x.....xx" },
-      { div:8, sound:"kick",  vol:0.70, pattern:"x...x..." }
+    { name:"Chachachá", note:"güiro long-short-short, bell on the beat, 4-and-1", bpm:120, rings:[
+      { div:4,  sound:"bell",  vol:0.55, pattern:"Xxxx" },
+      { div:8,  sound:"click", vol:0.70, pattern:"x.xxx.xx" },
+      { div:8,  sound:"kick",  vol:0.80, pattern:"x.....xx" }
     ]},
-    { name:"Merengue", note:"güira + tambora", bpm:140, rings:[
-      { div:4,  sound:"wood",  vol:0.30, pattern:"xxxx" },
-      { div:16, sound:"hihat", vol:0.45, pattern:"xxxxxxxxxxxxxxxx" },
-      { div:8,  sound:"kick",  vol:0.90, pattern:"x...xx.." }
+    { name:"Merengue", note:"güira drive, tambora bass and slaps", bpm:140, rings:[
+      { div:4,  sound:"wood",  vol:0.26, pattern:"Xxxx" },
+      { div:16, sound:"hihat", vol:0.42, pattern:"XxxxXxxxXxxxXxxx" },
+      { div:8,  sound:"kick",  vol:0.90, pattern:"x...xx.." },
+      { div:8,  sound:"rim",   vol:0.70, pattern:"..x...x." }
     ]},
-    { name:"Bachata", note:"derecho · push on 4-and", bpm:130, rings:[
-      { div:4, sound:"wood",  vol:0.30, pattern:"xxxx" },
-      { div:8, sound:"hihat", vol:0.45, pattern:"xxxxxxxx" },
-      { div:8, sound:"kick",  vol:0.90, pattern:"x...x..x" }
+    { name:"Bachata", note:"güira with the 4 accented, bongo push on 4-and", bpm:130, rings:[
+      { div:4,  sound:"wood",  vol:0.26, pattern:"Xxxx" },
+      { div:8,  sound:"hihat", vol:0.45, pattern:"xxxxxxXx" },
+      { div:8,  sound:"kick",  vol:0.90, pattern:"x...x..x" },
+      { div:8,  sound:"rim",   vol:0.55, pattern:"..x...xx" }
     ]},
-    { name:"Reggaetón", note:"dembow", bpm:96, rings:[
-      { div:4,  sound:"kick",  vol:0.95, pattern:"x.x." },
-      { div:16, sound:"snare", vol:0.90, pattern:"...x..x....x..x." },
+    { name:"Reggaetón", note:"dembow · kick on the floor, snare on the 3-3-2", bpm:96, rings:[
+      { div:4,  sound:"kick",  vol:0.95, pattern:"Xxxx" },
+      { div:16, sound:"snare", vol:0.90, pattern:"...X..x....X..x." },
       { div:4,  sound:"hihat", vol:0.45, off:0.5, pattern:"xxxx" }
     ]},
-    { name:"Dembow", note:"Dominican · busier kick", bpm:115, rings:[
-      { div:4,  sound:"wood",  vol:0.28, pattern:"xxxx" },
-      { div:16, sound:"kick",  vol:0.90, pattern:"x..x..x.x..x..x." },
-      { div:16, sound:"snare", vol:0.85, pattern:"...x..x....x..x." }
+    { name:"Dembow", note:"Dominican · kick on the tresillo, snare answers", bpm:115, rings:[
+      { div:4,  sound:"wood",  vol:0.26, pattern:"Xxxx" },
+      { div:16, sound:"kick",  vol:0.90, pattern:"X..x..x.X..x..x." },
+      { div:16, sound:"snare", vol:0.85, pattern:"...x..x....x..x." },
+      { div:16, sound:"hihat", vol:0.32, pattern:"xxxxxxxxxxxxxxxx" }
     ]}
   ]},
 
   { group:"South America", items:[
-    { name:"Samba", note:"surdo + clave", bpm:96, rings:[
-      { div:4,  sound:"kick",  vol:0.95, pattern:".x.x" },
-      { div:16, sound:"rim",   vol:0.85, pattern:"x..x..x...x.x..." },
-      { div:4,  sound:"hihat", vol:0.50, off:0.5, pattern:"xxxx" }
+    { name:"Samba", note:"surdo on 2, tamborim clave, ganzá", bpm:96, rings:[
+      { div:4,  sound:"wood",  vol:0.24, pattern:"Xxxx" },
+      { div:16, sound:"rim",   vol:0.85, pattern:"X..x..x...X.x..." },
+      { div:16, sound:"hihat", vol:0.38, pattern:"xxXxxxXxxxXxxxXx" },
+      { div:4,  sound:"kick",  vol:0.95, pattern:".X.X" }
     ]},
-    { name:"Bossa nova", note:"bossa clave", bpm:128, den:8, rings:[
-      { div:8,  sound:"wood", vol:0.35, pattern:"xxxxxxxx" },
-      { div:16, sound:"rim",  vol:0.90, pattern:"x..x..x...x..x.." },
-      { div:8,  sound:"kick", vol:0.60, pattern:"x.x.x.x." }
+    { name:"Bossa nova", note:"bossa clave over the 1, 2-and, 3, 4-and bass", bpm:128, rings:[
+      { div:4,  sound:"wood",  vol:0.26, pattern:"Xxxx" },
+      { div:16, sound:"rim",   vol:0.90, pattern:"X..x..x...X..x.." },
+      { div:8,  sound:"kick",  vol:0.65, pattern:"x..xx..x" },
+      { div:8,  sound:"hihat", vol:0.32, pattern:"xxxxxxxx" }
     ]},
-    { name:"Forró", note:"baião · zabumba tresillo", bpm:104, rings:[
-      { div:4,  sound:"wood",  vol:0.30, pattern:"xxxx" },
-      { div:16, sound:"kick",  vol:0.92, pattern:"x..x..x.x..x..x." },
-      { div:8,  sound:"hihat", vol:0.45, pattern:"xxxxxxxx" }
+    { name:"Forró", note:"baião · zabumba on the tresillo, triangle on top", bpm:104, rings:[
+      { div:4,  sound:"wood",  vol:0.24, pattern:"Xxxx" },
+      { div:16, sound:"kick",  vol:0.92, pattern:"X..x..x.X..x..x." },
+      { div:16, sound:"hihat", vol:0.42, pattern:"xxxXxxxXxxxXxxxX" },
+      { div:4,  sound:"rim",   vol:0.50, off:0.5, pattern:"xxxx" }
     ]},
-    { name:"Cumbia", note:"llamador on every off-beat", bpm:96, rings:[
-      { div:4, sound:"wood", vol:0.30, pattern:"xxxx" },
-      { div:4, sound:"rim",  vol:0.90, off:0.5, pattern:"xxxx" },
-      { div:8, sound:"kick", vol:0.85, pattern:"x....xx." }
+    { name:"Cumbia", note:"llamador on every off-beat, guache, tambora", bpm:96, rings:[
+      { div:4,  sound:"wood",  vol:0.26, pattern:"Xxxx" },
+      { div:4,  sound:"rim",   vol:0.90, off:0.5, pattern:"xxxx" },
+      { div:16, sound:"hihat", vol:0.36, pattern:"xxxxxxxxxxxxxxxx" },
+      { div:8,  sound:"kick",  vol:0.85, pattern:"x....xx." }
     ]},
-    { name:"Tango", note:"habanera", bpm:108, rings:[
-      { div:4, sound:"wood", vol:0.40, pattern:"xxxx" },
-      { div:8, sound:"kick", vol:0.95, pattern:"x..xx.x." },
-      { div:4, sound:"rim",  vol:0.50, pattern:".x.x" }
+    { name:"Tango argentino", note:"habanera bass, marcato on 1 and 3", bpm:108, rings:[
+      { div:4,  sound:"wood",  vol:0.36, pattern:"XxXx" },
+      { div:8,  sound:"kick",  vol:0.95, pattern:"X..xx.x." },
+      { div:4,  sound:"rim",   vol:0.50, pattern:".x.x" }
     ]},
-    { name:"Milonga", note:"3+3+2", bpm:104, rings:[
-      { div:4, sound:"wood", vol:0.32, pattern:"xxxx" },
-      { div:8, sound:"kick", vol:0.95, pattern:"x..x..x." },
-      { div:4, sound:"rim",  vol:0.55, pattern:".x.x" }
+    { name:"Milonga", note:"3+3+2 · the tresillo as a bass line", bpm:104, rings:[
+      { div:4,  sound:"wood",  vol:0.28, pattern:"Xxxx" },
+      { div:8,  sound:"kick",  vol:0.95, pattern:"X..X..X." },
+      { div:8,  sound:"rim",   vol:0.55, pattern:".x.x.x.x" }
     ]},
-    { name:"Landó", note:"12/8 · Afro-Peruvian", bpm:150, den:8, rings:[
-      { div:12, sound:"click", vol:0.62, pattern:"XxxXxxXXxxXx" },
-      { div:12, sound:"kick",  vol:0.70, pattern:"x.....x....." }
+    { name:"Landó", note:"12/8 cajón against a 6/4 hemiola", bpm:150, den:8, rings:[
+      { div:12, sound:"click", vol:0.55, pattern:"XxxXxxXxxXxx" },
+      { div:6,  sound:"rim",   vol:0.50, pattern:"Xxxxxx" },
+      { div:12, sound:"kick",  vol:0.75, pattern:"x.....x.x..." }
     ]}
   ]},
 
   { group:"Flamenco", items:[
-    { name:"Soleá", note:"12 · accents 12 3 6 8 10", bpm:80, den:8, rings:[
-      { div:12, sound:"clap", vol:0.62, pattern:"XxxXxxXxXxXx" },
-      { div:12, sound:"kick", vol:0.65, pattern:"x.....x....." }
-    ]},
-    { name:"Bulerías", note:"same 12, fast", bpm:210, den:8, rings:[
-      { div:12, sound:"clap", vol:0.62, pattern:"XxxXxxXxXxXx" },
+    /* the twelve-count starts on 12 so the loop begins on an accent;
+       palmas a contratiempo sit half a step behind the count */
+    { name:"Soleá", note:"12 · accents 12 3 6 8 10, palmas a contratiempo", bpm:80, den:8, rings:[
+      { div:12, sound:"clap",  vol:0.62, pattern:"XxxXxxXxXxXx" },
+      { div:12, sound:"clap",  vol:0.30, off:0.5, pattern:"xxxxxxxxxxxx" },
       { div:12, sound:"kick",  vol:0.60, pattern:"x.....x....." }
     ]},
-    { name:"Alegrías", note:"same 12, bright", bpm:180, den:8, rings:[
-      { div:12, sound:"clap", vol:0.62, pattern:"XxxXxxXxXxXx" },
-      { div:12, sound:"kick",  vol:0.62, pattern:"x.....x....." }
+    { name:"Bulerías", note:"same 12, fast · golpe on 12 and 8", bpm:210, den:8, rings:[
+      { div:12, sound:"clap",  vol:0.62, pattern:"XxxXxxXxXxXx" },
+      { div:12, sound:"clap",  vol:0.30, off:0.5, pattern:"xxxxxxxxxxxx" },
+      { div:12, sound:"kick",  vol:0.55, pattern:"x.......x..." }
     ]},
-    { name:"Seguiriya", note:"12 · accents 1 3 5 8 11", bpm:130, den:8, rings:[
-      { div:12, sound:"clap", vol:0.62, pattern:"XxXxXxxXxxXx" },
-      { div:12, sound:"kick",  vol:0.62, pattern:"x......x...." }
+    { name:"Alegrías", note:"same 12, bright · cajón keeps the eighths", bpm:180, den:8, rings:[
+      { div:12, sound:"clap",  vol:0.62, pattern:"XxxXxxXxXxXx" },
+      { div:12, sound:"clap",  vol:0.28, off:0.5, pattern:"xxxxxxxxxxxx" },
+      { div:12, sound:"hihat", vol:0.30, pattern:"xxxxxxxxxxxx" },
+      { div:12, sound:"kick",  vol:0.55, pattern:"x.....x....." }
     ]},
-    { name:"Tangos", note:"flamenco 4/4", bpm:110, rings:[
-      { div:4, sound:"wood",  vol:0.32, pattern:"xxxx" },
-      { div:4, sound:"clap", vol:0.90, pattern:".x.x" },
-      { div:8, sound:"kick",  vol:0.78, pattern:"x..x.x.." }
+    { name:"Seguiriya", note:"12 · 2+2+3+3+2 · accents 1 3 5 8 11", bpm:130, den:8, rings:[
+      { div:12, sound:"clap",  vol:0.62, pattern:"XxXxXxxXxxXx" },
+      { div:12, sound:"wood",  vol:0.22, pattern:"xxxxxxxxxxxx" },
+      { div:12, sound:"kick",  vol:0.60, pattern:"x......x...." }
     ]},
-    { name:"Rumba flamenca", note:"3+3+2 + off-beat palmas", bpm:100, rings:[
-      { div:4, sound:"wood",  vol:0.30, pattern:"xxxx" },
-      { div:8, sound:"clap", vol:0.92, pattern:"x..x..x." },
-      { div:4, sound:"rim",   vol:0.60, off:0.5, pattern:"xxxx" }
+    { name:"Tangos flamencos", note:"4/4 · palmas from the 2, the 4 answered", bpm:110, rings:[
+      { div:4,  sound:"wood",  vol:0.28, pattern:"Xxxx" },
+      { div:8,  sound:"clap",  vol:0.90, pattern:"..x.x.xX" },
+      { div:8,  sound:"kick",  vol:0.78, pattern:"x..x.x.." }
     ]},
-    { name:"Tanguillo", note:"2/4 · 16th tresillo", bpm:130, den:8, rings:[
-      { div:4,  sound:"wood",  vol:0.30, pattern:"xxxx" },
-      { div:16, sound:"clap", vol:0.92, pattern:"x..x..x.x..x..x." },
-      { div:4,  sound:"kick",  vol:0.70, pattern:"x.x." }
+    { name:"Rumba flamenca", note:"3+3+2 palmas, contratiempo, bombo on 1 and 3", bpm:100, rings:[
+      { div:4,  sound:"wood",  vol:0.26, pattern:"Xxxx" },
+      { div:8,  sound:"clap",  vol:0.92, pattern:"X..X..X." },
+      { div:4,  sound:"clap",  vol:0.36, off:0.5, pattern:"xxxx" },
+      { div:8,  sound:"kick",  vol:0.75, pattern:"x...x.x." }
+    ]},
+    { name:"Tanguillo", note:"6/8 palmas against a 3/4 cross-beat", bpm:220, den:8, rings:[
+      { div:6,  sound:"clap",  vol:0.85, pattern:"XxxXxx" },
+      { div:3,  sound:"rim",   vol:0.55, pattern:"Xxx" },
+      { div:6,  sound:"kick",  vol:0.70, pattern:"x..x.." }
     ]}
   ]},
 
   { group:"Spain · folk", items:[
-    { name:"Jota", note:"3/4 · castanet subdivisions", bpm:150, rings:[
+    { name:"Jota", note:"3/4 · castanet roll, bass on 1 and 3", bpm:150, rings:[
       { div:3, sub:2, sound:"wood",  vol:0.55, pattern:"Xxxxxx" },
       { div:3, sound:"kick",  vol:0.65, pattern:"x.x" }
     ]},
-    { name:"Fandango", note:"6 pulses · 3 against 2", bpm:180, den:8, rings:[
-      { div:6, sound:"wood",  vol:0.30, pattern:"xxxxxx" },
-      { div:3, sound:"click", vol:0.85, pattern:"xxx" },
-      { div:2, sound:"kick",  vol:0.80, pattern:"xx" }
+    { name:"Fandango", note:"3/4 palmas against 2 · the hemiola", bpm:180, den:8, rings:[
+      { div:6, sound:"wood",  vol:0.26, pattern:"Xxxxxx" },
+      { div:3, sound:"clap",  vol:0.85, pattern:"Xxx" },
+      { div:2, sound:"kick",  vol:0.80, pattern:"Xx" }
     ]},
     { name:"Sevillanas", note:"3/4 · palmas on 2 and 3", bpm:150, rings:[
-      { div:3, sub:2, sound:"wood",  vol:0.55, pattern:"xxXxXx" },
+      { div:3, sub:2, sound:"clap",  vol:0.60, pattern:"xxXxXx" },
       { div:3, sound:"kick",  vol:0.70, pattern:"x.." }
     ]}
   ]},
 
   { group:"Africa", items:[
-    { name:"Ewe", note:"12/8 · seven-stroke bell", bpm:210, den:8, rings:[
-      { div:12, sound:"wood", vol:0.25, pattern:"xxxxxxxxxxxx" },
-      { div:12, sound:"bell", vol:1.00, pattern:"x.x.xx.x.x.x" },
-      { div:4,  sound:"kick", vol:0.60, pattern:"xxxx" }
+    { name:"Ewe", note:"12/8 · seven-stroke bell, rattle, four-beat drum", bpm:210, den:8, rings:[
+      { div:12, sound:"wood",  vol:0.22, pattern:"Xxxxxxxxxxxx" },
+      { div:12, sound:"bell",  vol:1.00, pattern:"X.x.xx.x.x.x" },
+      { div:12, sound:"hihat", vol:0.30, pattern:"xxxxxxxxxxxx" },
+      { div:4,  sound:"kick",  vol:0.62, pattern:"Xxxx" }
     ]},
-    { name:"Mandinga", note:"12/8 · five-stroke bell", bpm:200, den:8, rings:[
-      { div:12, sound:"wood", vol:0.28, pattern:"xxxxxxxxxxxx" },
-      { div:12, sound:"bell", vol:0.95, pattern:"x.x..x.x..x." },
-      { div:4,  sound:"kick", vol:0.60, pattern:"xxxx" }
+    { name:"Mandinka", note:"12/8 · five-stroke bell over the four beats", bpm:200, den:8, rings:[
+      { div:12, sound:"wood",  vol:0.24, pattern:"Xxxxxxxxxxxx" },
+      { div:12, sound:"bell",  vol:0.95, pattern:"X.x..x.x..x." },
+      { div:4,  sound:"kick",  vol:0.62, pattern:"Xxxx" }
     ]},
-    { name:"Foli", note:"12 pulses · three on four", bpm:190, den:8, rings:[
-      { div:12, sound:"wood", vol:0.25, pattern:"xxxxxxxxxxxx" },
-      { div:4,  sound:"kick", vol:0.85, pattern:"xxxx" },
-      { div:3,  sound:"rim",  vol:0.80, pattern:"xxx" }
+    { name:"Foli", note:"12 pulses · three against four", bpm:190, den:8, rings:[
+      { div:12, sound:"wood",  vol:0.22, pattern:"Xxxxxxxxxxxx" },
+      { div:4,  sound:"kick",  vol:0.85, pattern:"Xxxx" },
+      { div:3,  sound:"rim",   vol:0.80, pattern:"Xxx" }
     ]},
-    { name:"Gnawa", note:"6/8 · qraqeb", bpm:190, den:8, rings:[
-      { div:6, sound:"click", vol:0.62, pattern:"XxXXxX" },
+    { name:"Gnawa", note:"6/8 · qraqeb long-short, guembri on the dotted beat", bpm:190, den:8, rings:[
+      { div:6, sound:"click", vol:0.62, pattern:"X.xX.x" },
       { div:6, sound:"kick",  vol:0.80, pattern:"x..x.." }
     ]},
-    { name:"Mbalax", note:"sabar · 4/4 syncopation", bpm:130, rings:[
-      { div:4,  sound:"wood",  vol:0.28, pattern:"xxxx" },
-      { div:16, sound:"rim",   vol:0.92, pattern:"x..x..xx..x..x.." },
-      { div:16, sound:"kick",  vol:0.80, pattern:"x......x........" }
+    { name:"Mbalax", note:"sabar · off-beat rolls over a sparse bass", bpm:130, rings:[
+      { div:4,  sound:"wood",  vol:0.24, pattern:"Xxxx" },
+      { div:16, sound:"rim",   vol:0.92, pattern:"X..x..xX..x..x.." },
+      { div:16, sound:"hihat", vol:0.30, pattern:"xxxxxxxxxxxxxxxx" },
+      { div:16, sound:"kick",  vol:0.80, pattern:"x......x..x....." }
     ]},
-    { name:"Afrobeat", note:"clave-leaning kick + shaker", bpm:112, rings:[
-      { div:4,  sound:"wood",  vol:0.26, pattern:"xxxx" },
+    { name:"Afrobeat", note:"clave-leaning kick, steady shaker, snare on 2 and 4", bpm:112, rings:[
+      { div:4,  sound:"wood",  vol:0.22, pattern:"Xxxx" },
       { div:16, sound:"hihat", vol:0.40, pattern:"xxxxxxxxxxxxxxxx" },
-      { div:16, sound:"kick",  vol:0.90, pattern:"x..x..x...x.x..." }
+      { div:16, sound:"kick",  vol:0.90, pattern:"X..x..x...x.x..." },
+      { div:4,  sound:"rim",   vol:0.55, pattern:".x.x" }
     ]}
   ]},
 
   { group:"Middle East", items:[
-    { name:"Maqsum", note:"iqa' · 4/4", bpm:100, rings:[
-      { div:4, sound:"wood", vol:0.30, pattern:"xxxx" },
-      { div:8, sound:"kick", vol:0.95, pattern:"x...x..." },
-      { div:8, sound:"rim",  vol:0.80, pattern:".x.x..x." }
+    { name:"Maqsum", note:"iqa' · dum tak _ tak dum _ tak _, riq on top", bpm:100, rings:[
+      { div:4,  sound:"wood",  vol:0.26, pattern:"Xxxx" },
+      { div:8,  sound:"kick",  vol:0.95, pattern:"X...x..." },
+      { div:8,  sound:"rim",   vol:0.80, pattern:".x.x..x." },
+      { div:16, sound:"hihat", vol:0.28, pattern:"xxxxxxxxxxxxxxxx" }
     ]},
-    { name:"Samai", note:"10/8 · 3+2+2+3", bpm:120, den:8, rings:[
-      { div:10, sound:"wood", vol:0.30, pattern:"xxxxxxxxxx" },
-      { div:10, sound:"kick", vol:0.95, pattern:"x....xx..." },
-      { div:10, sound:"rim",  vol:0.80, pattern:"...x....x." }
+    { name:"Samai", note:"10/8 · 3+2+2+3 · dum _ _ tak _ dum dum _ tak _", bpm:120, den:8, rings:[
+      { div:10, sound:"wood",  vol:0.28, pattern:"XxxXxXxXxx" },
+      { div:10, sound:"kick",  vol:0.95, pattern:"X....xx..." },
+      { div:10, sound:"rim",   vol:0.80, pattern:"...x....x." }
     ]},
-    { name:"Dabke", note:"Levantine 4/4", bpm:120, rings:[
-      { div:4, sound:"wood", vol:0.30, pattern:"xxxx" },
-      { div:8, sound:"kick", vol:0.95, pattern:"x..x.x.." },
-      { div:8, sound:"rim",  vol:0.75, pattern:".x..x..x" }
+    { name:"Dabke", note:"ayyub · dum _ _ tak dum _ tak _", bpm:120, rings:[
+      { div:4,  sound:"wood",  vol:0.26, pattern:"Xxxx" },
+      { div:8,  sound:"kick",  vol:0.95, pattern:"X...x..." },
+      { div:8,  sound:"rim",   vol:0.75, pattern:"...x..x." },
+      { div:16, sound:"hihat", vol:0.26, pattern:"xxxxxxxxxxxxxxxx" }
     ]}
   ]},
 
   { group:"Balkans & Europe", items:[
-    { name:"Aksak", note:"9/8 · 2+2+2+3", bpm:260, den:8, rings:[
-      { div:9, sound:"click", vol:0.62, pattern:"XxXxXxXxx" }
+    { name:"Aksak", note:"9/8 · 2+2+2+3, tapan on the group starts", bpm:260, den:8, rings:[
+      { div:9, sound:"click", vol:0.62, pattern:"XxXxXxXxx" },
+      { div:9, sound:"kick",  vol:0.60, pattern:"x.x.x.x.." }
     ]},
     { name:"Kopačka", note:"11/16 · 2+2+3+2+2", bpm:240, den:16, rings:[
-      { div:11, sound:"click", vol:0.62, pattern:"XxXxXxxXxXx" }
+      { div:11, sound:"click", vol:0.62, pattern:"XxXxXxxXxXx" },
+      { div:11, sound:"kick",  vol:0.60, pattern:"x.x.x..x.x." }
     ]},
     { name:"Kalamatianós", note:"7/8 · 3+2+2", bpm:220, den:8, rings:[
-      { div:7, sound:"click", vol:0.62, pattern:"XxxXxXx" }
+      { div:7, sound:"click", vol:0.62, pattern:"XxxXxXx" },
+      { div:7, sound:"kick",  vol:0.60, pattern:"x..x.x." }
     ]},
-    { name:"Csárdás", note:"2/4 · esztam off-beat", bpm:132, rings:[
-      { div:2, sound:"wood", vol:0.35, pattern:"xx" },
+    { name:"Csárdás", note:"2/4 · esztam: bass on the beat, chord off it", bpm:132, rings:[
+      { div:2, sound:"wood", vol:0.30, pattern:"Xx" },
       { div:2, sound:"rim",  vol:0.85, off:0.5, pattern:"xx" },
       { div:2, sound:"kick", vol:0.92, pattern:"x." }
     ]},
-    { name:"Verbunkos", note:"4/4 · dotted long-short", bpm:112, rings:[
-      { div:4,  sound:"wood",  vol:0.32, pattern:"xxxx" },
-      { div:16, sound:"click", vol:0.85, pattern:"x..xx..xx..xx..x" },
+    { name:"Verbunkos", note:"4/4 · dotted long-short, bass on 1 and 3", bpm:112, rings:[
+      { div:4,  sound:"wood",  vol:0.28, pattern:"Xxxx" },
+      { div:16, sound:"click", vol:0.85, pattern:"X..xX..xX..xX..x" },
       { div:4,  sound:"kick",  vol:0.72, pattern:"x.x." }
     ]},
-    { name:"Tarantella", note:"6/8 · tambourine", bpm:200, den:8, rings:[
-      { div:6, sound:"wood",  vol:0.28, pattern:"xxxxxx" },
-      { div:6, sound:"hihat", vol:0.50, pattern:"xxxxxx" },
+    { name:"Tarantella", note:"6/8 · tambourine with the shake on 2 and 5", bpm:200, den:8, rings:[
+      { div:6, sound:"hihat", vol:0.50, pattern:"XxxXxx" },
+      { div:6, sound:"wood",  vol:0.24, pattern:"xxxxxx" },
       { div:6, sound:"kick",  vol:0.88, pattern:"x..x.." }
     ]}
   ]},
 
   { group:"Asia", items:[
-    { name:"Konnakol", note:"adi tala 8 · with a 5", bpm:120, rings:[
-      { div:8, sub:2, sound:"wood",  vol:0.50, pattern:"xxxxxxxxxxxxxxxx" },
-      { div:8, sound:"click", vol:0.95, pattern:"x...x.x." },
-      { div:5, sound:"rim",   vol:0.70, pattern:"xxxxx" }
+    { name:"Konnakol", note:"adi tala · 8 with the claps of the tala, a 5 across it", bpm:120, rings:[
+      { div:8, sub:2, sound:"wood",  vol:0.45, pattern:"Xxxxxxxxxxxxxxxx" },
+      { div:8, sound:"clap",  vol:0.90, pattern:"X...x.x." },
+      { div:5, sound:"rim",   vol:0.70, pattern:"Xxxxx" }
     ]},
-    { name:"Gamelan", note:"colotomic · gong every 16", bpm:160, rings:[
-      { div:16, sound:"wood", vol:0.32, pattern:"xxxxxxxxxxxxxxxx" },
-      { div:4,  sound:"bell", vol:0.75, pattern:"xxxx" },
+    { name:"Gamelan", note:"colotomic · kenong on 4, gong every 16", bpm:160, rings:[
+      { div:16, sound:"wood", vol:0.30, pattern:"Xxxxxxxxxxxxxxxx" },
+      { div:4,  sound:"bell", vol:0.75, pattern:"Xxxx" },
       { div:1,  sound:"kick", vol:0.95, pattern:"x" }
     ]}
   ]},
 
   { group:"Electronic", items:[
-    { name:"Drum & bass", note:"two-step", bpm:174, rings:[
-      { div:4,  sub:2, sound:"hihat", vol:0.45, pattern:"xxxxxxxx" },
-      { div:16, sound:"kick",  vol:0.95, pattern:"x.........x....." },
-      { div:16, sound:"snare", vol:0.90, pattern:"........x......." }
+    { name:"Drum & bass", note:"two-step · kick on 1 and 3-and, snare on 2 and 4", bpm:174, rings:[
+      { div:4,  sub:2, sound:"hihat", vol:0.45, pattern:"XxxxXxxx" },
+      { div:16, sound:"kick",  vol:0.95, pattern:"X.........x....." },
+      { div:16, sound:"snare", vol:0.90, pattern:"....X.......X..." }
     ]},
-    { name:"Jungle", note:"amen-style break", bpm:170, rings:[
-      { div:4,  sub:4, sound:"hihat", vol:0.38, pattern:"xxxxxxxxxxxxxxxx" },
-      { div:16, sound:"kick",  vol:0.95, pattern:"x....x....x....." },
-      { div:16, sound:"snare", vol:0.90, pattern:"....x..x.x..x..." }
+    { name:"Jungle", note:"amen-style break · ghost snares between the backbeats", bpm:170, rings:[
+      { div:4,  sub:4, sound:"hihat", vol:0.36, pattern:"XxxxXxxxXxxxXxxx" },
+      { div:16, sound:"kick",  vol:0.95, pattern:"X.........x....." },
+      { div:16, sound:"snare", vol:0.88, pattern:"....X..x.x..X..." }
     ]},
-    { name:"House", note:"four to the floor", bpm:124, rings:[
-      { div:4, sound:"kick",  vol:0.95, pattern:"xxxx" },
+    { name:"House", note:"four to the floor · open hat off the beat, clap on 2 and 4", bpm:124, rings:[
+      { div:4, sound:"kick",  vol:0.95, pattern:"Xxxx" },
       { div:4, sound:"hihat", vol:0.55, off:0.5, pattern:"xxxx" },
-      { div:4, sound:"snare", vol:0.72, pattern:".x.x" }
+      { div:4, sound:"clap",  vol:0.70, pattern:".x.x" }
     ]},
-    { name:"Techno", note:"4/4 · sixteenth hats", bpm:134, rings:[
-      { div:4,  sound:"kick",  vol:0.95, pattern:"xxxx" },
-      { div:16, sound:"hihat", vol:0.38, pattern:"xxxxxxxxxxxxxxxx" },
+    { name:"Techno", note:"4/4 · sixteenth hats, off-beat rim", bpm:134, rings:[
+      { div:4,  sound:"kick",  vol:0.95, pattern:"Xxxx" },
+      { div:16, sound:"hihat", vol:0.36, pattern:"xxXxxxXxxxXxxxXx" },
       { div:4,  sound:"rim",   vol:0.58, off:0.5, pattern:"xxxx" }
     ]},
-    { name:"UK garage", note:"two-step", bpm:132, rings:[
-      { div:4,  sound:"wood",  vol:0.26, pattern:"xxxx" },
-      { div:16, sound:"kick",  vol:0.95, pattern:"x.........x....." },
-      { div:16, sound:"snare", vol:0.86, pattern:"....x.......x..." }
+    { name:"UK garage", note:"two-step · shuffled hats, skipping kick", bpm:132, rings:[
+      { div:4,  sound:"wood",  vol:0.22, pattern:"Xxxx" },
+      { div:16, sound:"hihat", vol:0.40, pattern:"x.xXx.xXx.xXx.xX" },
+      { div:16, sound:"kick",  vol:0.95, pattern:"X.........x....." },
+      { div:16, sound:"snare", vol:0.86, pattern:"....X.......X..." }
     ]},
-    { name:"Breakbeat", note:"funky-drummer lean", bpm:132, rings:[
-      { div:4,  sound:"wood",  vol:0.24, pattern:"xxxx" },
-      { div:16, sound:"kick",  vol:0.92, pattern:"x.....x...x....." },
-      { div:16, sound:"snare", vol:0.88, pattern:"....x..x....x..x" }
+    { name:"Breakbeat", note:"funky-drummer lean · displaced kicks, ghosted snares", bpm:132, rings:[
+      { div:4,  sound:"wood",  vol:0.22, pattern:"Xxxx" },
+      { div:16, sound:"kick",  vol:0.92, pattern:"X.....x...x....." },
+      { div:16, sound:"snare", vol:0.88, pattern:"....X..x....X..x" },
+      { div:16, sound:"hihat", vol:0.34, pattern:"xxxxxxxxxxxxxxxx" }
     ]},
-    { name:"Dubstep", note:"half-time · snare on 3", bpm:140, rings:[
-      { div:4, sub:2, sound:"hihat", vol:0.40, pattern:"xxxxxxxx" },
-      { div:4, sound:"kick",  vol:0.95, pattern:"x..." },
-      { div:4, sound:"snare", vol:0.90, pattern:"..x." }
+    { name:"Dubstep", note:"half-time · snare on 3, hats in eighths", bpm:140, rings:[
+      { div:4, sub:2, sound:"hihat", vol:0.40, pattern:"XxxxXxxx" },
+      { div:4, sound:"kick",  vol:0.95, pattern:"X..." },
+      { div:4, sound:"snare", vol:0.90, pattern:"..X." }
     ]},
-    { name:"Trap", note:"half-time · triplet hats", bpm:140, rings:[
-      { div:4,  sub:3, sound:"hihat", vol:0.42, pattern:"xxxxxxxxxxxx" },
-      { div:16, sound:"kick",  vol:0.95, pattern:"x.....x...x....." },
-      { div:4,  sound:"snare", vol:0.88, pattern:"..x." }
+    { name:"Trap", note:"half-time · triplet hats, rolling kick, snare on 3", bpm:140, rings:[
+      { div:4,  sub:3, sound:"hihat", vol:0.42, pattern:"XxxXxxXxxXxx" },
+      { div:16, sound:"kick",  vol:0.95, pattern:"X.....x...x....." },
+      { div:4,  sound:"snare", vol:0.88, pattern:"..X." }
     ]}
   ]},
 
   { group:"Rock & indie", items:[
     { name:"Rock", note:"backbeat · eighth hats", bpm:120, rings:[
-      { div:4, sub:2, sound:"hihat", vol:0.42, pattern:"xxxxxxxx" },
-      { div:4, sound:"kick",  vol:0.95, pattern:"x.x." },
-      { div:4, sound:"snare", vol:0.88, pattern:".x.x" }
+      { div:4, sub:2, sound:"hihat", vol:0.42, pattern:"XxxxXxxx" },
+      { div:4, sound:"kick",  vol:0.95, pattern:"X.x." },
+      { div:4, sound:"snare", vol:0.88, pattern:".x.X" }
     ]},
-    { name:"Indie disco", note:"four to the floor", bpm:128, rings:[
-      { div:4, sub:2, sound:"hihat", vol:0.42, pattern:"xxxxxxxx" },
-      { div:4, sound:"kick",  vol:0.95, pattern:"xxxx" },
+    { name:"Indie disco", note:"four to the floor · open hat off the beat", bpm:128, rings:[
+      { div:4, sub:2, sound:"hihat", vol:0.42, pattern:"xXxXxXxX" },
+      { div:4, sound:"kick",  vol:0.95, pattern:"Xxxx" },
       { div:4, sound:"snare", vol:0.85, pattern:".x.x" }
     ]},
-    { name:"Punk", note:"eighth-note kick", bpm:190, rings:[
-      { div:4, sound:"wood",  vol:0.24, pattern:"xxxx" },
-      { div:8, sound:"kick",  vol:0.95, pattern:"xxxxxxxx" },
+    { name:"Punk", note:"eighth-note kick under the backbeat", bpm:190, rings:[
+      { div:4, sound:"wood",  vol:0.22, pattern:"Xxxx" },
+      { div:8, sound:"kick",  vol:0.95, pattern:"Xxxxxxxx" },
       { div:4, sound:"snare", vol:0.90, pattern:".x.x" }
     ]},
-    { name:"Shuffle", note:"triplets · middle one muted", bpm:96, rings:[
-      { div:4, sub:3, sound:"hihat", vol:0.48, pattern:"x.xx.xx.xx.x" },
-      { div:4, sound:"kick",  vol:0.92, pattern:"x.x." },
+    { name:"Shuffle", note:"triplets with the middle one muted", bpm:96, rings:[
+      { div:4, sub:3, sound:"hihat", vol:0.48, pattern:"X.xx.xx.xx.x" },
+      { div:4, sound:"kick",  vol:0.92, pattern:"X.x." },
       { div:4, sound:"snare", vol:0.88, pattern:".x.x" }
     ]},
-    { name:"Motorik", note:"sixteenth drive", bpm:140, rings:[
-      { div:4, sub:4, sound:"hihat", vol:0.35, pattern:"xxxxxxxxxxxxxxxx" },
-      { div:4, sound:"kick",  vol:0.92, pattern:"x.x." },
+    { name:"Motorik", note:"sixteenth drive, nothing accented but the 1", bpm:140, rings:[
+      { div:4, sub:4, sound:"hihat", vol:0.35, pattern:"Xxxxxxxxxxxxxxxx" },
+      { div:4, sound:"kick",  vol:0.92, pattern:"X.x." },
       { div:4, sound:"snare", vol:0.82, pattern:".x.x" }
     ]},
     { name:"Math rock", note:"7/8 · 3+2+2", bpm:150, den:8, rings:[
-      { div:7, sound:"wood",  vol:0.28, pattern:"xxxxxxx" },
-      { div:7, sound:"kick",  vol:0.92, pattern:"x..x..." },
+      { div:7, sound:"wood",  vol:0.26, pattern:"XxxXxXx" },
+      { div:7, sound:"kick",  vol:0.92, pattern:"X..x..." },
       { div:7, sound:"snare", vol:0.85, pattern:"..x..x." }
     ]}
   ]}
@@ -3501,7 +3560,7 @@ function applySession(c){
     return r;
   });
   S.active = Math.max(0, Math.min(S.rings.length - 1, c.active || 0));
-  if(c.ptab === "mine" || c.ptab === "classic" || c.ptab === "rhythms") S.ptab = c.ptab;
+  /* the preset tab is not restored: the panel always opens on Presets (Oscar's call) */
   if(c.fold && typeof c.fold === "object"){
     FOLD_KEYS.forEach(function(k){ S.fold[k] = !!c.fold[k]; });
   }
@@ -4338,7 +4397,7 @@ function recTap(perfMs){
     return;
   }
 
-  var ph = heardPhase(perfMs);
+  var ph = heardPhase(perfMs - calOffsetMs());   /* the device's lateness, so the dot lands under the hand */
   if(ph === null) return;
   var frac = ph - Math.floor(ph);
 
@@ -5193,6 +5252,20 @@ function calCheck(){
   calSay(lat > 0.12 ? "Wireless headphones detected. Need to calibrate." : "Sound path changed. Need to calibrate.");
 }
 calBtn.addEventListener("click", function(){ if(!calRun && !game) calStart(false); });
+/* headphones plugged, paired or removed: the browser says a device changed, and
+   the next time the audio runs the latency is compared; the note appears if it
+   moved. Where the event is not fired (older browsers) the game-start check
+   still catches it. */
+if(navigator.mediaDevices && navigator.mediaDevices.addEventListener){
+  navigator.mediaDevices.addEventListener("devicechange", function(){
+    if(!cal) return;
+    if(ctx && ctx.state === "running" && ctx.outputLatency) setTimeout(calCheck, 800);
+    else calSay("Sound device changed. Need to calibrate.");
+  });
+}
+document.addEventListener("visibilitychange", function(){
+  if(document.visibilityState === "visible" && cal && S.playing) setTimeout(calCheck, 1200);
+});
 /* In the hub while calibrating: TAP over a number that counts the clicks down
    from ten, each one swelling out of the centre as its click sounds, the way
    the count-in does. Afterwards the verdict, in the app's good or bad colour. */
@@ -5685,6 +5758,174 @@ function showScore(on){
 scoreBtn.addEventListener("click", function(){ showScore(true); });
 document.getElementById("scoreClose").addEventListener("click", function(){ showScore(false); });
 scoreSheet.addEventListener("click", function(e){ if(e.target === scoreSheet) showScore(false); });
+
+/* ---------------------------------------------------------- share a clip ----
+   One to eight loops of the wheel, rendered offline through the very voices and
+   the very limiter the speaker hears, written as 16-bit WAV, and handed to the
+   phone's share sheet - or downloaded where there is none. WAV because every
+   messenger plays it and the browser makes it natively; MP3 would mean inlining
+   an encoder. The clip is rendered the moment the sheet opens (and again when
+   the loop count changes), so the Share press itself is a plain tap with a file
+   already in hand - the share API wants to be called inside that tap.
+   Muted rings are left out; the master fader and mute are not applied, the clip
+   is at nominal level. Available only while the wheel is at rest. */
+var shareBtn = document.getElementById("shareBtn"), shareSheet = document.getElementById("shareSheet");
+var shareGo = document.getElementById("shareGo"), shareSum = document.getElementById("shareSum");
+var shareLoopsEl = document.getElementById("shareLoops");
+var CLIP_LOOPS_KEY = "polyrhythm-circle:clip:loops", CLIP_N_KEY = "polyrhythm-circle:clip:n";
+var clipLoops = 4;
+try{ clipLoops = parseInt(localStorage.getItem(CLIP_LOOPS_KEY), 10) || 4; } catch(err){}
+if([1, 2, 4, 8].indexOf(clipLoops) < 0) clipLoops = 4;
+var clip = null, clipJob = 0;                /* {blob, key, secs}: the clip waiting for the press */
+function shareOK(){
+  return !S.playing && !game && !calRun && !S.tapMode && !run && pickSlot === null &&
+    !!(window.OfflineAudioContext || window.webkitOfflineAudioContext);
+}
+var lastShareOK = null;
+function paintShareBtn(){
+  var ok = shareOK();
+  if(ok !== lastShareOK){ shareBtn.disabled = !ok; lastShareOK = ok; if(!ok && !shareSheet.hidden) shareClose(); }
+}
+/* the same limiter chain the live bus has, built into another context */
+function renderBus(context){
+  var inGain = context.createGain(); inGain.gain.value = 0.9 * DRIVE;
+  var comp = context.createDynamicsCompressor();
+  comp.threshold.value = -6; comp.knee.value = 8; comp.ratio.value = 4; comp.attack.value = 0.0008; comp.release.value = 0.12;
+  var makeup = context.createGain(); makeup.gain.value = MAKEUP;
+  var shaper = context.createWaveShaper();
+  var N = 2048, curve = new Float32Array(N), KNEE = 0.6, j;
+  for(j = 0; j < N; j++){
+    var x = (j / (N - 1)) * 8 - 4, ax = Math.abs(x), y;
+    if(ax <= KNEE) y = ax; else y = KNEE + (1 - KNEE) * Math.tanh((ax - KNEE) / (1 - KNEE));
+    curve[j] = (x < 0 ? -y : y);
+  }
+  shaper.curve = curve; shaper.oversample = "none";
+  inGain.connect(comp); comp.connect(makeup); makeup.connect(shaper); shaper.connect(context.destination);
+  return inGain;
+}
+function renderClip(loops){
+  var cd = cycleDur(), sr = 44100, tail = 0.3, end = loops * cd;
+  var OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+  var off = new OAC(1, Math.ceil(sr * (end + tail)), sr);
+  var inGain = renderBus(off);
+  var len = Math.floor(sr * 0.4), i;
+  rNoise = off.createBuffer(1, len, sr);
+  var d = rNoise.getChannelData(0);
+  for(i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+  RCTX = off; DEST = inGain;
+  try{
+    S.rings.forEach(function(r){
+      if(r.mute) return;
+      var tot = total(r), oph = offPhase(r), L, k;
+      /* every tick that falls inside the clip, whichever rotation it belongs to,
+         so an offset ring's spill from the rotation before is there at the start */
+      for(L = -1; L <= loops; L++) for(k = 0; k < tot; k++){
+        if(!audible(r, k)) continue;
+        var t = (L + k / tot + oph) * cd;
+        if(t < -1e-6 || t >= end - 1e-6) continue;
+        t = Math.max(0, t);
+        if(isMain(r, k)) voice(r.sound, t, r.vol, accented(r, k));
+        else { PITCH = SUB_PITCH; voice(r.sound, t, r.vol * SUB_LEVEL, accented(r, k)); PITCH = 1; }
+      }
+    });
+  } finally { DEST = null; RCTX = null; rNoise = null; PITCH = 1; }
+  /* Loopable: the file is cut at the loop's exact end, and whatever rings past
+     that end (the tail of the last hits) is folded onto the start, which is
+     where it would be heard in a continuous loop. Nothing is lost, and a player
+     set to repeat has no gap. */
+  var endN = Math.round(sr * end);
+  return off.startRendering().then(function(buf){
+    var ch = buf.getChannelData(0), i;
+    for(i = endN; i < ch.length; i++) ch[i - endN] += ch[i];
+    return {buf:buf, frames:endN};
+  });
+}
+function wavBlob(buf, frames){
+  var ch = buf.getChannelData(0), n = Math.min(frames || ch.length, ch.length), bytes = 44 + n * 2;
+  var ab = new ArrayBuffer(bytes), v = new DataView(ab), i, o = 44;
+  function str(at, s){ for(var q = 0; q < s.length; q++) v.setUint8(at + q, s.charCodeAt(q)); }
+  str(0, "RIFF"); v.setUint32(4, bytes - 8, true); str(8, "WAVE");
+  str(12, "fmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, buf.sampleRate, true); v.setUint32(28, buf.sampleRate * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  str(36, "data"); v.setUint32(40, n * 2, true);
+  for(i = 0; i < n; i++){ var s = Math.max(-1, Math.min(1, ch[i])); v.setInt16(o, s < 0 ? s * 32768 : s * 32767, true); o += 2; }
+  return new Blob([ab], {type:"audio/wav"});
+}
+/* "Polyrhythm Circle 3-2 120bpm 04.wav": app, the rings in tab order, the tempo,
+   and a counter kept on the device; the counter only moves when a file goes out */
+function clipName(){
+  var n = 1;
+  try{ n = (parseInt(localStorage.getItem(CLIP_N_KEY), 10) || 0) + 1; } catch(err){}
+  var metrics = S.rings.map(function(r){ return r.div; }).join("-");
+  return {name:"Polyrhythm Circle " + metrics + " " + S.bpm + "bpm " + (n < 10 ? "0" + n : n) + ".wav", n:n};
+}
+function clipCommit(n){ try{ localStorage.setItem(CLIP_N_KEY, String(n)); } catch(err){} }
+function clipKey(){
+  return JSON.stringify([clipLoops, S.bpm, S.noteDen, S.noteDot, S.rings.map(function(r){
+    return [r.div, r.sub, r.off, r.sound, r.vol, !!r.mute, r.steps];
+  })]);
+}
+function loopsWord(){ return clipLoops + (clipLoops === 1 ? " loop" : " loops"); }
+function canShareFiles(){
+  try{
+    return !!(navigator.share && navigator.canShare &&
+      navigator.canShare({files:[new File([new Blob([""])], "t.wav", {type:"audio/wav"})]}));
+  } catch(err){ return false; }
+}
+function paintShareLoops(){
+  [].forEach.call(shareLoopsEl.querySelectorAll("button"), function(b){
+    b.dataset.on = (parseInt(b.dataset.loops, 10) === clipLoops) ? "1" : "0";
+  });
+}
+function prepareClip(){
+  var key = clipKey();
+  if(clip && clip.key === key){ shareReady(); return; }
+  clip = null; shareGo.disabled = true;
+  var job = ++clipJob, secs = clipLoops * cycleDur();
+  shareSum.textContent = "Rendering " + loopsWord() + " \u00b7 " + secs.toFixed(1) + " s\u2026";
+  var p;
+  try{ p = renderClip(clipLoops); } catch(err){ shareSum.textContent = "This browser cannot render audio offline."; return; }
+  p.then(function(r){
+    if(job !== clipJob) return;
+    clip = {blob:wavBlob(r.buf, r.frames), key:key, secs:secs};
+    shareReady();
+  }, function(){ if(job === clipJob) shareSum.textContent = "Rendering failed."; });
+}
+function shareReady(){
+  shareGo.disabled = false;
+  shareGo.textContent = canShareFiles() ? "Share" : "Save";
+  shareSum.textContent = loopsWord() + " \u00b7 " + clip.secs.toFixed(1) + " s \u00b7 " + Math.round(clip.blob.size / 1024) + " KB \u00b7 WAV";
+}
+function shareOpen(){ shareSheet.hidden = false; paintShareLoops(); prepareClip(); document.getElementById("shareClose").focus(); }
+function shareClose(){ shareSheet.hidden = true; if(!shareBtn.disabled) shareBtn.focus(); }
+function downloadClip(file, n){
+  var a = document.createElement("a"), url = URL.createObjectURL(file);
+  a.href = url; a.download = file.name; document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 4000);
+  clipCommit(n);
+  shareSum.textContent = "Saved " + file.name;
+}
+shareGo.addEventListener("click", function(){
+  if(!clip) return;
+  var nm = clipName(), file = new File([clip.blob], nm.name, {type:"audio/wav"});
+  if(canShareFiles()){
+    navigator.share({files:[file], title:nm.name}).then(function(){
+      clipCommit(nm.n); shareSum.textContent = "Shared " + nm.name;
+    }, function(err){
+      if(err && err.name === "AbortError"){ shareReady(); return; }   /* the sheet was dismissed: nothing went out */
+      downloadClip(file, nm.n);
+    });
+  } else downloadClip(file, nm.n);
+});
+shareLoopsEl.addEventListener("click", function(e){
+  var b = e.target.closest("button"); if(!b) return;
+  clipLoops = parseInt(b.dataset.loops, 10);
+  try{ localStorage.setItem(CLIP_LOOPS_KEY, String(clipLoops)); } catch(err){}
+  paintShareLoops(); prepareClip();
+});
+shareBtn.addEventListener("click", function(){ if(shareOK()) shareOpen(); });
+document.getElementById("shareClose").addEventListener("click", shareClose);
+shareSheet.addEventListener("click", function(e){ if(e.target === shareSheet) shareClose(); });
 /* ==================================================== the sequence ==========
    Patterns in the order you want to practise them, which the practice session
    can then walk through instead of picking at random.
@@ -5990,8 +6231,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v68";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-07 14:51";          /* and when it was built, for ?diag */
+  var BUILD = "v71";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-07 16:36";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

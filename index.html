@@ -366,9 +366,23 @@ input[type=range]::-moz-range-thumb{
 #shareBtn{grid-column:5;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none}
 #shareBtn svg{width:15px;height:15px;display:block}
 .icobtn:disabled{opacity:.4;cursor:default}
+/* the share sheet, laid out to Oscar's mockup (v83): the format first, then a
+   "Seconds:" rule, the lengths beside the one big Share button, the summary last */
 .share-sheet{max-width:440px}
-.share-sheet .seg{margin-left:auto;margin-right:10px}
-.share-foot{justify-content:space-between}
+.share-sheet .sheet-head{margin-bottom:12px}
+.share-sheet .seg{margin:0}
+.share-fmt button{font-size:15px;padding:11px 20px}
+.share-lbl{display:flex;align-items:center;gap:14px;margin:18px 0 8px;color:var(--ink-2);font-size:15px}
+.share-lbl i{flex:1;border-top:1px dashed var(--line-2)}
+.share-row{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.share-dur button{font-size:15px;padding:11px 14px;min-width:44px}
+#shareGo{padding:12px 26px;font-size:17px;color:var(--c2);border-radius:12px}
+#shareGo[data-rec="1"]{color:var(--c3)}   /* the video is not made yet: this press records */
+#shareGo:disabled{opacity:.45;cursor:default}
+.share-keep{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);margin:12px 0 0;cursor:pointer;user-select:none}
+.share-keep input{accent-color:var(--c2);width:16px;height:16px;margin:0}
+.share-keep[hidden]{display:none}
+.share-sheet .plan-sum{margin:12px 0 0;font-size:14px}
 /* recording a video: the wheel is the stage. Everything a viewer does not need
    goes; every touch is caught by a shield (a tap on the centre cancels). */
 :root[data-rec="1"] :is(#dialHint,#sessNow,#scoreBtn,#shareBtn,#posLbl){visibility:hidden}
@@ -380,7 +394,6 @@ input[type=range]::-moz-range-thumb{
 #recShield{position:fixed;inset:0;z-index:60;touch-action:none;background:transparent}
 #recShield[hidden]{display:none}
 .beatnow.rec .mono{color:var(--c3);letter-spacing:.14em;font-weight:600}
-.share-foot .seg{margin:0}
 /* the readouts that used to sit in the hub - now the dial's headline, so they
    carry the weight the hub used to give them */
 /* the ratio may shrink and, in the worst case, clip with an ellipsis rather than
@@ -1299,18 +1312,20 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   <div class="sheet share-sheet" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
     <div class="sheet-head">
       <h2 id="shareTitle">Share a clip</h2>
-      <span class="seg" id="shareDur" role="group" aria-label="How long">
-        <button type="button" data-secs="3">3 s</button><button type="button" data-secs="5">5 s</button><button type="button" data-secs="10">10 s</button><button type="button" data-secs="15">15 s</button><button type="button" data-secs="30">30 s</button>
-      </span>
       <button class="icobtn" id="shareClose" title="Close" aria-label="Close">&times;</button>
     </div>
-    <p class="plan-sum" id="shareSum"></p>
-    <div class="lvl-foot share-foot">
-      <span class="seg" id="shareFmt" role="group" aria-label="File format">
-        <button type="button" data-fmt="mp3">MP3</button><button type="button" data-fmt="wav">WAV</button><button type="button" data-fmt="video">Video</button>
+    <span class="seg share-fmt" id="shareFmt" role="group" aria-label="File format">
+      <button type="button" data-fmt="mp3">MP3</button><button type="button" data-fmt="wav">WAV</button><button type="button" data-fmt="video">Video</button>
+    </span>
+    <div class="share-lbl"><span>Seconds:</span><i></i></div>
+    <div class="share-row">
+      <span class="seg share-dur" id="shareDur" role="group" aria-label="How long">
+        <button type="button" data-secs="3">3</button><button type="button" data-secs="5">5</button><button type="button" data-secs="10">10</button><button type="button" data-secs="15">15</button><button type="button" data-secs="30">30</button>
       </span>
       <button class="btn" id="shareGo" disabled>Share</button>
     </div>
+    <label class="share-keep" id="shareKeepRow" hidden><input type="checkbox" id="shareKeep"> Keep a copy on the device</label>
+    <p class="plan-sum" id="shareSum"></p>
   </div>
 </div>
 
@@ -6222,6 +6237,18 @@ var shareBtn = document.getElementById("shareBtn"), shareSheet = document.getEle
 var shareGo = document.getElementById("shareGo"), shareSum = document.getElementById("shareSum");
 var shareDurEl = document.getElementById("shareDur");
 var CLIP_SECS_KEY = "polyrhythm-circle:clip:secs", CLIP_N_KEY = "polyrhythm-circle:clip:n", CLIP_FMT_KEY = "polyrhythm-circle:clip:fmt";
+/* Share hands the file to another app; "Keep a copy" downloads it as well, in the
+   same press (a download does not spend the tap, the share does, so it goes first).
+   Shown only where files can be shared at all - elsewhere Share is already Save. */
+var CLIP_KEEP_KEY = "polyrhythm-circle:clip:keep", clipKeep = true;
+try{ clipKeep = localStorage.getItem(CLIP_KEEP_KEY) !== "0"; } catch(err){}
+var shareKeepRow = document.getElementById("shareKeepRow"), shareKeep = document.getElementById("shareKeep");
+shareKeep.checked = clipKeep;
+shareKeep.addEventListener("change", function(){
+  clipKeep = shareKeep.checked;
+  try{ localStorage.setItem(CLIP_KEEP_KEY, clipKeep ? "1" : "0"); } catch(err){}
+});
+function paintShareKeep(){ shareKeepRow.hidden = !(navigator.share && navigator.canShare); }
 /* MP3 through lamejs (inlined above the app; LGPL). A WAV of a few loops ran to a
    megabyte in Oscar's tests; 128 kb/s mono is about a tenth. MP3 cannot loop
    without a gap (the format pads the start and the end), so WAV stays for loops. */
@@ -6411,14 +6438,14 @@ function prepareClip(){
   if(shareSheet.hidden || !shareOK()) return;       /* only for an open sheet on a resting wheel */
   var key = clipKey();
   if(clip && clip.key === key){ shareReady(); return; }
-  clip = null; shareGo.disabled = true;
+  clip = null; shareGo.disabled = true; shareGo.dataset.rec = "0";
   var job = ++clipJob, loops = clipLoopsFor(), secs = loops * cycleDur();
   if(clipFmt === "video"){
     /* the video is recorded live when the button is pressed: the app writes the
        MP4 itself where the browser encodes H.264 and AAC, else MediaRecorder */
     var vm = videoMime();
     if(!codecAble() && !vm){ shareSum.textContent = "This browser cannot record video."; return; }
-    shareGo.disabled = false; shareGo.textContent = "Record";
+    shareGo.disabled = false; shareGo.textContent = "Record"; shareGo.dataset.rec = "1";
     codecProbe(function(c){
       if(job !== clipJob || clipFmt !== "video") return;
       if(!c && !vm){ shareGo.disabled = true; shareSum.textContent = "This browser cannot record video."; return; }
@@ -6447,7 +6474,7 @@ function prepareClip(){
   }, function(){ if(job === clipJob) shareSum.textContent = "Rendering failed."; });
 }
 function shareReady(){
-  shareGo.disabled = false;
+  shareGo.disabled = false; shareGo.dataset.rec = "0";
   shareGo.textContent = canShareFiles() ? "Share" : "Save";
   var kb = clip.blob.size / 1024, sizeText = kb >= 1024 ? (kb / 1024).toFixed(1) + " MB" : Math.round(kb) + " KB";
   var L = clip.loops || clipLoopsFor();
@@ -6455,25 +6482,34 @@ function shareReady(){
     (clip.fmt === "mp3" ? "MP3 (WAV loops without a gap)" : clip.fmt === "wav" ? "WAV" : clip.fmt.toUpperCase() + " video") +
     (clip.note ? " · " + clip.note : "");
 }
-function shareOpen(){ shareSheet.hidden = false; paintShareDur(); paintShareFmt(); prepareClip(); document.getElementById("shareClose").focus(); }
+function shareOpen(){ shareSheet.hidden = false; paintShareDur(); paintShareFmt(); paintShareKeep(); prepareClip(); document.getElementById("shareClose").focus(); }
 function shareClose(){ shareSheet.hidden = true; if(!shareBtn.disabled) shareBtn.focus(); }
-function downloadClip(file, n){
+function saveCopy(file){
   var a = document.createElement("a"), url = URL.createObjectURL(file);
   a.href = url; a.download = file.name; document.body.appendChild(a); a.click();
   setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 4000);
+}
+function downloadClip(file, n){
+  saveCopy(file);
   clipCommit(n);
   shareSum.textContent = "Saved " + file.name;
 }
+/* One button. A video that is not made yet is recorded first (the wheel plays for
+   the chosen seconds) and the sheet comes back with the same button; the share
+   itself needs a press of its own because the browser only opens the share sheet
+   within a few seconds of a tap, and a recording takes longer than that. */
 shareGo.addEventListener("click", function(){
   if(clipFmt === "video" && (!clip || clip.key !== clipKey())){ recVideoStart(); return; }
   if(!clip) return;
   var nm = clipName(), file = new File([clip.blob], nm.name, {type:clipMime()});
   if(canShareFiles()){
+    var kept = clipKeep && !shareKeepRow.hidden;
+    if(kept) saveCopy(file);
     navigator.share({files:[file], title:nm.name}).then(function(){
-      clipCommit(nm.n); shareSum.textContent = "Shared " + nm.name;
+      clipCommit(nm.n); shareSum.textContent = "Shared " + nm.name + (kept ? " \u00b7 copy kept" : "");
     }, function(err){
-      if(err && err.name === "AbortError"){ shareReady(); return; }   /* the sheet was dismissed: nothing went out */
-      downloadClip(file, nm.n);
+      if(err && err.name === "AbortError"){ if(kept){ clipCommit(nm.n); shareSum.textContent = "Saved " + nm.name; } else shareReady(); return; }
+      if(kept){ clipCommit(nm.n); shareSum.textContent = "Saved " + nm.name; } else downloadClip(file, nm.n);
     });
   } else downloadClip(file, nm.n);
 });
@@ -7350,8 +7386,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v82";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-08 15:09";          /* and when it was built, for ?diag */
+  var BUILD = "v84";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-08 16:15";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

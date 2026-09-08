@@ -6642,11 +6642,13 @@ function recStartRecorder(mime){
 var REC_FPS = 30;
 function recStartCodec(c){
   var r = recV;
-  r.codec = c; r.fps = REC_FPS; r.k = -1; r.emitted = 0; r.frames = Math.max(1, Math.round(r.loops * r.cyc * REC_FPS)); r.chunks = null;
+  r.codec = c; r.fps = REC_FPS; r.k = -1; r.lastTs = 0; r.emitted = 0; r.frames = Math.max(1, Math.round(r.loops * r.cyc * REC_FPS)); r.chunks = null;
   var fail = function(){ if(recV !== r || r.failed) return; r.failed = true; recVideoStop(); };
   try{
     r.target = new Mp4Muxer.ArrayBufferTarget();
-    r.muxer = new Mp4Muxer.Muxer({target:r.target, video:{codec:"avc", width:1080, height:1920, frameRate:REC_FPS},
+    /* no frameRate here: mp4-muxer would make it the track's timescale and round
+       every stamp back to a thirtieth; without it the timescale is 57600 */
+    r.muxer = new Mp4Muxer.Muxer({target:r.target, video:{codec:"avc", width:1080, height:1920},
                                   audio:{codec:"aac", sampleRate:44100, numberOfChannels:1}, fastStart:"in-memory"});
     r.venc = new VideoEncoder({output:function(chunk, meta){ try{ r.muxer.addVideoChunk(chunk, meta); } catch(err){ fail(); } }, error:fail});
     /* realtime: the encoder keeps pace with live frames instead of holding them for
@@ -6693,21 +6695,25 @@ function recFrame(){
        every other turn, half the work (v82: Oscar's phone dropped frames) */
     if(p >= 0){
       var k = (r.k < 0) ? 0 : Math.floor(p * r.cyc * r.fps + 1e-6);
-      if(k > r.k && k < r.frames){ recDraw(p, r); recEmit(k); }
+      if(k > r.k && k < r.frames){ recDraw(p, r); recEmit(k, p); }
     } else if(!r.drewIdle){ recDraw(p, r); r.drewIdle = true; }
   } else recDraw(p, r);
   requestAnimationFrame(recFrame);
 }
 /* one frame per thirtieth of the music, timed by the wheel's phase, never by the
    clock: a slow phone skips frames and the clip stays the right length and speed */
-function recEmit(k){
+function recEmit(k, p){
   var r = recV;
   if(r.venc.encodeQueueSize > 12) return;         /* the encoder is behind: this frame waits for the next turn, which keeps its own time */
   try{
-    var vf = new VideoFrame(r.canvas, {timestamp:Math.round(k * 1e6 / r.fps), duration:Math.round(1e6 / r.fps)});
-    r.venc.encode(vf, {keyFrame:(r.k < 0) || (k % (r.fps * 2)) === 0});
+    /* the frame is stamped with the moment the wheel really shows, not the tidy
+       k/30: a frame caught a screen refresh late used to be played early, a
+       visible tremor in the hand (v85). The muxer takes the gaps as they come. */
+    var ts = (r.k < 0) ? 0 : Math.max(r.lastTs + 1000, Math.round(p * r.cyc * 1e6));
+    var vf = new VideoFrame(r.canvas, {timestamp:ts, duration:Math.round(1e6 / r.fps)});
+    r.venc.encode(vf, {keyFrame:(r.k < 0) || (k % (r.fps * 4)) === 0});
     vf.close();
-    r.k = k; r.emitted++;
+    r.k = k; r.lastTs = ts; r.emitted++;
   } catch(err){ r.failed = true; recVideoStop(); }
 }
 function recLayout(kit){
@@ -6812,8 +6818,9 @@ function recVideoStop(){
     try{
       recDraw(r.loops, r);
       while(r.k < r.frames - 1){
-        var k = r.k + 1, vf = new VideoFrame(r.canvas, {timestamp:Math.round(k * 1e6 / r.fps), duration:Math.round(1e6 / r.fps)});
-        r.venc.encode(vf, {keyFrame:(k % (r.fps * 2)) === 0}); vf.close(); r.k = k;
+        var k = r.k + 1, ts = Math.max(r.lastTs + 1000, Math.round(k * 1e6 / r.fps));
+        var vf = new VideoFrame(r.canvas, {timestamp:ts, duration:Math.round(1e6 / r.fps)});
+        r.venc.encode(vf, {keyFrame:(k % (r.fps * 4)) === 0}); vf.close(); r.k = k; r.lastTs = ts;
       }
     } catch(err){}
     r.venc.flush().then(function(){
@@ -7386,8 +7393,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v84";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-08 16:15";          /* and when it was built, for ?diag */
+  var BUILD = "v85";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-08 16:35";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

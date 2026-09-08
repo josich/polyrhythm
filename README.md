@@ -1,4 +1,4 @@
-# Polyrhythm Circle
+# Polyorbit
 
 A polyrhythm metronome for practising on a phone. Ring 1 clicks at your tempo;
 up to three more rings fit their own divisions into the same rotation, so 5

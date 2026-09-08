@@ -1,7 +1,7 @@
 {
-  "name": "Polyrhythm Circle",
-  "short_name": "Polyrhythm",
-  "description": "A polyrhythm metronome: Ring 1 clicks at your BPM while up to three more rings fit their divisions into the same rotation.",
+  "name": "Polyorbit",
+  "short_name": "Polyorbit",
+  "description": "Polyorbit, a polyrhythm metronome: Ring 1 clicks at your BPM while up to three more rings fit their divisions into the same rotation.",
   "start_url": "./",
   "scope": "./",
   "display": "fullscreen",
@@ -25,7 +25,7 @@
       "purpose": "any"
     },
     {
-      "src": "./icon-512.png",
+      "src": "./icon-512-maskable.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"

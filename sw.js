@@ -1,6 +1,6 @@
-/* Offline cache for Polyrhythm Circle.
+/* Offline cache for Polyorbit.
    Bump CACHE whenever you redeploy, or phones will keep serving the old app. */
-var CACHE = "polyrhythm-v71";
+var CACHE = "polyrhythm-v79";
 /* proof that a response really is this app and not a host's error page */
 var MARK = "polyrhythm-circle:session";
 var ASSETS = [
@@ -9,6 +9,7 @@ var ASSETS = [
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png",
+  "./icon-512-maskable.png",
   "./apple-touch-icon.png"
 ];
 

@@ -6452,7 +6452,8 @@ function shareReady(){
   var kb = clip.blob.size / 1024, sizeText = kb >= 1024 ? (kb / 1024).toFixed(1) + " MB" : Math.round(kb) + " KB";
   var L = clip.loops || clipLoopsFor();
   shareSum.textContent = L + (L === 1 ? " loop \u00b7 " : " loops \u00b7 ") + clip.secs.toFixed(1) + " s \u00b7 " + sizeText + " \u00b7 " +
-    (clip.fmt === "mp3" ? "MP3 (WAV loops without a gap)" : clip.fmt === "wav" ? "WAV" : clip.fmt.toUpperCase() + " video");
+    (clip.fmt === "mp3" ? "MP3 (WAV loops without a gap)" : clip.fmt === "wav" ? "WAV" : clip.fmt.toUpperCase() + " video") +
+    (clip.note ? " · " + clip.note : "");
 }
 function shareOpen(){ shareSheet.hidden = false; paintShareDur(); paintShareFmt(); prepareClip(); document.getElementById("shareClose").focus(); }
 function shareClose(){ shareSheet.hidden = true; if(!shareBtn.disabled) shareBtn.focus(); }
@@ -6605,14 +6606,16 @@ function recStartRecorder(mime){
 var REC_FPS = 30;
 function recStartCodec(c){
   var r = recV;
-  r.codec = c; r.fps = REC_FPS; r.k = -1; r.frames = Math.max(1, Math.round(r.loops * r.cyc * REC_FPS)); r.chunks = null;
+  r.codec = c; r.fps = REC_FPS; r.k = -1; r.emitted = 0; r.frames = Math.max(1, Math.round(r.loops * r.cyc * REC_FPS)); r.chunks = null;
   var fail = function(){ if(recV !== r || r.failed) return; r.failed = true; recVideoStop(); };
   try{
     r.target = new Mp4Muxer.ArrayBufferTarget();
     r.muxer = new Mp4Muxer.Muxer({target:r.target, video:{codec:"avc", width:1080, height:1920, frameRate:REC_FPS},
                                   audio:{codec:"aac", sampleRate:44100, numberOfChannels:1}, fastStart:"in-memory"});
     r.venc = new VideoEncoder({output:function(chunk, meta){ try{ r.muxer.addVideoChunk(chunk, meta); } catch(err){ fail(); } }, error:fail});
-    r.venc.configure({codec:c.video, width:1080, height:1920, bitrate:8000000, framerate:REC_FPS, avc:{format:"avc"}, latencyMode:"quality"});
+    /* realtime: the encoder keeps pace with live frames instead of holding them for
+       a better picture; 8 Mb/s is plenty for these flat colours either way */
+    r.venc.configure({codec:c.video, width:1080, height:1920, bitrate:8000000, framerate:REC_FPS, avc:{format:"avc"}, latencyMode:"realtime"});
   } catch(err){ recVideoFinish(null, "Recording could not start."); return; }
   /* the sound is not taken from the speaker: the same loops are rendered offline,
      as for the audio clip, and encoded before the wheel starts, so they are exact
@@ -6646,24 +6649,29 @@ function encodeAac(r, buf, frames){
 }
 function recFrame(){
   if(!recV || recV.done) return;
-  var p = (recV.started && S.playing) ? phaseNow() : -1;
-  if(recV.started && S.playing && p >= recV.loops){ recVideoStop(); return; }
-  if(recV.started && !S.playing && ++recV.idle > 120){ recVideoStop(); return; }   /* the wheel never ran: do not wait forever */
-  recDraw(p, recV);
-  if(recV.codec && p >= 0) recEmit(p);
+  var r = recV, p = (r.started && S.playing) ? phaseNow() : -1;
+  if(r.started && S.playing && p >= r.loops){ recVideoStop(); return; }
+  if(r.started && !S.playing && ++r.idle > 120){ recVideoStop(); return; }   /* the wheel never ran: do not wait forever */
+  if(r.codec){
+    /* the picture is composed only when a frame is due - on a 60 Hz screen that is
+       every other turn, half the work (v82: Oscar's phone dropped frames) */
+    if(p >= 0){
+      var k = (r.k < 0) ? 0 : Math.floor(p * r.cyc * r.fps + 1e-6);
+      if(k > r.k && k < r.frames){ recDraw(p, r); recEmit(k); }
+    } else if(!r.drewIdle){ recDraw(p, r); r.drewIdle = true; }
+  } else recDraw(p, r);
   requestAnimationFrame(recFrame);
 }
 /* one frame per thirtieth of the music, timed by the wheel's phase, never by the
    clock: a slow phone skips frames and the clip stays the right length and speed */
-function recEmit(p){
-  var r = recV, k = (r.k < 0) ? 0 : Math.floor(p * r.cyc * r.fps + 1e-6);
-  if(k <= r.k || k >= r.frames) return;
-  if(r.venc.encodeQueueSize > 8) return;          /* the encoder is behind: this frame is dropped, the next keeps its own time */
+function recEmit(k){
+  var r = recV;
+  if(r.venc.encodeQueueSize > 12) return;         /* the encoder is behind: this frame waits for the next turn, which keeps its own time */
   try{
     var vf = new VideoFrame(r.canvas, {timestamp:Math.round(k * 1e6 / r.fps), duration:Math.round(1e6 / r.fps)});
     r.venc.encode(vf, {keyFrame:(r.k < 0) || (k % (r.fps * 2)) === 0});
     vf.close();
-    r.k = k;
+    r.k = k; r.emitted++;
   } catch(err){ r.failed = true; recVideoStop(); }
 }
 function recLayout(kit){
@@ -6764,6 +6772,7 @@ function recVideoStop(){
     }
     /* the frames the wheel did not reach are the wheel at rest, so the picture
        ends exactly where the sound does - and the last frame is the first again */
+    r.live = r.emitted; r.due = r.k + 1;          /* frames made vs frames the music asked for, for the sheet */
     try{
       recDraw(r.loops, r);
       while(r.k < r.frames - 1){
@@ -6775,7 +6784,7 @@ function recVideoStop(){
       recCodecClose(r);
       var blob = null;
       try{ r.muxer.finalize(); blob = new Blob([r.target.buffer], {type:"video/mp4"}); } catch(err){ blob = null; }
-      recVideoFinish(blob, "Recording failed.", "mp4");
+      recVideoFinish(blob, "Recording failed.", "mp4", (r.live < r.due) ? r.live + "/" + r.due + " frames" : "");
     }, function(){ recCodecClose(r); recVideoFinish(null, "Recording failed."); });
     return;
   }
@@ -6787,7 +6796,7 @@ function recVideoCancel(){
   recV.cancelled = true;
   recVideoStop();
 }
-function recVideoFinish(blob, msg, ext){
+function recVideoFinish(blob, msg, ext, note){
   var r = recV; if(!r) return;
   recV = null;
   if(S.playing) stop();
@@ -6799,7 +6808,7 @@ function recVideoFinish(blob, msg, ext){
   paintCount();
   tickLabel();
   if(!blob){ shareOpen(); shareSum.textContent = msg || "Nothing was recorded."; return; }
-  clip = {blob:blob, key:clipKey(), secs:r.loops * r.cyc, fmt:ext || "mp4", loops:r.loops};
+  clip = {blob:blob, key:clipKey(), secs:r.loops * r.cyc, fmt:ext || "mp4", loops:r.loops, note:note || ""};
   shareOpen();
 }
 /* every touch during a recording lands on the shield; the centre cancels */
@@ -7341,8 +7350,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v81";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-08 14:31";          /* and when it was built, for ?diag */
+  var BUILD = "v82";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-08 15:09";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

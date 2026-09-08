@@ -6268,7 +6268,7 @@ function codecProbe(done){
   var vids = ["avc1.640028", "avc1.4D0028", "avc1.42E028"];
   var tryV = function(i){
     if(i >= vids.length) return Promise.resolve(null);
-    var cfg = {codec:vids[i], width:1080, height:1920, bitrate:8000000, framerate:30, avc:{format:"avc"}};
+    var cfg = {codec:vids[i], width:REC_W, height:REC_H, bitrate:5000000, framerate:30, avc:{format:"avc"}};
     return VideoEncoder.isConfigSupported(cfg).then(function(r){ return r.supported ? vids[i] : tryV(i + 1); }, function(){ return tryV(i + 1); });
   };
   tryV(0).then(function(v){
@@ -6449,7 +6449,7 @@ function prepareClip(){
     codecProbe(function(c){
       if(job !== clipJob || clipFmt !== "video") return;
       if(!c && !vm){ shareGo.disabled = true; shareSum.textContent = "This browser cannot record video."; return; }
-      shareSum.textContent = loopsWord() + " \u00b7 " + secs.toFixed(1) + " s \u00b7 1080\u00d71920 " +
+      shareSum.textContent = loopsWord() + " \u00b7 " + secs.toFixed(1) + " s \u00b7 " + (c ? REC_W + "\u00d7" + REC_H : "1080\u00d71920") + " " +
         (c ? "MP4 (H.264, AAC)" : videoExt(vm).toUpperCase()) + " \u00b7 records live, " + Math.ceil(secs) + " s";
     });
     return;
@@ -6576,8 +6576,9 @@ function frameKit(done){
       var finished = false;
       var finish = function(){
         if(finished) return; finished = true;
-        var canvas = document.createElement("canvas"); canvas.width = 1080; canvas.height = 1920;
-        done({canvas:canvas, g:canvas.getContext("2d"), col:col, score:score, icons:icons});
+        var canvas = document.createElement("canvas"); canvas.width = REC_W; canvas.height = REC_H;
+        var g = canvas.getContext("2d"); g.setTransform(REC_K, 0, 0, REC_K, 0, 0);
+        done({canvas:canvas, g:g, col:col, score:score, icons:icons});
       };
       icons.score = iconSvg(scoreBtn); icons.share = iconSvg(shareBtn);
       if(!pending) finish();
@@ -6640,6 +6641,10 @@ function recStartRecorder(mime){
   recFrame();
 }
 var REC_FPS = 30;
+/* the picture is laid out in 1080x1920 units and written at 720x1280 (v86): the
+   phone dropped frames at full size, and the platforms re-encode to about this
+   anyway. REC_K scales the layout onto the output canvas. */
+var REC_W = 720, REC_H = 1280, REC_K = REC_W / 1080;
 function recStartCodec(c){
   var r = recV;
   r.codec = c; r.fps = REC_FPS; r.k = -1; r.lastTs = 0; r.emitted = 0; r.frames = Math.max(1, Math.round(r.loops * r.cyc * REC_FPS)); r.chunks = null;
@@ -6648,12 +6653,12 @@ function recStartCodec(c){
     r.target = new Mp4Muxer.ArrayBufferTarget();
     /* no frameRate here: mp4-muxer would make it the track's timescale and round
        every stamp back to a thirtieth; without it the timescale is 57600 */
-    r.muxer = new Mp4Muxer.Muxer({target:r.target, video:{codec:"avc", width:1080, height:1920},
+    r.muxer = new Mp4Muxer.Muxer({target:r.target, video:{codec:"avc", width:REC_W, height:REC_H},
                                   audio:{codec:"aac", sampleRate:44100, numberOfChannels:1}, fastStart:"in-memory"});
     r.venc = new VideoEncoder({output:function(chunk, meta){ try{ r.muxer.addVideoChunk(chunk, meta); } catch(err){ fail(); } }, error:fail});
     /* realtime: the encoder keeps pace with live frames instead of holding them for
        a better picture; 8 Mb/s is plenty for these flat colours either way */
-    r.venc.configure({codec:c.video, width:1080, height:1920, bitrate:8000000, framerate:REC_FPS, avc:{format:"avc"}, latencyMode:"realtime"});
+    r.venc.configure({codec:c.video, width:REC_W, height:REC_H, bitrate:5000000, framerate:REC_FPS, avc:{format:"avc"}, latencyMode:"realtime"});
   } catch(err){ recVideoFinish(null, "Recording could not start."); return; }
   /* the sound is not taken from the speaker: the same loops are rendered offline,
      as for the audio clip, and encoded before the wheel starts, so they are exact
@@ -6744,8 +6749,8 @@ function recLayout(kit){
    button and the bar line - cheap enough for a phone to keep up with */
 function recStatic(kit){
   var L = kit.L, col = kit.col, bg = document.createElement("canvas");
-  bg.width = L.W; bg.height = L.H;
-  var g = bg.getContext("2d");
+  bg.width = REC_W; bg.height = REC_H;
+  var g = bg.getContext("2d"); g.setTransform(REC_K, 0, 0, REC_K, 0, 0);
   g.fillStyle = col.bg; g.fillRect(0, 0, L.W, L.H);
   var rr = function(x, y, w, h, r, fill, stroke){
     g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
@@ -6782,7 +6787,7 @@ function recStatic(kit){
 }
 function recDraw(p, kit){
   var g = kit.g, col = kit.col, L = kit.L;
-  g.drawImage(kit.bg, 0, 0);
+  g.drawImage(kit.bg, 0, 0, L.W, L.H);          /* the background is already at output size; the transform maps it back */
   /* the wheel as drawn on screen, then the hub button over it as the app shows it:
      a disc of ink at half opacity with a hairline of ink and the play glyph in
      the panel colour, all at that same half opacity */
@@ -7393,8 +7398,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v85";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-08 16:35";          /* and when it was built, for ?diag */
+  var BUILD = "v86";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-08 16:50";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 
@@ -7542,9 +7547,9 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
     if(!window.VideoEncoder || !window.AudioEncoder){ say("WebCodecs", "MISSING - video clips use MediaRecorder"); return; }
     var vids = ["avc1.640028", "avc1.4D0028", "avc1.42E028"];
     Promise.all(vids.map(function(c){
-      return VideoEncoder.isConfigSupported({codec:c, width:1080, height:1920, bitrate:8000000, framerate:30, avc:{format:"avc"}})
+      return VideoEncoder.isConfigSupported({codec:c, width:720, height:1280, bitrate:5000000, framerate:30, avc:{format:"avc"}})
         .then(function(r){ return r.supported ? c : null; }, function(){ return null; });
-    })).then(function(rs){ say("WebCodecs H.264 1080x1920", rs.filter(Boolean).join(" ") || "NOT SUPPORTED - video clips use MediaRecorder"); });
+    })).then(function(rs){ say("WebCodecs H.264 720x1280", rs.filter(Boolean).join(" ") || "NOT SUPPORTED - video clips use MediaRecorder"); });
     AudioEncoder.isConfigSupported({codec:"mp4a.40.2", sampleRate:44100, numberOfChannels:1, bitrate:128000})
       .then(function(r){ say("WebCodecs AAC", r.supported ? "supported" : "NOT SUPPORTED - video clips use MediaRecorder"); },
             function(e){ say("WebCodecs AAC", "ERROR " + e.message); });

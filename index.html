@@ -471,7 +471,12 @@ input[type=range]::-moz-range-thumb{
 .seq-box[data-over="1"]{border-color:var(--c2);box-shadow:0 0 0 2px color-mix(in srgb,var(--c2) 22%,transparent)}
 /* The level list: one row a level, loaded onto the wheel by its name, moved
    with the arrows. Rows are plain so a hundred of them still read. */
-.lvl-list{display:flex;flex-direction:column;gap:6px}
+/* the list scrolls inside its own box, about seven rows tall (Oscar, v90: the ladder
+   had grown past a screen); position:relative so a row's offsetTop is list-relative */
+.lvl-list{display:flex;flex-direction:column;gap:6px;max-height:342px;overflow-y:auto;position:relative;padding:2px;scrollbar-width:thin}
+.lvl-row[data-play="1"]{border-color:var(--c2);box-shadow:0 0 0 2px color-mix(in srgb,var(--c2) 22%,transparent)}
+.lvl-row .ops button[data-play]{color:var(--c2)}
+.lvl-row[data-play="1"] .ops button[data-play]{background:color-mix(in srgb,var(--c2) 18%,transparent);color:var(--ink)}
 .lvl-row{
   display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;align-items:center;
   padding:6px 8px;border:1px solid var(--line);border-radius:9px;background:var(--sunk);
@@ -508,6 +513,19 @@ input[type=range]::-moz-range-thumb{
   background:var(--sunk);color:var(--ink);font-family:"IBM Plex Mono",monospace;font-size:11px;padding:8px;
 }
 .lvl-empty{font-size:12.5px;color:var(--ink-3);margin:0}
+/* the playability verdict: on the wheel line under the editor's buttons, and as a
+   tag on a row that is hard or not playable */
+#lvlChk{font-size:11.5px;color:var(--ink-3);align-self:center;white-space:nowrap}
+#lvlChk[data-v="hard"]{color:var(--c1)}
+#lvlChk[data-v="no"]{color:var(--c3)}
+.lvl-row .chk{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-left:6px;color:var(--c1)}
+.lvl-row .chk.no{color:var(--c3)}
+/* a challenge that arrived by link: a card in Play time with the one button that matters */
+.chal{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px;padding:10px 12px;
+  border:1px solid var(--c1);border-radius:10px;background:color-mix(in srgb,var(--c1) 10%,transparent)}
+.chal-t{flex:1;min-width:0;font-size:13px;color:var(--ink);line-height:1.4}
+.chal-t .k{color:var(--ink-3);font-size:.85em;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.chal[hidden]{display:none}
 /* the + chip that adds a step: its selector line was lost when the level-list CSS
    went in above it, and the chip fell back to a plain white button */
 .seq-add{
@@ -1190,6 +1208,13 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <button class="btn sm" id="tapPause" disabled title="Pause the game">Pause</button>
     </div>
     <p class="tap-hint" id="tapHint"></p>
+    <!-- a level that arrived by link (?c=): shown here until it is played or dismissed -->
+    <div class="chal" id="chalBox" hidden>
+      <span class="chal-t" id="chalText"></span>
+      <button type="button" class="btn sm lead" id="chalPlay">Play it</button>
+      <button type="button" class="btn sm" id="chalKeep" hidden title="Add it to your levels">Keep</button>
+      <button type="button" class="icobtn" id="chalClose" title="Dismiss" aria-label="Dismiss">&times;</button>
+    </div>
     <!-- the best run, as a card that stays whatever the game is doing -->
     <div class="best" id="bestCard" hidden>
       <span class="best-k">Best</span><span class="best-v">Level <b id="bestLvl">0</b></span>
@@ -1216,11 +1241,20 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <button class="btn sm" id="lvlAdd" title="Add what is on the wheel as a new level">+ Add the wheel</button>
       <button class="btn sm" id="lvlUpdate" hidden title="Save the wheel back into the level you loaded">Update</button>
       <button class="btn sm" id="lvlShare" title="Show the whole list as text, to send for the next build">Copy the list</button>
+      <button class="btn sm" id="lvlImport" title="Paste a level code or a challenge link">Import</button>
+      <span id="lvlChk" data-v=""></span>
     </div>
     <div class="lvl-share" id="lvlShareBox" hidden>
       <textarea id="lvlText" rows="4" spellcheck="false" aria-label="The level list as text"></textarea>
       <div class="lvl-foot">
         <button class="btn sm" id="lvlCopy">Copy to clipboard</button>
+      </div>
+    </div>
+    <div class="lvl-share" id="lvlImportBox" hidden>
+      <textarea id="lvlImportText" rows="2" spellcheck="false" aria-label="A level code or challenge link" placeholder="Paste a level code or a challenge link"></textarea>
+      <div class="lvl-foot">
+        <button class="btn sm" id="lvlImportGo">Add to the list</button>
+        <span class="seq-note" id="lvlImportNote"></span>
       </div>
     </div>
     <div class="lvl-list" id="lvlList"></div>
@@ -4971,6 +5005,12 @@ function gameLadder(){
 /* one of the choices at this level, drawn when the level is entered; past the
    last level the ladder comes round again, fifteen percent faster each time */
 function gameLevel(n){
+  /* a challenge is one fixed level: it never moves on to the ladder */
+  if(game && game.fixed){
+    var f = game.fixed;
+    return {name:isAutoName(f.name) ? "" : f.name, noteDen:f.noteDen || 4, noteDot:!!f.noteDot,
+            rings:f.rings.slice(0, 2), bpm:Math.min(BPM_MAX, f.bpm)};
+  }
   var lad = gameLadder(), L = lad.length, i = (n - 1) % L, round = Math.floor((n - 1) / L);
   var v = lad[i], d = v[Math.floor(Math.random() * v.length)];
   var rings = d.rings ? d.rings : [{div:d.div, sub:d.sub, steps:pat(d.pattern), sound:"wood", vol:0.9, off:0}];
@@ -4985,7 +5025,7 @@ function gameTol(){
 }
 function gameSetLevel(n){
   var d = gameLevel(n);
-  game.level = n; game.name = d.name; game.attempt = 1; game.failed = false;
+  game.level = n; game.name = d.name; game.attempt = 1; game.failed = false; game.cur = d;
   S.rings = d.rings.map(function(rc, i){
     var r = mkRing(i, rc.div || 4);
     reshape(r, rc.div || 4, rc.sub || 1);
@@ -5007,7 +5047,8 @@ function gameStart(){
   if(S.playing) stop();
   /* the wheel is borrowed whole and handed back at the end */
   game = {prev:{rings:S.rings, bpm:S.bpm, noteDen:S.noteDen, noteDot:S.noteDot, active:S.active, rackOpen:rackOpen},
-          level:1, state:"listen", loop:-1, cleared:[], restoreAt:0, total:0};
+          level:1, state:"listen", loop:-1, cleared:[], restoreAt:0, total:0, fixed:gameNextFixed};
+  gameNextFixed = null;
   S.rings = [mkRing(0, 4)];
   S.active = 0; rackOpen = false;
   S.tapMode = "game"; paintTapMode();
@@ -5023,6 +5064,7 @@ function gameStart(){
   tapNow.hidden = false; sessNow.hidden = true; dialHint.hidden = true;
   gameSetLevel(1);
   paintGame();
+  if(editorOn && lvlPlaying >= 0) paintLevels();   /* the row being played lights up */
   game.countIn = true;               /* three beats before the first listening loop */
   start();
   setTimeout(calCheck, 1500);        /* outputLatency reads 0 until audio has rendered */
@@ -5057,6 +5099,7 @@ function gameEnd(){
   tapNow.hidden = true; dialHint.hidden = !!run;
   paintGameBest();
   buildRack(); paintTransport(); paintRack();
+  if(lvlPlaying >= 0){ lvlPlaying = -1; if(editorOn) paintLevels(); }
   queueSave();
 }
 /* where the dots go and come back */
@@ -5113,7 +5156,8 @@ function gameClear(tnow){
   /* the run's attempts so far, this level's included; a new best is a higher
      level, or the same level reached in fewer attempts overall */
   game.total = (game.total || 0) + game.attempt;
-  if(game.level > gameBest || (game.level === gameBest && (!gameBestTries || game.total < gameBestTries))){
+  lvlProve(game.cur);                      /* cleared, so it is playable: the check learns from it */
+  if(!game.fixed && (game.level > gameBest || (game.level === gameBest && (!gameBestTries || game.total < gameBestTries)))){
     gameBest = game.level; gameBestTries = game.total;
     try{ localStorage.setItem(GAME_KEY, JSON.stringify({level:gameBest, attempts:gameBestTries})); } catch(err){}
     paintBestCard();                 /* the card updates mid-game; the idle text waits */
@@ -5126,6 +5170,13 @@ function gameClear(tnow){
   var lvl = game.level;
   setTimeout(function(){
     if(!game || game.level !== lvl) return;
+    if(game.fixed){                          /* a challenge ends here, with its result on the card */
+      var tries = game.attempt, f = game.fixed, fromRow = lvlPlaying >= 0;
+      gameEnd();
+      if(fromRow) lvlNote.textContent = "Cleared in " + tries + (tries === 1 ? " attempt" : " attempts") + " \u00b7 " + chalName(f);
+      else chalShow(f, "Cleared in " + tries + (tries === 1 ? " attempt" : " attempts") + " \u00b7 " + chalName(f), true);
+      return;
+    }
     if(game.state === "paused"){ game.nextOnResume = lvl + 1; return; }   /* paused in the breath: next level waits */
     gameSetLevel(lvl + 1);
     game.state = "listen"; game.loop = -1;
@@ -5268,7 +5319,8 @@ function paintGame(){
   tapNowIn.innerHTML = txt;
   fitTapNow();
   tapHint.hidden = false;
-  tapHint.innerHTML = "<b>Level " + game.level + "</b> " + lbl("of " + gameLadder().length) +
+  tapHint.innerHTML = (game.fixed ? (lvlPlaying >= 0 ? "<b>Level " + (lvlPlaying + 1) + "</b> " + lbl("from the list") : "<b>Challenge</b>")
+                                  : "<b>Level " + game.level + "</b> " + lbl("of " + gameLadder().length)) +
     (game.name ? " &middot; " + escapeHtml(game.name) : "") +
     " &middot; " + lbl("attempt") + " " + game.attempt +
     /* between a clear and the next level the finished attempts are already in the
@@ -5288,6 +5340,7 @@ var lvlAdd = document.getElementById("lvlAdd"), lvlUpdate = document.getElementB
 var lvlShare = document.getElementById("lvlShare");
 var lvlShareBox = document.getElementById("lvlShareBox"), lvlText = document.getElementById("lvlText");
 var lvlEditing = -1;         /* which level the wheel was loaded from, or -1 */
+var lvlPlaying = -1;         /* which level is being played from its row, or -1 */
 /* "Level 12" is the handle the editor gives a level when it is added; it is not
    a name, and the number in it is not the position. Wherever a level is shown,
    such a handle counts as no name and the position speaks. */
@@ -5327,6 +5380,163 @@ buildTag.addEventListener("click", function(){
   paintLevels();
   buildTag.textContent = buildTag.textContent.split(" · editor")[0] + (editorOn ? " · editor on" : " · editor off");
 });
+
+/* ============================================================ level code =====
+   One level as a short string, so it fits a link: "P1" + base64url of
+   [flags][bpm hi][bpm lo][rings]{[div][sub][offset/24][sound][vol%][steps, 2 bits each]}
+   [name length][name utf-8][hint length][hint utf-8]. Flags: bit 0 dotted note,
+   bits 1-3 log2 of the note value. Anything after the hint is ignored, so a
+   later version can append fields and this one still reads them. The prefix is
+   the version: change the layout, change the letter or the digit, and keep this
+   decoder for the old one. A link is <live site>?c=<code>. */
+var LVL_VER = "P1", LIVE_URL = "https://josich.github.io/polyrhythm/";
+var LVL_NAME_MAX = 40, LVL_HINT_MAX = 120;
+function b64uEnc(bytes){
+  var bin = ""; for(var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function b64uDec(str){
+  str = str.replace(/-/g, "+").replace(/_/g, "/");
+  while(str.length % 4) str += "=";
+  var bin = atob(str), out = new Uint8Array(bin.length);
+  for(var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+function utf8Bytes(str){ return Array.prototype.slice.call(new TextEncoder().encode(str)); }
+function utf8Str(bytes){ return new TextDecoder().decode(bytes); }
+function lvlCode(l){
+  var b = [], den = l.noteDen || 4, lg = Math.max(0, Math.min(7, Math.round(Math.log(den) / Math.LN2)));
+  b.push((l.noteDot ? 1 : 0) | (lg << 1));
+  var bpm = Math.max(1, Math.min(65535, Math.round(l.bpm)));
+  b.push(bpm >> 8, bpm & 255);
+  var rings = l.rings.slice(0, 4);
+  b.push(rings.length);
+  rings.forEach(function(r){
+    var tot = r.div * r.sub, si = SOUNDS.map(function(x){ return x.id; }).indexOf(r.sound);
+    b.push(r.div, r.sub, Math.round((r.off || 0) * 24) % 24, si < 0 ? 3 : si, Math.round((typeof r.vol === "number" ? r.vol : 0.9) * 100));
+    var k, byte = 0, n = 0;
+    for(k = 0; k < tot; k++){
+      byte |= ((r.steps[k] || 0) & 3) << (2 * n);
+      if(++n === 4){ b.push(byte); byte = 0; n = 0; }
+    }
+    if(n) b.push(byte);
+  });
+  var nm = utf8Bytes(String(isAutoName(l.name) ? "" : l.name).slice(0, LVL_NAME_MAX)).slice(0, 2 * LVL_NAME_MAX);
+  b.push(nm.length); b = b.concat(nm);
+  var ht = utf8Bytes(String(l.hint || "").slice(0, LVL_HINT_MAX)).slice(0, 255);
+  b.push(ht.length); b = b.concat(ht);
+  return LVL_VER + b64uEnc(b);
+}
+/* a level from a code, a link holding one, or nothing */
+function lvlDecode(str){
+  try{
+    str = String(str || "").trim();
+    var m = /[?&]c=([A-Za-z0-9_\-]+)/.exec(str);
+    if(m) str = m[1];
+    if(str.indexOf(LVL_VER) !== 0) return null;
+    var b = b64uDec(str.slice(LVL_VER.length)), p = 0;
+    var flags = b[p++], bpm = (b[p++] << 8) | b[p++], n = b[p++];
+    if(!(bpm >= BPM_MIN && bpm <= BPM_MAX) || n < 1 || n > 4) return null;
+    var l = {name:"", hint:"", bpm:bpm, noteDen:1 << ((flags >> 1) & 7), noteDot:!!(flags & 1), rings:[]};
+    if(!NOTE_NAMES[l.noteDen]) return null;
+    for(var i = 0; i < n; i++){
+      var div = b[p++], sub = b[p++], off = b[p++], si = b[p++], vol = b[p++];
+      if(!(div >= 1 && div <= 32) || !(sub >= 1 && sub <= 4)) return null;
+      var tot = div * sub, steps = [], k, byte = 0;
+      for(k = 0; k < tot; k++){
+        if(k % 4 === 0) byte = b[p++];
+        steps.push((byte >> (2 * (k % 4))) & 3);
+      }
+      if(steps.some(function(v){ return v > 2; })) return null;
+      l.rings.push({div:div, sub:sub, off:normOff((off % 24) / 24), sound:(SOUNDS[si] || {id:"wood"}).id, vol:Math.max(0, Math.min(1, vol / 100)), steps:steps});
+    }
+    var nl = b[p++]; if(nl){ l.name = utf8Str(b.slice(p, p + nl)).slice(0, LVL_NAME_MAX); p += nl; }
+    if(p < b.length){ var hl = b[p++]; if(hl) l.hint = utf8Str(b.slice(p, p + hl)).slice(0, LVL_HINT_MAX); }
+    if(p > b.length) return null;
+    return l;
+  } catch(err){ return null; }
+}
+function lvlLink(l){
+  var here = /^(localhost|127\.0\.0\.1|josich\.github\.io)$/.test(location.hostname) ? location.origin + location.pathname : LIVE_URL;
+  return here + "?c=" + lvlCode(l);
+}
+
+/* ============================================================ playability ====
+   What two fingers on a phone can do (Oscar's rule: no level may be impossible).
+   Every required hit of the level is laid out in one bar at its tempo, coincident
+   hits counted once (the game clears them together), and three things are
+   measured: the shortest gap between hits, the rate over the bar, and the rate in
+   the densest second. One table holds the limits, to be tuned by playing. */
+var PLAY_LIMITS = {gapNo:90, gapHard:140, rateNo:8, rateHard:6, peakNo:9, peakHard:7};
+/* Proof beats guesswork: every level cleared on this device - on the ladder or
+   played from the editor - is remembered by key, and its gap, rate and peak move
+   the limits: anything up to what has been cleared is playable, a fifth beyond it
+   is hard, further is not playable. Oscar's rule after the first check flagged
+   levels he had already cleared (v90). */
+var PROOF_KEY = "polyrhythm-circle:playproof", proof = {gap:null, rate:0, peak:0, keys:{}};
+try{ var proofJ = JSON.parse(localStorage.getItem(PROOF_KEY) || "null"); if(proofJ && proofJ.keys) proof = proofJ; } catch(err){}
+function lvlProve(l){
+  if(!l || !l.rings || !l.rings.length) return;
+  var c = lvlCheck(l, true);
+  if(!c.n) return;
+  proof.gap = (proof.gap === null) ? c.gapMs : Math.min(proof.gap, c.gapMs);
+  proof.rate = Math.max(proof.rate || 0, c.rate);
+  proof.peak = Math.max(proof.peak || 0, c.peak);
+  proof.keys[lvlKey(l)] = 1;
+  var ks = Object.keys(proof.keys); if(ks.length > 400) delete proof.keys[ks[0]];
+  try{ localStorage.setItem(PROOF_KEY, JSON.stringify(proof)); } catch(err){}
+  if(editorOn) paintLevels();
+}
+function playLimits(){
+  var L = PLAY_LIMITS;
+  if(proof.gap === null) return L;
+  return {gapNo:Math.min(L.gapNo, proof.gap * 0.8), gapHard:Math.min(L.gapHard, proof.gap),
+          rateNo:Math.max(L.rateNo, proof.rate * 1.2), rateHard:Math.max(L.rateHard, proof.rate),
+          peakNo:Math.max(L.peakNo, proof.peak + 1), peakHard:Math.max(L.peakHard, proof.peak)};
+}
+function lvlHits(l){
+  var r0 = l.rings[0], cyc = (r0 ? r0.div : 1) * 60 / l.bpm, ts = [];
+  l.rings.slice(0, 2).forEach(function(r){
+    var tot = r.div * r.sub, k;
+    for(k = 0; k < tot; k++) if(r.steps[k]){ var ph = (k / tot + (r.off || 0)) % 1; ts.push(ph * cyc); }
+  });
+  ts.sort(function(a, b){ return a - b; });
+  var out = [];
+  ts.forEach(function(t){ if(!out.length || t - out[out.length - 1] > 0.002) out.push(t); });
+  if(out.length > 1 && out[0] + cyc - out[out.length - 1] <= 0.002) out.pop();
+  return {cyc:cyc, ts:out};
+}
+function lvlCheck(l, raw){
+  var h = lvlHits(l), ts = h.ts, n = ts.length, i, j;
+  if(!n) return {verdict:"no", reason:"no dots to clear", gapMs:0, rate:0, peak:0, n:0};
+  var minGap = h.cyc;
+  for(i = 1; i < n; i++) minGap = Math.min(minGap, ts[i] - ts[i - 1]);
+  if(n > 1) minGap = Math.min(minGap, ts[0] + h.cyc - ts[n - 1]);
+  var rate = n / h.cyc, peak = 0, ext = ts.concat(ts.map(function(t){ return t + h.cyc; }));
+  for(i = 0; i < n; i++){ var c = 0; for(j = i; j < ext.length && ext[j] < ts[i] + 1; j++) c++; peak = Math.max(peak, Math.min(c, n)); }
+  var gapMs = minGap * 1000, L = raw ? PLAY_LIMITS : playLimits(), verdict = "ok", reason = "";
+  if(!raw && proof.keys[lvlKey(l)]) return {verdict:"ok", reason:"cleared here", gapMs:gapMs, rate:rate, peak:peak, n:n, proven:true};
+  if(gapMs < L.gapNo){ verdict = "no"; reason = "two hits " + Math.round(gapMs) + " ms apart"; }
+  else if(rate > L.rateNo){ verdict = "no"; reason = rate.toFixed(1) + " hits a second"; }
+  else if(peak > L.peakNo){ verdict = "no"; reason = peak + " hits in one second"; }
+  else if(gapMs < L.gapHard){ verdict = "hard"; reason = "hits " + Math.round(gapMs) + " ms apart"; }
+  else if(rate > L.rateHard){ verdict = "hard"; reason = rate.toFixed(1) + " hits a second"; }
+  else if(peak > L.peakHard){ verdict = "hard"; reason = peak + " hits in one second"; }
+  return {verdict:verdict, reason:reason, gapMs:gapMs, rate:rate, peak:peak, n:n};
+}
+function lvlCheckText(c){
+  if(c.verdict === "no") return "Not playable: " + c.reason;
+  if(c.verdict === "hard") return "Hard: " + c.reason;
+  return (c.proven ? "Cleared here" : "Playable") + " \u00b7 " + c.rate.toFixed(1) + " hits/s \u00b7 gap " + Math.round(c.gapMs) + " ms";
+}
+/* the wheel's own verdict, on the editor's button row */
+function paintLvlChk(){
+  var el = document.getElementById("lvlChk");
+  if(!el || !editorOn || !S.rings || !S.rings.length) return;
+  var c = lvlCheck(lvlFromWheel(""));
+  el.dataset.v = c.verdict;
+  el.textContent = "Wheel: " + lvlCheckText(c);
+}
 
 /* what is on the wheel, as a level: its first two rings */
 function lvlFromWheel(name){
@@ -5384,18 +5594,24 @@ function lvlSync(){
   queueSave();
 }
 function paintLevels(){
+  paintLvlChk();
   lvlList.innerHTML = "";
   if(!S.levels.length){
     lvlList.innerHTML = '<p class="lvl-empty">No levels yet: set the wheel up and add it.</p>';
   }
   S.levels.forEach(function(l, i){
-    var row = document.createElement("div");
+    var row = document.createElement("div"), chk = lvlCheck(l);
     row.className = "lvl-row";
     row.dataset.on = (i === lvlEditing) ? "1" : "0";
+    row.dataset.play = (i === lvlPlaying && game) ? "1" : "0";
     row.innerHTML = '<span class="n">' + (i + 1) + (lvlIsLocal(l) ? '<b class="new" title="Not in the build yet">*</b>' : '') + '</span>' +
       '<div class="body"><input class="nm" value="' + escapeHtml(isAutoName(l.name) ? "" : l.name) + '" aria-label="Level name" placeholder="Level ' + (i + 1) + '">' +
-      '<span class="sum" title="Load onto the wheel">' + escapeHtml(lvlSummary(l)) + '</span></div>' +
+      '<span class="sum" title="Load onto the wheel">' + escapeHtml(lvlSummary(l)) +
+        (chk.verdict !== "ok" ? '<b class="chk ' + chk.verdict + '" title="' + escapeHtml(lvlCheckText(chk)) + '">' + (chk.verdict === "no" ? "not playable" : "hard") + '</b>' : '') + '</span></div>' +
       '<span class="ops">' +
+        '<button type="button" data-play title="' + (i === lvlPlaying && game ? "Stop" : "Play this level as a game") + '" aria-label="Play">' + (i === lvlPlaying && game ? "\u25a0" : "\u25b6") + '</button>' +
+        '<button type="button" data-link title="Share this level as a challenge link" aria-label="Challenge link">' +
+          '<svg viewBox="0 0 24 24" aria-hidden="true" width="11" height="11"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.5 1.5M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>' +
         '<button type="button" data-up title="Move up" aria-label="Move up"' + (i === 0 ? " disabled" : "") + '>▲</button>' +
         '<button type="button" data-down title="Move down" aria-label="Move down"' + (i === S.levels.length - 1 ? " disabled" : "") + '>▼</button>' +
         '<button type="button" data-del title="Remove" aria-label="Remove">×</button>' +
@@ -5406,6 +5622,8 @@ function paintLevels(){
       lvlLoad(i);
     });
     row.addEventListener("pointerdown", function(e){ lvlDown(e, i, row); });
+    row.querySelector("[data-play]").addEventListener("click", function(){ lvlPlay(i); });
+    row.querySelector("[data-link]").addEventListener("click", function(){ lvlShareLink(l); });
     row.querySelector("[data-up]").addEventListener("click", function(){ lvlMove(i, -1); });
     row.querySelector("[data-down]").addEventListener("click", function(){ lvlMove(i, 1); });
     row.querySelector("[data-del]").addEventListener("click", function(){
@@ -5415,9 +5633,17 @@ function paintLevels(){
     });
     lvlList.appendChild(row);
   });
+  /* the row that matters - loaded or playing - is brought into the box's view */
+  var onRow = lvlList.querySelector('.lvl-row[data-play="1"]') || lvlList.querySelector('.lvl-row[data-on="1"]');
+  if(onRow){
+    var top = onRow.offsetTop, bot = top + onRow.offsetHeight;
+    if(top < lvlList.scrollTop || bot > lvlList.scrollTop + lvlList.clientHeight)
+      lvlList.scrollTop = Math.max(0, top - lvlList.clientHeight / 2 + onRow.offsetHeight / 2);
+  }
   var own = S.levels.filter(lvlIsLocal).length;
   lvlNote.textContent = S.levels.length
-    ? S.levels.length + " levels · " + (own ? own + " new here (*), not in the build yet" : "all in the build")
+    ? S.levels.length + " levels · " + (own ? own + " new here (*), not in the build yet" : "all in the build") +
+      (proof.gap !== null ? " · cleared here down to a " + Math.round(proof.gap) + " ms gap, " + proof.rate.toFixed(1) + " hits/s" : "")
     : "";
   lvlUpdate.hidden = (lvlEditing < 0);
   lvlUpdate.textContent = "Update " + (lvlEditing + 1);
@@ -5433,6 +5659,17 @@ function lvlMove(i, dir){
   if(lvlEditing === i) lvlEditing = j; else if(lvlEditing === j) lvlEditing = i;
   paintLevels(); queueSave();
 }
+/* one level as a game, from its row: the same one-level game a challenge gets; a
+   level the check calls not playable can still be played - that is how it is proved */
+function lvlPlay(i){
+  var l = S.levels[i];
+  if(!l || calRun) return;
+  if(game && lvlPlaying === i){ gameEnd(); return; }
+  if(game) gameEnd();
+  gameNextFixed = JSON.parse(JSON.stringify(l));
+  lvlPlaying = i;
+  if(!cal) calStart(true); else gameStart();       /* gameStart repaints the list once the game exists */
+}
 /* onto the wheel, to hear it or change it; the ring cards stay editable */
 function lvlLoad(i){
   var l = S.levels[i];
@@ -5447,6 +5684,8 @@ function lvlLoad(i){
 }
 lvlAdd.addEventListener("click", function(){
   if(game) gameEnd();
+  var c = lvlCheck(lvlFromWheel(""));
+  if(c.verdict === "no"){ lvlNote.textContent = lvlCheckText(c) + " \u00b7 not added"; paintLvlChk(); return; }
   S.levels.push(lvlFromWheel(""));            /* the row shows its position until you name it */
   lvlEditing = S.levels.length - 1;
   paintLevels(); queueSave();
@@ -5466,7 +5705,89 @@ document.getElementById("lvlCopy").addEventListener("click", function(){
   lvlText.select();
   try{ navigator.clipboard.writeText(lvlText.value); } catch(err){ document.execCommand("copy"); }
 });
+/* one level out as a link: the phone's share sheet where there is one, else the
+   clipboard; the link is shown in the import box too, so it can be read or copied by hand */
+var lvlImport = document.getElementById("lvlImport"), lvlImportBox = document.getElementById("lvlImportBox");
+var lvlImportText = document.getElementById("lvlImportText"), lvlImportNote = document.getElementById("lvlImportNote");
+function lvlShareLink(l){
+  var url = lvlLink(l), title = "Polyorbit challenge" + (isAutoName(l.name) ? "" : ": " + l.name);
+  lvlImportBox.hidden = false; lvlImportText.value = url; lvlImportNote.textContent = "";
+  if(navigator.share){
+    navigator.share({title:title, text:title + " \u00b7 " + lvlSummary(l), url:url}).then(function(){ lvlImportNote.textContent = "Link shared"; }, function(){});
+    return;
+  }
+  try{ navigator.clipboard.writeText(url).then(function(){ lvlImportNote.textContent = "Link copied"; }, function(){ lvlImportText.select(); }); }
+  catch(err){ lvlImportText.select(); }
+}
+lvlImport.addEventListener("click", function(){
+  lvlImportBox.hidden = !lvlImportBox.hidden;
+  if(!lvlImportBox.hidden){ lvlImportText.value = ""; lvlImportNote.textContent = ""; lvlImportText.focus(); }
+});
+document.getElementById("lvlImportGo").addEventListener("click", function(){
+  var l = lvlDecode(lvlImportText.value);
+  if(!l){ lvlImportNote.textContent = "Not a level code or challenge link"; return; }
+  var c = lvlCheck(l);
+  if(c.verdict === "no"){ lvlImportNote.textContent = lvlCheckText(c) + " \u00b7 not added"; return; }
+  if(game) gameEnd();
+  S.levels.push(l);
+  lvlEditing = S.levels.length - 1;
+  paintLevels(); queueSave();
+  lvlLoad(lvlEditing);
+  lvlImportNote.textContent = "Added as " + S.levels.length + (c.verdict === "hard" ? " \u00b7 " + lvlCheckText(c) : "");
+});
 paintLevels();
+
+/* ============================================================ challenges =====
+   A link with ?c= opens the app on that level: it is put on the wheel so it can be
+   heard, and a card in Play time offers to play it as a one-level game. The URL is
+   cleaned so a reload does not bring it back. */
+var challenge = null, gameNextFixed = null;
+var chalBox = document.getElementById("chalBox"), chalText = document.getElementById("chalText");
+var chalPlay = document.getElementById("chalPlay"), chalKeep = document.getElementById("chalKeep");
+function chalName(l){ return isAutoName(l.name) ? lvlSummary(l) : l.name + " \u00b7 " + l.bpm + " bpm"; }
+function chalShow(l, text, done){
+  challenge = l;
+  chalText.innerHTML = '<span class="k">' + (done ? "Challenge" : "Challenge") + '</span> ' + escapeHtml(text);
+  chalPlay.textContent = done ? "Play again" : "Play it";
+  chalKeep.hidden = !editorOn;
+  chalBox.hidden = false;
+}
+function openChallengeFromUrl(){
+  var m = /[?&]c=([A-Za-z0-9_\-]+)/.exec(location.search);
+  if(!m) return;
+  try{
+    var q = new URLSearchParams(location.search); q.delete("c");
+    var rest = q.toString();
+    history.replaceState(null, "", location.pathname + (rest ? "?" + rest : "") + location.hash);
+  } catch(err){}
+  var l = lvlDecode(m[1]);
+  if(!l){ chalBox.hidden = false; chalText.textContent = "This challenge link could not be read."; chalPlay.hidden = true; chalKeep.hidden = true; return; }
+  var c = lvlCheck(l);
+  if(game) gameEnd();
+  applyConfig({bpm:l.bpm, noteDen:l.noteDen, noteDot:l.noteDot, rings:l.rings.map(function(r){
+    return {div:r.div, sub:r.sub, off:r.off, sound:r.sound, vol:r.vol, steps:r.steps.slice()};
+  })});
+  chalPlay.hidden = (c.verdict === "no");
+  chalShow(l, chalName(l) + (c.verdict === "no" ? " \u00b7 " + lvlCheckText(c) : c.verdict === "hard" ? " \u00b7 hard" : ""));
+  var panel = document.getElementById("tapPanel");
+  if(panel && panel.scrollIntoView) setTimeout(function(){ panel.scrollIntoView({behavior:"smooth", block:"center"}); }, 400);
+}
+chalPlay.addEventListener("click", function(){
+  if(!challenge || calRun) return;
+  if(game) gameEnd();
+  gameNextFixed = challenge;
+  if(!cal) calStart(true); else gameStart();
+});
+chalKeep.addEventListener("click", function(){
+  if(!challenge) return;
+  S.levels.push(JSON.parse(JSON.stringify(challenge)));
+  lvlEditing = S.levels.length - 1;
+  paintLevels(); queueSave();
+  chalKeep.disabled = true; chalKeep.textContent = "Kept";
+});
+document.getElementById("chalClose").addEventListener("click", function(){
+  chalBox.hidden = true; challenge = null; chalPlay.hidden = false; chalKeep.disabled = false; chalKeep.textContent = "Keep";
+});
 
 /* Dragging a row to a new place: the same split as the sequence boxes - a
    mouse arms on the smallest movement, a finger has to hold, so a finger that
@@ -5497,6 +5818,8 @@ function lvlMoveEv(e){
     return;
   }
   e.preventDefault();
+  var lr = lvlList.getBoundingClientRect();
+  if(e.clientY < lr.top + 28) lvlList.scrollTop -= 8; else if(e.clientY > lr.bottom - 28) lvlList.scrollTop += 8;
   var t = document.elementFromPoint(e.clientX, e.clientY);
   var over = t && t.closest ? t.closest(".lvl-row") : null;
   var rowsAll = [].slice.call(lvlList.querySelectorAll(".lvl-row"));
@@ -7400,6 +7723,7 @@ paintNote();
 paintRack();
 paintMine();
 tickLabel();
+openChallengeFromUrl();
 requestAnimationFrame(draw);
 document.fonts && document.fonts.ready.then(sizeCanvas);
 (function(){
@@ -7426,8 +7750,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v88";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-09 09:11";          /* and when it was built, for ?diag */
+  var BUILD = "v90";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-09 15:42";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

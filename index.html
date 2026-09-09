@@ -385,12 +385,14 @@ input[type=range]::-moz-range-thumb{
 .share-sheet .plan-sum{margin:12px 0 0;font-size:14px}
 /* recording a video: the wheel is the stage. Everything a viewer does not need
    goes; every touch is caught by a shield (a tap on the centre cancels). */
-:root[data-rec="1"] :is(#dialHint,#sessNow,#scoreBtn,#shareBtn,#posLbl){visibility:hidden}
-:root[data-rec="1"] :is(#rack,#sessionPanel,#tapPanel,#lvlPanel,#seqPanel,#patPanel,.bpm-block,.bpm-row,.note-row,#tap,#countBtn){opacity:.35}
-:root[data-rec="1"] .play,:root[data-rec="1"] .play:hover{background:#E5484D;border-color:#E5484D;color:#fff;opacity:1}
-:root[data-rec="1"] .play svg{display:none}
-:root[data-rec="1"] .play::after{content:"";width:34%;height:34%;border-radius:50%;background:#fff;display:block}
-:root[data-rec="1"] body{overflow:hidden}
+/* data-video, not data-rec: data-rec is Tap pattern's flag, and sharing it (v74-v86)
+   greyed the whole app while a ring was being tapped in - Oscar's report */
+:root[data-video="1"] :is(#dialHint,#sessNow,#scoreBtn,#shareBtn,#posLbl){visibility:hidden}
+:root[data-video="1"] :is(#rack,#sessionPanel,#tapPanel,#lvlPanel,#seqPanel,#patPanel,.bpm-block,.bpm-row,.note-row,#tap,#countBtn){opacity:.35}
+:root[data-video="1"] .play,:root[data-video="1"] .play:hover{background:#E5484D;border-color:#E5484D;color:#fff;opacity:1}
+:root[data-video="1"] .play svg{display:none}
+:root[data-video="1"] .play::after{content:"";width:34%;height:34%;border-radius:50%;background:#fff;display:block}
+:root[data-video="1"] body{overflow:hidden}
 #recShield{position:fixed;inset:0;z-index:60;touch-action:none;background:transparent}
 #recShield[hidden]{display:none}
 .beatnow.rec .mono{color:var(--c3);letter-spacing:.14em;font-weight:600}
@@ -626,7 +628,16 @@ canvas{
 .ring-card .tapbtn[data-on="1"]{
   border-color:var(--lc); color:var(--ink);
   background:color-mix(in srgb,var(--lc) 18%,transparent);
+  animation:tapPulse 1.8s ease-in-out infinite;     /* live, like the session's Stop and the Game button (v87) */
 }
+@keyframes tapPulse{
+  0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--lc) 0%,transparent)}
+  50%    {box-shadow:0 0 0 4px color-mix(in srgb,var(--lc) 45%,transparent)}
+}
+@media (prefers-reduced-motion:reduce){ .ring-card .tapbtn[data-on="1"]{animation:none} }
+/* the tempo numbers jump on a tap (bpmPop): transforms need a box, and the jump
+   must paint over its neighbours */
+#bpmNum,#fbNum,#tapNowBpm{display:inline-block;transform-origin:center;position:relative}
 :root[data-ui="simple"] .tap-row{display:none}
 /* While a ring listens the whole wheel is the tap target, so the play button
    steps out of the way, and the two controls that would fight over the tempo
@@ -2956,6 +2967,21 @@ var playBtn = document.getElementById("play");
 var playIcon = document.getElementById("playIcon");
 var bpmNum = document.getElementById("bpmNum");
 var fbNum = document.getElementById("fbNum");   /* the same number, on the folded bar */
+/* every tap of Tap tempo or of Tap pattern on ring 1 makes both tempo numbers
+   jump - scale 1 to 2 and back in a quarter second (Oscar, v87/v88), and so does
+   the number in the row under the wheel while a ring is tapped in. Transform
+   only, so nothing around them moves; a fresh animation per tap, so quick taps
+   restart the jump rather than queue. */
+function bpmPop(){
+  [bpmNum, fbNum, document.getElementById("tapNowBpm")].forEach(function(el){
+    if(!el || !el.animate) return;
+    el.getAnimations().forEach(function(a){ a.cancel(); });
+    el.style.zIndex = "3";
+    var a = el.animate([{transform:"scale(1)"}, {transform:"scale(2)", offset:.5}, {transform:"scale(1)"}],
+                       {duration:250, easing:"ease-in-out"});   /* Oscar: 0.25 s (v88) */
+    a.onfinish = a.oncancel = function(){ el.style.zIndex = ""; };
+  });
+}
 
 /* What one click of ring 1 is worth, as a note. The tempo number is the speed
    of that note, so the readout reads like a score marking - an eighth and 200
@@ -3217,6 +3243,7 @@ function doTap(){
   if(taps.length && t - taps[taps.length-1] > 2500) taps = [];
   taps.push(t);
   if(taps.length > 5) taps.shift();
+  bpmPop();
   if(taps.length >= 2){
     var sum = 0;
     for(var i=1;i<taps.length;i++) sum += taps[i] - taps[i-1];
@@ -4809,6 +4836,7 @@ function recTap(perfMs){
     var liveBpm = recBpm();                  /* the Tempo number follows the taps as they land */
     if(liveBpm) setBpm(liveBpm);
     paintRack(); paintTapNow();
+    bpmPop();                                /* after the paint: the row's number is a fresh span each tap */
     return;
   }
 
@@ -4878,7 +4906,7 @@ function paintTapNow(){
     } else {
       if(S.active === 0){
         tapNowIn.innerHTML = lbl("divisions") + " " + recTaps.length +
-          (bpm === null ? "  " + lbl("one more for the tempo") : "  " + bpm + " " + lbl("bpm"));
+          (bpm === null ? "  " + lbl("one more for the tempo") : '  <span class="n" id="tapNowBpm">' + bpm + "</span> " + lbl("bpm"));
       } else {
         var on = r.steps.filter(Boolean).length;
         tapNowIn.innerHTML = lbl("in") + " " + r.div +
@@ -6612,7 +6640,7 @@ function recVideoStart(){
       recLayout(kit); recStatic(kit);
       recV = {loops:loops, cyc:cycleDur(), canvas:kit.canvas, g:kit.g, bg:kit.bg, L:kit.L, col:kit.col, score:kit.score, icons:kit.icons,
               chunks:[], started:false, done:false, cancelled:false, failed:false, idle:0};
-      document.documentElement.dataset.rec = "1";
+      document.documentElement.dataset.video = "1";
       recShield.hidden = false;
       recV.countIn = S.countIn; S.countIn = false;        /* the clip starts on the downbeat */
       if(S.playing) stop();
@@ -6851,7 +6879,7 @@ function recVideoFinish(blob, msg, ext, note){
   S.countIn = r.countIn;
   try{ if(r.dest) busOut.disconnect(r.dest); } catch(err){}
   try{ if(r.stream) r.stream.getTracks().forEach(function(t){ t.stop(); }); } catch(err){}
-  delete document.documentElement.dataset.rec;
+  delete document.documentElement.dataset.video;
   recShield.hidden = true;
   paintCount();
   tickLabel();
@@ -7398,8 +7426,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v86";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-08 16:50";          /* and when it was built, for ?diag */
+  var BUILD = "v88";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-09 09:11";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

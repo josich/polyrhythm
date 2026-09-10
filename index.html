@@ -1345,7 +1345,9 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <span class="fold-ico note" aria-hidden="true"><svg viewBox="0 0 22 30"><ellipse cx="8" cy="22.5" rx="5.4" ry="3.7" transform="rotate(-22 8 22.5)" fill="currentColor"/><path d="M12.9 21.6V3.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M12.9 3.5c3.6 2.2 6 5.2 4.4 10.2" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg></span>
       <span class="seq-note" id="seqNote"></span>
     </div>
-    <div class="seq-row" id="seqRow"></div>
+    <!-- the steps as rows in the levels' box (Oscar, v115); patterns arrive through the
+         list-plus button on any row of the Patterns section -->
+    <div class="lvl-list seq-list" id="seqRow"></div>
   </section>
 
   <section class="presets foldsec" id="patPanel">
@@ -7963,37 +7965,49 @@ var pickSlot = null;          /* index being filled, or -1 for a new step */
 var seqDrag = null;
 var seqNoClick = false;       /* set when a pointerup ended a drag, not a tap */
 
+function stepCfg(step){
+  return { bpm: step.bpm, noteDen: step.noteDen, noteDot: step.noteDot,
+    rings: (step.rings || []).map(function(r){
+      var o = {div:r.div, sub:r.sub || 1, off:r.off || 0, sound:r.sound, vol:r.vol, mute:!!r.mute};
+      if(Array.isArray(r.steps)) o.steps = r.steps.slice();
+      return o;
+    }) };
+}
 function seqRender(){
   seqRow.innerHTML = "";
   S.seq.forEach(function(step, i){
-    var b = document.createElement("button");
-    b.className = "seq-box";
-    b.type = "button";
-    b.title = step.name + " - tap to change, drag onto another step to swap";
-    b.innerHTML = '<span class="n">' + (i + 1) + '</span>' +
-                  '<span class="nm">' + escapeHtml(step.name) + '</span>';
-    b.addEventListener("click", function(){
+    var row = document.createElement("div");
+    row.className = "lvl-row";
+    var meta = (step.rings || []).map(function(r){ return r.div; }).join(" : ") + " \u00b7 " + step.bpm + " bpm";
+    row.innerHTML = '<span class="n">' + (i + 1) + '</span>' +
+      '<div class="body" title="Put it on the wheel"><span class="nm-ro">' + escapeHtml(step.name) + '</span>' +
+      '<span class="meta"><span>' + meta + '</span></span></div>' +
+      '<span class="ops">' +
+        '<button type="button" data-play title="Put it on the wheel and play" aria-label="Play">\u25b6</button>' +
+        '<button type="button" data-up title="Move up" aria-label="Move up"' + (i === 0 ? " disabled" : "") + '>\u25b2</button>' +
+        '<button type="button" data-down title="Move down" aria-label="Move down"' + (i === S.seq.length - 1 ? " disabled" : "") + '>\u25bc</button>' +
+        '<button type="button" data-del title="Remove this step" aria-label="Remove this step">\u00d7</button>' +
+      '</span>';
+    row.querySelector(".body").addEventListener("click", function(){
       if(seqNoClick){ seqNoClick = false; return; }
-      startPick(i);
+      applyConfig(stepCfg(step));
     });
-    b.addEventListener("pointerdown", function(e){ seqDown(e, i); });
-    seqRow.appendChild(b);
+    row.querySelector("[data-play]").addEventListener("click", function(){ applyConfig(stepCfg(step)); if(!S.playing) start(); });
+    row.querySelector("[data-up]").addEventListener("click", function(){ seqShift(i, -1); });
+    row.querySelector("[data-down]").addEventListener("click", function(){ seqShift(i, 1); });
+    row.querySelector("[data-del]").addEventListener("click", function(){ S.seq.splice(i, 1); seqRender(); paintPlan(); queueSave(); });
+    row.addEventListener("pointerdown", function(e){ seqDown(e, i); });
+    seqRow.appendChild(row);
   });
-
-  if(S.seq.length < MAX_SEQ){
-    var add = document.createElement("button");
-    add.className = "seq-add";
-    add.type = "button";
-    add.textContent = "+";
-    add.title = "Add a step";
-    add.setAttribute("aria-label", "Add a step");
-    add.addEventListener("click", function(){ startPick(-1); });
-    seqRow.appendChild(add);
-  }
-
   seqNote.textContent = S.seq.length
-    ? S.seq.length + (S.seq.length === 1 ? " step" : " steps")
-    : "Press + to add a pattern";
+    ? S.seq.length + (S.seq.length === 1 ? " step" : " steps") + (S.seq.length >= MAX_SEQ ? " \u00b7 full" : "")
+    : "Add patterns with the list button in Patterns";
+}
+function seqShift(i, dir){
+  var j = i + dir;
+  if(j < 0 || j >= S.seq.length) return;
+  var t = S.seq[i]; S.seq[i] = S.seq[j]; S.seq[j] = t;
+  seqRender(); paintPlan(); queueSave();
 }
 
 /* ------------------------------------------------------------- filling a step */
@@ -8035,6 +8049,7 @@ function chipHit(name, cfg){
 }
 /* straight onto the end of the sequence, no step to arm first (Oscar, v111) */
 function seqAppend(name, cfg){
+  if(S.seq.length >= MAX_SEQ){ seqNote.textContent = "The sequence is full: " + MAX_SEQ + " steps"; return; }
   S.seq.push(stepFrom(name, cfg));
   seqRender(); paintPlan(); queueSave();
 }
@@ -8042,6 +8057,7 @@ function seqAppend(name, cfg){
 /* --------------------------------------------------------- dragging to swap */
 function seqDown(e, i){
   if(pickSlot !== null) return;
+  if(e.target.closest && e.target.closest("button")) return;   /* the row's buttons are their own controls */
   var box = e.currentTarget;
   seqDrag = {i:i, box:box, x:e.clientX, y:e.clientY, armed:false, dead:false, over:-1};
   /* mouse arms on the smallest movement; touch has to hold, so that a finger
@@ -8071,8 +8087,10 @@ function seqMove(e){
     return;
   }
   e.preventDefault();
+  var lr = seqRow.getBoundingClientRect();
+  if(e.clientY < lr.top + 28) seqRow.scrollTop -= 8; else if(e.clientY > lr.bottom - 28) seqRow.scrollTop += 8;
   var t = document.elementFromPoint(e.clientX, e.clientY);
-  var box = t && t.closest ? t.closest(".seq-box") : null;
+  var box = t && t.closest ? t.closest("#seqRow .lvl-row") : null;
   var j = box ? [].indexOf.call(seqRow.children, box) : -1;
   if(j === seqDrag.i) j = -1;
   if(j !== seqDrag.over){
@@ -8092,7 +8110,8 @@ function seqEnd(cancel){
   if(!d.armed) return;
   seqNoClick = true;                       /* the pointerup was a drag, not a tap */
   if(cancel || d.over < 0 || d.over >= S.seq.length) return;
-  var a = S.seq[d.i]; S.seq[d.i] = S.seq[d.over]; S.seq[d.over] = a;
+  var moved = S.seq.splice(d.i, 1)[0];       /* the row lands where it is dropped; the others close up */
+  S.seq.splice(d.over, 0, moved);
   seqRender();
   paintPlan();
   queueSave();
@@ -8285,8 +8304,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v114";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-10 15:26";          /* and when it was built, for ?diag */
+  var BUILD = "v115";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-10 15:30";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

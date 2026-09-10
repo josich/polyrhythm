@@ -1,6 +1,6 @@
 /* Offline cache for Polyorbit.
    Bump CACHE whenever you redeploy, or phones will keep serving the old app. */
-var CACHE = "polyrhythm-v122";
+var CACHE = "polyrhythm-v123";
 /* proof that a response really is this app and not a host's error page */
 var MARK = "polyrhythm-circle:session";
 var ASSETS = [
@@ -17,7 +17,10 @@ var ASSETS = [
   "./fonts/plexmono-500.woff2",
   "./fonts/plexmono-600.woff2",
   "./lame.min.js",
-  "./mp4-muxer.min.js"
+  "./mp4-muxer.min.js",
+  /* the app script (v123): index.html asks for exactly this URL, so the version in
+     the query is the one build-pwa.sh stamped, which is this CACHE's number */
+  "./app.js?v=" + CACHE.slice("polyrhythm-".length)
 ];
 
 self.addEventListener("install", function(e){

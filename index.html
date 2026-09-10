@@ -1028,6 +1028,7 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .mine-list .lvl-row .ops button[data-del]:hover{border-color:var(--c3);color:var(--c3)}
 .mine-list:empty{display:none}
 .lvl-row .ops button[data-seq]{color:var(--c1)}
+.lvl-row .ops button[data-play][data-on="1"]{background:color-mix(in srgb,var(--c2) 18%,transparent);color:var(--ink);border-color:var(--c2)}
 .lvl-row .ops button[data-seq] svg{width:13px;height:13px;vertical-align:-2px}
 .empty{color:var(--ink-3);font-size:12px;margin-top:11px}
 .keys{margin-top:16px;color:var(--ink-3);font-size:11.5px;display:flex;gap:18px;flex-wrap:wrap}
@@ -3239,6 +3240,7 @@ function groupLabel(){
   return parts.join("+");
 }
 function paintTransport(){
+  paintRowPlay();
   playBtn.dataset.on = S.playing ? "1" : "0";
   playBtn.setAttribute("aria-label", S.playing ? "Stop" : "Play");
   playIcon.setAttribute("d", S.playing ? "M7 6h4v12H7zm6 0h4v12h-4z" : "M8 5.5v13l11-6.5z");
@@ -4034,10 +4036,8 @@ RHYTHM_GROUPS.forEach(function(g, gi){
           '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M4 12h10M4 18h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M18 11v8M14 15h8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>' +
       '</span>';
     row.querySelector(".body").addEventListener("click", function(){ chipHit(rh.name, rhythmCfg(rh)); });
-    row.querySelector("[data-play]").addEventListener("click", function(){
-      chipHit(rh.name, rhythmCfg(rh));
-      if(pickSlot === null && !S.playing) start();
-    });
+    row.querySelector("[data-play]").dataset.key = "rh:" + rh.name;
+    row.querySelector("[data-play]").addEventListener("click", function(){ rowPlay("rh:" + rh.name, rh.name, rhythmCfg(rh)); });
     row.querySelector("[data-seq]").addEventListener("click", function(e){ bump(e.currentTarget); seqAppend(rh.name, rhythmCfg(rh)); });
     rgrid.appendChild(row);
     rows.push(row);
@@ -4088,10 +4088,8 @@ BUILTIN.forEach(function(p){
         '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M4 12h10M4 18h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M18 11v8M14 15h8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>' +
     '</span>';
   row.querySelector(".body").addEventListener("click", function(){ chipHit(p.label, ratioCfg(p)); });
-  row.querySelector("[data-play]").addEventListener("click", function(){
-    chipHit(p.label, ratioCfg(p));
-    if(pickSlot === null && !S.playing) start();
-  });
+  row.querySelector("[data-play]").dataset.key = "ratio:" + p.label;
+  row.querySelector("[data-play]").addEventListener("click", function(){ rowPlay("ratio:" + p.label, p.label, ratioCfg(p)); });
   row.querySelector("[data-seq]").addEventListener("click", function(e){ bump(e.currentTarget); seqAppend(p.label, ratioCfg(p)); });
   pgrid.appendChild(row);
 });
@@ -4241,11 +4239,9 @@ function paintMine(){
     row.querySelector("[data-seq]").addEventListener("click", function(e){ bump(e.currentTarget); seqAppend(p.name, p); });
     row.querySelector("[data-up]").addEventListener("click", function(){ mineMove(i, -1); });
     row.querySelector("[data-down]").addEventListener("click", function(){ mineMove(i, 1); });
+    row.querySelector("[data-play]").dataset.key = "mine:" + p.name;
     row.querySelector("[data-play]").addEventListener("click", function(){
-      chipHit(p.name, p);
-      if(pickSlot !== null) return;                /* a step was waiting: filled, nothing plays */
-      mineOn = i; paintMine();
-      if(!S.playing) start();
+      rowPlay("mine:" + p.name, p.name, p, function(){ mineOn = i; paintMine(); });
     });
     row.querySelector("[data-del]").addEventListener("click", function(){
       if(pickSlot !== null) return;                /* not while a step is waiting */
@@ -4255,6 +4251,7 @@ function paintMine(){
     });
     mineEl.appendChild(row);
   });
+  paintRowPlay();
 }
 function mineMove(i, dir){
   var a = loadMine(), j = i + dir;
@@ -7992,13 +7989,15 @@ function seqRender(){
       if(seqNoClick){ seqNoClick = false; return; }
       applyConfig(stepCfg(step));
     });
-    row.querySelector("[data-play]").addEventListener("click", function(){ applyConfig(stepCfg(step)); if(!S.playing) start(); });
+    row.querySelector("[data-play]").dataset.key = "seq:" + i;
+    row.querySelector("[data-play]").addEventListener("click", function(){ rowPlay("seq:" + i, step.name, stepCfg(step)); });
     row.querySelector("[data-up]").addEventListener("click", function(){ seqShift(i, -1); });
     row.querySelector("[data-down]").addEventListener("click", function(){ seqShift(i, 1); });
     row.querySelector("[data-del]").addEventListener("click", function(){ S.seq.splice(i, 1); seqRender(); paintPlan(); queueSave(); });
     row.addEventListener("pointerdown", function(e){ seqDown(e, i); });
     seqRow.appendChild(row);
   });
+  paintRowPlay();
   seqNote.textContent = S.seq.length
     ? S.seq.length + (S.seq.length === 1 ? " step" : " steps") + (S.seq.length >= MAX_SEQ ? " \u00b7 full" : "")
     : "Add patterns with the list button in Patterns";
@@ -8046,6 +8045,30 @@ function chipHit(name, cfg){
   seqRender();
   paintPlan();
   queueSave();
+}
+/* A row's play button starts the wheel with that row's pattern and turns into Stop
+   while it plays; the wheel's own big button never touches the rows (Oscar, v117).
+   `rowPlaying` names the row (a key per list); paintTransport repaints on every
+   start and stop, so any stop - the hub, another row, a load - clears it. */
+var rowPlaying = null;
+function rowPlay(key, name, cfg, after){
+  if(rowPlaying === key && S.playing){ stop(); return; }
+  chipHit(name, cfg);
+  if(pickSlot !== null) return;
+  if(after) after();
+  if(!S.playing) start();
+  rowPlaying = key; paintRowPlay();
+}
+function paintRowPlay(){
+  if(!S.playing) rowPlaying = null;
+  var bs = document.querySelectorAll(".lvl-row [data-play][data-key]"), i;
+  for(i = 0; i < bs.length; i++){
+    var b = bs[i], on = (rowPlaying !== null && b.dataset.key === rowPlaying) ? "1" : "0";
+    if(b.dataset.on === on) continue;
+    b.dataset.on = on;
+    b.textContent = on === "1" ? "■" : "▶";
+    b.title = on === "1" ? "Stop" : "Put it on the wheel and play";
+  }
 }
 /* straight onto the end of the sequence, no step to arm first (Oscar, v111) */
 function seqAppend(name, cfg){
@@ -8304,8 +8327,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v116";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-10 15:37";          /* and when it was built, for ?diag */
+  var BUILD = "v117";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-10 16:16";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

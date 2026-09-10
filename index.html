@@ -1009,10 +1009,11 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .pchip small{font-family:"Archivo",sans-serif;color:var(--ink-3);margin-left:7px;font-size:10.5px}
 .saverow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .saverow input[type=text]{padding:8px 10px;border-radius:9px;border:1px solid var(--line-2);background:var(--sunk);font-size:13px;min-width:180px}
-.mine{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
-.mine .pchip{display:flex;align-items:center;gap:9px;font-family:"Archivo",sans-serif;font-size:12.5px}
-.mine .del{color:var(--ink-3);font-weight:700}
-.mine .del:hover{color:var(--c3)}
+.mine-lbl{margin:14px 0 8px}
+.mine-list .lvl-row{grid-template-columns:minmax(0,1fr) auto}   /* no position number: presets have no order that means anything */
+.mine-list .lvl-row .body{cursor:pointer}
+.mine-list .lvl-row .ops button[data-del]:hover{border-color:var(--c3);color:var(--c3)}
+.mine-list:empty{display:none}
 .empty{color:var(--ink-3);font-size:12px;margin-top:11px}
 .keys{margin-top:16px;color:var(--ink-3);font-size:11.5px;display:flex;gap:18px;flex-wrap:wrap}
 kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(--line-2);border-bottom-width:2px;border-radius:5px;padding:1px 5px;color:var(--ink-2);background:var(--sunk)}
@@ -1356,7 +1357,9 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         <input type="text" id="pname" placeholder="Name this setup" maxlength="28">
         <button class="btn" id="psave">Save current</button>
       </div>
-      <div class="mine" id="mine"></div>
+      <!-- saved setups as rows in a scrolling box, the levels' rows (Oscar, v110) -->
+      <div class="share-lbl lvl-lbl mine-lbl"><span>Saved:</span><i></i></div>
+      <div class="lvl-list mine-list" id="mine"></div>
       <p class="empty" id="pempty">Nothing saved yet — presets stay in this browser.</p>
     </div>
 
@@ -4177,25 +4180,41 @@ function saveMine(arr){
   try{ localStorage.setItem(KEY, JSON.stringify(arr)); } catch(err){}
 }
 var mineEl = document.getElementById("mine"), pempty = document.getElementById("pempty");
+/* the saved setups as rows: name, ratio and tempo, play, remove. Tapping the row puts
+   it on the wheel (or fills the waiting sequence step); play does that and starts;
+   the loaded one lights up like a loaded level (v110) */
+var mineOn = -1;
 function paintMine(){
   var arr = loadMine();
   mineEl.innerHTML = "";
   pempty.style.display = arr.length ? "none" : "block";
   arr.forEach(function(p, i){
-    var b = document.createElement("button");
-    b.className = "pchip";
-    b.innerHTML = '<span>' + escapeHtml(p.name) + '</span>' +
-      '<span class="mono" style="color:var(--ink-3)">' +
-      p.rings.map(function(r){ return r.div; }).reverse().join(":") + ' · ' + p.bpm + '</span>' +
-      '<span class="del" data-del>&times;</span>';
-    b.addEventListener("click", function(e){
-      if(e.target && e.target.hasAttribute("data-del")){
-        if(pickSlot !== null) return;      /* not while a step is waiting */
-        var a = loadMine(); a.splice(i,1); saveMine(a); paintMine(); return;
-      }
+    var row = document.createElement("div");
+    row.className = "lvl-row";
+    row.dataset.on = (mineOn === i) ? "1" : "0";
+    row.innerHTML = '<div class="body" title="Put it on the wheel"><span class="nm-ro">' + escapeHtml(p.name) + '</span>' +
+      '<span class="meta"><span>' + p.rings.map(function(r){ return r.div; }).join(" : ") + ' · ' + p.bpm + ' bpm</span></span></div>' +
+      '<span class="ops">' +
+        '<button type="button" data-play title="Put it on the wheel and play" aria-label="Play">▶</button>' +
+        '<button type="button" data-del title="Remove" aria-label="Remove">×</button>' +
+      '</span>';
+    row.querySelector(".body").addEventListener("click", function(){
       chipHit(p.name, p);
+      if(pickSlot === null){ mineOn = i; paintMine(); }
     });
-    mineEl.appendChild(b);
+    row.querySelector("[data-play]").addEventListener("click", function(){
+      chipHit(p.name, p);
+      if(pickSlot !== null) return;                /* a step was waiting: filled, nothing plays */
+      mineOn = i; paintMine();
+      if(!S.playing) start();
+    });
+    row.querySelector("[data-del]").addEventListener("click", function(){
+      if(pickSlot !== null) return;                /* not while a step is waiting */
+      var a = loadMine(); a.splice(i, 1); saveMine(a);
+      if(mineOn === i) mineOn = -1; else if(mineOn > i) mineOn--;
+      paintMine();
+    });
+    mineEl.appendChild(row);
   });
 }
 function escapeHtml(s){
@@ -4216,8 +4235,9 @@ document.getElementById("psave").addEventListener("click", function(){
               mute:r.mute, steps:r.steps.slice()};
     })
   });
-  saveMine(arr.slice(0,12));
+  saveMine(arr.slice(0, 30));                      /* rows scroll, so thirty instead of twelve */
   input.value = "";
+  mineOn = 0;                                      /* the new one is what the wheel holds */
   paintMine();
 });
 
@@ -8148,8 +8168,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v109";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-10 14:01";          /* and when it was built, for ?diag */
+  var BUILD = "v110";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-10 14:47";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

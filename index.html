@@ -3901,7 +3901,7 @@ function paintMine(){
     row.querySelector(".body").addEventListener("click", function(){
       if(mineNoClick){ mineNoClick = false; return; }        /* the pointerup ended a drag, not a tap */
       chipHit(p.name, p);
-      if(pickSlot === null){ mineOn = i; paintMine(); }
+      if(pickSlot === null){ mineOn = i; mineLight(); }
     });
     row.addEventListener("pointerdown", function(e){ mineDown(e, i, row); });
     row.querySelector("[data-seq]").addEventListener("click", function(e){ bump(e.currentTarget); seqAppend(p.name, p); });
@@ -3909,7 +3909,7 @@ function paintMine(){
     row.querySelector("[data-down]").addEventListener("click", function(){ mineMove(i, 1); });
     row.querySelector("[data-play]").dataset.key = "mine:" + p.name;
     row.querySelector("[data-play]").addEventListener("click", function(){
-      rowPlay("mine:" + p.name, p.name, p, function(){ mineOn = i; paintMine(); });
+      rowPlay("mine:" + p.name, p.name, p, function(){ mineOn = i; mineLight(); });
     });
     row.querySelector("[data-del]").addEventListener("click", function(){
       if(pickSlot !== null) return;                /* not while a step is waiting */
@@ -3920,6 +3920,11 @@ function paintMine(){
     mineEl.appendChild(row);
   });
   paintRowPlay();
+}
+/* the loaded row lights up without the list being rebuilt (v122) */
+function mineLight(){
+  var rs = mineEl.querySelectorAll(".lvl-row");
+  for(var k = 0; k < rs.length; k++) rs[k].dataset.on = (k === mineOn) ? "1" : "0";
 }
 function mineMove(i, dir){
   var a = loadMine(), j = i + dir;
@@ -8034,6 +8039,10 @@ paintSessLoop();
 seqRender();
 if(editorOn) lvlSync();   /* seed or re-seed the editor's list from this build */
 setTimeout(paintLevels, 0);   /* the rows come right after the first paint: the wheel shows sooner (v121) */
+/* Creating the AudioContext is the slow part of the first Play press on a phone
+   (Oscar's ?diag: 327 ms on the first row play). Made here, after the splash, it
+   waits suspended and the press only resumes it, which is asynchronous (v122). */
+setTimeout(function(){ try{ initAudio(); } catch(err){} }, 1500);
 paintGameBest();
 paintPlan();
 paintTransport();
@@ -8068,8 +8077,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v121";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-10 17:21";          /* and when it was built, for ?diag */
+  var BUILD = "v122";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-10 17:42";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

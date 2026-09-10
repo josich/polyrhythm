@@ -1,6 +1,6 @@
 /* Offline cache for Polyorbit.
    Bump CACHE whenever you redeploy, or phones will keep serving the old app. */
-var CACHE = "polyrhythm-v117";
+var CACHE = "polyrhythm-v118";
 /* proof that a response really is this app and not a host's error page */
 var MARK = "polyrhythm-circle:session";
 var ASSETS = [
@@ -10,7 +10,14 @@ var ASSETS = [
   "./icon-192.png",
   "./icon-512.png",
   "./icon-512-maskable.png",
-  "./apple-touch-icon.png"
+  "./apple-touch-icon.png",
+  "./fonts.css",
+  "./fonts/archivo.woff2",
+  "./fonts/plexmono-400.woff2",
+  "./fonts/plexmono-500.woff2",
+  "./fonts/plexmono-600.woff2",
+  "./lame.min.js",
+  "./mp4-muxer.min.js"
 ];
 
 self.addEventListener("install", function(e){

@@ -4197,9 +4197,9 @@ function paintMine(){
     row.innerHTML = '<div class="body" title="Put it on the wheel"><span class="nm-ro">' + escapeHtml(p.name) + '</span>' +
       '<span class="meta"><span>' + p.rings.map(function(r){ return r.div; }).join(" : ") + ' · ' + p.bpm + ' bpm</span></span></div>' +
       '<span class="ops">' +
+        '<button type="button" data-play title="Put it on the wheel and play" aria-label="Play">▶</button>' +
         '<button type="button" data-seq title="Add to the sequence" aria-label="Add to the sequence">' +
           '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M4 12h10M4 18h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M18 11v8M14 15h8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>' +
-        '<button type="button" data-play title="Put it on the wheel and play" aria-label="Play">▶</button>' +
         '<button type="button" data-up title="Move up" aria-label="Move up"' + (i === 0 ? " disabled" : "") + '>▲</button>' +
         '<button type="button" data-down title="Move down" aria-label="Move down"' + (i === arr.length - 1 ? " disabled" : "") + '>▼</button>' +
         '<button type="button" data-del title="Remove" aria-label="Remove">×</button>' +
@@ -8259,8 +8259,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v111";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-10 15:04";          /* and when it was built, for ?diag */
+  var BUILD = "v112";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-10 15:11";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

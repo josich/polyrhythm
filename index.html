@@ -1524,7 +1524,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v128"></script>
+<script src="./app.js?v=v129"></script>
 
 <script>
 /* PWA plumbing for the hosted build: offline cache, an Install button, a screen
@@ -1536,8 +1536,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v128";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-10 21:12";          /* and when it was built, for ?diag */
+  var BUILD = "v129";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-10 21:21";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 
@@ -1555,8 +1555,36 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* ---- service worker ------------------------------------------------- */
   if("serviceWorker" in navigator){
+    /* How a release used to arrive: the launch checks sw.js, the new worker installs
+       and takes over, but the page on screen is the cached old one, so the new build
+       showed only on the NEXT cold launch - and an installed app that is merely
+       resumed never checks at all (Oscar sat on v125 through three releases). Now:
+       the app checks again whenever it comes back to the front, and once a new
+       worker has taken over it reloads as soon as the wheel is idle (v129). */
+    var hadWorker = !!navigator.serviceWorker.controller, reloaded = false;
+    var busy = function(){
+      var root = document.documentElement, play = document.getElementById("play"), sess = document.getElementById("sessBtn");
+      return (play && play.dataset.on === "1") || (sess && sess.dataset.on === "1") ||
+             root.dataset.game === "1" || root.dataset.video === "1" || root.dataset.rec === "1" ||
+             root.dataset.cal === "1" || root.dataset.chal === "1" || !!document.querySelector(".modal:not([hidden])");
+    };
+    var reloadWhenIdle = function(){
+      if(reloaded) return;
+      if(busy()){ setTimeout(reloadWhenIdle, 2000); return; }
+      reloaded = true;
+      location.reload();
+    };
+    navigator.serviceWorker.addEventListener("controllerchange", function(){
+      /* the first worker ever taking over is not an update: nothing to reload for */
+      if(hadWorker) reloadWhenIdle();
+      hadWorker = true;
+    });
     addEventListener("load", function(){
-      navigator.serviceWorker.register("./sw.js").catch(function(err){
+      navigator.serviceWorker.register("./sw.js").then(function(reg){
+        document.addEventListener("visibilitychange", function(){
+          if(document.visibilityState === "visible") reg.update().catch(function(){});
+        });
+      }).catch(function(err){
         console.warn("service worker did not register:", err);
       });
     });

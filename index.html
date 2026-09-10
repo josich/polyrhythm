@@ -551,8 +551,11 @@ input[type=range]::-moz-range-thumb{
 .chal-cta:hover{filter:brightness(1.06)}
 .chal-more{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:12px}
 .chal-more .btn.sm{padding:9px 14px;font-size:13px}
+/* while a game runs, or a challenge is on, the wheel's header trades Score and Share
+   for one cross that leaves (Oscar, v109: the Game button was off screen) */
 .chal-head-x[hidden]{display:none}
-:root[data-chal="1"] #chalHeadX{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
+#gameX{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
+:is(:root[data-game="1"],:root[data-chal="1"]) :is(#scoreBtn,#shareBtn){display:none}
 /* the card arrives with a small pop; a pressed button bounces and flashes its ring
    (Oscar, v108) - the action itself follows a beat later so the bounce is seen */
 .chal-modal:not([hidden]) .chal-sheet{animation:chalIn .3s cubic-bezier(.2,.9,.3,1.15)}
@@ -1168,7 +1171,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         <span class="metric sub mono" id="posLbl">stopped</span>
         <!-- the score is what the wheel writes out, so its button lives on the wheel -->
         <button class="icobtn score-ico" id="scoreBtn" title="Write it out as notation" aria-label="Score"><svg class="note" viewBox="0 0 22 30" aria-hidden="true"><ellipse cx="8" cy="22.5" rx="5.4" ry="3.7" transform="rotate(-22 8 22.5)" fill="currentColor"/><path d="M12.9 21.6V3.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M12.9 3.5c3.6 2.2 6 5.2 4.4 10.2" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg></button>
-        <button class="icobtn chal-head-x" id="chalHeadX" hidden title="Leave the challenge" aria-label="Leave the challenge">&times;</button>
+        <button class="icobtn chal-head-x" id="gameX" hidden title="Leave the game" aria-label="Leave the game">&times;</button>
         <button class="icobtn" id="shareBtn" title="Share a clip of the wheel as audio" aria-label="Share a clip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="6" cy="12" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="19" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8.1 10.8l7.8-4.6M8.1 13.2l7.8 4.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
       </div>
       <div class="canvas-hold">
@@ -5147,6 +5150,7 @@ function gameStart(){
   initAudio();
   if(ctx && ctx.state === "suspended") ctx.resume();
   document.documentElement.dataset.game = "1";
+  gameX.hidden = false;
   tapGame.dataset.on = "1";
   tapPause.disabled = false; tapPause.textContent = "Pause";
   document.getElementById("scoreBtn").disabled = true;    /* the wheel is the level now */
@@ -5183,6 +5187,7 @@ function gameEnd(){
   S.active = Math.min(prev.active, S.rings.length - 1); rackOpen = prev.rackOpen;
   S.rings.forEach(function(rr){ realign(rr); });
   document.documentElement.dataset.game = "0";
+  gameX.hidden = !chalMode;
   tapGame.dataset.on = "0";
   tapPause.disabled = true; tapPause.textContent = "Pause";
   tapNowIn.dataset.grade = "";
@@ -5904,7 +5909,7 @@ var chalInstall = document.getElementById("chalInstall"), chalKeep = document.ge
 var chalModal = document.getElementById("chalModal"), chalKicker = document.getElementById("chalKicker"), chalTitle = document.getElementById("chalTitle");
 var chalStarline = document.getElementById("chalStarline"), chalSub = document.getElementById("chalSub"), chalGo = document.getElementById("chalGo");
 var chalAgain = document.getElementById("chalAgain"), chalLater = document.getElementById("chalLater"), chalKind = "";
-var chalHeadX = document.getElementById("chalHeadX"), chalPrev = null;   /* the wheel before the link: given back on leaving */
+var gameX = document.getElementById("gameX"), chalPrev = null;   /* the wheel before the link: given back on leaving */
 /* a pressed card button bounces and lights; its action follows the bounce */
 function bump(el){ if(!el) return; el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump"); }
 function afterBump(el, fn){ bump(el); setTimeout(fn, 230); }
@@ -5957,7 +5962,7 @@ function chalPaint(kind){
   chalModal.hidden = false;
 }
 function chalEnter(l){
-  challenge = l; chalMode = true; chalHeadX.hidden = false;
+  challenge = l; chalMode = true; gameX.hidden = false;
   var dial = document.querySelector(".dial");
   if(dial && dial.scrollIntoView) dial.scrollIntoView({block:"start"});
   document.documentElement.dataset.chal = "1";
@@ -5970,7 +5975,7 @@ function chalLeave(){
   if(game) gameEnd();
   chalMode = false; challenge = null; chalTarget = null; chalMine = null;
   delete document.documentElement.dataset.chal;
-  chalNow.hidden = true; chalModal.hidden = true; chalHeadX.hidden = true; starsHide();
+  chalNow.hidden = true; chalModal.hidden = true; gameX.hidden = true; starsHide();
   dialHint.hidden = !!run;
   chalKeep.disabled = false; chalKeep.textContent = "Keep";
   if(chalPrev){ var p = chalPrev; chalPrev = null; applyConfig(p); }
@@ -6052,7 +6057,7 @@ chalLater.addEventListener("click", function(){ afterBump(chalLater, chalLeave);
 document.getElementById("chalX").addEventListener("click", function(){ afterBump(this, chalLeave); });
 chalModal.addEventListener("click", function(e){ if(e.target === chalModal) chalLeave(); });
 chalQuit.addEventListener("click", chalLeave);
-chalHeadX.addEventListener("click", chalLeave);
+gameX.addEventListener("click", function(){ if(chalMode) chalLeave(); else if(game) gameEnd(); });
 chalInstall.addEventListener("click", function(){ bump(chalInstall); });
 chalKeep.addEventListener("click", function(){ bump(chalKeep); });
 chalInstall.addEventListener("click", function(){
@@ -8143,8 +8148,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v108";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-10 13:22";          /* and when it was built, for ?diag */
+  var BUILD = "v109";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-10 14:01";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

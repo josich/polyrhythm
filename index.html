@@ -899,6 +899,19 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rgroup svg{width:13px;height:13px;flex:none;transition:transform .16s ease}
 .rgroup[data-fold="1"] svg{transform:rotate(-90deg)}
 .rgroup[data-fold="1"]{margin-bottom:0}
+/* the library as rows (Oscar, v113): grey category rows that stay pinned at the top
+   of the box while their rhythms scroll under them, and fold on a tap */
+.rlist{margin-top:2px}
+.rlist .lvl-row{grid-template-columns:minmax(0,1fr) auto}
+.rcat{position:sticky;top:-2px;z-index:2;display:flex;align-items:center;gap:8px;padding:8px 10px;margin:0;
+  border-radius:8px;background:var(--panel);border:1px solid var(--line-2);
+  font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);
+  cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.rcat:hover{color:var(--ink)}
+.rcat svg{width:12px;height:12px;flex:none;transition:transform .16s ease}
+.rcat[data-fold="1"] svg{transform:rotate(-90deg)}
+.rcat .rgname{flex:1 1 auto;min-width:0}
+.rcat .rgcount{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:0}
 @media (prefers-reduced-motion:reduce){ .rgroup svg{transition:none} }
 
 /* Practice session. Written as a sentence you can read straight through, with
@@ -1366,7 +1379,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
 
     <div class="pane" data-pane="rhythms" hidden>
-      <div id="rgrid"></div>
+      <div class="lvl-list rlist" id="rgrid"></div>
       <p class="empty">Skeletons, not arrangements — the fewest strokes that still name the rhythm.</p>
     </div>
 
@@ -3985,10 +3998,17 @@ var rgrid = document.getElementById("rgrid");
 var rgroupPainters = [];
 function paintRhythmGroups(){ rgroupPainters.forEach(function(f){ f(); }); }
 
+function rhythmCfg(rh){
+  return { bpm: rh.bpm, noteDen: rh.den || 4,
+    rings: rh.rings.map(function(rc){
+      return { div: rc.div, sub: rc.sub || 1, off: rc.off || 0, sound: rc.sound, vol: rc.vol, steps: pat(rc.pattern) };
+    }) };
+}
 RHYTHM_GROUPS.forEach(function(g, gi){
-  var h = document.createElement("button");
-  h.type = "button";
-  h.className = "rgroup";
+  /* the category row: pinned while its rhythms scroll, folds on a tap */
+  var h = document.createElement("div");
+  h.className = "rcat";
+  h.setAttribute("role", "button");
   h.innerHTML =
     '<svg viewBox="0 0 24 24" aria-hidden="true">' +
       '<path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" ' +
@@ -3998,29 +4018,27 @@ RHYTHM_GROUPS.forEach(function(g, gi){
     '<span class="rgcount">' + g.items.length + '</span>';
   rgrid.appendChild(h);
 
-  var grid = document.createElement("div");
-  grid.className = "pgrid";
+  var rows = [];
   g.items.forEach(function(rh){
-    var b = document.createElement("button");
-    b.className = "pchip";
-    /* the name alone: the descriptions read as noise down a list of fifty-odd
-       and made the phone list far longer to get through. Kept as the tooltip. */
-    b.textContent = rh.name;
-    b.title = rh.note;
-    b.addEventListener("click", function(){
-      chipHit(rh.name, {
-        bpm: rh.bpm, noteDen: rh.den || 4,
-        rings: rh.rings.map(function(rc){
-          return {
-            div: rc.div, sub: rc.sub || 1, off: rc.off || 0,
-            sound: rc.sound, vol: rc.vol, steps: pat(rc.pattern)
-          };
-        })
-      });
+    var row = document.createElement("div");
+    row.className = "lvl-row";
+    var meter = rh.rings[0].div + "/" + (rh.den || 4);
+    row.innerHTML = '<div class="body" title="' + escapeHtml(rh.note || "") + '"><span class="nm-ro">' + escapeHtml(rh.name) + '</span>' +
+      '<span class="meta"><span>' + meter + ' \u00b7 ' + rh.bpm + ' bpm</span></span></div>' +
+      '<span class="ops">' +
+        '<button type="button" data-play title="Put it on the wheel and play" aria-label="Play">\u25b6</button>' +
+        '<button type="button" data-seq title="Add to the sequence" aria-label="Add to the sequence">' +
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M4 12h10M4 18h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M18 11v8M14 15h8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>' +
+      '</span>';
+    row.querySelector(".body").addEventListener("click", function(){ chipHit(rh.name, rhythmCfg(rh)); });
+    row.querySelector("[data-play]").addEventListener("click", function(){
+      chipHit(rh.name, rhythmCfg(rh));
+      if(pickSlot === null && !S.playing) start();
     });
-    grid.appendChild(b);
+    row.querySelector("[data-seq]").addEventListener("click", function(e){ bump(e.currentTarget); seqAppend(rh.name, rhythmCfg(rh)); });
+    rgrid.appendChild(row);
+    rows.push(row);
   });
-  rgrid.appendChild(grid);
 
   /* The first region stays open and the rest start closed, so the pane reads as
      an index with one region already showing - enough to make plain what the
@@ -4035,16 +4053,13 @@ RHYTHM_GROUPS.forEach(function(g, gi){
     h.dataset.fold = folded ? "1" : "0";
     h.setAttribute("aria-expanded", folded ? "false" : "true");
     h.title = (folded ? "Show " : "Hide ") + g.group;
-    grid.hidden = folded;
+    rows.forEach(function(r){ r.hidden = folded; });
   }
   var downY = null;
   h.addEventListener("pointerdown", function(e){ downY = e.clientY; });
   h.addEventListener("click", function(e){
     var y = downY; downY = null;
-    /* the same guards as the panels: a halted fling is not a tap, and neither
-       is a drag that happened to end on a heading */
-    if(performance.now() - lastScrollAt < 320) return;
-    if(y !== null && Math.abs(e.clientY - y) > 10) return;
+    if(y !== null && Math.abs(e.clientY - y) > 10) return;   /* a drag that ended on the heading is not a tap */
     S.rfold[g.group] = !isFolded();
     paintGroup();
     queueSave();
@@ -8259,8 +8274,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v112";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-10 15:11";          /* and when it was built, for ?diag */
+  var BUILD = "v113";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-10 15:18";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

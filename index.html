@@ -532,6 +532,25 @@ input[type=range]::-moz-range-thumb{
 .chalnow .stars{color:var(--c1);letter-spacing:.05em}
 .chal-ops{display:inline-flex;align-items:center;gap:8px}
 .chal-ops .btn.lead{border-color:var(--c2);color:var(--ink)}
+/* the challenge card */
+.modal.chal-modal{z-index:70;background:rgba(0,0,0,.72)}   /* over the other sheets; .modal is declared later, hence the double class */
+.chal-sheet{position:relative;max-width:400px;text-align:center;padding:24px 22px 20px;border-color:color-mix(in srgb,var(--c1) 45%,var(--line))}
+.chal-x{position:absolute;top:10px;right:10px}
+.chal-brand{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--ink-3);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin:0 0 16px}
+.chal-brand svg{flex:none}
+/* the header is the headline (v106, Oscar): CHALLENGE / CLEARED! big, the attempts line under it */
+.chal-kicker{margin:0;font-family:var(--title);font-stretch:var(--title-stretch);font-weight:700;font-size:clamp(32px,9vw,44px);line-height:1.05;letter-spacing:.02em;text-transform:uppercase;color:var(--ink)}
+.chal-sheet h2.chal-title{margin:8px 0 4px;font-family:inherit;font-weight:600;font-size:clamp(17px,4.6vw,21px);line-height:1.2;letter-spacing:0;color:var(--c1)}
+.chal-starline{font-size:48px;line-height:1;color:var(--c1);letter-spacing:.1em;margin:10px 0 6px}
+.chal-starline .off{color:var(--line-2)}
+.chal-starline[hidden]{display:none}
+.chal-sub{margin:0 0 18px;font-size:16px;line-height:1.4;color:var(--ink-2)}
+.chal-sub:empty{display:none}
+.chal-cta,.chal-cta:hover{display:block;width:100%;padding:17px 16px;font-size:21px;font-weight:700;border-radius:14px;
+  background:var(--c2);border-color:var(--c2);color:var(--ground);letter-spacing:.01em}
+.chal-cta:hover{filter:brightness(1.06)}
+.chal-more{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chal-more .btn.sm{padding:9px 14px;font-size:13px}
 .chal-ops:empty{display:none}
 /* the stars of a clear: three big glyphs over the wheel, each landing with the jump
    the tempo numbers make; the ones not earned come in outlined and dim */
@@ -1153,9 +1172,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         <!-- a challenge that arrived by link: the wheel is the whole app until it is
              cleared or left; this row says what to beat, then the result and Send it back -->
         <p class="sessnow chalnow" id="chalNow" hidden><span id="chalNowIn"></span><span class="chal-ops">
-          <button type="button" class="btn sm lead" id="chalBack" hidden title="Share your result with the sender">Send it back</button>
-          <button type="button" class="btn sm" id="chalInstall" hidden title="Install Polyorbit on this device">Install app</button>
-          <button type="button" class="btn sm" id="chalKeep" hidden title="Add it to your levels">Keep</button>
+          <button type="button" class="btn sm" id="chalOpen" title="Show the challenge card">Card</button>
           <button type="button" class="icobtn" id="chalQuit" title="Leave the challenge" aria-label="Leave the challenge">&times;</button>
         </span></p>
       </div>
@@ -1379,6 +1396,25 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 </div>
 <!-- a clip of the wheel: whole loops closest to a chosen length, as MP3, WAV or a vertical video -->
 <div id="recShield" hidden></div>
+<!-- the challenge card: big, few words, one big button - a game's pop-up in the app's
+     own clothes (Oscar, v105). It carries the offer, the result and an answer. -->
+<div class="modal chal-modal" id="chalModal" hidden>
+  <div class="sheet chal-sheet" role="dialog" aria-modal="true" aria-labelledby="chalTitle">
+    <button type="button" class="icobtn chal-x" id="chalX" title="Leave the challenge" aria-label="Leave the challenge">&times;</button>
+    <div class="chal-brand"><svg viewBox="0 0 512 512" width="26" height="26" aria-hidden="true"><path d="M256 256L256 56 A200 200 0 1 1 82.8 156.0 Z" fill="var(--ink)" opacity=".12"/><circle cx="256" cy="256" r="200" fill="none" stroke="var(--line-2)" stroke-width="10"/><path d="M256 256L70.7 149.0" stroke="var(--ink)" stroke-width="7" stroke-linecap="round"/><circle cx="256.0" cy="56.0" r="30" fill="var(--c1)"/><circle cx="256.0" cy="56.0" r="46" fill="none" stroke="var(--c1)" stroke-width="8" opacity=".6"/><circle cx="456.0" cy="256.0" r="26" fill="var(--c2)"/><circle cx="256.0" cy="456.0" r="26" fill="var(--c2)"/><circle cx="56.0" cy="256.0" r="26" fill="var(--c2)"/><circle cx="256" cy="256" r="26" fill="var(--ink)"/></svg><span>Polyorbit</span></div>
+    <p class="chal-kicker" id="chalKicker">Challenge</p>
+    <h2 class="chal-title" id="chalTitle">Beat 4 attempts</h2>
+    <div class="chal-starline" id="chalStarline" hidden></div>
+    <p class="chal-sub" id="chalSub"></p>
+    <button type="button" class="btn chal-cta" id="chalGo">Play</button>
+    <div class="chal-more">
+      <button type="button" class="btn sm" id="chalAgain" hidden>Play again</button>
+      <button type="button" class="btn sm" id="chalInstall" hidden title="Install Polyorbit on this device">Install app</button>
+      <button type="button" class="btn sm" id="chalKeep" hidden title="Add it to your levels">Keep</button>
+      <button type="button" class="btn sm" id="chalLater">Not now</button>
+    </div>
+  </div>
+</div>
 <div class="modal" id="shareSheet" hidden>
   <div class="sheet share-sheet" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
     <div class="sheet-head">
@@ -5203,31 +5239,29 @@ function gameClear(tnow){
     paintBestCard();                 /* the card updates mid-game; the idle text waits */
   }
   if(game.attempt === 1) fireworks(3);   /* the show is for a clean first go */
-  if(!game.fixed) starsShow(starsFor(game.attempt), null);   /* a ladder clear gets its stars too; the next level clears them */
   gameFlash("c2");
   paintGame();
-  /* a breath, then the next one starts from its listening loop */
   gameHold = true; stop(); gameHold = false;
-  var lvl = game.level;
-  setTimeout(function(){
-    if(!game || game.level !== lvl) return;
-    if(game.fixed){                          /* a challenge ends here, with its result on the banner */
-      var tries = game.attempt, f = game.fixed, fromRow = lvlPlaying >= 0;
-      if(fromRow){
-        /* nothing changes under the stars (Oscar, v103): the game stays exactly as the
-           clear left it - empty wheel, no hub, the "cleared" line - and ends only when
-           the stars fade (three seconds) or a tap on the wheel skips them */
-        lvlNote.textContent = "Cleared in " + attemptsWord(tries) + " " + starText(starsFor(tries)) + " · " + chalName(f);
-        starsShow(starsFor(tries), null, 3000, function(){ if(game && game.fixed) gameEnd(); });
-      } else { gameEnd(); chalClear(f, tries); }
+  /* One flow for every clear (Oscar, v104): the game stays exactly as the clear left
+     it - empty wheel, no hub, the "cleared" line - while three stars land over the
+     wheel; three seconds later, or at once on a tap on the wheel, what follows
+     follows: the next ladder level from its listening loop, or the end of a
+     one-level game (a row's level, or a challenge whose result row then appears). */
+  var g = game, lvl = game.level, tries = game.attempt, f = game.fixed, fromRow = lvlPlaying >= 0;
+  if(f && fromRow) lvlNote.textContent = "Cleared in " + attemptsWord(tries) + " " + starText(starsFor(tries)) + " · " + chalName(f);
+  starsShow(starsFor(tries), null, 3000, function(){
+    if(game !== g || game.level !== lvl) return;     /* another game took over, or the player left */
+    if(f){
+      gameEnd();
+      if(!fromRow) chalClear(f, tries);
       return;
     }
-    if(game.state === "paused"){ game.nextOnResume = lvl + 1; return; }   /* paused in the breath: next level waits */
+    if(game.state === "paused"){ game.nextOnResume = lvl + 1; return; }   /* paused under the stars: the next level waits */
     gameSetLevel(lvl + 1);
     game.state = "listen"; game.loop = -1;
     paintGame();
     start();
-  }, 900);
+  });
 }
 /* A wrong tap gets a short, quiet buzz: two rough tones a fifth apart dropping
    in pitch over a sixth of a second. It is a reaction, not a beat, so the
@@ -5850,8 +5884,10 @@ paintLevels();
    so a reload does not bring the challenge back. */
 var challenge = null, chalTarget = null, chalMine = null, gameNextFixed = null, chalMode = false;
 var chalNow = document.getElementById("chalNow"), chalNowIn = document.getElementById("chalNowIn");
-var chalBack = document.getElementById("chalBack"), chalInstall = document.getElementById("chalInstall");
-var chalKeep = document.getElementById("chalKeep"), chalQuit = document.getElementById("chalQuit");
+var chalInstall = document.getElementById("chalInstall"), chalKeep = document.getElementById("chalKeep"), chalQuit = document.getElementById("chalQuit");
+var chalModal = document.getElementById("chalModal"), chalKicker = document.getElementById("chalKicker"), chalTitle = document.getElementById("chalTitle");
+var chalStarline = document.getElementById("chalStarline"), chalSub = document.getElementById("chalSub"), chalGo = document.getElementById("chalGo");
+var chalAgain = document.getElementById("chalAgain"), chalLater = document.getElementById("chalLater"), chalKind = "";
 var chalStars = document.getElementById("chalStars"), starsTimer = 0, starsHideTimer = 0;
 function chalName(l){ return (isAutoName(l.name) ? "" : l.name + " \u00b7 ") + l.bpm + " bpm"; }
 function isStandalone(){
@@ -5860,22 +5896,36 @@ function isStandalone(){
 }
 function attemptsWord(n){ return n + (n === 1 ? " attempt" : " attempts"); }
 /* the row under the wheel: kind = "offer" (a challenge to play), "done" (cleared here), "answer" (the sender reads the reply) */
+/* the words: a short line under the wheel (stays when the card is put away) and
+   the card itself - kicker, big title, stars, one line, one big button */
 function chalPaint(kind){
-  var k = "Challenge", t = "";
+  chalKind = kind;
+  var k = "Challenge", t = "", title = "", sub = chalName(challenge), stars = 0, cta = "Play", later = "Not now";
   if(kind === "offer"){
+    title = chalTarget ? (chalTarget.attempts <= 1 ? "Clear it first time" : "Beat " + attemptsWord(chalTarget.attempts)) : "Can you clear it?";
     t = escapeHtml(chalName(challenge)) + (chalTarget ? (chalTarget.attempts <= 1 ? " \u00b7 cleared first time - can you?" : " \u00b7 beat " + attemptsWord(chalTarget.attempts)) : "") + " \u00b7 press play";
+    sub += " \u00b7 listen once, then tap every dot in time";
   } else if(kind === "done"){
-    t = "Cleared in " + attemptsWord(chalMine.attempts) + ' <b class="stars">' + starText(chalMine.stars) + "</b>" +
-        (chalTarget && !chalTarget.answer ? (chalMine.attempts < chalTarget.attempts ? " \u00b7 you beat " + chalTarget.attempts : chalMine.attempts === chalTarget.attempts ? " \u00b7 level with the sender" : " \u00b7 the sender did it in " + chalTarget.attempts) : "");
+    k = "Cleared!"; stars = chalMine.stars; cta = "Send it back"; later = "Close";
+    title = "In " + attemptsWord(chalMine.attempts);
+    var vs = chalTarget && !chalTarget.answer ? (chalMine.attempts < chalTarget.attempts ? "You beat the sender's " + chalTarget.attempts : chalMine.attempts === chalTarget.attempts ? "Level with the sender" : "The sender did it in " + chalTarget.attempts) : "";
+    sub = vs;
+    t = "Cleared in " + attemptsWord(chalMine.attempts) + ' <b class="stars">' + starText(chalMine.stars) + "</b>" + (vs ? " \u00b7 " + vs.toLowerCase() : "");
   } else {
-    k = "Challenge answered";
+    k = "Challenge answered"; stars = chalTarget.stars; cta = "Play again"; later = "Close";
+    title = "Cleared in " + attemptsWord(chalTarget.attempts);
     t = escapeHtml(chalName(challenge)) + " \u00b7 cleared in " + attemptsWord(chalTarget.attempts) + ' <b class="stars">' + starText(chalTarget.stars) + "</b> \u00b7 play it again?";
   }
   chalNowIn.innerHTML = '<span class="k">' + k + '</span> ' + t;
-  chalBack.hidden = kind !== "done";
+  chalKicker.textContent = k; chalTitle.textContent = title; chalSub.textContent = sub;
+  chalStarline.hidden = !stars;
+  if(stars) chalStarline.innerHTML = starText(stars).split("").map(function(c){ return c === "\u2605" ? "<span>\u2605</span>" : '<span class="off">\u2606</span>'; }).join("");
+  chalGo.textContent = cta; chalLater.textContent = later;
+  chalAgain.hidden = kind !== "done";
   chalKeep.hidden = !editorOn;
   chalInstall.hidden = isStandalone();
   chalNow.hidden = false; dialHint.hidden = true;
+  chalModal.hidden = false;
 }
 function chalEnter(l){
   challenge = l; chalMode = true;
@@ -5888,13 +5938,14 @@ function chalLeave(){
   if(game) gameEnd();
   chalMode = false; challenge = null; chalTarget = null; chalMine = null;
   delete document.documentElement.dataset.chal;
-  chalNow.hidden = true; starsHide();
+  chalNow.hidden = true; chalModal.hidden = true; starsHide();
   dialHint.hidden = !!run;
   chalKeep.disabled = false; chalKeep.textContent = "Keep";
 }
 /* the hub in challenge mode: Play starts the challenge, not the metronome */
 function chalPlayNow(){
   if(!challenge || calRun) return;
+  chalModal.hidden = true;
   if(game) gameEnd();
   starsHide();
   gameNextFixed = challenge;
@@ -5902,7 +5953,7 @@ function chalPlayNow(){
 }
 function chalClear(l, tries){
   chalMine = {attempts:tries, stars:starsFor(tries), answer:true};
-  starsShow(chalMine.stars, function(){ chalPaint("done"); });
+  chalPaint("done");                       /* the stars have already landed; gameClear showed them */
 }
 /* three stars over the wheel, one by one, each with the tempo numbers' jump */
 var starsCb = null;                        /* {done, onHide}: what still has to happen when the stars end or are skipped */
@@ -5954,14 +6005,22 @@ function openChallengeFromUrl(){
   chalTarget = l.res || null; chalMine = null;
   chalEnter(l);
 }
-chalBack.addEventListener("click", function(){ if(challenge && chalMine) chalShare(challenge, chalMine, true); });
+chalGo.addEventListener("click", function(){
+  if(chalKind === "done"){ if(challenge && chalMine) chalShare(challenge, chalMine, true); }
+  else chalPlayNow();
+});
+chalAgain.addEventListener("click", chalPlayNow);
+chalLater.addEventListener("click", function(){ chalModal.hidden = true; });
+document.getElementById("chalOpen").addEventListener("click", function(){ if(challenge) chalModal.hidden = false; });
+document.getElementById("chalX").addEventListener("click", chalLeave);
+chalModal.addEventListener("click", function(e){ if(e.target === chalModal) chalModal.hidden = true; });
 chalQuit.addEventListener("click", chalLeave);
 chalInstall.addEventListener("click", function(){
   var b = document.getElementById("installBtn");
   if(b){ b.click(); return; }
-  chalNowIn.innerHTML = '<span class="k">Install</span> ' + (/iPhone|iPad/.test(navigator.userAgent)
+  chalSub.textContent = /iPhone|iPad/.test(navigator.userAgent)
     ? "Safari: share button, then \u201cAdd to Home Screen\u201d."
-    : "Browser menu, then \u201cInstall app\u201d or \u201cAdd to Home screen\u201d.");
+    : "Browser menu, then \u201cInstall app\u201d or \u201cAdd to Home screen\u201d.";
 });
 chalKeep.addEventListener("click", function(){
   if(!challenge) return;
@@ -6048,7 +6107,7 @@ function chalShare(l, res, answer){
   applyConfig(lvlToConfig(l));
   draw(true);
   /* answering: the status joins the result line under the wheel instead of replacing it */
-  var noteEl = answer ? {set textContent(v){ chalNowIn.innerHTML = chalNowIn.innerHTML.replace(/ · <i>[^<]*<\/i>$/, "") + " · <i>" + escapeHtml(v) + "</i>"; }} : (editorOn ? lvlImportNote : lvlNote);
+  var noteEl = answer ? chalSub : (editorOn ? lvlImportNote : lvlNote);
   if(!answer){ lvlImportBox.hidden = false; lvlImportText.value = lvlLink(l, res); }
   frameKit(function(kit){
     chalCard(kit, l, res, answer, function(canvas){
@@ -8051,8 +8110,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v103";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-10 11:32";          /* and when it was built, for ?diag */
+  var BUILD = "v106";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-10 12:22";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

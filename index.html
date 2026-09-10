@@ -5898,25 +5898,34 @@ function attemptsWord(n){ return n + (n === 1 ? " attempt" : " attempts"); }
 /* the row under the wheel: kind = "offer" (a challenge to play), "done" (cleared here), "answer" (the sender reads the reply) */
 /* the words: a short line under the wheel (stays when the card is put away) and
    the card itself - kicker, big title, stars, one line, one big button */
+/* The card carries the words; the row under the wheel keeps only a label (what this
+   is, and the stars) for when the card is put away - no second copy of the card's
+   text (Oscar, v107). Kinds: "offer" (a level to clear, with the sender's result to
+   beat when there is one), "answer" (the other side has cleared it: their result is
+   now the target - the rechallenge loop), "done" (cleared here: compared with the
+   target, ready to send back). */
 function chalPaint(kind){
   chalKind = kind;
-  var k = "Challenge", t = "", title = "", sub = chalName(challenge), stars = 0, cta = "Play", later = "Not now";
+  var k = "Challenge", title = "", sub = "", stars = 0, cta = "Play", later = "Not now", row = "", tgt = chalTarget;
   if(kind === "offer"){
-    title = chalTarget ? (chalTarget.attempts <= 1 ? "Clear it first time" : "Beat " + attemptsWord(chalTarget.attempts)) : "Can you clear it?";
-    t = escapeHtml(chalName(challenge)) + (chalTarget ? (chalTarget.attempts <= 1 ? " \u00b7 cleared first time - can you?" : " \u00b7 beat " + attemptsWord(chalTarget.attempts)) : "") + " \u00b7 press play";
-    sub += " \u00b7 listen once, then tap every dot in time";
+    title = tgt ? (tgt.attempts <= 1 ? "Clear it first time" : "Beat " + attemptsWord(tgt.attempts)) : "Can you clear it?";
+    stars = tgt ? tgt.stars : 0;
+    sub = chalName(challenge) + " \u00b7 listen once, then tap every dot in time";
+    row = "Challenge \u00b7 " + chalName(challenge);
   } else if(kind === "done"){
     k = "Cleared!"; stars = chalMine.stars; cta = "Send it back"; later = "Close";
     title = "In " + attemptsWord(chalMine.attempts);
-    var vs = chalTarget && !chalTarget.answer ? (chalMine.attempts < chalTarget.attempts ? "You beat the sender's " + chalTarget.attempts : chalMine.attempts === chalTarget.attempts ? "Level with the sender" : "The sender did it in " + chalTarget.attempts) : "";
-    sub = vs;
-    t = "Cleared in " + attemptsWord(chalMine.attempts) + ' <b class="stars">' + starText(chalMine.stars) + "</b>" + (vs ? " \u00b7 " + vs.toLowerCase() : "");
+    sub = tgt ? (chalMine.attempts < tgt.attempts ? "You beat the sender's " + attemptsWord(tgt.attempts)
+              : chalMine.attempts === tgt.attempts ? "Level with the sender" : "The sender did it in " + attemptsWord(tgt.attempts)) : "";
+    row = "Cleared \u00b7 " + starText(chalMine.stars);
   } else {
-    k = "Challenge answered"; stars = chalTarget.stars; cta = "Play again"; later = "Close";
-    title = "Cleared in " + attemptsWord(chalTarget.attempts);
-    t = escapeHtml(chalName(challenge)) + " \u00b7 cleared in " + attemptsWord(chalTarget.attempts) + ' <b class="stars">' + starText(chalTarget.stars) + "</b> \u00b7 play it again?";
+    k = "Challenge answered"; stars = tgt.stars; later = "Close";
+    title = tgt.attempts <= 1 ? "Cleared first time" : "Cleared in " + attemptsWord(tgt.attempts);
+    sub = tgt.attempts <= 1 ? chalName(challenge) + " \u00b7 can you match it?" : chalName(challenge) + " \u00b7 can you do better?";
+    cta = tgt.attempts <= 1 ? "Match it" : "Beat it";
+    row = "Answered \u00b7 " + starText(tgt.stars);
   }
-  chalNowIn.innerHTML = '<span class="k">' + k + '</span> ' + t;
+  chalNowIn.innerHTML = '<span class="k">' + escapeHtml(row) + '</span>';
   chalKicker.textContent = k; chalTitle.textContent = title; chalSub.textContent = sub;
   chalStarline.hidden = !stars;
   if(stars) chalStarline.innerHTML = starText(stars).split("").map(function(c){ return c === "\u2605" ? "<span>\u2605</span>" : '<span class="off">\u2606</span>'; }).join("");
@@ -8110,8 +8119,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v106";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-10 12:22";          /* and when it was built, for ?diag */
+  var BUILD = "v107";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-10 12:43";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

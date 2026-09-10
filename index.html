@@ -1384,7 +1384,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
 
     <div class="pane" data-pane="classic" hidden>
-      <div class="pgrid" id="pgrid"></div>
+      <!-- the classic ratios as rows, the same box as the levels (Oscar, v114) -->
+      <div class="lvl-list rlist" id="pgrid"></div>
     </div>
 
     <div class="keys">
@@ -4069,18 +4070,28 @@ RHYTHM_GROUPS.forEach(function(g, gi){
 });
 
 var pgrid = document.getElementById("pgrid");
+/* a ratio keeps the wheel's tempo and note: only the rings change */
+function ratioCfg(p){
+  return { bpm: S.bpm, noteDen: S.noteDen, noteDot: S.noteDot,
+    rings: p.divs.map(function(d, i){ return {div:d, sound:DEFAULT_SOUND[i], vol: i === 0 ? 0.95 : 0.8}; }) };
+}
 BUILTIN.forEach(function(p){
-  var b = document.createElement("button");
-  b.className = "pchip";
-  b.innerHTML = p.label + " <small>" + p.note + "</small>";
-  b.addEventListener("click", function(){
-    chipHit(p.label, {
-      bpm: S.bpm,
-      noteDen: S.noteDen, noteDot: S.noteDot,
-      rings: p.divs.map(function(d,i){ return {div:d, sound:DEFAULT_SOUND[i], vol: i===0?0.95:0.8}; })
-    });
+  var row = document.createElement("div");
+  row.className = "lvl-row";
+  row.innerHTML = '<div class="body" title="Put it on the wheel"><span class="nm-ro">' + p.label.replace(":", " : ") + '</span>' +
+    '<span class="meta"><span>' + escapeHtml(p.note) + '</span></span></div>' +
+    '<span class="ops">' +
+      '<button type="button" data-play title="Put it on the wheel and play" aria-label="Play">▶</button>' +
+      '<button type="button" data-seq title="Add to the sequence" aria-label="Add to the sequence">' +
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M4 12h10M4 18h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M18 11v8M14 15h8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>' +
+    '</span>';
+  row.querySelector(".body").addEventListener("click", function(){ chipHit(p.label, ratioCfg(p)); });
+  row.querySelector("[data-play]").addEventListener("click", function(){
+    chipHit(p.label, ratioCfg(p));
+    if(pickSlot === null && !S.playing) start();
   });
-  pgrid.appendChild(b);
+  row.querySelector("[data-seq]").addEventListener("click", function(e){ bump(e.currentTarget); seqAppend(p.label, ratioCfg(p)); });
+  pgrid.appendChild(row);
 });
 
 /* -------------------------------------------------- the session, kept for you */
@@ -8274,8 +8285,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v113";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-10 15:18";          /* and when it was built, for ?diag */
+  var BUILD = "v114";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-10 15:26";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

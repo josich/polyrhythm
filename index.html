@@ -3758,7 +3758,8 @@ function sessionSnapshot(){
     active: S.active,
     ptab: S.ptab,
     seq: S.seq,
-    levels: S.levels, levelsBuild: S.levelsBuild,
+    levels: S.levels.map(function(l){ var k = lvlKey(l); return (BUILT_INDEX[k] !== undefined) ? BUILT_INDEX[k] : l; }),   /* built levels by index (v119) */
+    levelsBuild: S.levelsBuild,
     sess: {from:sFrom.value, to:sTo.value, step:sStep.value, per:sPer.value,
            pat:sPat.value, sil:sSil.value,
            loop:S.sessLoop ? 1 : 0, pong:S.sessPong ? 1 : 0},
@@ -3820,7 +3821,9 @@ function applySession(c){
     Object.keys(c.rfold).forEach(function(k){ S.rfold[k] = !!c.rfold[k]; });
   }
   if(Array.isArray(c.levels)){
-    S.levels = c.levels.filter(function(l){
+    S.levels = c.levels.map(function(l){
+      return (typeof l === "number" && GAME_LEVELS[l]) ? JSON.parse(JSON.stringify(GAME_LEVELS[l][0])) : l;
+    }).filter(function(l){
       return l && Array.isArray(l.rings) && l.rings.length;
     }).slice(0, 400);
   }
@@ -5481,8 +5484,8 @@ function lvlKey(l){
     return [r.div, r.sub, r.off || 0, r.sound, r.vol, r.steps];
   })]);
 }
-var BUILT_KEYS = {};
-GAME_LEVELS.forEach(function(l){ BUILT_KEYS[lvlKey(l[0])] = true; });
+var BUILT_KEYS = {}, BUILT_INDEX = {};
+GAME_LEVELS.forEach(function(l, i){ var k = lvlKey(l[0]); BUILT_KEYS[k] = true; if(BUILT_INDEX[k] === undefined) BUILT_INDEX[k] = i; });
 function lvlIsLocal(l){ return !BUILT_KEYS[lvlKey(l)]; }
 function lvlBuiltCopies(){ return GAME_LEVELS.map(function(l){ return JSON.parse(JSON.stringify(l[0])); }); }
 function lvlSync(){
@@ -7880,7 +7883,7 @@ function tickLabel(){
   }
   if(recV){ beatText = "RECORDING"; }
   if(beatNow.classList.contains("rec") !== !!recV) beatNow.classList.toggle("rec", !!recV);
-  posLbl.textContent = "";
+  if(posLbl.textContent !== "") posLbl.textContent = "";
   var showBeat = S.playing && !S.tapMode && (!run || counting);
   if(beatNow.hidden === showBeat) beatNow.hidden = !showBeat;
   if(showBeat && beatNowIn.textContent !== beatText) beatNowIn.textContent = beatText;
@@ -8007,8 +8010,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v118";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-10 16:26";          /* and when it was built, for ?diag */
+  var BUILD = "v119";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-10 16:45";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 
@@ -8155,16 +8158,30 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
     perf.style.cssText = box.style.cssText || "";
     perf.className = box.className;
     box.parentNode.insertBefore(perf, box.nextSibling);
-    var ds = [], last = performance.now(), longs = 0;
+    var ds = [], last = performance.now(), longs = 0, loafs = 0, worstBlock = 0, who = {};
     try{ new PerformanceObserver(function(l){ longs += l.getEntries().length; }).observe({type:"longtask", buffered:true}); } catch(e){}
+    /* long animation frames name the script that ran: the phone tells us what blocks */
+    try{
+      new PerformanceObserver(function(l){
+        l.getEntries().forEach(function(e){
+          loafs++; worstBlock = Math.max(worstBlock, e.blockingDuration || 0);
+          (e.scripts || []).forEach(function(sc){
+            var k = (sc.sourceFunctionName || "?") + " <- " + (sc.invoker || sc.invokerType || "?");
+            who[k] = (who[k] || 0) + sc.duration;
+          });
+        });
+      }).observe({type:"long-animation-frame", buffered:true});
+    } catch(e){}
     function tick(t){ ds.push(t - last); last = t; if(ds.length > 180) ds.shift(); requestAnimationFrame(tick); }
     requestAnimationFrame(tick);
     setInterval(function(){
       if(ds.length < 10){ perf.textContent = "frames: measuring\u2026"; return; }
       var a = ds.slice().sort(function(x, y){ return x - y; }), mean = a.reduce(function(x, y){ return x + y; }, 0) / a.length;
       var mem = (performance.memory && performance.memory.usedJSHeapSize) ? " \u00b7 heap " + Math.round(performance.memory.usedJSHeapSize / 1048576) + " MB" : "";
-      perf.textContent = "frames (last 3 s): mean " + mean.toFixed(1) + " ms \u00b7 worst " + a[a.length - 1].toFixed(0) + " ms \u00b7 over 50 ms: " +
-        a.filter(function(x){ return x > 50; }).length + " \u00b7 long tasks since open: " + longs + mem + " \u00b7 nodes " + document.querySelectorAll("*").length;
+      var top = Object.keys(who).sort(function(x, y){ return who[y] - who[x]; }).slice(0, 4).map(function(k){ return Math.round(who[k]) + " ms " + k; });
+      perf.textContent = "frames (last 3 s): mean " + mean.toFixed(1) + " ms · worst " + a[a.length - 1].toFixed(0) + " ms · over 50 ms: " +
+        a.filter(function(x){ return x > 50; }).length + " · long tasks since open: " + longs + mem + " · nodes " + document.querySelectorAll("*").length +
+        "\nlong frames: " + loafs + " · worst blocking " + Math.round(worstBlock) + " ms" + (top.length ? "\n  " + top.join("\n  ") : "");
     }, 1000);
   })();
   say("serviceWorker API", ("serviceWorker" in navigator) ? "present" : "MISSING");

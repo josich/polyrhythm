@@ -551,6 +551,22 @@ input[type=range]::-moz-range-thumb{
 .chal-cta:hover{filter:brightness(1.06)}
 .chal-more{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:12px}
 .chal-more .btn.sm{padding:9px 14px;font-size:13px}
+.chal-head-x[hidden]{display:none}
+:root[data-chal="1"] #chalHeadX{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
+/* the card arrives with a small pop; a pressed button bounces and flashes its ring
+   (Oscar, v108) - the action itself follows a beat later so the bounce is seen */
+.chal-modal:not([hidden]) .chal-sheet{animation:chalIn .3s cubic-bezier(.2,.9,.3,1.15)}
+@keyframes chalIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.chal-sheet .btn,.chal-sheet .icobtn{transition:transform .08s ease}
+.chal-sheet .btn:active,.chal-sheet .icobtn:active{transform:scale(.95)}
+.chal-sheet .bump{animation:btnBump .36s ease-out}
+@keyframes btnBump{
+  0%  {transform:scale(1);   box-shadow:0 0 0 0 color-mix(in srgb,var(--c2) 0%,transparent)}
+  35% {transform:scale(1.08);box-shadow:0 0 0 8px color-mix(in srgb,var(--c2) 45%,transparent);filter:brightness(1.15)}
+  70% {transform:scale(.96)}
+  100%{transform:scale(1);   box-shadow:0 0 0 0 color-mix(in srgb,var(--c2) 0%,transparent)}
+}
+@media (prefers-reduced-motion:reduce){ .chal-modal:not([hidden]) .chal-sheet,.chal-sheet .bump{animation:none} }
 .chal-ops:empty{display:none}
 /* the stars of a clear: three big glyphs over the wheel, each landing with the jump
    the tempo numbers make; the ones not earned come in outlined and dim */
@@ -1152,6 +1168,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         <span class="metric sub mono" id="posLbl">stopped</span>
         <!-- the score is what the wheel writes out, so its button lives on the wheel -->
         <button class="icobtn score-ico" id="scoreBtn" title="Write it out as notation" aria-label="Score"><svg class="note" viewBox="0 0 22 30" aria-hidden="true"><ellipse cx="8" cy="22.5" rx="5.4" ry="3.7" transform="rotate(-22 8 22.5)" fill="currentColor"/><path d="M12.9 21.6V3.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M12.9 3.5c3.6 2.2 6 5.2 4.4 10.2" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg></button>
+        <button class="icobtn chal-head-x" id="chalHeadX" hidden title="Leave the challenge" aria-label="Leave the challenge">&times;</button>
         <button class="icobtn" id="shareBtn" title="Share a clip of the wheel as audio" aria-label="Share a clip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="6" cy="12" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="19" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8.1 10.8l7.8-4.6M8.1 13.2l7.8 4.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
       </div>
       <div class="canvas-hold">
@@ -1172,7 +1189,6 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         <!-- a challenge that arrived by link: the wheel is the whole app until it is
              cleared or left; this row says what to beat, then the result and Send it back -->
         <p class="sessnow chalnow" id="chalNow" hidden><span id="chalNowIn"></span><span class="chal-ops">
-          <button type="button" class="btn sm" id="chalOpen" title="Show the challenge card">Card</button>
           <button type="button" class="icobtn" id="chalQuit" title="Leave the challenge" aria-label="Leave the challenge">&times;</button>
         </span></p>
       </div>
@@ -5888,6 +5904,10 @@ var chalInstall = document.getElementById("chalInstall"), chalKeep = document.ge
 var chalModal = document.getElementById("chalModal"), chalKicker = document.getElementById("chalKicker"), chalTitle = document.getElementById("chalTitle");
 var chalStarline = document.getElementById("chalStarline"), chalSub = document.getElementById("chalSub"), chalGo = document.getElementById("chalGo");
 var chalAgain = document.getElementById("chalAgain"), chalLater = document.getElementById("chalLater"), chalKind = "";
+var chalHeadX = document.getElementById("chalHeadX"), chalPrev = null;   /* the wheel before the link: given back on leaving */
+/* a pressed card button bounces and lights; its action follows the bounce */
+function bump(el){ if(!el) return; el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump"); }
+function afterBump(el, fn){ bump(el); setTimeout(fn, 230); }
 var chalStars = document.getElementById("chalStars"), starsTimer = 0, starsHideTimer = 0;
 function chalName(l){ return (isAutoName(l.name) ? "" : l.name + " \u00b7 ") + l.bpm + " bpm"; }
 function isStandalone(){
@@ -5937,19 +5957,23 @@ function chalPaint(kind){
   chalModal.hidden = false;
 }
 function chalEnter(l){
-  challenge = l; chalMode = true;
+  challenge = l; chalMode = true; chalHeadX.hidden = false;
   var dial = document.querySelector(".dial");
   if(dial && dial.scrollIntoView) dial.scrollIntoView({block:"start"});
   document.documentElement.dataset.chal = "1";
   chalPaint((chalTarget && chalTarget.answer) ? "answer" : "offer");
 }
+/* every way out - Not now, Close, the crosses, a tap on the backdrop - is this: the
+   app back as it was before the link, the wheel included (Oscar, v108: "cancel
+   doesn't restore the app to the normal state") */
 function chalLeave(){
   if(game) gameEnd();
   chalMode = false; challenge = null; chalTarget = null; chalMine = null;
   delete document.documentElement.dataset.chal;
-  chalNow.hidden = true; chalModal.hidden = true; starsHide();
+  chalNow.hidden = true; chalModal.hidden = true; chalHeadX.hidden = true; starsHide();
   dialHint.hidden = !!run;
   chalKeep.disabled = false; chalKeep.textContent = "Keep";
+  if(chalPrev){ var p = chalPrev; chalPrev = null; applyConfig(p); }
 }
 /* the hub in challenge mode: Play starts the challenge, not the metronome */
 function chalPlayNow(){
@@ -6010,20 +6034,27 @@ function openChallengeFromUrl(){
   var l = lvlDecode(m[1]);
   if(!l){ dialHint.textContent = "This challenge link could not be read."; return; }
   if(game) gameEnd();
+  chalPrev = {bpm:S.bpm, noteDen:S.noteDen, noteDot:S.noteDot, rings:S.rings.map(function(r){
+    return {div:r.div, sub:r.sub, off:r.off, sound:r.sound, vol:r.vol, mute:r.mute, steps:r.steps.slice()};
+  })};
   applyConfig(lvlToConfig(l));
   chalTarget = l.res || null; chalMine = null;
   chalEnter(l);
 }
 chalGo.addEventListener("click", function(){
-  if(chalKind === "done"){ if(challenge && chalMine) chalShare(challenge, chalMine, true); }
-  else chalPlayNow();
+  afterBump(chalGo, function(){
+    if(chalKind === "done"){ if(challenge && chalMine) chalShare(challenge, chalMine, true); }
+    else chalPlayNow();
+  });
 });
-chalAgain.addEventListener("click", chalPlayNow);
-chalLater.addEventListener("click", function(){ chalModal.hidden = true; });
-document.getElementById("chalOpen").addEventListener("click", function(){ if(challenge) chalModal.hidden = false; });
-document.getElementById("chalX").addEventListener("click", chalLeave);
-chalModal.addEventListener("click", function(e){ if(e.target === chalModal) chalModal.hidden = true; });
+chalAgain.addEventListener("click", function(){ afterBump(chalAgain, chalPlayNow); });
+chalLater.addEventListener("click", function(){ afterBump(chalLater, chalLeave); });
+document.getElementById("chalX").addEventListener("click", function(){ afterBump(this, chalLeave); });
+chalModal.addEventListener("click", function(e){ if(e.target === chalModal) chalLeave(); });
 chalQuit.addEventListener("click", chalLeave);
+chalHeadX.addEventListener("click", chalLeave);
+chalInstall.addEventListener("click", function(){ bump(chalInstall); });
+chalKeep.addEventListener("click", function(){ bump(chalKeep); });
 chalInstall.addEventListener("click", function(){
   var b = document.getElementById("installBtn");
   if(b){ b.click(); return; }
@@ -6143,13 +6174,6 @@ function chalShare(l, res, answer){
     });
   });
 }
-chalKeep.addEventListener("click", function(){
-  if(!challenge) return;
-  S.levels.push(JSON.parse(JSON.stringify(challenge)));
-  lvlEditing = S.levels.length - 1;
-  paintLevels(); queueSave();
-  chalKeep.disabled = true; chalKeep.textContent = "Kept";
-});
 
 
 /* Dragging a row to a new place: the same split as the sequence boxes - a
@@ -8119,8 +8143,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v107";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-10 12:43";          /* and when it was built, for ?diag */
+  var BUILD = "v108";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-10 13:22";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

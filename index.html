@@ -620,6 +620,7 @@ input[type=range]::-moz-range-thumb{
 .sheet-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:4px}
 /* which copy this is - two phones disagreeing is nearly always two builds */
 .build{margin:0 0 10px;font-size:10.5px;color:var(--ink-3);letter-spacing:.04em}
+.build .diaglink{color:var(--c2);text-decoration:none;border-bottom:1px dotted var(--c2)}
 .sheet h2{
   font-family:var(--title);font-stretch:var(--title-stretch);
   font-weight:600;font-size:19px;margin:0;letter-spacing:-.01em;
@@ -635,7 +636,11 @@ input[type=range]::-moz-range-thumb{
 .sheet .hnote{width:9px;height:13px;display:inline-block;vertical-align:-2px;color:var(--ink)}
 .sheet .hico{width:14px;height:14px;display:inline-block;vertical-align:-2px;color:var(--ink);margin-right:2px}
 .sheet h3 .hico{width:15px;height:15px;vertical-align:-2px;margin-right:4px}
-.canvas-hold{position:relative;width:100%;max-width:min(100%,64vh,560px);aspect-ratio:1/1;margin:0 auto}
+/* 64lvh, not 64vh (v121): in the installed fullscreen app the viewport height moves
+   every time Android shows or hides its bars, and with vh the wheel resized with it -
+   a new canvas backing store and a full page layout each time. The largest-viewport
+   unit holds still; the plain vh line is the fallback for old browsers. */
+.canvas-hold{position:relative;width:100%;max-width:min(100%,64vh,560px);max-width:min(100%,64lvh,560px);aspect-ratio:1/1;margin:0 auto}
 canvas{
   /* touch-action none: the wheel keeps every touch. With "manipulation" Chrome on
      Android took the finger for a page scroll the moment it drifted during the
@@ -1450,6 +1455,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <button class="icobtn" id="helpClose" title="Close" aria-label="Close">&times;</button>
     </div>
     <p class="build mono" id="buildTag"></p>
+    <!-- the installed app has no address bar: this is the way to the ?diag page from inside it (v121) -->
+    <p class="build mono"><a href="./?diag" class="diaglink">Diagnostics</a> &middot; frame times and this device's own readings</p>
 
     <h3>The wheel</h3>
     <ul>
@@ -1925,11 +1932,16 @@ var W = 0, H = 0, DPR = 1;
 var hubR = 30;
 function sizeCanvas(){
   var rect = cv.getBoundingClientRect();
-  DPR = Math.min(window.devicePixelRatio || 1, 2);
-  W = Math.max(160, Math.round(rect.width));
-  H = Math.max(160, Math.round(rect.height));
-  cv.width = Math.round(W * DPR);
-  cv.height = Math.round(H * DPR);
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var w = Math.max(160, Math.round(rect.width)), h = Math.max(160, Math.round(rect.height));
+  var pw = Math.round(w * dpr), ph = Math.round(h * dpr);
+  if(pw === cv.width && ph === cv.height && dpr === DPR && w === W && h === H){
+    if(playBtn){ var pr0 = playBtn.getBoundingClientRect(); if(pr0.width) hubR = pr0.width / 2; }
+    return;                                  /* nothing changed: no new backing store (v121) */
+  }
+  DPR = dpr; W = w; H = h;
+  cv.width = pw;
+  cv.height = ph;
   g2.setTransform(DPR, 0, 0, DPR, 0, 0);
   if(playBtn){
     var pr = playBtn.getBoundingClientRect();
@@ -5527,6 +5539,7 @@ function ladderRows(){
 }
 function lvlRows(){ return editorOn ? S.levels : ladderRows(); }
 var SHARE_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="6" cy="12" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="19" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.1 10.8l7.8-4.6M8.1 13.2l7.8 4.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+var LVL_PAGE = 30, lvlShown = LVL_PAGE, lvlLastOn = -2;
 function paintLevels(){
   if(!lvlList) return;
   paintLvlChk();
@@ -5535,6 +5548,11 @@ function paintLevels(){
   if(editorOn && !rows.length){
     lvlList.innerHTML = '<p class="lvl-empty">No levels yet: set the wheel up and add it.</p>';
   }
+  /* the row that matters must be among those rendered */
+  var need = Math.max(editorOn ? lvlEditing : -1, lvlPlaying) + 1;
+  if(need > lvlShown) lvlShown = Math.ceil(need / LVL_PAGE) * LVL_PAGE;
+  var shown = Math.min(rows.length, lvlShown), all = rows;
+  rows = rows.slice(0, shown);
   rows.forEach(function(l, i){
     var k = lvlKey(l), row = document.createElement("div"), chk = lvlCheckMemo(l), best = proof.best[k] || 0, cleared = !!proof.keys[k];
     row.className = "lvl-row";
@@ -5585,12 +5603,24 @@ function paintLevels(){
     if(sb) sb.addEventListener("click", function(){ chalShare(l, {attempts:best || 1, stars:starsFor(best || 1)}, false); });
     lvlList.appendChild(row);
   });
-  /* the row that matters - loaded or playing - is brought into the box's view */
-  var onRow = lvlList.querySelector('.lvl-row[data-play="1"]') || lvlList.querySelector('.lvl-row[data-on="1"]');
-  if(onRow){
-    var top = onRow.offsetTop, bot = top + onRow.offsetHeight;
-    if(top < lvlList.scrollTop || bot > lvlList.scrollTop + lvlList.clientHeight)
-      lvlList.scrollTop = Math.max(0, top - lvlList.clientHeight / 2 + onRow.offsetHeight / 2);
+  if(shown < all.length){
+    var more = document.createElement("p");
+    more.className = "lvl-empty lvl-more";
+    more.textContent = shown + " of " + all.length + " · scroll for more";
+    lvlList.appendChild(more);
+  }
+  /* the row that matters - loaded or playing - is brought into the box's view, but
+     only when it changed: the offsets below force a layout, and a repaint that
+     changes nothing about the selection should not pay for one */
+  var onIdx = (lvlPlaying >= 0 && game) ? lvlPlaying : (editorOn ? lvlEditing : -1);
+  if(onIdx !== lvlLastOn){
+    lvlLastOn = onIdx;
+    var onRow = lvlList.querySelector('.lvl-row[data-play="1"]') || lvlList.querySelector('.lvl-row[data-on="1"]');
+    if(onRow){
+      var top = onRow.offsetTop, bot = top + onRow.offsetHeight;
+      if(top < lvlList.scrollTop || bot > lvlList.scrollTop + lvlList.clientHeight)
+        lvlList.scrollTop = Math.max(0, top - lvlList.clientHeight / 2 + onRow.offsetHeight / 2);
+    }
   }
   var own = S.levels.filter(lvlIsLocal).length;
   if(editorOn){
@@ -5609,6 +5639,10 @@ function paintLevels(){
      later by its own block, so only refresh it once it exists */
   if(!game && typeof tapHint !== "undefined" && tapHint) paintGameBest();
 }
+lvlList.addEventListener("scroll", function(){
+  if(lvlShown >= lvlRows().length) return;
+  if(lvlList.scrollTop + lvlList.clientHeight > lvlList.scrollHeight - 120){ lvlShown += LVL_PAGE; paintLevels(); }
+}, {passive:true});
 function lvlMove(i, dir){
   var j = i + dir;
   if(j < 0 || j >= S.levels.length) return;
@@ -5706,7 +5740,14 @@ var chalStarline = document.getElementById("chalStarline"), chalSub = document.g
 var chalAgain = document.getElementById("chalAgain"), chalLater = document.getElementById("chalLater"), chalKind = "";
 var gameX = document.getElementById("gameX"), chalPrev = null;   /* the wheel before the link: given back on leaving */
 /* a pressed card button bounces and lights; its action follows the bounce */
-function bump(el){ if(!el) return; el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump"); }
+function bump(el){
+  if(!el || !el.animate) return;
+  el.getAnimations().forEach(function(a){ a.cancel(); });
+  el.animate([{transform:"scale(1)", boxShadow:"0 0 0 0 rgba(47,201,188,0)"},
+              {transform:"scale(1.08)", boxShadow:"0 0 0 8px rgba(47,201,188,.45)", filter:"brightness(1.15)", offset:.35},
+              {transform:"scale(.96)", offset:.7},
+              {transform:"scale(1)", boxShadow:"0 0 0 0 rgba(47,201,188,0)"}], {duration:360, easing:"ease-out"});
+}
 function afterBump(el, fn){ bump(el); setTimeout(fn, 230); }
 var chalStars = document.getElementById("chalStars"), starsTimer = 0, starsHideTimer = 0;
 function chalName(l){ return (isAutoName(l.name) ? "" : l.name + " \u00b7 ") + l.bpm + " bpm"; }
@@ -7992,7 +8033,7 @@ paintRhythmGroups();     /* the saved region states have arrived by now */
 paintSessLoop();
 seqRender();
 if(editorOn) lvlSync();   /* seed or re-seed the editor's list from this build */
-paintLevels();            /* the restored list and the game invitation, now that S.levels is back */
+setTimeout(paintLevels, 0);   /* the rows come right after the first paint: the wheel shows sooner (v121) */
 paintGameBest();
 paintPlan();
 paintTransport();
@@ -8027,8 +8068,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v120";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-10 17:07";          /* and when it was built, for ?diag */
+  var BUILD = "v121";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-10 17:21";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

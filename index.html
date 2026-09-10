@@ -1261,55 +1261,6 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
   </section>
 
-  <section class="presets foldsec" id="tapPanel">
-    <div class="sess-head">
-      <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
-      <span class="lbl">Play time</span>
-      <span class="fold-ico" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg></span>
-      <button class="btn sm lead" id="tapGame" data-on="0" title="Clear the dots by tapping them in time"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg> Game</button>
-      <button class="btn sm" id="tapPause" disabled title="Pause the game">Pause</button>
-    </div>
-    <p class="tap-hint" id="tapHint"></p>
-    <!-- the best run, as a card that stays whatever the game is doing -->
-    <div class="best" id="bestCard" hidden>
-      <span class="best-k">Best</span><span class="best-v">Level <b id="bestLvl">0</b></span>
-      <span class="best-k">Best attempts</span><span class="best-v"><b id="bestTries">0</b></span>
-      <button type="button" class="best-reset" id="bestReset" title="Reset the game's progress">reset</button>
-    </div>
-    <!-- "Levels:" and a dashed rule, the share sheet's label style, between the best run and the rows -->
-    <div class="share-lbl lvl-lbl"><span>Levels:</span><i></i></div>
-    <!-- the ladder, as rows: what has been cleared here and the next level. With the
-         cheat on, the maker's controls appear above it and the whole list is editable;
-         the wheel is the editor - set up one or two rings, listen, then add it -->
-    <div class="lvl-foot">
-      <button class="btn sm" id="lvlAdd" title="Add what is on the wheel as a new level">+ Add the wheel</button>
-      <button class="btn sm" id="lvlUpdate" hidden title="Save the wheel back into the level you loaded">Update</button>
-      <button class="btn sm" id="lvlShare" title="Show the whole list as text, to send for the next build">Copy the list</button>
-      <button class="btn sm" id="lvlImport" title="Paste a level code or a challenge link">Import</button>
-      <span id="lvlChk" data-v=""></span>
-    </div>
-    <div class="lvl-share" id="lvlShareBox" hidden>
-      <textarea id="lvlText" rows="4" spellcheck="false" aria-label="The level list as text"></textarea>
-      <div class="lvl-foot">
-        <button class="btn sm" id="lvlCopy">Copy to clipboard</button>
-      </div>
-    </div>
-    <div class="lvl-share" id="lvlImportBox" hidden>
-      <textarea id="lvlImportText" rows="2" spellcheck="false" aria-label="A level code or challenge link" placeholder="Paste a level code or a challenge link"></textarea>
-      <div class="lvl-foot">
-        <button class="btn sm" id="lvlImportGo">Add to the list</button>
-        <span class="seq-note" id="lvlImportNote"></span>
-      </div>
-    </div>
-    <div class="lvl-list" id="lvlList"></div>
-    <p class="lvl-note" id="lvlNote"></p>
-    <!-- the device's own delay, measured with ten clicks; the note says why to run it again -->
-    <div class="cal-foot">
-      <span class="cal-note" id="calNote" hidden></span>
-      <button type="button" class="btn sm" id="calBtn" title="Measure this device's delay: ten clicks, tap along">Calibrate</button>
-    </div>
-  </section>
-
   <section class="presets foldsec" id="seqPanel">
     <div class="sess-head">
       <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
@@ -1367,6 +1318,55 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <span><kbd>&uarr;</kbd><kbd>&darr;</kbd> tempo (hold <kbd>Shift</kbd> for 5)</span>
       <span><kbd>1</kbd>&ndash;<kbd>4</kbd> mute a ring</span>
       <span><kbd>T</kbd> tap</span>
+    </div>
+  </section>
+
+  <section class="presets foldsec" id="tapPanel">
+    <div class="sess-head">
+      <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+      <span class="lbl">Play time</span>
+      <span class="fold-ico" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg></span>
+      <button class="btn sm lead" id="tapGame" data-on="0" title="Clear the dots by tapping them in time"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg> Game</button>
+      <button class="btn sm" id="tapPause" disabled title="Pause the game">Pause</button>
+    </div>
+    <p class="tap-hint" id="tapHint"></p>
+    <!-- the best run, as a card that stays whatever the game is doing -->
+    <div class="best" id="bestCard" hidden>
+      <span class="best-k">Best</span><span class="best-v">Level <b id="bestLvl">0</b></span>
+      <span class="best-k">Best attempts</span><span class="best-v"><b id="bestTries">0</b></span>
+      <button type="button" class="best-reset" id="bestReset" title="Reset the game's progress">reset</button>
+    </div>
+    <!-- "Levels:" and a dashed rule, the share sheet's label style, between the best run and the rows -->
+    <div class="share-lbl lvl-lbl"><span>Levels:</span><i></i></div>
+    <!-- the ladder, as rows: what has been cleared here and the next level. With the
+         cheat on, the maker's controls appear above it and the whole list is editable;
+         the wheel is the editor - set up one or two rings, listen, then add it -->
+    <div class="lvl-foot">
+      <button class="btn sm" id="lvlAdd" title="Add what is on the wheel as a new level">+ Add the wheel</button>
+      <button class="btn sm" id="lvlUpdate" hidden title="Save the wheel back into the level you loaded">Update</button>
+      <button class="btn sm" id="lvlShare" title="Show the whole list as text, to send for the next build">Copy the list</button>
+      <button class="btn sm" id="lvlImport" title="Paste a level code or a challenge link">Import</button>
+      <span id="lvlChk" data-v=""></span>
+    </div>
+    <div class="lvl-share" id="lvlShareBox" hidden>
+      <textarea id="lvlText" rows="4" spellcheck="false" aria-label="The level list as text"></textarea>
+      <div class="lvl-foot">
+        <button class="btn sm" id="lvlCopy">Copy to clipboard</button>
+      </div>
+    </div>
+    <div class="lvl-share" id="lvlImportBox" hidden>
+      <textarea id="lvlImportText" rows="2" spellcheck="false" aria-label="A level code or challenge link" placeholder="Paste a level code or a challenge link"></textarea>
+      <div class="lvl-foot">
+        <button class="btn sm" id="lvlImportGo">Add to the list</button>
+        <span class="seq-note" id="lvlImportNote"></span>
+      </div>
+    </div>
+    <div class="lvl-list" id="lvlList"></div>
+    <p class="lvl-note" id="lvlNote"></p>
+    <!-- the device's own delay, measured with ten clicks; the note says why to run it again -->
+    <div class="cal-foot">
+      <span class="cal-note" id="calNote" hidden></span>
+      <button type="button" class="btn sm" id="calBtn" title="Measure this device's delay: ten clicks, tap along">Calibrate</button>
     </div>
   </section>
 </div>
@@ -1522,7 +1522,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v123"></script>
+<script src="./app.js?v=v124"></script>
 
 <script>
 /* PWA plumbing for the hosted build: offline cache, an Install button, a screen
@@ -1534,8 +1534,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v123";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-10 19:42";          /* and when it was built, for ?diag */
+  var BUILD = "v124";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-10 20:13";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

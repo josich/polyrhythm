@@ -3295,6 +3295,7 @@ function paintPtabs(){
     t.dataset.on = (t.dataset.ptab === act) ? "1" : "0";
   });
   ppanes.forEach(function(p){ p.hidden = (p.dataset.pane !== act); });
+  if(act === "rhythms") buildRhythmRows();     /* the library's rows exist only once the tab is opened */
 }
 ptabEls.forEach(function(t){
   t.addEventListener("click", function(){
@@ -3656,6 +3657,10 @@ function rhythmCfg(rh){
       return { div: rc.div, sub: rc.sub || 1, off: rc.off || 0, sound: rc.sound, vol: rc.vol, steps: pat(rc.pattern) };
     }) };
 }
+var rgridBuilt = false;
+function buildRhythmRows(){
+  if(rgridBuilt) return;
+  rgridBuilt = true;
 RHYTHM_GROUPS.forEach(function(g, gi){
   /* the category row: pinned while its rhythms scroll, folds on a tap */
   var h = document.createElement("div");
@@ -3717,6 +3722,7 @@ RHYTHM_GROUPS.forEach(function(g, gi){
   rgroupPainters.push(paintGroup);
   paintGroup();
 });
+}
 
 var pgrid = document.getElementById("pgrid");
 /* a ratio keeps the wheel's tempo and note: only the rings change */
@@ -5385,6 +5391,7 @@ function lvlProve(l, attempts){
   proof.rate = Math.max(proof.rate || 0, c.rate);
   proof.peak = Math.max(proof.peak || 0, c.peak);
   proof.keys[lvlKey(l)] = 1;
+  chkEpoch++;                                  /* the limits may have moved: every row's check is stale */
   var ks = Object.keys(proof.keys); if(ks.length > 400) delete proof.keys[ks[0]];
   try{ localStorage.setItem(PROOF_KEY, JSON.stringify(proof)); } catch(err){}
   paintLevels();
@@ -5426,6 +5433,16 @@ function lvlCheck(l, raw){
   else if(rate > L.rateHard){ verdict = "hard"; reason = rate.toFixed(1) + " hits a second"; }
   else if(peak > L.peakHard){ verdict = "hard"; reason = peak + " hits in one second"; }
   return {verdict:verdict, reason:reason, gapMs:gapMs, rate:rate, peak:peak, n:n};
+}
+/* the check, remembered per level object until the proof moves (v120): the editor's
+   122 rows repainted on every game end, each running the full check */
+var chkCache = new WeakMap(), chkEpoch = 0;
+function lvlCheckMemo(l){
+  var c = chkCache.get(l);
+  if(c && c.epoch === chkEpoch) return c.res;
+  var res = lvlCheck(l);
+  chkCache.set(l, {epoch:chkEpoch, res:res});
+  return res;
 }
 function lvlCheckText(c){
   if(c.verdict === "no") return "Not playable: " + c.reason;
@@ -5519,7 +5536,7 @@ function paintLevels(){
     lvlList.innerHTML = '<p class="lvl-empty">No levels yet: set the wheel up and add it.</p>';
   }
   rows.forEach(function(l, i){
-    var row = document.createElement("div"), chk = lvlCheck(l), best = lvlBest(l), cleared = !!proof.keys[lvlKey(l)];
+    var k = lvlKey(l), row = document.createElement("div"), chk = lvlCheckMemo(l), best = proof.best[k] || 0, cleared = !!proof.keys[k];
     row.className = "lvl-row";
     row.dataset.on = (editorOn && i === lvlEditing) ? "1" : "0";
     row.dataset.play = (i === lvlPlaying && game) ? "1" : "0";
@@ -5536,7 +5553,7 @@ function paintLevels(){
     /* a level goes out as a challenge only once it has been cleared here (Oscar's rule) */
     var shareBtn = cleared ? '<button type="button" data-share title="Send this level as a challenge" aria-label="Challenge">' + SHARE_SVG + '</button>' : '';
     if(editorOn){
-      row.innerHTML = '<span class="n">' + (i + 1) + (lvlIsLocal(l) ? '<b class="new" title="Not in the build yet">*</b>' : '') + '</span>' +
+      row.innerHTML = '<span class="n">' + (i + 1) + (!BUILT_KEYS[k] ? '<b class="new" title="Not in the build yet">*</b>' : '') + '</span>' +
         '<div class="body"><input class="nm" value="' + escapeHtml(isAutoName(l.name) ? "" : l.name) + '" aria-label="Level name" placeholder="Level ' + (i + 1) + '">' +
         '<span class="sum" title="Load onto the wheel">' + escapeHtml(lvlSummary(l)) + tag + '</span></div>' +
         '<span class="ops">' + playBtn + shareBtn +
@@ -8010,8 +8027,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v119";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-10 16:45";          /* and when it was built, for ?diag */
+  var BUILD = "v120";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-10 17:07";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 
@@ -8166,7 +8183,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
         l.getEntries().forEach(function(e){
           loafs++; worstBlock = Math.max(worstBlock, e.blockingDuration || 0);
           (e.scripts || []).forEach(function(sc){
-            var k = (sc.sourceFunctionName || "?") + " <- " + (sc.invoker || sc.invokerType || "?");
+            var src = (sc.sourceURL || "").split("/").pop().split("?")[0];
+            var k = (sc.sourceFunctionName || "?") + " @" + (sc.sourceCharPosition >= 0 ? sc.sourceCharPosition : "?") + (src ? " " + src : "") + " <- " + (sc.invoker || sc.invokerType || "?");
             who[k] = (who[k] || 0) + sc.duration;
           });
         });
@@ -8181,6 +8199,7 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
       var top = Object.keys(who).sort(function(x, y){ return who[y] - who[x]; }).slice(0, 4).map(function(k){ return Math.round(who[k]) + " ms " + k; });
       perf.textContent = "frames (last 3 s): mean " + mean.toFixed(1) + " ms · worst " + a[a.length - 1].toFixed(0) + " ms · over 50 ms: " +
         a.filter(function(x){ return x > 50; }).length + " · long tasks since open: " + longs + mem + " · nodes " + document.querySelectorAll("*").length +
+        "\nboot: parse+run " + Math.round(performance.timing.domInteractive - performance.timing.responseEnd) + " ms" +
         "\nlong frames: " + loafs + " · worst blocking " + Math.round(worstBlock) + " ms" + (top.length ? "\n  " + top.join("\n  ") : "");
     }, 1000);
   })();

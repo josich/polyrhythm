@@ -562,7 +562,7 @@ input[type=range]::-moz-range-thumb{
 @keyframes chalIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
 .chal-sheet .btn,.chal-sheet .icobtn{transition:transform .08s ease}
 .chal-sheet .btn:active,.chal-sheet .icobtn:active{transform:scale(.95)}
-.chal-sheet .bump{animation:btnBump .36s ease-out}
+.chal-sheet .bump,.lvl-row .bump{animation:btnBump .36s ease-out}
 @keyframes btnBump{
   0%  {transform:scale(1);   box-shadow:0 0 0 0 color-mix(in srgb,var(--c2) 0%,transparent)}
   35% {transform:scale(1.08);box-shadow:0 0 0 8px color-mix(in srgb,var(--c2) 45%,transparent);filter:brightness(1.15)}
@@ -1014,6 +1014,8 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .mine-list .lvl-row .body{cursor:pointer}
 .mine-list .lvl-row .ops button[data-del]:hover{border-color:var(--c3);color:var(--c3)}
 .mine-list:empty{display:none}
+.lvl-row .ops button[data-seq]{color:var(--c1)}
+.lvl-row .ops button[data-seq] svg{width:13px;height:13px;vertical-align:-2px}
 .empty{color:var(--ink-3);font-size:12px;margin-top:11px}
 .keys{margin-top:16px;color:var(--ink-3);font-size:11.5px;display:flex;gap:18px;flex-wrap:wrap}
 kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(--line-2);border-bottom-width:2px;border-radius:5px;padding:1px 5px;color:var(--ink-2);background:var(--sunk)}
@@ -4195,13 +4197,22 @@ function paintMine(){
     row.innerHTML = '<div class="body" title="Put it on the wheel"><span class="nm-ro">' + escapeHtml(p.name) + '</span>' +
       '<span class="meta"><span>' + p.rings.map(function(r){ return r.div; }).join(" : ") + ' · ' + p.bpm + ' bpm</span></span></div>' +
       '<span class="ops">' +
+        '<button type="button" data-seq title="Add to the sequence" aria-label="Add to the sequence">' +
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M4 12h10M4 18h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M18 11v8M14 15h8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>' +
         '<button type="button" data-play title="Put it on the wheel and play" aria-label="Play">▶</button>' +
+        '<button type="button" data-up title="Move up" aria-label="Move up"' + (i === 0 ? " disabled" : "") + '>▲</button>' +
+        '<button type="button" data-down title="Move down" aria-label="Move down"' + (i === arr.length - 1 ? " disabled" : "") + '>▼</button>' +
         '<button type="button" data-del title="Remove" aria-label="Remove">×</button>' +
       '</span>';
     row.querySelector(".body").addEventListener("click", function(){
+      if(mineNoClick){ mineNoClick = false; return; }        /* the pointerup ended a drag, not a tap */
       chipHit(p.name, p);
       if(pickSlot === null){ mineOn = i; paintMine(); }
     });
+    row.addEventListener("pointerdown", function(e){ mineDown(e, i, row); });
+    row.querySelector("[data-seq]").addEventListener("click", function(e){ bump(e.currentTarget); seqAppend(p.name, p); });
+    row.querySelector("[data-up]").addEventListener("click", function(){ mineMove(i, -1); });
+    row.querySelector("[data-down]").addEventListener("click", function(){ mineMove(i, 1); });
     row.querySelector("[data-play]").addEventListener("click", function(){
       chipHit(p.name, p);
       if(pickSlot !== null) return;                /* a step was waiting: filled, nothing plays */
@@ -4217,6 +4228,71 @@ function paintMine(){
     mineEl.appendChild(row);
   });
 }
+function mineMove(i, dir){
+  var a = loadMine(), j = i + dir;
+  if(j < 0 || j >= a.length) return;
+  var t = a[i]; a[i] = a[j]; a[j] = t;
+  if(mineOn === i) mineOn = j; else if(mineOn === j) mineOn = i;
+  saveMine(a); paintMine();
+}
+/* dragging a preset row to a new place: the level rows' rules - a mouse arms on the
+   smallest movement, a finger has to hold, so a finger can still scroll the page */
+var mineDrag = null, mineNoClick = false;
+function mineDown(e, i, row){
+  if(!e.isPrimary) return;
+  if(e.target.closest && e.target.closest("button")) return;
+  mineDrag = {i:i, row:row, x:e.clientX, y:e.clientY, armed:false, dead:false, over:-1};
+  if(e.pointerType === "touch"){
+    mineDrag.timer = setTimeout(function(){ if(mineDrag && !mineDrag.dead) mineArm(row, e.pointerId); }, DRAG_HOLD);
+  }
+}
+function mineArm(row, id){
+  mineDrag.armed = true;
+  row.dataset.drag = "1";
+  try{ row.setPointerCapture(id); } catch(err){}
+}
+window.addEventListener("pointermove", function(e){
+  if(!mineDrag || mineDrag.dead) return;
+  var dx = e.clientX - mineDrag.x, dy = e.clientY - mineDrag.y, dist = Math.sqrt(dx*dx + dy*dy);
+  if(!mineDrag.armed){
+    if(e.pointerType === "touch"){ if(dist > TAP_SLOP) mineEnd(true); }
+    else if(dist > MOUSE_SLOP) mineArm(mineDrag.row, e.pointerId);
+    return;
+  }
+  e.preventDefault();
+  var lr = mineEl.getBoundingClientRect();
+  if(e.clientY < lr.top + 28) mineEl.scrollTop -= 8; else if(e.clientY > lr.bottom - 28) mineEl.scrollTop += 8;
+  var t = document.elementFromPoint(e.clientX, e.clientY);
+  var over = t && t.closest ? t.closest("#mine .lvl-row") : null;
+  var rowsAll = [].slice.call(mineEl.querySelectorAll(".lvl-row"));
+  var j = over ? rowsAll.indexOf(over) : -1;
+  if(j === mineDrag.i) j = -1;
+  if(j !== mineDrag.over){
+    rowsAll.forEach(function(r){ delete r.dataset.over; });
+    if(j >= 0) rowsAll[j].dataset.over = "1";
+    mineDrag.over = j;
+  }
+});
+function mineEnd(cancel){
+  if(!mineDrag) return;
+  var d = mineDrag;
+  mineDrag = null;
+  d.dead = true;
+  if(d.timer) clearTimeout(d.timer);
+  delete d.row.dataset.drag;
+  [].forEach.call(mineEl.querySelectorAll(".lvl-row"), function(r){ delete r.dataset.over; });
+  if(!d.armed) return;
+  mineNoClick = true;
+  if(cancel || d.over < 0) return;
+  var a = loadMine();
+  if(d.over >= a.length) return;
+  var moved = a.splice(d.i, 1)[0], cur = a[mineOn];
+  a.splice(d.over, 0, moved);
+  if(mineOn === d.i) mineOn = d.over; else if(mineOn >= 0 && cur) mineOn = a.indexOf(cur);
+  saveMine(a); paintMine();
+}
+window.addEventListener("pointerup", function(){ mineEnd(false); });
+window.addEventListener("pointercancel", function(){ mineEnd(true); });
 function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, function(c){
     return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
@@ -4224,10 +4300,17 @@ function escapeHtml(s){
 }
 document.getElementById("psave").addEventListener("click", function(){
   var input = document.getElementById("pname");
-  var name = (input.value || "").trim() || (ratioString().replace(/ /g,"") + " @ " + S.bpm);
+  var name = ((input.value || "").trim() || (ratioString().replace(/ /g,"") + " @ " + S.bpm)).slice(0, 28);
   var arr = loadMine();
+  /* the same name twice would be two indistinguishable rows: the newcomer gets _001, _002 ... (Oscar, v111) */
+  var taken = {}; arr.forEach(function(q){ taken[q.name] = true; });
+  if(taken[name]){
+    var base = name.replace(/_\d{3}$/, ""), k = 1;
+    while(taken[base + "_" + ("00" + k).slice(-3)]) k++;
+    name = base + "_" + ("00" + k).slice(-3);
+  }
   arr.unshift({
-    name: name.slice(0,28),
+    name: name,
     bpm: S.bpm,
     noteDen: S.noteDen, noteDot: S.noteDot,
     rings: S.rings.map(function(r){
@@ -7904,9 +7987,8 @@ function endPick(){
   paintFolds();
 }
 /* every chip in the three libraries comes through here */
-function chipHit(name, cfg){
-  if(pickSlot === null){ applyConfig(cfg); return; }
-  var step = { name: name,
+function stepFrom(name, cfg){
+  return { name: name,
     /* the score prints a tempo marking: the pattern's own, or the wheel's */
     bpm: cfg.bpm || S.bpm,
     noteDen: cfg.bpm ? (NOTE_NAMES[cfg.noteDen] ? cfg.noteDen : 4) : S.noteDen,
@@ -7915,11 +7997,20 @@ function chipHit(name, cfg){
     return {div:r.div, sub:r.sub || 1, off:r.off || 0, sound:r.sound,
             vol:r.vol, mute:!!r.mute, steps:Array.isArray(r.steps) ? r.steps.slice() : null};
   })};
+}
+function chipHit(name, cfg){
+  if(pickSlot === null){ applyConfig(cfg); return; }
+  var step = stepFrom(name, cfg);
   if(pickSlot < 0) S.seq.push(step); else S.seq[pickSlot] = step;
   endPick();
   seqRender();
   paintPlan();
   queueSave();
+}
+/* straight onto the end of the sequence, no step to arm first (Oscar, v111) */
+function seqAppend(name, cfg){
+  S.seq.push(stepFrom(name, cfg));
+  seqRender(); paintPlan(); queueSave();
 }
 
 /* --------------------------------------------------------- dragging to swap */
@@ -8168,8 +8259,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v110";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-10 14:47";          /* and when it was built, for ?diag */
+  var BUILD = "v111";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-10 15:04";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

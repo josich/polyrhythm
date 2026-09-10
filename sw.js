@@ -1,6 +1,6 @@
 /* Offline cache for Polyorbit.
    Bump CACHE whenever you redeploy, or phones will keep serving the old app. */
-var CACHE = "polyrhythm-v129";
+var CACHE = "polyrhythm-v130";
 /* proof that a response really is this app and not a host's error page */
 var MARK = "polyrhythm-circle:session";
 var ASSETS = [
@@ -24,9 +24,22 @@ var ASSETS = [
 ];
 
 self.addEventListener("install", function(e){
+  /* Every asset is fetched past the HTTP cache (v130). addAll used the default cache
+     mode, and the host serves everything with max-age=600, so a launch within ten
+     minutes of the last one filled the NEW cache with the OLD page from the browser's
+     HTTP cache - and the background refresh then refused the real new page because
+     its identity mark had moved into app.js (v123-v129). Oscar sat on v125 through
+     four releases; reproduced locally. */
   e.waitUntil(
     caches.open(CACHE)
-      .then(function(c){ return c.addAll(ASSETS); })
+      .then(function(c){
+        return Promise.all(ASSETS.map(function(u){
+          return fetch(u, {cache:"reload", credentials:"same-origin"}).then(function(res){
+            if(!res || !res.ok) throw new Error("http " + (res && res.status) + " for " + u);
+            return c.put(u, res);
+          });
+        }));
+      })
       .then(function(){ return self.skipWaiting(); })
   );
 });

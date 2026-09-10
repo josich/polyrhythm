@@ -520,16 +520,35 @@ input[type=range]::-moz-range-thumb{
 #lvlChk[data-v="no"]{color:var(--c3)}
 .lvl-row .chk{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-left:6px;color:var(--c1)}
 .lvl-row .chk.no{color:var(--c3)}
-/* a challenge that arrived by link: a card in Play time with the one button that matters */
-.chal{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;margin:10px 0 0;padding:10px 12px;
-  border:1px solid var(--c1);border-radius:10px;background:color-mix(in srgb,var(--c1) 10%,transparent)}
-.chal-t{flex:1 1 100%;min-width:0;font-size:13px;color:var(--ink);line-height:1.4}
-.chal .stars{color:var(--c1);letter-spacing:.06em}
-.chal-n{flex:1 1 100%;font-size:11.5px;color:var(--ink-3);margin:0}
-.chal-n:empty{display:none}
-.chal .btn.lead{border-color:var(--c2);color:var(--ink)}
-.chal-t .k{color:var(--ink-3);font-size:.85em;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
-.chal[hidden]{display:none}
+/* challenge mode (v94, Oscar): the wheel is the whole app - everything else greyed
+   and out of reach, the page locked, the hub a big teal Play, the row under the
+   wheel the challenge's own line with its buttons */
+:root[data-chal="1"] .wrap > :not(.stage),:root[data-chal="1"] .stage > :not(.dial){opacity:.35;pointer-events:none}
+:root[data-chal="1"] body{overflow:hidden}
+:root[data-chal="1"] .play,:root[data-chal="1"] .play:hover{width:clamp(76px,30%,120px);opacity:.95;background:var(--c2);border-color:var(--c2);color:var(--ground)}
+:root[data-chal="1"] .dial-foot{min-height:0}
+.chalnow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 10px;font-size:13px;color:var(--ink);line-height:1.5;padding:2px 4px}
+.chalnow .k{font-size:.8em;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.chalnow .stars{color:var(--c1);letter-spacing:.05em}
+.chal-ops{display:inline-flex;align-items:center;gap:8px}
+.chal-ops .btn.lead{border-color:var(--c2);color:var(--ink)}
+.chal-ops:empty{display:none}
+/* the stars of a clear: three big glyphs over the wheel, each landing with the jump
+   the tempo numbers make; the ones not earned come in outlined and dim */
+.chal-stars{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;gap:.18em;z-index:3;pointer-events:none;
+  font-size:clamp(44px,15vmin,96px);line-height:1}
+.chal-stars b{color:var(--c1);opacity:0;font-weight:400;text-shadow:0 2px 14px rgba(0,0,0,.55)}
+.chal-stars b.off{color:var(--ink-3)}
+.chal-stars[hidden]{display:none}
+/* player rows: stars, fewest attempts, tempo */
+.lvl-row .meta{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lvl-row .meta .stars{color:var(--c1);font-size:13px;letter-spacing:.04em}
+.lvl-row .meta .stars.none{color:var(--line-2)}
+.lvl-row .meta .k{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-left:4px}
+.lvl-row .meta .num{font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:700;color:var(--c1);margin-left:-2px}
+.lvl-lbl{margin:4px 0 10px;font-size:12.5px}
+.lvl-note{font-size:11.5px;color:var(--ink-3);margin:8px 0 0}
+.lvl-note:empty{display:none}
 /* the + chip that adds a step: its selector line was lost when the level-list CSS
    went in above it, and the chip fell back to a plain white button */
 .seq-add{
@@ -681,14 +700,14 @@ canvas{
 :root[data-sesspause="1"] .play,:root[data-sesspause="1"] .play:hover{opacity:0;background:transparent;border-color:transparent}
 :root[data-game="1"] canvas{cursor:pointer}
 :is(:root[data-game="1"],:root[data-cal="1"]) #scoreBtn{opacity:.45;pointer-events:none}
-:is(:root[data-game="1"],:root[data-cal="1"]) :is(#rack,#sessionPanel,#seqPanel,#lvlPanel,#patPanel,.bpm-block,.bpm-row,.note-row,#tap,#countBtn){opacity:.45;pointer-events:none}
+:is(:root[data-game="1"],:root[data-cal="1"]) :is(#rack,#sessionPanel,#seqPanel,#patPanel,.bpm-block,.bpm-row,.note-row,#tap,#countBtn){opacity:.45;pointer-events:none}
 #tapNowIn[data-grade="c2"]{color:var(--c2)}
 #tapNowIn[data-grade="c3"]{color:var(--c3)}
 /* the score line under the buttons while the game runs */
 .tap-hint b{color:var(--ink);font-weight:600}
 /* the best run: two figures on one strip, the way a scoreboard puts them */
 .best{
-  display:flex;align-items:baseline;gap:8px 14px;flex-wrap:wrap;margin-top:10px;
+  display:flex;align-items:baseline;gap:8px 14px;flex-wrap:wrap;margin:6px 0 12px;   /* above the levels (v95, Oscar) */
   padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);
 }
 .best .best-k{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
@@ -946,8 +965,7 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 /* the whole panel is an advanced-only feature */
 :root[data-ui="simple"] #sessionPanel,
 :root[data-ui="simple"] #tapPanel,
-:root[data-ui="simple"] #seqPanel,
-:root[data-ui="simple"] #lvlPanel{display:none}
+:root[data-ui="simple"] #seqPanel{display:none}
 .pchip{border:1px solid var(--line-2);background:var(--sunk);border-radius:8px;padding:7px 12px;cursor:pointer;font-family:"IBM Plex Mono",monospace;font-size:12.5px;font-weight:500}
 .pchip:hover{border-color:var(--ink);color:var(--ink)}
 .pchip small{font-family:"Archivo",sans-serif;color:var(--ink-3);margin-left:7px;font-size:10.5px}
@@ -1123,6 +1141,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         <button class="play" id="play" data-preroll="0" aria-label="Play" title="Play (Space)">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path id="playIcon" fill="currentColor" d="M8 5.5v13l11-6.5z"/></svg>
         </button>
+        <!-- the stars of a clear land here one by one, over the wheel -->
+        <div class="chal-stars" id="chalStars" hidden aria-hidden="true"><b>★</b><b>★</b><b>★</b></div>
       </div>
       <!-- one fixed-height slot, so swapping tip for readout cannot resize the dial -->
       <div class="dial-foot">
@@ -1130,17 +1150,14 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         <p class="sessnow" id="sessNow" hidden><span class="mono" id="sessNowIn"></span></p>
         <p class="sessnow tapnow" id="tapNow" hidden><span class="mono" id="tapNowIn"></span></p>
         <p class="sessnow beatnow" id="beatNow" hidden><span class="mono" id="beatNowIn"></span></p>
-      </div>
-      <!-- a challenge that arrived by link (?c=) lives under the wheel it is loaded on:
-           play it, and once cleared send the result back; installs from here too -->
-      <div class="chal" id="chalBox" hidden>
-        <span class="chal-t" id="chalText"></span>
-        <button type="button" class="btn sm lead" id="chalPlay">Play it</button>
-        <button type="button" class="btn sm" id="chalBack" hidden title="Share your result with the sender">Send it back</button>
-        <button type="button" class="btn sm" id="chalInstall" hidden title="Install Polyorbit on this device">Install app</button>
-        <button type="button" class="btn sm" id="chalKeep" hidden title="Add it to your levels">Keep</button>
-        <button type="button" class="icobtn" id="chalClose" title="Dismiss" aria-label="Dismiss">&times;</button>
-        <p class="chal-n" id="chalNote"></p>
+        <!-- a challenge that arrived by link: the wheel is the whole app until it is
+             cleared or left; this row says what to beat, then the result and Send it back -->
+        <p class="sessnow chalnow" id="chalNow" hidden><span id="chalNowIn"></span><span class="chal-ops">
+          <button type="button" class="btn sm lead" id="chalBack" hidden title="Share your result with the sender">Send it back</button>
+          <button type="button" class="btn sm" id="chalInstall" hidden title="Install Polyorbit on this device">Install app</button>
+          <button type="button" class="btn sm" id="chalKeep" hidden title="Add it to your levels">Keep</button>
+          <button type="button" class="icobtn" id="chalQuit" title="Leave the challenge" aria-label="Leave the challenge">&times;</button>
+        </span></p>
       </div>
     </section>
 
@@ -1232,25 +1249,14 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <!-- the best run, as a card that stays whatever the game is doing -->
     <div class="best" id="bestCard" hidden>
       <span class="best-k">Best</span><span class="best-v">Level <b id="bestLvl">0</b></span>
-      <span class="best-k">Total attempts</span><span class="best-v"><b id="bestTries">0</b></span>
-      <button type="button" class="best-reset" id="bestReset" title="Forget the best run">reset</button>
+      <span class="best-k">Best attempts</span><span class="best-v"><b id="bestTries">0</b></span>
+      <button type="button" class="best-reset" id="bestReset" title="Reset the game's progress">reset</button>
     </div>
-    <!-- the device's own delay, measured with ten clicks; the note says why to run it again -->
-    <div class="cal-foot">
-      <span class="cal-note" id="calNote" hidden></span>
-      <button type="button" class="btn sm" id="calBtn" title="Measure this device's delay: ten clicks, tap along">Calibrate</button>
-    </div>
-  </section>
-
-  <section class="presets foldsec" id="lvlPanel">
-    <div class="sess-head">
-      <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
-      <span class="lbl">Levels</span>
-      <span class="seq-note" id="lvlNote"></span>
-    </div>
-    <!-- the wheel is the editor: set up one or two rings, listen, then add it.
-         The buttons lead; the list grows beneath them, and a row can be dragged
-         to a new place the way a sequence box can -->
+    <!-- "Levels:" and a dashed rule, the share sheet's label style, between the best run and the rows -->
+    <div class="share-lbl lvl-lbl"><span>Levels:</span><i></i></div>
+    <!-- the ladder, as rows: what has been cleared here and the next level. With the
+         cheat on, the maker's controls appear above it and the whole list is editable;
+         the wheel is the editor - set up one or two rings, listen, then add it -->
     <div class="lvl-foot">
       <button class="btn sm" id="lvlAdd" title="Add what is on the wheel as a new level">+ Add the wheel</button>
       <button class="btn sm" id="lvlUpdate" hidden title="Save the wheel back into the level you loaded">Update</button>
@@ -1272,6 +1278,12 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       </div>
     </div>
     <div class="lvl-list" id="lvlList"></div>
+    <p class="lvl-note" id="lvlNote"></p>
+    <!-- the device's own delay, measured with ten clicks; the note says why to run it again -->
+    <div class="cal-foot">
+      <span class="cal-note" id="calNote" hidden></span>
+      <button type="button" class="btn sm" id="calBtn" title="Measure this device's delay: ten clicks, tap along">Calibrate</button>
+    </div>
   </section>
 
   <section class="presets foldsec" id="seqPanel">
@@ -2108,7 +2120,10 @@ function stop(){
   if(S.tapMode === "record") recEnd(true);    /* stopping is the other way to keep it */
   if(S.tapMode === "game" && !gameHold) gameEnd();  /* and the way out of the game */
 }
-function toggle(){ S.playing ? stop() : start(); }
+function toggle(){
+  if(chalMode && !game && challenge){ chalPlayNow(); return; }   /* in challenge mode the hub plays the challenge */
+  S.playing ? stop() : start();
+}
 /* Stop during a practice session pauses it: the plan and its place are kept and
    Play (or a tap on the wheel) carries on from the same loop. The session's own
    button is the one that ends it. While paused the play button steps aside and
@@ -4996,16 +5011,21 @@ try{
 } catch(err){ try{ gameBest = parseInt(localStorage.getItem(GAME_KEY), 10) || 0; } catch(e2){} }
 var bestCard = document.getElementById("bestCard");
 document.getElementById("bestReset").addEventListener("click", function(){
-  if(!confirm("Forget the best run?")) return;
+  if(!confirm("Reset the game's progress? Cleared levels and best attempts are forgotten.")) return;
   gameBest = 0; gameBestTries = 0;
-  try{ localStorage.removeItem(GAME_KEY); } catch(err){}
-  paintBestCard();
+  proof.keys = {}; proof.best = {};          /* the playability limits (gap, rate, peak) stay: they are about the device */
+  try{ localStorage.removeItem(GAME_KEY); localStorage.setItem(PROOF_KEY, JSON.stringify(proof)); } catch(err){}
+  paintBestCard(); paintLevels();
 });
 function paintBestCard(){
   bestCard.hidden = false;                 /* the card is the section's face: zeros until a first run */
-  document.getElementById("bestReset").disabled = !gameBest;
+  document.getElementById("bestReset").disabled = !gameBest && !Object.keys((proof && proof.best) || {}).length && !Object.keys((proof && proof.keys) || {}).length;
   document.getElementById("bestLvl").textContent = gameBest;
-  document.getElementById("bestTries").textContent = gameBestTries;
+  /* the attempts figure is the sum of every cleared level's fewest attempts - the
+     best total this device could post for the ladder (Oscar, v98) */
+  var sum = 0;
+  GAME_LEVELS.forEach(function(v){ sum += (proof && proof.best && proof.best[lvlKey(v[0])]) || 0; });
+  document.getElementById("bestTries").textContent = sum;
 }
 
 /* The ladder the game climbs: the levels you built, if there are any, else the
@@ -5018,18 +5038,21 @@ function gameLadder(){
 }
 /* one of the choices at this level, drawn when the level is entered; past the
    last level the ladder comes round again, fifteen percent faster each time */
+/* how many of a level's rings the game plays today; the level code carries up to
+   four, so raising this is the game's work, not the format's */
+var GAME_RINGS = 2;
 function gameLevel(n){
   /* a challenge is one fixed level: it never moves on to the ladder */
   if(game && game.fixed){
     var f = game.fixed;
     return {name:isAutoName(f.name) ? "" : f.name, noteDen:f.noteDen || 4, noteDot:!!f.noteDot,
-            rings:f.rings.slice(0, 2), bpm:Math.min(BPM_MAX, f.bpm)};
+            rings:f.rings.slice(0, GAME_RINGS), bpm:Math.min(BPM_MAX, f.bpm)};
   }
   var lad = gameLadder(), L = lad.length, i = (n - 1) % L, round = Math.floor((n - 1) / L);
   var v = lad[i], d = v[Math.floor(Math.random() * v.length)];
   var rings = d.rings ? d.rings : [{div:d.div, sub:d.sub, steps:pat(d.pattern), sound:"wood", vol:0.9, off:0}];
   return {name:isAutoName(d.name) ? "" : d.name, noteDen:d.noteDen || 4, noteDot:!!d.noteDot,
-          rings:rings.slice(0, 2),
+          rings:rings.slice(0, GAME_RINGS),
           bpm:Math.min(BPM_MAX, Math.round(d.bpm * (1 + 0.15 * round)))};
 }
 /* the window a tap has to land in, in rotations: 110ms at first, 50ms by level 20 */
@@ -5038,6 +5061,7 @@ function gameTol(){
   return ms / 1000 / cycleDur();
 }
 function gameSetLevel(n){
+  starsHide();
   var d = gameLevel(n);
   game.level = n; game.name = d.name; game.attempt = 1; game.failed = false; game.cur = d;
   S.rings = d.rings.map(function(rc, i){
@@ -5060,6 +5084,7 @@ function gameStart(){
   if(run){ stop(); finishSession(); }
   if(S.playing) stop();
   /* the wheel is borrowed whole and handed back at the end */
+  starsHide();
   game = {prev:{rings:S.rings, bpm:S.bpm, noteDen:S.noteDen, noteDot:S.noteDot, active:S.active, rackOpen:rackOpen},
           level:1, state:"listen", loop:-1, cleared:[], restoreAt:0, total:0, fixed:gameNextFixed};
   gameNextFixed = null;
@@ -5113,7 +5138,8 @@ function gameEnd(){
   tapNow.hidden = true; dialHint.hidden = !!run;
   paintGameBest();
   buildRack(); paintTransport(); paintRack();
-  if(lvlPlaying >= 0){ lvlPlaying = -1; if(editorOn) paintLevels(); }
+  if(lvlPlaying >= 0){ lvlPlaying = -1; paintLevels(); }   /* the row stops reading "playing" for everyone (v100) */
+  starsHide();                                              /* a game that ends takes its stars with it; a clear shows them after this */
   queueSave();
 }
 /* where the dots go and come back */
@@ -5177,6 +5203,7 @@ function gameClear(tnow){
     paintBestCard();                 /* the card updates mid-game; the idle text waits */
   }
   if(game.attempt === 1) fireworks(3);   /* the show is for a clean first go */
+  if(!game.fixed) starsShow(starsFor(game.attempt), null);   /* a ladder clear gets its stars too; the next level clears them */
   gameFlash("c2");
   paintGame();
   /* a breath, then the next one starts from its listening loop */
@@ -5186,9 +5213,13 @@ function gameClear(tnow){
     if(!game || game.level !== lvl) return;
     if(game.fixed){                          /* a challenge ends here, with its result on the banner */
       var tries = game.attempt, f = game.fixed, fromRow = lvlPlaying >= 0;
-      gameEnd();
-      if(fromRow) lvlNote.textContent = "Cleared in " + attemptsWord(tries) + " " + starText(starsFor(tries)) + " \u00b7 " + chalName(f);
-      else chalClear(f, tries);
+      if(fromRow){
+        /* nothing changes under the stars (Oscar, v103): the game stays exactly as the
+           clear left it - empty wheel, no hub, the "cleared" line - and ends only when
+           the stars fade (three seconds) or a tap on the wheel skips them */
+        lvlNote.textContent = "Cleared in " + attemptsWord(tries) + " " + starText(starsFor(tries)) + " · " + chalName(f);
+        starsShow(starsFor(tries), null, 3000, function(){ if(game && game.fixed) gameEnd(); });
+      } else { gameEnd(); chalClear(f, tries); }
       return;
     }
     if(game.state === "paused"){ game.nextOnResume = lvl + 1; return; }   /* paused in the breath: next level waits */
@@ -5339,8 +5370,8 @@ function paintGame(){
     " &middot; " + lbl("attempt") + " " + game.attempt +
     /* between a clear and the next level the finished attempts are already in the
        total, so the current count is not added again - paused there or not */
-    " &middot; " + lbl("run") + " " + ((game.total || 0) +
-      ((game.state === "cleared" || (game.state === "paused" && game.before === "cleared")) ? 0 : game.attempt));
+    (game.fixed ? "" : " &middot; " + lbl("run") + " " + ((game.total || 0) +
+      ((game.state === "cleared" || (game.state === "paused" && game.before === "cleared")) ? 0 : game.attempt)));
 }
 /* ======================================================= level editor ========
    The wheel is the editor. Set up one or two rings, a tempo and a note, listen
@@ -5500,6 +5531,17 @@ var PLAY_LIMITS = {gapNo:38, gapHard:48, rateNo:9.7, rateHard:8.1, peakNo:10, pe
 var PROOF_KEY = "polyrhythm-circle:playproof", proof = {gap:null, rate:0, peak:0, keys:{}, best:{}};
 try{ var proofJ = JSON.parse(localStorage.getItem(PROOF_KEY) || "null"); if(proofJ && proofJ.keys) proof = proofJ; } catch(err){}
 if(!proof.best) proof.best = {};
+/* Clears from before v90 left no proof, so the rows said "2 of 122 cleared" under a
+   Best of level 40 (Oscar's report, v99). The best run means levels 1..gameBest were
+   cleared: they are marked so, with no attempts figure, since that was never kept. */
+(function(){
+  var changed = false, i;
+  for(i = 0; i < Math.min(gameBest, GAME_LEVELS.length); i++){
+    var k = lvlKey(GAME_LEVELS[i][0]);
+    if(!proof.keys[k]){ proof.keys[k] = 1; changed = true; }
+  }
+  if(changed){ try{ localStorage.setItem(PROOF_KEY, JSON.stringify(proof)); } catch(err){} }
+})();
 function lvlBest(l){ return proof.best[lvlKey(l)] || 0; }     /* fewest attempts this level was cleared in here, 0 = never */
 function lvlProve(l, attempts){
   if(!l || !l.rings || !l.rings.length) return;
@@ -5513,6 +5555,7 @@ function lvlProve(l, attempts){
   var ks = Object.keys(proof.keys); if(ks.length > 400) delete proof.keys[ks[0]];
   try{ localStorage.setItem(PROOF_KEY, JSON.stringify(proof)); } catch(err){}
   paintLevels();
+  paintBestCard();                         /* the best-attempts sum moves with every clear, mid-game too */
 }
 function playLimits(){
   var L = PLAY_LIMITS;
@@ -5523,7 +5566,7 @@ function playLimits(){
 }
 function lvlHits(l){
   var r0 = l.rings[0], cyc = (r0 ? r0.div : 1) * 60 / l.bpm, ts = [];
-  l.rings.slice(0, 2).forEach(function(r){
+  l.rings.slice(0, GAME_RINGS).forEach(function(r){
     var tot = r.div * r.sub, k;
     for(k = 0; k < tot; k++) if(r.steps[k]){ var ph = (k / tot + (r.off || 0)) % 1; ts.push(ph * cyc); }
   });
@@ -5568,7 +5611,7 @@ function paintLvlChk(){
 /* what is on the wheel, as a level: its first two rings */
 function lvlFromWheel(name){
   return { name:name, bpm:S.bpm, noteDen:S.noteDen, noteDot:S.noteDot,
-    rings:S.rings.slice(0, 2).map(function(r){
+    rings:S.rings.slice(0, GAME_RINGS).map(function(r){
       return {div:r.div, sub:r.sub, off:r.off, sound:r.sound, vol:r.vol, steps:r.steps.slice()};
     }) };
 }
@@ -5623,13 +5666,14 @@ function lvlSync(){
 /* what the list shows: the editor's own list with the cheat on; for everyone else
    the shipped ladder as far as it has been cleared here, plus the next level */
 function ladderRows(){
-  var out = [], i;
-  for(i = 0; i < GAME_LEVELS.length; i++){
-    var l = GAME_LEVELS[i][0];
-    out.push(l);
-    if(!proof.keys[lvlKey(l)]) break;
+  /* every level up to the last one cleared here (a challenge can clear a level far
+     up the ladder), plus one more to play; with nothing cleared, the first level */
+  var last = -1, first = -1, i, n = GAME_LEVELS.length;
+  for(i = 0; i < n; i++){
+    if(proof.keys[lvlKey(GAME_LEVELS[i][0])]) last = i; else if(first < 0) first = i;
   }
-  return out;
+  var upto = Math.min(n - 1, Math.max(first < 0 ? n - 1 : first, last + 1));
+  return GAME_LEVELS.slice(0, upto + 1).map(function(v){ return v[0]; });
 }
 function lvlRows(){ return editorOn ? S.levels : ladderRows(); }
 var SHARE_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="6" cy="12" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="19" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.1 10.8l7.8-4.6M8.1 13.2l7.8 4.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
@@ -5649,6 +5693,12 @@ function paintLevels(){
     var tag = chk.verdict !== "ok"
       ? '<b class="chk ' + chk.verdict + '" title="' + escapeHtml(lvlCheckText(chk)) + '">' + (chk.verdict === "no" ? "not playable" : "hard") + '</b>'
       : (cleared ? '<b class="chk ok" title="Cleared on this device">cleared' + (best ? " · best " + best : "") + '</b>' : '');
+    /* what a player reads: the stars, the fewest attempts, the tempo - never the pattern code */
+    /* Oscar's mockup (v97): the stars, then "attempt" in the scoreboard's small caps
+       with the fewest attempts as an orange figure; no tempo on the row */
+    var meta = '<span class="meta"><b class="stars' + (cleared && best ? '' : ' none') + '">' + (cleared && best ? starText(starsFor(best)) : "☆☆☆") + '</b>' +
+      (cleared ? (best ? '<span class="k">attempt</span><b class="num">' + best + '</b>' : '<span class="k">cleared</span>') : '') +
+      (chk.verdict === "hard" ? '<b class="chk hard" title="' + escapeHtml(lvlCheckText(chk)) + '">hard</b>' : '') + '</span>';
     var playBtn = '<button type="button" data-play title="' + (i === lvlPlaying && game ? "Stop" : "Play this level as a game") + '" aria-label="Play">' + (i === lvlPlaying && game ? "\u25a0" : "\u25b6") + '</button>';
     /* a level goes out as a challenge only once it has been cleared here (Oscar's rule) */
     var shareBtn = cleared ? '<button type="button" data-share title="Send this level as a challenge" aria-label="Challenge">' + SHARE_SVG + '</button>' : '';
@@ -5673,7 +5723,7 @@ function paintLevels(){
     } else {
       row.innerHTML = '<span class="n">' + (i + 1) + '</span>' +
         '<div class="body"><span class="nm-ro">' + escapeHtml(isAutoName(l.name) ? "Level " + (i + 1) : l.name) + '</span>' +
-        '<span class="sum" title="Load onto the wheel">' + escapeHtml(lvlSummary(l)) + tag + '</span></div>' +
+        '<span class="sum" title="Put it on the wheel">' + meta + '</span></div>' +
         '<span class="ops">' + playBtn + shareBtn + '</span>';
     }
     row.querySelector(".sum").addEventListener("click", function(){
@@ -5700,7 +5750,7 @@ function paintLevels(){
       : "";
   } else {
     var done = GAME_LEVELS.filter(function(v){ return proof.keys[lvlKey(v[0])]; }).length;
-    lvlNote.textContent = done + " of " + GAME_LEVELS.length + " cleared" + (done ? " · cleared levels can be sent as challenges" : "");
+    lvlNote.textContent = done + " of " + GAME_LEVELS.length + " cleared";
   }
   lvlUpdate.hidden = (lvlEditing < 0);
   lvlUpdate.textContent = "Update " + (lvlEditing + 1);
@@ -5788,51 +5838,107 @@ document.getElementById("lvlImportGo").addEventListener("click", function(){
 paintLevels();
 
 /* ============================================================ challenges =====
-   Oscar's flow (v93). Sender: a cleared level's share icon puts the level on the
-   wheel, draws a 4:5 card (the challenge line, the wheel, the notation) and hands
-   card + caption + link to the phone's share sheet; the link carries the sender's
-   best attempts. Receiver: the ?c= link opens the app on that level, scrolled to the
-   wheel, with a banner under it - "beat 5 attempts", Play it, Install app where the
-   page is not installed. A clear shows the result with stars and "Send it back",
-   which shares the same kind of card with the result, the link now flagged as an
-   answer, so the sender's banner reads "answered: cleared in 3 attempts". The URL
-   is cleaned so a reload does not bring the challenge back. */
-var challenge = null, chalTarget = null, chalMine = null, gameNextFixed = null;
-var chalBox = document.getElementById("chalBox"), chalText = document.getElementById("chalText"), chalNote = document.getElementById("chalNote");
-var chalPlay = document.getElementById("chalPlay"), chalKeep = document.getElementById("chalKeep");
+   Oscar's flow (v93, reshaped in v94). Sender: a cleared level's share icon puts the
+   level on the wheel, draws a 4:5 card and hands card + caption + link to the share
+   sheet; the link carries the sender's best attempts. Receiver: the ?c= link opens
+   the app in challenge mode - the wheel is the whole app (the rest greyed, the page
+   locked), the hub a big Play, the row under the wheel says what to beat with a
+   cross to leave and, where the page is not installed, Install app. A clear lands
+   three stars over the wheel one by one, then the row shows the result and "Send it
+   back", which shares the same card with the result and the link flagged as an
+   answer, so the sender reads "answered: cleared in 3 attempts". The URL is cleaned
+   so a reload does not bring the challenge back. */
+var challenge = null, chalTarget = null, chalMine = null, gameNextFixed = null, chalMode = false;
+var chalNow = document.getElementById("chalNow"), chalNowIn = document.getElementById("chalNowIn");
 var chalBack = document.getElementById("chalBack"), chalInstall = document.getElementById("chalInstall");
-function chalName(l){ return isAutoName(l.name) ? lvlSummary(l) : l.name + " \u00b7 " + l.bpm + " bpm"; }
-function chalRatio(l){ return l.rings.map(function(r){ return r.div; }).join(" : ") + " \u00b7 " + l.bpm + " bpm"; }
+var chalKeep = document.getElementById("chalKeep"), chalQuit = document.getElementById("chalQuit");
+var chalStars = document.getElementById("chalStars"), starsTimer = 0, starsHideTimer = 0;
+function chalName(l){ return (isAutoName(l.name) ? "" : l.name + " \u00b7 ") + l.bpm + " bpm"; }
 function isStandalone(){
   try{ return matchMedia("(display-mode: standalone)").matches || matchMedia("(display-mode: fullscreen)").matches || matchMedia("(display-mode: minimal-ui)").matches || navigator.standalone === true; }
   catch(err){ return false; }
 }
 function attemptsWord(n){ return n + (n === 1 ? " attempt" : " attempts"); }
-/* the banner: kind = "offer" (a challenge to play), "done" (cleared here), "answer" (the sender reads the reply) */
-function chalShow(l, kind){
-  challenge = l;
-  var t = "", k = "Challenge";
+/* the row under the wheel: kind = "offer" (a challenge to play), "done" (cleared here), "answer" (the sender reads the reply) */
+function chalPaint(kind){
+  var k = "Challenge", t = "";
   if(kind === "offer"){
-    t = chalName(l) + (chalTarget ? (chalTarget.attempts <= 1 ? " \u00b7 cleared first time - can you?" : " \u00b7 beat " + attemptsWord(chalTarget.attempts)) : "");
+    t = escapeHtml(chalName(challenge)) + (chalTarget ? (chalTarget.attempts <= 1 ? " \u00b7 cleared first time - can you?" : " \u00b7 beat " + attemptsWord(chalTarget.attempts)) : "") + " \u00b7 press play";
   } else if(kind === "done"){
     t = "Cleared in " + attemptsWord(chalMine.attempts) + ' <b class="stars">' + starText(chalMine.stars) + "</b>" +
-        (chalTarget ? (chalMine.attempts < chalTarget.attempts ? " \u00b7 you beat " + chalTarget.attempts : chalMine.attempts === chalTarget.attempts ? " \u00b7 level with the sender" : " \u00b7 the sender did it in " + chalTarget.attempts) : "");
+        (chalTarget && !chalTarget.answer ? (chalMine.attempts < chalTarget.attempts ? " \u00b7 you beat " + chalTarget.attempts : chalMine.attempts === chalTarget.attempts ? " \u00b7 level with the sender" : " \u00b7 the sender did it in " + chalTarget.attempts) : "");
   } else {
     k = "Challenge answered";
-    t = chalName(l) + " \u00b7 cleared in " + attemptsWord(chalTarget.attempts) + ' <b class="stars">' + starText(chalTarget.stars) + "</b>";
+    t = escapeHtml(chalName(challenge)) + " \u00b7 cleared in " + attemptsWord(chalTarget.attempts) + ' <b class="stars">' + starText(chalTarget.stars) + "</b> \u00b7 play it again?";
   }
-  chalText.innerHTML = '<span class="k">' + k + '</span> ' + (kind === "offer" ? escapeHtml(t) : t.replace(/^([^<]*)/, function(m){ return escapeHtml(m); }));
-  chalPlay.textContent = kind === "offer" ? "Play it" : "Play again";
+  chalNowIn.innerHTML = '<span class="k">' + k + '</span> ' + t;
   chalBack.hidden = kind !== "done";
   chalKeep.hidden = !editorOn;
   chalInstall.hidden = isStandalone();
-  chalNote.textContent = "";
-  chalBox.hidden = false;
+  chalNow.hidden = false; dialHint.hidden = true;
+}
+function chalEnter(l){
+  challenge = l; chalMode = true;
+  var dial = document.querySelector(".dial");
+  if(dial && dial.scrollIntoView) dial.scrollIntoView({block:"start"});
+  document.documentElement.dataset.chal = "1";
+  chalPaint((chalTarget && chalTarget.answer) ? "answer" : "offer");
+}
+function chalLeave(){
+  if(game) gameEnd();
+  chalMode = false; challenge = null; chalTarget = null; chalMine = null;
+  delete document.documentElement.dataset.chal;
+  chalNow.hidden = true; starsHide();
+  dialHint.hidden = !!run;
+  chalKeep.disabled = false; chalKeep.textContent = "Keep";
+}
+/* the hub in challenge mode: Play starts the challenge, not the metronome */
+function chalPlayNow(){
+  if(!challenge || calRun) return;
+  if(game) gameEnd();
+  starsHide();
+  gameNextFixed = challenge;
+  if(!cal) calStart(true); else gameStart();
 }
 function chalClear(l, tries){
   chalMine = {attempts:tries, stars:starsFor(tries), answer:true};
-  chalShow(l, "done");
+  starsShow(chalMine.stars, function(){ chalPaint("done"); });
 }
+/* three stars over the wheel, one by one, each with the tempo numbers' jump */
+var starsCb = null;                        /* {done, onHide}: what still has to happen when the stars end or are skipped */
+function starsShow(n, done, hideAfter, onHide){
+  clearTimeout(starsTimer); clearTimeout(starsHideTimer);
+  starsCb = {done:done || null, onHide:onHide || null};
+  var bs = chalStars.querySelectorAll("b");
+  chalStars.hidden = false;
+  [].forEach.call(bs, function(b, i){
+    var on = i < n;
+    b.textContent = on ? "\u2605" : "\u2606";
+    b.className = on ? "" : "off";
+    b.getAnimations().forEach(function(a){ a.cancel(); });
+    b.style.opacity = "0";
+    if(!b.animate){ b.style.opacity = "1"; return; }
+    var a = b.animate([{opacity:0, transform:"scale(.2)"}, {opacity:1, transform:"scale(2)", offset:.55}, {opacity:1, transform:"scale(1)"}],
+                      {duration:420, delay:i * 260, easing:"ease-out", fill:"forwards"});
+    a.onfinish = function(){ b.style.opacity = "1"; };
+  });
+  if(done) starsTimer = setTimeout(function(){ if(starsCb) starsCb.done = null; done(); }, 260 * 2 + 420 + 120);
+  if(hideAfter) starsHideTimer = setTimeout(starsHide, hideAfter);
+}
+/* the end of the stars, by time or by a tap: whatever was waiting on them runs now,
+   so a skip speeds the show up and changes nothing else */
+function starsHide(){
+  clearTimeout(starsTimer); clearTimeout(starsHideTimer);
+  chalStars.hidden = true;
+  var cb = starsCb; starsCb = null;
+  if(cb && cb.done) cb.done();
+  if(cb && cb.onHide) cb.onHide();
+}
+cv.addEventListener("pointerdown", function(e){
+  if(chalStars.hidden || !starsCb) return;
+  e.stopImmediatePropagation(); e.preventDefault();
+  starsHide();
+}, true);
 function openChallengeFromUrl(){
   var m = /[?&]c=([A-Za-z0-9_\-]+)/.exec(location.search);
   if(!m) return;
@@ -5842,30 +5948,27 @@ function openChallengeFromUrl(){
     history.replaceState(null, "", location.pathname + (rest ? "?" + rest : "") + location.hash);
   } catch(err){}
   var l = lvlDecode(m[1]);
-  if(!l){ chalBox.hidden = false; chalText.textContent = "This challenge link could not be read."; chalPlay.hidden = true; chalKeep.hidden = true; chalBack.hidden = true; chalInstall.hidden = true; return; }
-  var c = lvlCheck(l);
+  if(!l){ dialHint.textContent = "This challenge link could not be read."; return; }
   if(game) gameEnd();
   applyConfig(lvlToConfig(l));
   chalTarget = l.res || null; chalMine = null;
-  chalPlay.hidden = (c.verdict === "no");
-  chalShow(l, (chalTarget && chalTarget.answer) ? "answer" : "offer");
-  if(c.verdict === "no") chalNote.textContent = lvlCheckText(c);
-  var dial = document.querySelector(".dial");
-  if(dial && dial.scrollIntoView) setTimeout(function(){ dial.scrollIntoView({behavior:"smooth", block:"start"}); }, 400);
+  chalEnter(l);
 }
-chalPlay.addEventListener("click", function(){
-  if(!challenge || calRun) return;
-  if(game) gameEnd();
-  gameNextFixed = challenge;
-  if(!cal) calStart(true); else gameStart();
-});
 chalBack.addEventListener("click", function(){ if(challenge && chalMine) chalShare(challenge, chalMine, true); });
+chalQuit.addEventListener("click", chalLeave);
 chalInstall.addEventListener("click", function(){
   var b = document.getElementById("installBtn");
   if(b){ b.click(); return; }
-  chalNote.textContent = /iPhone|iPad/.test(navigator.userAgent)
+  chalNowIn.innerHTML = '<span class="k">Install</span> ' + (/iPhone|iPad/.test(navigator.userAgent)
     ? "Safari: share button, then \u201cAdd to Home Screen\u201d."
-    : "Browser menu, then \u201cInstall app\u201d or \u201cAdd to Home screen\u201d.";
+    : "Browser menu, then \u201cInstall app\u201d or \u201cAdd to Home screen\u201d.");
+});
+chalKeep.addEventListener("click", function(){
+  if(!challenge) return;
+  S.levels.push(JSON.parse(JSON.stringify(challenge)));
+  lvlEditing = S.levels.length - 1;
+  paintLevels(); queueSave();
+  chalKeep.disabled = true; chalKeep.textContent = "Kept";
 });
 
 /* ------------------------------------------------------------ the card ----
@@ -5899,7 +6002,7 @@ function chalCard(kit, l, res, answer, done){
     g.fillText(starText(res.stars), X + 2 + hw + 26, 196);
   }
   g.fillStyle = col.ink3; g.font = '500 36px "Archivo", Helvetica, Arial, sans-serif';
-  g.fillText(chalRatio(l) + (isAutoName(l.name) ? "" : " \u00b7 " + l.name), X + 4, 254);
+  g.fillText(chalName(l), X + 4, 254);
   /* the wheel's panel, as in the app and the video */
   var y0 = 300, D = 560, panelH = PAD + HEAD + 20 + D + PAD;
   rr(X, y0, PW, panelH, 30, col.panel, col.line);
@@ -5944,7 +6047,8 @@ function chalShare(l, res, answer){
   if(game) gameEnd();
   applyConfig(lvlToConfig(l));
   draw(true);
-  var noteEl = answer ? chalNote : (editorOn ? lvlImportNote : lvlNote);
+  /* answering: the status joins the result line under the wheel instead of replacing it */
+  var noteEl = answer ? {set textContent(v){ chalNowIn.innerHTML = chalNowIn.innerHTML.replace(/ · <i>[^<]*<\/i>$/, "") + " · <i>" + escapeHtml(v) + "</i>"; }} : (editorOn ? lvlImportNote : lvlNote);
   if(!answer){ lvlImportBox.hidden = false; lvlImportText.value = lvlLink(l, res); }
   frameKit(function(kit){
     chalCard(kit, l, res, answer, function(canvas){
@@ -5952,7 +6056,7 @@ function chalShare(l, res, answer){
         var url = lvlLink(l, res), title = "Polyorbit challenge";
         var text = (answer ? "Polyorbit challenge answered: cleared in " + attemptsWord(res.attempts) + " " + starText(res.stars)
                            : "Polyorbit challenge: " + (res.attempts <= 1 ? "cleared first time - can you?" : "beat my " + attemptsWord(res.attempts)))
-                   + " \u00b7 " + chalRatio(l);
+                   + " \u00b7 " + chalName(l);
         var file = blob ? new File([blob], "Polyorbit challenge.png", {type:"image/png"}) : null, can = false;
         try{ can = !!(file && navigator.share && navigator.canShare && navigator.canShare({files:[file]})); } catch(err){ can = false; }
         var fallback = function(){
@@ -5978,10 +6082,7 @@ chalKeep.addEventListener("click", function(){
   paintLevels(); queueSave();
   chalKeep.disabled = true; chalKeep.textContent = "Kept";
 });
-document.getElementById("chalClose").addEventListener("click", function(){
-  chalBox.hidden = true; challenge = null; chalTarget = null; chalMine = null;
-  chalPlay.hidden = false; chalKeep.disabled = false; chalKeep.textContent = "Keep"; chalNote.textContent = "";
-});
+
 
 /* Dragging a row to a new place: the same split as the sequence boxes - a
    mouse arms on the smallest movement, a finger has to hold, so a finger that
@@ -7848,7 +7949,7 @@ function tickLabel(){
   }
   /* in the game the header is the scoreboard: the level on the left, the
      attempt on the right - the count-in keeps its three beats */
-  if(S.tapMode === "game" && game) wantRatio = "Level " + game.level;   /* the attempt is on the game line below */
+  if(S.tapMode === "game" && game) wantRatio = game.fixed ? (lvlPlaying >= 0 ? "Level " + (lvlPlaying + 1) : "Challenge") : "Level " + game.level;   /* the attempt is on the game line below */
   /* refitting 16 times a second would measure the same string over and over */
   if(wantRatio !== dialRatio.textContent || posLbl.textContent !== lastPos){
     dialRatio.textContent = wantRatio;
@@ -7856,6 +7957,12 @@ function tickLabel(){
     fitHead();
   }
 
+  /* in challenge mode the row under the wheel is the challenge's, whenever no game runs */
+  if(chalMode){
+    var quiet = !game && !S.playing;
+    if(quiet && dialHint && !dialHint.hidden) dialHint.hidden = true;
+    if(chalNow && chalNow.hidden === quiet) chalNow.hidden = !quiet;
+  }
   setTimeout(tickLabel, 60);
 }
 
@@ -7944,8 +8051,8 @@ document.fonts && document.fonts.ready.then(sizeCanvas);
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v93";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-09 17:14";          /* and when it was built, for ?diag */
+  var BUILD = "v103";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-10 11:32";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

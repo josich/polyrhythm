@@ -347,8 +347,12 @@ input[type=range]::-moz-range-thumb{
 #shareGo{padding:12px 26px;font-size:17px;color:var(--c2);border-radius:12px}
 #shareGo[data-rec="1"]{color:var(--c3)}   /* the video is not made yet: this press records */
 #shareGo:disabled{opacity:.45;cursor:default}
-#shareSheet[data-link="1"] :is(.share-lbl,#shareDur,#shareKeepRow){display:none}
-#shareSheet[data-link="1"] .share-row{margin-top:22px}   /* the Seconds label used to hold the button off the format row (Oscar, v132) */
+/* Link mode keeps the sheet's shape: the Seconds label and the lengths stay in the
+   layout but invisible, so the button sits exactly where Record / Share / Save sit
+   (Oscar, v132); only the keep-a-copy row goes */
+#shareSheet[data-link="1"] .share-lbl{visibility:hidden}
+#shareSheet[data-link="1"] #shareDur{visibility:hidden;width:0;min-width:0;overflow:hidden;padding:0;border:0}   /* zero width: the wider "Copy link" must not wrap to a second line */
+#shareSheet[data-link="1"] #shareKeepRow{display:none}
 .share-keep{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);margin:12px 0 0;cursor:pointer;user-select:none}
 .share-keep input{accent-color:var(--c2);width:16px;height:16px;margin:0}
 .share-keep[hidden]{display:none}
@@ -1542,7 +1546,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
   var BUILD = "v132";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-12 18:29";          /* and when it was built, for ?diag */
+  var BUILT = "2026-09-12 18:32";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

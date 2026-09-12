@@ -511,6 +511,13 @@ input[type=range]::-moz-range-thumb{
 /* the challenge card */
 .modal.chal-modal{z-index:70;background:rgba(0,0,0,.72)}   /* over the other sheets; .modal is declared later, hence the double class */
 .chal-sheet{position:relative;max-width:400px;text-align:center;padding:24px 22px 20px;border-color:color-mix(in srgb,var(--c1) 45%,var(--line))}
+.ask-modal{z-index:80}
+.ask-sheet{max-width:340px;text-align:center;padding:22px 22px 18px}
+.ask-sheet .chal-brand{margin-bottom:12px}
+.ask-text{margin:0 0 18px;font-size:15px;line-height:1.45;color:var(--ink)}
+.ask-btns{display:flex;gap:10px;justify-content:center}
+.ask-btns .btn{min-width:110px}
+.btn.danger{border-color:var(--c3);color:var(--c3)}
 .chal-x{position:absolute;top:10px;right:10px}
 .chal-brand{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--ink-3);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin:0 0 16px}
 .chal-brand svg{flex:none}
@@ -1420,6 +1427,18 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 <div id="recShield" hidden></div>
 <!-- the challenge card: big, few words, one big button - a game's pop-up in the app's
      own clothes (Oscar, v105). It carries the offer, the result and an answer. -->
+<!-- the app's own yes/no box (v133): the browser's confirm() names the site's address -->
+<div class="modal ask-modal" id="askModal" hidden>
+  <div class="sheet ask-sheet" role="alertdialog" aria-modal="true" aria-labelledby="askTitle" aria-describedby="askText">
+    <div class="chal-brand"><svg viewBox="0 0 512 512" width="22" height="22" aria-hidden="true"><path d="M256 256L256 56 A200 200 0 1 1 82.8 156.0 Z" fill="var(--ink)" opacity=".12"/><circle cx="256" cy="256" r="200" fill="none" stroke="var(--line-2)" stroke-width="10"/><path d="M256 256L70.7 149.0" stroke="var(--ink)" stroke-width="7" stroke-linecap="round"/><circle cx="256.0" cy="56.0" r="30" fill="var(--c1)"/><circle cx="456.0" cy="256.0" r="26" fill="var(--c2)"/><circle cx="256.0" cy="456.0" r="26" fill="var(--c2)"/><circle cx="56.0" cy="256.0" r="26" fill="var(--c2)"/><circle cx="256" cy="256" r="26" fill="var(--ink)"/></svg><span id="askTitle">Polyorbit</span></div>
+    <p class="ask-text" id="askText"></p>
+    <div class="ask-btns">
+      <button type="button" class="btn" id="askNo">Cancel</button>
+      <button type="button" class="btn danger" id="askYes">OK</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal chal-modal" id="chalModal" hidden>
   <div class="sheet chal-sheet" role="dialog" aria-modal="true" aria-labelledby="chalTitle">
     <button type="button" class="icobtn chal-x" id="chalX" title="Leave the challenge" aria-label="Leave the challenge">&times;</button>
@@ -1532,7 +1551,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v132"></script>
+<script src="./app.js?v=v133"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1545,8 +1564,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v132";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-12 18:32";          /* and when it was built, for ?diag */
+  var BUILD = "v133";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-12 18:48";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

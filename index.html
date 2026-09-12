@@ -323,6 +323,7 @@ input[type=range]::-moz-range-thumb{
   align-items:baseline;gap:8px;margin-bottom:2px;
 }
 #dialRatio{grid-column:1;text-align:left}
+#dialRatio .ratio-sep{color:var(--ink-3)}
 #dialPat{grid-column:2;justify-self:stretch;text-align:center}
 #posLbl{grid-column:3;text-align:right}
 /* the note that opens the score: a small round button at the header's end */
@@ -330,6 +331,7 @@ input[type=range]::-moz-range-thumb{
 #scoreBtn svg.note{width:11px;height:15px;display:block}
 /* the share button beside it: greyed whenever a clip cannot be made */
 #shareBtn{grid-column:5;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none}
+#shareBtn:not(:disabled){border-color:var(--c2)}
 #shareBtn svg{width:15px;height:15px;display:block}
 .icobtn:disabled{opacity:.4;cursor:default}
 /* the share sheet, laid out to Oscar's mockup (v83): the format first, then a
@@ -345,6 +347,7 @@ input[type=range]::-moz-range-thumb{
 #shareGo{padding:12px 26px;font-size:17px;color:var(--c2);border-radius:12px}
 #shareGo[data-rec="1"]{color:var(--c3)}   /* the video is not made yet: this press records */
 #shareGo:disabled{opacity:.45;cursor:default}
+#shareSheet[data-link="1"] :is(.share-lbl,#shareDur,#shareKeepRow){display:none}
 .share-keep{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);margin:12px 0 0;cursor:pointer;user-select:none}
 .share-keep input{accent-color:var(--c2);width:16px;height:16px;margin:0}
 .share-keep[hidden]{display:none}
@@ -1436,7 +1439,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <button class="icobtn" id="shareClose" title="Close" aria-label="Close">&times;</button>
     </div>
     <span class="seg share-fmt" id="shareFmt" role="group" aria-label="File format">
-      <button type="button" data-fmt="mp3">MP3</button><button type="button" data-fmt="wav">WAV</button><button type="button" data-fmt="video">Video</button>
+      <button type="button" data-fmt="mp3">MP3</button><button type="button" data-fmt="wav">WAV</button><button type="button" data-fmt="video">Video</button><button type="button" data-fmt="link">Link</button>
     </span>
     <div class="share-lbl"><span>Seconds:</span><i></i></div>
     <div class="share-row">
@@ -1524,7 +1527,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v130"></script>
+<script src="./app.js?v=v131"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1537,8 +1540,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v130";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-10 21:26";          /* and when it was built, for ?diag */
+  var BUILD = "v131";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-12 18:24";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

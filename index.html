@@ -321,7 +321,7 @@ input[type=range]::-moz-range-thumb{
   /* fit-content caps the middle track against the header's own width. A
      max-width on the item resolved against this track instead - which the item
      itself sizes - and collapsed the name to 46% of its own width. */
-  grid-template-columns:minmax(0,1fr) fit-content(46%) minmax(0,1fr) auto auto;
+  grid-template-columns:minmax(0,1fr) fit-content(46%) minmax(0,1fr) auto auto auto;
   align-items:baseline;gap:8px;margin-bottom:2px;
 }
 #dialRatio{grid-column:1;text-align:left}
@@ -332,7 +332,10 @@ input[type=range]::-moz-range-thumb{
 #scoreBtn{grid-column:4;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none;border-color:var(--c1)}
 #scoreBtn svg.note{width:11px;height:15px;display:block}
 /* the share button beside it: greyed whenever a clip cannot be made */
-#shareBtn{grid-column:5;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none}
+#flashBtn{grid-column:5;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none}
+#flashBtn svg{width:15px;height:15px;display:block}
+#flashBtn[data-on="1"]{border-color:var(--c1);color:var(--c1);background:color-mix(in srgb,var(--c1) 15%,transparent)}
+#shareBtn{grid-column:6;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none}
 #shareBtn:not(:disabled){border-color:var(--c2)}
 #shareBtn svg{width:15px;height:15px;display:block}
 .icobtn:disabled{opacity:.4;cursor:default}
@@ -363,7 +366,7 @@ input[type=range]::-moz-range-thumb{
    goes; every touch is caught by a shield (a tap on the centre cancels). */
 /* data-video, not data-rec: data-rec is Tap pattern's flag, and sharing it (v74-v86)
    greyed the whole app while a ring was being tapped in - Oscar's report */
-:root[data-video="1"] :is(#dialHint,#sessNow,#scoreBtn,#shareBtn,#posLbl){visibility:hidden}
+:root[data-video="1"] :is(#dialHint,#sessNow,#scoreBtn,#shareBtn,#flashBtn,#posLbl){visibility:hidden}
 :root[data-video="1"] :is(#rack,#sessionPanel,#tapPanel,#lvlPanel,#seqPanel,#patPanel,.bpm-block,.bpm-row,.note-row,#tap,#countBtn){opacity:.35}
 /* the record disc in the app's own alert colour (c3, the Record button's pink), the
    dot in the ground colour - the stock red sat outside the palette (Oscar, v128) */
@@ -514,6 +517,8 @@ input[type=range]::-moz-range-thumb{
 .modal.chal-modal{z-index:70;background:rgba(0,0,0,.72)}   /* over the other sheets; .modal is declared later, hence the double class */
 .chal-sheet{position:relative;max-width:400px;text-align:center;padding:24px 22px 20px;border-color:color-mix(in srgb,var(--c1) 45%,var(--line))}
 .ask-modal{z-index:80}
+#beatFlash{position:fixed;inset:0;z-index:45;pointer-events:none;opacity:0;
+  box-shadow:inset 0 0 110px 34px var(--c1)}
 .ask-sheet{max-width:340px;text-align:center;padding:22px 22px 18px}
 .ask-sheet .chal-brand{margin-bottom:12px}
 .ask-text{margin:0 0 18px;font-size:15px;line-height:1.45;color:var(--ink)}
@@ -540,7 +545,7 @@ input[type=range]::-moz-range-thumb{
    for one cross that leaves (Oscar, v109: the Game button was off screen) */
 .chal-head-x[hidden]{display:none}
 #gameX{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
-:is(:root[data-game="1"],:root[data-chal="1"]) :is(#scoreBtn,#shareBtn){display:none}
+:is(:root[data-game="1"],:root[data-chal="1"]) :is(#scoreBtn,#shareBtn,#flashBtn){display:none}
 /* the card arrives with a small pop; a pressed button bounces and flashes its ring
    (Oscar, v108) - the action itself follows a beat later so the bounce is seen */
 .chal-modal:not([hidden]) .chal-sheet{animation:chalIn .3s cubic-bezier(.2,.9,.3,1.15)}
@@ -1179,7 +1184,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         <!-- the score is what the wheel writes out, so its button lives on the wheel -->
         <button class="icobtn score-ico" id="scoreBtn" title="Write it out as notation" aria-label="Score"><svg class="note" viewBox="0 0 22 30" aria-hidden="true"><ellipse cx="8" cy="22.5" rx="5.4" ry="3.7" transform="rotate(-22 8 22.5)" fill="currentColor"/><path d="M12.9 21.6V3.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M12.9 3.5c3.6 2.2 6 5.2 4.4 10.2" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg></button>
         <button class="icobtn chal-head-x" id="gameX" hidden title="Leave the game" aria-label="Leave the game">&times;</button>
-        <button class="icobtn" id="shareBtn" title="Share a clip of the wheel as audio" aria-label="Share a clip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="6" cy="12" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="19" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8.1 10.8l7.8-4.6M8.1 13.2l7.8 4.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+        <button class="icobtn" id="flashBtn" data-on="0" aria-pressed="false" title="Flash the screen's edge on ring 1's beats" aria-label="Beat flash"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L5 14h6l-1 8 9-13h-6l0-7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
+      <button class="icobtn" id="shareBtn" title="Share a clip of the wheel as audio" aria-label="Share a clip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="6" cy="12" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="19" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8.1 10.8l7.8-4.6M8.1 13.2l7.8 4.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
       </div>
       <div class="canvas-hold">
         <canvas id="cv"></canvas>
@@ -1430,6 +1436,10 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 <!-- the challenge card: big, few words, one big button - a game's pop-up in the app's
      own clothes (Oscar, v105). It carries the offer, the result and an answer. -->
 <!-- the app's own yes/no box (v133): the browser's confirm() names the site's address -->
+<!-- the beat flash (v139): a glow along the screen's edges on ring 1's beats; only
+     its opacity moves, so it costs the compositor nothing and touches no element -->
+<div id="beatFlash" aria-hidden="true"></div>
+
 <div class="modal ask-modal" id="askModal" hidden>
   <div class="sheet ask-sheet" role="alertdialog" aria-modal="true" aria-labelledby="askTitle" aria-describedby="askText">
     <div class="chal-brand"><svg viewBox="0 0 512 512" width="22" height="22" aria-hidden="true"><path d="M256 256L256 56 A200 200 0 1 1 82.8 156.0 Z" fill="var(--ink)" opacity=".12"/><circle cx="256" cy="256" r="200" fill="none" stroke="var(--line-2)" stroke-width="10"/><path d="M256 256L70.7 149.0" stroke="var(--ink)" stroke-width="7" stroke-linecap="round"/><circle cx="256.0" cy="56.0" r="30" fill="var(--c1)"/><circle cx="456.0" cy="256.0" r="26" fill="var(--c2)"/><circle cx="256.0" cy="456.0" r="26" fill="var(--c2)"/><circle cx="56.0" cy="256.0" r="26" fill="var(--c2)"/><circle cx="256" cy="256" r="26" fill="var(--ink)"/></svg><span id="askTitle">Polyorbit</span></div>
@@ -1553,7 +1563,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v138"></script>
+<script src="./app.js?v=v139"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1566,8 +1576,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v138";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-12 20:54";          /* and when it was built, for ?diag */
+  var BUILD = "v139";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-12 21:10";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

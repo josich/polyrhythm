@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
 <link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#0C1015">
+<meta name="theme-color" content="#0D1318">
 
 <!-- installable on Android/desktop Chrome via the manifest above; iOS needs these -->
 <meta name="mobile-web-app-capable" content="yes">
@@ -29,25 +29,27 @@
    through the header toggle; its selector carries an extra type on purpose, so it
    outranks any data-theme the host stamps on the root element. */
 :root{
-  --ground:#0C1015;
-  --panel:#141A20;
-  --sunk:#0F151A;
+  /* v135: the "C" contrast trial, Oscar's pick on the phone - panels a shade lighter,
+     the quiet inks and lines a step up, so the UI reads at normal screen brightness */
+  --ground:#0D1318;
+  --panel:#1A222B;
+  --sunk:#131A21;
   --ink:#E7EDF2;
-  --ink-2:#9AA8B4;
-  --ink-3:#6C7A87;
-  --line:#232C35;
-  --line-2:#313D48;
+  --ink-2:#C2CDD6;
+  --ink-3:#97A5B2;
+  --line:#35424F;
+  --line-2:#4A5866;
   --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.7);
-  --dot-off:#3A464F;
+  --dot-off:#586673;
   --c1:#F0AB4B;
   --c2:#2FC9BC;
   --c3:#F0729D;
   --c4:#9A90FF;
-  --grid:rgba(231,237,242,.08);
-  --sweep:rgba(231,237,242,.28);
+  --grid:rgba(231,237,242,.16);
+  --sweep:rgba(231,237,242,.52);
   /* the progress wedge darkens the panel rather than lightening it - a shadow
-     filling up, not a light sweeping round */
-  --wedge:rgba(0,0,0,.30);
+     filling up, not a light sweeping round (.30 was invisible on a phone: v135) */
+  --wedge:rgba(0,0,0,.62);
   /* titles: the UI face stretched wide, so the panel reads as one design
      instead of a logo sitting on top of it. Swap these two to change it. */
   --title:"Archivo","Helvetica Neue",Arial,sans-serif;
@@ -57,29 +59,6 @@
    it, and a khaki line family - the greys the rings are drawn against carry a
    little colour of their own. The ring hues stay cool so they read as marks on
    the surface rather than more of it. */
-/* Contrast trials (v134, Oscar: "I have to turn the phone's brightness up to see the
-   UI; the dark cake on the clock is barely visible"). A = the look above. B lifts the
-   quiet inks and lines a step and doubles the wedge; C goes further and lightens the
-   panels a little; D is the strongest. The one that reads right on the phone becomes
-   the default; the others go. Light skin unaffected. */
-html:root:not([data-skin="light"])[data-contrast="b"]{
-  --panel:#161D25; --sunk:#10171D;
-  --ink-2:#B1BDC8; --ink-3:#8492A0;
-  --line:#2C3743; --line-2:#3E4B59; --dot-off:#4B5864;
-  --grid:rgba(231,237,242,.12); --sweep:rgba(231,237,242,.42); --wedge:rgba(0,0,0,.50);
-}
-html:root:not([data-skin="light"])[data-contrast="c"]{
-  --panel:#1A222B; --sunk:#131A21; --ground:#0D1318;
-  --ink-2:#C2CDD6; --ink-3:#97A5B2;
-  --line:#35424F; --line-2:#4A5866; --dot-off:#586673;
-  --grid:rgba(231,237,242,.16); --sweep:rgba(231,237,242,.52); --wedge:rgba(0,0,0,.62);
-}
-html:root:not([data-skin="light"])[data-contrast="d"]{
-  --panel:#1E2731; --sunk:#161E26; --ground:#0F151B; --ink:#F2F6F9;
-  --ink-2:#D2DBE3; --ink-3:#A8B5C1;
-  --line:#40505F; --line-2:#586A7A; --dot-off:#667581;
-  --grid:rgba(231,237,242,.20); --sweep:rgba(231,237,242,.62); --wedge:rgba(0,0,0,.72);
-}
 html:root[data-skin="light"]{
   --ground:#E4DCC9;
   --panel:#FBF8F1;
@@ -661,8 +640,6 @@ input[type=range]::-moz-range-thumb{
 /* which copy this is - two phones disagreeing is nearly always two builds */
 .build{margin:0 0 10px;font-size:10.5px;color:var(--ink-3);letter-spacing:.04em}
 .build .diaglink{color:var(--c2);text-decoration:none;border-bottom:1px dotted var(--c2)}
-.contrast-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.contrast-row .seg{margin:0}
 .sheet h2{
   font-family:var(--title);font-stretch:var(--title-stretch);
   font-weight:600;font-size:19px;margin:0;letter-spacing:-.01em;
@@ -1110,7 +1087,6 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 <script>
 (function(){
   try{ if(localStorage.getItem("polyrhythm-circle:skin") === "light") document.documentElement.setAttribute("data-skin", "light"); } catch(err){}
-  try{ var ct = localStorage.getItem("polyrhythm-circle:contrast"); if(ct && /^[bcd]$/.test(ct)) document.documentElement.setAttribute("data-contrast", ct); } catch(err){}
   setTimeout(function(){ var sp = document.getElementById("splash"); if(sp && !sp.dataset.out){ sp.dataset.out = "1"; setTimeout(function(){ sp.remove(); }, 500); } }, 4000);
 })();
 </script>
@@ -1512,8 +1488,6 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <p class="build mono" id="buildTag"></p>
     <!-- the installed app has no address bar: this is the way to the ?diag page from inside it (v121) -->
     <p class="build mono"><a href="./?diag" class="diaglink">Diagnostics</a> &middot; frame times and this device's own readings</p>
-    <!-- contrast trials (v134): A is today's look, B-D stronger; dark skin only -->
-    <p class="build mono contrast-row">Contrast <span class="seg" id="contrastSeg" role="group" aria-label="Contrast"><button type="button" data-contrast="a">A</button><button type="button" data-contrast="b">B</button><button type="button" data-contrast="c">C</button><button type="button" data-contrast="d">D</button></span> <span id="contrastNote">A is the current look</span></p>
 
     <h3>The wheel</h3>
     <ul>
@@ -1579,7 +1553,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v134"></script>
+<script src="./app.js?v=v135"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1592,8 +1566,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v134";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-12 19:01";          /* and when it was built, for ?diag */
+  var BUILD = "v135";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-12 19:37";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

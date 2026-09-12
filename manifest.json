@@ -5,8 +5,8 @@
   "start_url": "./",
   "scope": "./",
   "display": "fullscreen",
-  "background_color": "#0C1015",
-  "theme_color": "#0C1015",
+  "background_color": "#0D1318",
+  "theme_color": "#0D1318",
   "categories": [
     "music",
     "utilities"

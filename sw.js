@@ -1,6 +1,6 @@
 /* Offline cache for Polyorbit.
    Bump CACHE whenever you redeploy, or phones will keep serving the old app. */
-var CACHE = "polyrhythm-v133";
+var CACHE = "polyrhythm-v134";
 /* proof that a response really is this app and not a host's error page */
 var MARK = "polyrhythm-circle:session";
 var ASSETS = [

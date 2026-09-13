@@ -872,6 +872,13 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .ptabs{--lc:var(--ink-2)}
 .ptabs .tab{font-family:"Archivo",sans-serif;font-size:12.5px}
 .gtabs{margin:8px 0 6px}
+#twoSplit{display:none;position:absolute;inset:0;pointer-events:none;z-index:1;border-radius:inherit;overflow:hidden}
+:root[data-two="1"] #twoSplit{display:block}
+#twoSplit::before{content:"";position:absolute;left:50%;top:44px;bottom:8px;border-left:1px dashed var(--line-2)}
+#twoSplit span{position:absolute;top:0;bottom:0;width:50%;display:flex;align-items:flex-end;padding:0 10px 8px;
+  font-family:"Archivo",sans-serif;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+#twoSplit .ts-l{left:0;color:var(--c2);background:linear-gradient(90deg,color-mix(in srgb,var(--c2) 13%,transparent),transparent 55%)}
+#twoSplit .ts-r{right:0;justify-content:flex-end;color:var(--c1);background:linear-gradient(270deg,color-mix(in srgb,var(--c1) 13%,transparent),transparent 55%)}
 .pane{padding-top:14px}
 .pane[hidden]{display:none}
 .pgrid{display:flex;gap:8px;flex-wrap:wrap;margin:0}
@@ -1188,6 +1195,10 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         <button class="icobtn" id="flashBtn" data-on="0" aria-pressed="false" title="Flash the screen's edge on ring 1's beats" aria-label="Beat flash"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L5 14h6l-1 8 9-13h-6l0-7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
       <button class="icobtn" id="shareBtn" title="Share a clip of the wheel as audio" aria-label="Share a clip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="6" cy="12" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="19" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8.1 10.8l7.8-4.6M8.1 13.2l7.8 4.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
       </div>
+      <!-- Two fingers (v142): the wheel box is two tap areas while such a game runs -
+           ring 1 on the right, ring 2 on the left (Oscar taps below the wheel to keep
+           it in view, so the whole box counts, not just the wheel) -->
+      <div id="twoSplit" aria-hidden="true"><span class="ts-l">ring 2</span><span class="ts-r">ring 1</span></div>
       <div class="canvas-hold">
         <canvas id="cv"></canvas>
         <!-- play sits in the hub: the one big empty area, always on screen -->
@@ -1359,6 +1370,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <div class="tabs ptabs gtabs" id="gtabs" role="tablist" aria-label="Game mode">
       <button class="tab" data-gmode="classic" data-on="1" title="Tap the dots you see">Classic</button>
       <button class="tab" data-gmode="blind" data-on="0" title="Listen once, then clear the dots without seeing them">Blind</button>
+      <button class="tab" data-gmode="two" data-on="0" title="Two tap areas: ring 1 on the right, ring 2 on the left">Two fingers</button>
     </div>
     <p class="tap-hint" id="tapHint"></p>
     <!-- the best run, as a card that stays whatever the game is doing -->
@@ -1569,7 +1581,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v141"></script>
+<script src="./app.js?v=v142"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1582,8 +1594,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v141";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-13 13:32";          /* and when it was built, for ?diag */
+  var BUILD = "v142";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-13 13:43";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

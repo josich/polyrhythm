@@ -875,10 +875,14 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 #twoSplit{display:none;position:absolute;inset:0;pointer-events:none;z-index:1;border-radius:inherit;overflow:hidden}
 :root[data-two="1"] #twoSplit{display:block}
 #twoSplit::before{content:"";position:absolute;left:50%;top:44px;bottom:8px;border-left:1px dashed var(--line-2)}
+/* the tint's strength is a registered property so a tap can animate it (v143) */
+@property --ta{syntax:"<number>";inherits:false;initial-value:13}
 #twoSplit span{position:absolute;top:0;bottom:0;width:50%;display:flex;align-items:flex-end;padding:0 10px 8px;
-  font-family:"Archivo",sans-serif;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
-#twoSplit .ts-l{left:0;color:var(--c2);background:linear-gradient(90deg,color-mix(in srgb,var(--c2) 13%,transparent),transparent 55%)}
-#twoSplit .ts-r{right:0;justify-content:flex-end;color:var(--c1);background:linear-gradient(270deg,color-mix(in srgb,var(--c1) 13%,transparent),transparent 55%)}
+  font-family:"Archivo",sans-serif;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;--ta:13}
+#twoSplit span b{font-weight:600;transform-origin:center;display:inline-block}
+#twoSplit .ts-l{left:0;--tc:var(--c2);color:var(--tc);background:linear-gradient(90deg,color-mix(in srgb,var(--tc) calc(var(--ta) * 1%),transparent),transparent 55%)}
+#twoSplit .ts-r{right:0;justify-content:flex-end;--tc:var(--c1);color:var(--tc);background:linear-gradient(270deg,color-mix(in srgb,var(--tc) calc(var(--ta) * 1%),transparent),transparent 55%)}
+#twoSplit span[data-miss="1"]{--tc:var(--c3)}
 .pane{padding-top:14px}
 .pane[hidden]{display:none}
 .pgrid{display:flex;gap:8px;flex-wrap:wrap;margin:0}
@@ -1198,7 +1202,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <!-- Two fingers (v142): the wheel box is two tap areas while such a game runs -
            ring 1 on the right, ring 2 on the left (Oscar taps below the wheel to keep
            it in view, so the whole box counts, not just the wheel) -->
-      <div id="twoSplit" aria-hidden="true"><span class="ts-l">ring 2</span><span class="ts-r">ring 1</span></div>
+      <div id="twoSplit" aria-hidden="true"><span class="ts-l"><b>ring 2</b></span><span class="ts-r"><b>ring 1</b></span></div>
       <div class="canvas-hold">
         <canvas id="cv"></canvas>
         <!-- play sits in the hub: the one big empty area, always on screen -->
@@ -1581,7 +1585,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v142"></script>
+<script src="./app.js?v=v143"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1594,8 +1598,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v142";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-13 13:43";          /* and when it was built, for ?diag */
+  var BUILD = "v143";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-13 14:40";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

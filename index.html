@@ -871,6 +871,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 /* same tab mechanism as the rings, but neutral: these are not a ring's colour */
 .ptabs{--lc:var(--ink-2)}
 .ptabs .tab{font-family:"Archivo",sans-serif;font-size:12.5px}
+.gtabs{margin:8px 0 6px}
 .pane{padding-top:14px}
 .pane[hidden]{display:none}
 .pgrid{display:flex;gap:8px;flex-wrap:wrap;margin:0}
@@ -1354,6 +1355,11 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <button class="btn sm lead" id="tapGame" data-on="0" title="Clear the dots by tapping them in time"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg> Game</button>
       <button class="btn sm" id="tapPause" disabled title="Pause the game">Pause</button>
     </div>
+    <!-- game modes (v141): each tab is its own ladder, progress and best card -->
+    <div class="tabs ptabs gtabs" id="gtabs" role="tablist" aria-label="Game mode">
+      <button class="tab" data-gmode="classic" data-on="1" title="Tap the dots you see">Classic</button>
+      <button class="tab" data-gmode="blind" data-on="0" title="Listen once, then clear the dots without seeing them">Blind</button>
+    </div>
     <p class="tap-hint" id="tapHint"></p>
     <!-- the best run, as a card that stays whatever the game is doing -->
     <div class="best" id="bestCard" hidden>
@@ -1563,7 +1569,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v140"></script>
+<script src="./app.js?v=v141"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1576,8 +1582,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v140";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-12 21:28";          /* and when it was built, for ?diag */
+  var BUILD = "v141";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-13 13:32";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

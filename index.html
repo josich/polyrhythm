@@ -750,6 +750,55 @@ canvas{
 .best .best-reset{margin-left:auto;background:none;border:0;color:var(--ink-3);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;padding:2px 4px}
 .best .best-reset:hover{color:var(--c3)}
 .best .best-reset:disabled{opacity:.35;cursor:default}
+/* achievements (v151): badges in a family colour (--bc), the entry row under the Best
+   card, the sheet, the toast under the wheel and the card for a completed ladder */
+.badge{--bc:var(--c1);position:relative;width:60px;height:60px;border-radius:50%;background:var(--sunk);border:2px solid var(--bc);display:grid;place-items:center;color:var(--bc);flex:none}
+.badge svg{width:30px;height:30px;display:block}
+.badge.earned{box-shadow:0 0 0 4px color-mix(in srgb,var(--bc) 18%,transparent),0 6px 18px -8px color-mix(in srgb,var(--bc) 60%,transparent)}
+.badge.locked{border-color:var(--line);color:var(--dot-off);border-style:dashed}
+.badge.progress{border-color:var(--line-2);color:var(--ink-3)}
+.badge.progress::before{content:"";position:absolute;inset:-2px;border-radius:50%;padding:2px;
+  background:conic-gradient(var(--bc) calc(var(--p) * 1%),transparent 0);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.badge.sm{width:24px;height:24px;border-width:1.5px}
+.badge.sm svg{width:12px;height:12px}
+.badge.sm.earned{box-shadow:none}
+.badge.md{width:40px;height:40px}
+.badge.md svg{width:20px;height:20px}
+.badge.xl{width:104px;height:104px;border-width:3px;margin:20px auto 16px}
+.badge.xl svg{width:54px;height:54px}
+.badge.xl.earned{box-shadow:0 0 0 7px color-mix(in srgb,var(--bc) 16%,transparent),0 0 0 14px color-mix(in srgb,var(--bc) 6%,transparent),0 12px 34px -10px color-mix(in srgb,var(--bc) 70%,transparent)}
+.ach-row{display:flex;align-items:center;gap:10px;width:100%;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);margin:0 0 12px;cursor:pointer;font-family:inherit;color:var(--ink);text-align:left}
+.ach-row:hover{border-color:var(--line-2)}
+.ach-row .ico{width:18px;height:18px;color:var(--c1);flex:none}
+.ach-row .t{font-size:12.5px;font-weight:600}
+.ach-row .n{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-3)}
+.ach-row .n b{color:var(--c1);font-weight:600}
+.ach-row .recent{margin-left:auto;display:flex;gap:5px}
+.ach-row .chev{color:var(--ink-3);font-size:14px;margin-left:2px}
+.ach-sheet .sub{margin:0 0 6px;font-size:12.5px;color:var(--ink-3)}
+.ach-sheet .count{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink-3);margin-left:auto;margin-right:10px}
+.ach-sheet .count b{color:var(--c1);font-weight:600}
+.ach-group{margin-top:16px}
+.ach-group-h{display:flex;align-items:center;gap:8px;margin:0 0 10px}
+.ach-group-h .dot{width:7px;height:7px;border-radius:50%;background:var(--gc)}
+.ach-group-h .gn{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3);margin-left:auto}
+.ach-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 8px}
+.ach-cell{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;min-width:0}
+.ach-cell .nm{font-size:11.5px;font-weight:600;color:var(--ink);line-height:1.2;text-wrap:balance}
+.ach-cell .d{font-size:10.5px;color:var(--ink-3);line-height:1.3}
+.ach-cell .p{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3)}
+.ach-cell .p b{color:var(--ink-2);font-weight:500}
+.ach-cell.locked .nm{color:var(--ink-3)}
+.ach-toast{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:4;display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:12px;
+  background:var(--sunk);border:1px solid color-mix(in srgb,var(--c1) 45%,var(--line));box-shadow:var(--shadow);max-width:min(92%,340px);
+  animation:achIn .5s cubic-bezier(.2,.9,.3,1.15) both}
+.ach-toast .k{font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--c1)}
+.ach-toast .t{font-size:13.5px;font-weight:600;line-height:1.2;color:var(--ink)}
+.ach-toast .d{font-size:11.5px;color:var(--ink-3)}
+@keyframes achIn{from{transform:translateX(-50%) translateY(8px) scale(.96);opacity:0}to{transform:translateX(-50%);opacity:1}}
+@media (prefers-reduced-motion:reduce){.ach-toast{animation:none}}
+.ach-card h2.chal-title{color:var(--c1)}
 .cal-foot{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:10px}
 .cal-note{font-size:11.5px;color:var(--c1);text-align:right}
 /* effects that must not be cut by the wheel's edge - the burst of a killed dot,
@@ -1233,6 +1282,11 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
           <button type="button" class="icobtn" id="chalQuit" title="Leave the challenge" aria-label="Leave the challenge">&times;</button>
         </span></p>
       </div>
+      <!-- an achievement just earned: a toast over the row under the wheel, three seconds (v151) -->
+      <div class="ach-toast" id="achToast" hidden aria-live="polite">
+        <span class="badge md earned" id="achToastBadge"><svg viewBox="0 0 24 24"><use id="achToastUse" href="#i-star"/></svg></span>
+        <span><div class="k" id="achToastK">Achievement</div><div class="t" id="achToastT"></div><div class="d" id="achToastD"></div></span>
+      </div>
     </section>
 
     <section class="rack" id="rack"></section>
@@ -1393,6 +1447,12 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <button type="button" class="best-reset" id="bestReset" title="Reset the game's progress">reset</button>
     </div>
     <!-- "Levels:" and a dashed rule, the share sheet's label style, between the best run and the rows -->
+    <!-- achievements: one slim row, the count and the last three earned; opens the sheet (v151) -->
+    <button type="button" class="ach-row" id="achRow" title="Achievements">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-trophy"/></svg>
+      <span class="t">Achievements</span><span class="n" id="achRowN"><b>0</b> / 0</span>
+      <span class="recent" id="achRowRecent"></span><span class="chev">&rsaquo;</span>
+    </button>
     <div class="share-lbl lvl-lbl"><span>Levels:</span><i></i></div>
     <!-- the ladder, as rows: what has been cleared here and the next level. With the
          cheat on, the maker's controls appear above it and the whole list is editable;
@@ -1499,6 +1559,53 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
   </div>
 </div>
+<!-- achievement icons (v151): hand-drawn strokes at the app's line weight, one colour each -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="i-star"><path d="M12 3.2l2.7 5.7 6.1.8-4.5 4.2 1.2 6.1L12 17l-5.5 3 1.2-6.1L3.2 9.7l6.1-.8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></g>
+    <g id="i-star-f"><path d="M12 3.2l2.7 5.7 6.1.8-4.5 4.2 1.2 6.1L12 17l-5.5 3 1.2-6.1L3.2 9.7l6.1-.8z" fill="currentColor"/></g>
+    <g id="i-flame"><path d="M12 3c.6 3.2 3.6 4.6 4.6 7.6.9 2.7-.2 6.4-3.6 7.3.8-1.4.6-2.9-.4-4.2-.6 1.1-1.5 1.6-2.4 2.1-1.4-1.9-.9-3.8.3-5.4-1.9.8-3.3 2.6-3.4 5.1-2.4-1.9-2.9-6.3 0-8.5.2 1.4.9 2.2 1.9 2.7-.4-2.6.7-5 3-6.7z" fill="currentColor"/></g>
+    <g id="i-crown"><path d="M4.5 17.5h15l1.5-9.5-5 3.6L12 5l-4 6.6-5-3.6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M5.5 20.5h13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></g>
+    <g id="i-trophy"><path d="M8 4h8v5.5a4 4 0 0 1-8 0zM8 6H5.2a2.8 2.8 0 0 0 2.8 4.2M16 6h2.8a2.8 2.8 0 0 1-2.8 4.2M12 13.5v3.5M8.5 20.5h7M10 17h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-medal"><circle cx="12" cy="15" r="5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M7.5 3.5l3 6.2M16.5 3.5l-3 6.2M12 12.8l.9 1.6h1.6l-1.2 1 .4 1.7-1.7-.9-1.7.9.4-1.7-1.2-1h1.6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-note"><circle cx="8.5" cy="17" r="3.2" fill="currentColor"/><path d="M11.7 17V4c.3 3.2 5.2 3.4 5.2 7.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></g>
+    <g id="i-clef"><circle cx="7.6" cy="7.6" r="1.9" fill="currentColor"/><path d="M7.6 7.6c1.2-3.4 7.4-3.2 7.4 1.6 0 5.3-5 8.6-9.6 10.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="18.3" cy="6.6" r="1.2" fill="currentColor"/><circle cx="18.3" cy="10.6" r="1.2" fill="currentColor"/></g>
+    <g id="i-sharp"><path d="M9.2 3v18M15 3v18M4.8 9.8l14.4-3.4M4.8 17.4l14.4-3.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></g>
+    <g id="i-eyeoff"><path d="M3 3l18 18M10 6.3A10 10 0 0 1 12 6c6 0 10 6 10 6s-1.3 2-3.5 3.7M6.4 7.8C3.5 9.7 2 12 2 12s4 6 10 6c1.4 0 2.7-.3 3.8-.8M9.9 9.9A3 3 0 0 0 14.1 14.1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-hand"><rect x="6.3" y="3" width="3.6" height="11" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="12.6" y="5" width="3.6" height="9" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 13.5h12.5v2.5a6.25 6.25 0 0 1-12.5 0z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></g>
+    <g id="i-metro"><path d="M9 3h6l3.5 17.5h-13zM12 20.5L16.5 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="20.5" r="1.3" fill="currentColor"/></g>
+    <g id="i-hourglass"><path d="M6 3h12M6 21h12M8 3v3.2L12 11l4-4.8V3M8 21v-3.2L12 13l4 4.8V21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-speed"><path d="M4 16.5a8 8 0 0 1 16 0M12 16.5l4.2-5.2M4 16.5h1.5M18.5 16.5H20M6.3 11l1 .8M17.7 11l-1 .8M12 8.5V10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="16.5" r="1.6" fill="currentColor"/></g>
+    <g id="i-share"><circle cx="18" cy="5" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="6" cy="12" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="19" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8.1 10.8l7.8-4.6M8.1 13.2l7.8 4.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></g>
+    <g id="i-gem"><path d="M7 3.5h10l4 5.5-9 11.5L3 9zM3 9h18M7 3.5l5 17M17 3.5l-5 17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></g>
+    <g id="i-orbit"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="3.5" r="1.9" fill="currentColor"/><circle cx="19.4" cy="16.2" r="1.9" fill="currentColor"/><circle cx="4.6" cy="16.2" r="1.9" fill="currentColor"/></g>
+    <g id="i-link"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.2 1.2M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.2-1.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></g>
+  </defs>
+</svg>
+<!-- the achievements sheet (v151) -->
+<div class="modal" id="achModal" hidden>
+  <div class="sheet ach-sheet" role="dialog" aria-modal="true" aria-labelledby="achTitle">
+    <div class="sheet-head">
+      <h2 id="achTitle">Achievements</h2>
+      <span class="count" id="achCount"><b>0</b> / 0</span>
+      <button class="icobtn" id="achClose" title="Close" aria-label="Close">&times;</button>
+    </div>
+    <p class="sub">Earned on this device &middot; nothing here makes the game easier</p>
+    <div id="achBody"></div>
+  </div>
+</div>
+<!-- a completed ladder gets the card (v151) -->
+<div class="modal chal-modal" id="achCardModal" hidden>
+  <div class="sheet chal-sheet ach-card" role="dialog" aria-modal="true" aria-labelledby="achCardTitle">
+    <button type="button" class="icobtn chal-x" id="achCardX" title="Close" aria-label="Close">&times;</button>
+    <div class="chal-brand"><svg viewBox="0 0 512 512" width="26" height="26" aria-hidden="true"><path d="M256 256L256 56 A200 200 0 1 1 82.8 156.0 Z" fill="var(--ink)" opacity=".12"/><circle cx="256" cy="256" r="200" fill="none" stroke="var(--line-2)" stroke-width="10"/><path d="M256 256L70.7 149.0" stroke="var(--ink)" stroke-width="7" stroke-linecap="round"/><circle cx="256.0" cy="56.0" r="30" fill="var(--c1)"/><circle cx="256.0" cy="56.0" r="46" fill="none" stroke="var(--c1)" stroke-width="8" opacity=".6"/><circle cx="456.0" cy="256.0" r="26" fill="var(--c2)"/><circle cx="256.0" cy="456.0" r="26" fill="var(--c2)"/><circle cx="56.0" cy="256.0" r="26" fill="var(--c2)"/><circle cx="256" cy="256" r="26" fill="var(--ink)"/></svg><span>Polyorbit</span></div>
+    <p class="chal-kicker" id="achCardKicker">Ladder<br>complete</p>
+    <span class="badge xl earned" id="achCardBadge"><svg viewBox="0 0 24 24"><use id="achCardUse" href="#i-crown"/></svg></span>
+    <h2 class="chal-title" id="achCardTitle"></h2>
+    <p class="chal-sub" id="achCardSub"></p>
+    <button type="button" class="btn chal-cta" id="achCardGo">Nice</button>
+  </div>
+</div>
 <div class="modal" id="shareSheet" hidden>
   <div class="sheet share-sheet" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
     <div class="sheet-head">
@@ -1594,7 +1701,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v150"></script>
+<script src="./app.js?v=v151"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1607,8 +1714,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v150";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-14 16:06";          /* and when it was built, for ?diag */
+  var BUILD = "v151";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-14 16:30";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

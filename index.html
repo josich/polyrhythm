@@ -329,7 +329,7 @@ input[type=range]::-moz-range-thumb{
 #dialPat{grid-column:2;justify-self:stretch;text-align:center}
 #posLbl{grid-column:3;text-align:right}
 /* the note that opens the score: a small round button at the header's end */
-#scoreBtn{grid-column:4;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none;border-color:var(--c1)}
+#scoreBtn{grid-column:4;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none;border-color:var(--c4)}   /* purple, ring 4's colour (Oscar, v144) */
 #scoreBtn svg.note{width:11px;height:15px;display:block}
 /* the share button beside it: greyed whenever a clip cannot be made */
 #flashBtn{grid-column:5;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none}
@@ -427,6 +427,7 @@ input[type=range]::-moz-range-thumb{
 .score-export{margin:6px 0 10px;flex-wrap:wrap;align-items:center}
 .score-export .seq-note{flex:1 1 100%;text-align:left}
 #scoreShare svg{width:14px;height:14px;display:block}
+#scoreShare{border-color:var(--c2);color:var(--c2)}
 .seq-note{font-size:11.5px;color:var(--ink-3)}
 .seq-box,.seq-add{width:94px;height:40px;flex:none;border-radius:9px;padding:0 6px}
 .seq-box{
@@ -872,16 +873,24 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .ptabs{--lc:var(--ink-2)}
 .ptabs .tab{font-family:"Archivo",sans-serif;font-size:12.5px}
 .gtabs{margin:8px 0 6px}
-#twoSplit{display:none;position:absolute;inset:0;pointer-events:none;z-index:1;border-radius:inherit;overflow:hidden}
+#twoSplit{display:none;position:absolute;inset:0;pointer-events:none;z-index:1}
 :root[data-two="1"] #twoSplit{display:block}
 #twoSplit::before{content:"";position:absolute;left:50%;top:44px;bottom:8px;border-left:1px dashed var(--line-2)}
 /* the tint's strength is a registered property so a tap can animate it (v143) */
-@property --ta{syntax:"<number>";inherits:false;initial-value:13}
-#twoSplit span{position:absolute;top:0;bottom:0;width:50%;display:flex;align-items:flex-end;padding:0 10px 8px;
+@property --ta{syntax:"<number>";inherits:true;initial-value:13}   /* inherits: the edge bar is a ::before reading it (v144) */
+/* v144: no wash over the wheel (Oscar: it took the contrast) - each half is marked by
+   a bar along its outer edge, in its ring's colour; --ta is the bar's strength, so a
+   tap makes it flare */
+#twoSplit span{position:absolute;top:8px;bottom:8px;width:50%;display:flex;align-items:flex-end;padding:0 14px 6px;
   font-family:"Archivo",sans-serif;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;--ta:13}
-#twoSplit span b{font-weight:600;transform-origin:center;display:inline-block}
-#twoSplit .ts-l{left:0;--tc:var(--c2);color:var(--tc);background:linear-gradient(90deg,color-mix(in srgb,var(--tc) calc(var(--ta) * 1%),transparent),transparent 55%)}
-#twoSplit .ts-r{right:0;justify-content:flex-end;--tc:var(--c1);color:var(--tc);background:linear-gradient(270deg,color-mix(in srgb,var(--tc) calc(var(--ta) * 1%),transparent),transparent 55%)}
+#twoSplit span::before{content:"";position:absolute;top:0;bottom:0;width:4px;border-radius:2px;background:var(--tc);opacity:calc(var(--ta) / 40)}
+#twoSplit span b{font-weight:600;display:inline-block}
+#twoSplit .ts-l{left:0;--tc:var(--c2);color:var(--tc)}
+#twoSplit .ts-l::before{left:0}
+#twoSplit .ts-l b{transform-origin:left bottom}
+#twoSplit .ts-r{right:0;justify-content:flex-end;--tc:var(--c1);color:var(--tc)}
+#twoSplit .ts-r::before{right:0}
+#twoSplit .ts-r b{transform-origin:right bottom}
 #twoSplit span[data-miss="1"]{--tc:var(--c3)}
 .pane{padding-top:14px}
 .pane[hidden]{display:none}
@@ -1367,7 +1376,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
       <span class="lbl">Play time</span>
       <span class="fold-ico" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg></span>
-      <button class="btn sm lead" id="tapGame" data-on="0" title="Clear the dots by tapping them in time"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg> Game</button>
+      <button class="btn sm lead" id="tapGame" data-on="0" title="Clear the dots by tapping them in time"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg> <span id="tapGameTxt">Play game</span></button>
       <button class="btn sm" id="tapPause" disabled title="Pause the game">Pause</button>
     </div>
     <!-- game modes (v141): each tab is its own ladder, progress and best card -->
@@ -1585,7 +1594,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v143"></script>
+<script src="./app.js?v=v144"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1598,8 +1607,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v143";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-13 14:40";          /* and when it was built, for ?diag */
+  var BUILD = "v144";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-14 09:57";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

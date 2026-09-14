@@ -1720,7 +1720,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v154"></script>
+<script src="./app.js?v=v155"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1733,8 +1733,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v154";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-14 17:38";          /* and when it was built, for ?diag */
+  var BUILD = "v155";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-14 23:36";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 
@@ -1931,8 +1931,16 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       var a = ds.slice().sort(function(x, y){ return x - y; }), mean = a.reduce(function(x, y){ return x + y; }, 0) / a.length;
       var mem = (performance.memory && performance.memory.usedJSHeapSize) ? " \u00b7 heap " + Math.round(performance.memory.usedJSHeapSize / 1048576) + " MB" : "";
       var top = Object.keys(who).sort(function(x, y){ return who[y] - who[x]; }).slice(0, 4).map(function(k){ return Math.round(who[k]) + " ms " + k; });
+      /* v155: the app's own per-frame meter - what draw() costs and whether the hand jumped */
+      var P = window.POLY_PERF, drawLine = "";
+      if(P && P.n){
+        drawLine = "\ndraw (last 1 s): mean " + (P.draw / P.n).toFixed(1) + " ms/frame · worst " + P.worst.toFixed(0) + " ms · overlay " + (P.overlay / P.n).toFixed(2) +
+          " ms · game tick " + P.tick.toFixed(0) + " ms · overlay busy " + P.busy + " of " + P.n + " frames · hand jumps " + P.jumps + " (since open " + P.jumpsAll + ")" +
+          " · animations " + (document.getAnimations ? document.getAnimations().length : "?");
+        P.n = 0; P.draw = 0; P.worst = 0; P.overlay = 0; P.tick = 0; P.busy = 0; P.jumps = 0;
+      }
       perf.textContent = "frames (last 3 s): mean " + mean.toFixed(1) + " ms · worst " + a[a.length - 1].toFixed(0) + " ms · over 50 ms: " +
-        a.filter(function(x){ return x > 50; }).length + " · long tasks since open: " + longs + mem + " · nodes " + document.querySelectorAll("*").length +
+        a.filter(function(x){ return x > 50; }).length + " · long tasks since open: " + longs + mem + " · nodes " + document.querySelectorAll("*").length + drawLine +
         "\nboot: parse+run " + Math.round(performance.timing.domInteractive - performance.timing.responseEnd) + " ms" +
         "\nlong frames: " + loafs + " · worst blocking " + Math.round(worstBlock) + " ms" + (top.length ? "\n  " + top.join("\n  ") : "");
     }, 1000);

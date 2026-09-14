@@ -1720,7 +1720,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v155"></script>
+<script src="./app.js?v=v156"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1733,8 +1733,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v155";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-14 23:36";          /* and when it was built, for ?diag */
+  var BUILD = "v156";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-15 00:02";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 
@@ -1854,6 +1854,50 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   var lines = [];
   function say(k, v){ lines.push(k + ": " + v); box.textContent = lines.join("\n"); }
 
+  /* v156: the bisect - each switch takes one suspect out of the rendering while the
+     game plays, so a phone can say which one carries the shaking (Oscar, 2026-09-15).
+     Kept in localStorage so a reload of the diag page keeps the chosen switches. */
+  (function(){
+    var FLAGS = [
+      ["anim",   "no animations",      ":root[data-dg-anim=\"1\"] *{animation:none!important;transition:none!important}"],
+      ["shadow", "no shadows",         ":root[data-dg-shadow=\"1\"] *{box-shadow:none!important;text-shadow:none!important;filter:none!important}"],
+      ["fx",     "no effects canvas",  ":root[data-dg-fx=\"1\"] .fxcv,:root[data-dg-fx=\"1\"] #beatFlash{display:none!important}"],
+      ["list",   "no level list",      ":root[data-dg-list=\"1\"] #lvlList{display:none!important}"],
+      ["stars",  "no stars",           ":root[data-dg-stars=\"1\"] #chalStars{display:none!important}"],
+      ["panels", "hide other sections", ":root[data-dg-panels=\"1\"] .wrap > :not(.stage):not(pre):not(.dgbar),:root[data-dg-panels=\"1\"] .stage > :not(.dial){display:none!important}"],
+      ["canvas", "hide the wheel",     ":root[data-dg-canvas=\"1\"] #cv{visibility:hidden!important}"]
+    ];
+    var st = document.createElement("style");
+    st.textContent = FLAGS.map(function(f){ return f[2]; }).join("\n");
+    document.head.appendChild(st);
+    var KEY = "polyrhythm-circle:diagflags", on = {};
+    try{ on = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch(e){ on = {}; }
+    var bar = document.createElement("div"); bar.className = "dgbar";
+    bar.style.cssText = "margin:0 auto 6px;max-width:1180px;display:flex;flex-wrap:wrap;gap:8px;font:12px ui-monospace,Menlo,Consolas,monospace";
+    box.parentNode.insertBefore(bar, box);
+    var lab = document.createElement("span"); lab.textContent = "bisect (play with one on at a time):"; lab.style.cssText = "color:var(--ink-3);width:100%";
+    bar.appendChild(lab);
+    FLAGS.forEach(function(f){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.style.cssText = "padding:6px 10px;border-radius:8px;border:1px solid var(--line-2);background:var(--sunk);color:var(--ink-2);font:inherit;cursor:pointer";
+      var paint = function(){
+        var v = !!on[f[0]];
+        document.documentElement.dataset["dg" + f[0].charAt(0).toUpperCase() + f[0].slice(1)] = v ? "1" : "0";
+        b.textContent = (v ? "\u25a0 " : "\u25a1 ") + f[1];
+        b.style.borderColor = v ? "var(--c1)" : "var(--line-2)";
+        b.style.color = v ? "var(--ink)" : "var(--ink-2)";
+      };
+      b.addEventListener("click", function(){
+        on[f[0]] = !on[f[0]];
+        try{ localStorage.setItem(KEY, JSON.stringify(on)); } catch(e){}
+        paint();
+      });
+      paint();
+      bar.appendChild(b);
+    });
+  })();
+
   /* The wheel's pointer events, counted live. Both the ring drag and Tap
      pattern begin with a pointerdown on the wheel, so when a phone says they do
      nothing, tapping the wheel here shows whether the touches arrive at all. */
@@ -1909,13 +1953,18 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     perf.style.cssText = box.style.cssText || "";
     perf.className = box.className;
     box.parentNode.insertBefore(perf, box.nextSibling);
-    var ds = [], last = performance.now(), longs = 0, loafs = 0, worstBlock = 0, who = {};
+    var ds = [], last = performance.now(), longs = 0, loafs = 0, worstBlock = 0, who = {}, loafScript = 0, loafRender = 0, loafLayout = 0;
+    if(window.POLY_PERF) window.POLY_PERF.probe = true;   /* the app times a forced layout per frame while this page is up */
     try{ new PerformanceObserver(function(l){ longs += l.getEntries().length; }).observe({type:"longtask", buffered:true}); } catch(e){}
     /* long animation frames name the script that ran: the phone tells us what blocks */
     try{
       new PerformanceObserver(function(l){
         l.getEntries().forEach(function(e){
           loafs++; worstBlock = Math.max(worstBlock, e.blockingDuration || 0);
+          /* where a long frame went: script before rendering, then rendering, of which style+layout */
+          if(e.renderStart){ loafScript += e.renderStart - e.startTime; loafRender += e.startTime + e.duration - e.renderStart; }
+          else loafScript += e.duration;
+          if(e.styleAndLayoutStart) loafLayout += e.startTime + e.duration - e.styleAndLayoutStart;
           (e.scripts || []).forEach(function(sc){
             var src = (sc.sourceURL || "").split("/").pop().split("?")[0];
             var k = (sc.sourceFunctionName || "?") + " @" + (sc.sourceCharPosition >= 0 ? sc.sourceCharPosition : "?") + (src ? " " + src : "") + " <- " + (sc.invoker || sc.invokerType || "?");
@@ -1936,13 +1985,14 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       if(P && P.n){
         drawLine = "\ndraw (last 1 s): mean " + (P.draw / P.n).toFixed(1) + " ms/frame · worst " + P.worst.toFixed(0) + " ms · overlay " + (P.overlay / P.n).toFixed(2) +
           " ms · game tick " + P.tick.toFixed(0) + " ms · overlay busy " + P.busy + " of " + P.n + " frames · hand jumps " + P.jumps + " (since open " + P.jumpsAll + ")" +
-          " · animations " + (document.getAnimations ? document.getAnimations().length : "?");
-        P.n = 0; P.draw = 0; P.worst = 0; P.overlay = 0; P.tick = 0; P.busy = 0; P.jumps = 0;
+          " · animations " + (document.getAnimations ? document.getAnimations().length : "?") +
+          "\nforced layout (last 1 s): mean " + (P.layout / P.n).toFixed(2) + " ms/frame · worst " + P.layoutWorst.toFixed(1) + " ms";
+        P.n = 0; P.draw = 0; P.worst = 0; P.overlay = 0; P.tick = 0; P.busy = 0; P.jumps = 0; P.layout = 0; P.layoutWorst = 0;
       }
       perf.textContent = "frames (last 3 s): mean " + mean.toFixed(1) + " ms · worst " + a[a.length - 1].toFixed(0) + " ms · over 50 ms: " +
         a.filter(function(x){ return x > 50; }).length + " · long tasks since open: " + longs + mem + " · nodes " + document.querySelectorAll("*").length + drawLine +
         "\nboot: parse+run " + Math.round(performance.timing.domInteractive - performance.timing.responseEnd) + " ms" +
-        "\nlong frames: " + loafs + " · worst blocking " + Math.round(worstBlock) + " ms" + (top.length ? "\n  " + top.join("\n  ") : "");
+        "\nlong frames: " + loafs + " · worst blocking " + Math.round(worstBlock) + " ms · script " + Math.round(loafScript) + " ms · rendering " + Math.round(loafRender) + " ms (style+layout " + Math.round(loafLayout) + " ms)" + (top.length ? "\n  " + top.join("\n  ") : "");
     }, 1000);
   })();
   say("serviceWorker API", ("serviceWorker" in navigator) ? "present" : "MISSING");

@@ -704,13 +704,20 @@ canvas{
 .ring-card .tapbtn[data-on="1"]{
   border-color:var(--lc); color:var(--ink);
   background:color-mix(in srgb,var(--lc) 18%,transparent);
-  animation:tapPulse 1.8s ease-in-out infinite;     /* live, like the session's Stop and the Game button (v87) */
+  --pc:var(--lc);                                    /* pulses while it listens (v87), on the compositor since v157 */
 }
-@keyframes tapPulse{
-  0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--lc) 0%,transparent)}
-  50%    {box-shadow:0 0 0 4px color-mix(in srgb,var(--lc) 45%,transparent)}
-}
-@media (prefers-reduced-motion:reduce){ .ring-card .tapbtn[data-on="1"]{animation:none} }
+/* v157: every pulse in the app is the opacity of a shadow layer, never an animated
+   box-shadow or colour. Oscar's phone bisect (2026-09-15): an animated box-shadow
+   repaints every frame, and each repaint re-rasters the blurred panel shadows around
+   it over a page of ~3000 nodes - the wheel shook and text doubled during a game;
+   "no animations", "no shadows" and "hide other sections" each cured it. An opacity
+   animation on its own layer is composited: no paint, no layout, whatever the page. */
+.pulse-host{position:relative}
+.pulse-host::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--pc,var(--c3)) 45%,transparent);opacity:0}
+.pulse-host[data-on="1"]::after,.ach-row[data-fresh="1"]::after{animation:pulseFade 1.8s ease-in-out infinite;will-change:opacity}
+@keyframes pulseFade{0%,100%{opacity:0}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){ .pulse-host[data-on="1"]::after,.ach-row[data-fresh="1"]::after{animation:none;opacity:.6} }
 /* the tempo numbers jump on a tap (bpmPop): transforms need a box, and the jump
    must paint over its neighbours */
 #bpmNum,#fbNum,#tapNowBpm{display:inline-block;transform-origin:center;position:relative}
@@ -802,17 +809,14 @@ canvas{
 .ach-card h2.chal-title{color:var(--c1)}
 /* a badge not yet looked at (v152, Oscar): the row pulses in orange until it is opened,
    and the badge itself blinks in the sheet until the sheet is closed */
-.ach-row[data-fresh="1"]{border-color:var(--c1);animation:achRowPulse 1.8s ease-in-out infinite}
-@keyframes achRowPulse{
-  0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--c1) 0%,transparent)}
-  50%    {box-shadow:0 0 0 4px color-mix(in srgb,var(--c1) 45%,transparent)}
-}
+.ach-row{--pc:var(--c1)}
+.ach-row[data-fresh="1"]{border-color:var(--c1)}   /* the pulse itself is the .pulse-host layer (v157) */
 .ach-cell .badge.fresh{animation:achBlink 1.2s ease-in-out infinite}
 @keyframes achBlink{
   0%,100%{box-shadow:0 0 0 4px color-mix(in srgb,var(--bc) 18%,transparent),0 6px 18px -8px color-mix(in srgb,var(--bc) 60%,transparent);transform:scale(1)}
   50%    {box-shadow:0 0 0 8px color-mix(in srgb,var(--bc) 55%,transparent),0 6px 22px -6px color-mix(in srgb,var(--bc) 90%,transparent);transform:scale(1.06)}
 }
-@media (prefers-reduced-motion:reduce){ .ach-row[data-fresh="1"],.ach-cell .badge.fresh{animation:none} .ach-row[data-fresh="1"]{box-shadow:0 0 0 3px color-mix(in srgb,var(--c1) 40%,transparent)} }
+@media (prefers-reduced-motion:reduce){ .ach-cell .badge.fresh{animation:none} }
 .cal-foot{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:10px}
 .cal-note{font-size:11.5px;color:var(--c1);text-align:right}
 /* effects that must not be cut by the wheel's edge - the burst of a killed dot,
@@ -920,7 +924,11 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
    so it reads as the way to make one rather than punctuation after the tabs.
    The stops are sin(pi*t) sampled every eighth, which is the 0-1-0 curve asked
    for; CSS cannot express a sine directly and this runs on the compositor. */
-.tab.add[data-hint="1"]{animation:addPulse 2s linear infinite}
+.tab.add{position:relative}
+.tab.add::after{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;opacity:0;
+  border:1px solid var(--nc);background:color-mix(in srgb,var(--nc) 16%,transparent)}
+.tab.add[data-hint="1"]::after{animation:pulseFade 2s ease-in-out infinite;will-change:opacity}   /* v157: opacity, not colours */
+@media (prefers-reduced-motion:reduce){ .tab.add[data-hint="1"]::after{animation:none} }
 @keyframes addPulse{
   0%,100%    {border-color:var(--line);   background:var(--sunk);                                          color:var(--ink-3)}
   12.5%,87.5%{border-color:color-mix(in srgb,var(--nc) 38%,var(--line)); background:color-mix(in srgb,var(--nc) 6%,var(--sunk));  color:color-mix(in srgb,var(--ink) 38%,var(--ink-3))}
@@ -1031,7 +1039,11 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 
 /* Something is running in there: the bar breathes so a folded section cannot
    quietly keep playing. Same sine stops as the + hint on the rings. */
-.foldsec[data-fold="1"][data-live="1"]{animation:secPulse 2s linear infinite}
+.foldsec{position:relative}
+.foldsec::after{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;opacity:0;
+  border:1px solid var(--c1);background:color-mix(in srgb,var(--c1) 10%,transparent)}
+.foldsec[data-fold="1"][data-live="1"]::after{animation:pulseFade 2s ease-in-out infinite;will-change:opacity}   /* v157: opacity, not colours */
+@media (prefers-reduced-motion:reduce){ .foldsec[data-fold="1"][data-live="1"]::after{animation:none} }
 @keyframes secPulse{
   0%,100%    {border-color:var(--line);                                  background:var(--panel)}
   12.5%,87.5%{border-color:color-mix(in srgb,var(--c1) 38%,var(--line)); background:color-mix(in srgb,var(--c1) 4%,var(--panel))}
@@ -1086,13 +1098,8 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 /* while a session is on - running or paused - its Stop button pulses, the way a
    folded bar blinks for something live inside it, so the session cannot be lost
    sight of below the fold */
-#sessBtn[data-on="1"]{animation:sessPulse 1.8s ease-in-out infinite}
-#tapGame[data-on="1"]{border-color:var(--c3);background:color-mix(in srgb,var(--c3) 16%,transparent);color:var(--ink);animation:sessPulse 1.8s ease-in-out infinite}
-@keyframes sessPulse{
-  0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--c3) 0%,transparent)}
-  50%    {box-shadow:0 0 0 4px color-mix(in srgb,var(--c3) 45%,transparent)}
-}
-@media (prefers-reduced-motion:reduce){ #sessBtn[data-on="1"],#tapGame[data-on="1"]{animation:none} }
+#sessBtn,#tapGame{--pc:var(--c3)}                  /* their pulse is the .pulse-host layer (v157) */
+#tapGame[data-on="1"]{border-color:var(--c3);background:color-mix(in srgb,var(--c3) 16%,transparent);color:var(--ink)}
 /* the whole panel is an advanced-only feature */
 :root[data-ui="simple"] #sessionPanel,
 :root[data-ui="simple"] #tapPanel,
@@ -1340,7 +1347,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
         </svg>
       </button>
-      <button class="btn" id="sessBtn" data-on="0">Start</button>
+      <button class="btn pulse-host" id="sessBtn" data-on="0">Start</button>
     </div>
 
     <div class="sess-row">
@@ -1447,7 +1454,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
       <span class="lbl">Play time</span>
       <span class="fold-ico" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg></span>
-      <button class="btn sm lead" id="tapGame" data-on="0" title="Clear the dots by tapping them in time"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg> <span id="tapGameTxt">Play game</span></button>
+      <button class="btn sm lead pulse-host" id="tapGame" data-on="0" title="Clear the dots by tapping them in time"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg> <span id="tapGameTxt">Play game</span></button>
       <button class="btn sm" id="tapPause" disabled title="Pause the game">Pause</button>
     </div>
     <!-- game modes (v141): each tab is its own ladder, progress and best card -->
@@ -1465,7 +1472,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
     <!-- "Levels:" and a dashed rule, the share sheet's label style, between the best run and the rows -->
     <!-- achievements: one slim row, the count and the last three earned; opens the sheet (v151) -->
-    <button type="button" class="ach-row" id="achRow" title="Achievements">
+    <button type="button" class="ach-row pulse-host" id="achRow" title="Achievements">
       <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-trophy"/></svg>
       <span class="t">Achievements</span><span class="n" id="achRowN"><b>0</b> / 0</span>
       <span class="recent" id="achRowRecent"></span><span class="chev">&rsaquo;</span>
@@ -1720,7 +1727,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v156"></script>
+<script src="./app.js?v=v157"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1733,8 +1740,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v156";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-15 00:02";          /* and when it was built, for ?diag */
+  var BUILD = "v157";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-15 00:28";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

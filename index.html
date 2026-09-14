@@ -1019,7 +1019,8 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 /* the level editor is a maker's tool: hidden unless this device has been let in */
 /* the Levels section is for everyone (v93): players see the ladder as far as they
    have cleared it plus the next level; the editing controls stay behind the cheat */
-:root:not([data-editor="1"]) :is(#lvlAdd,#lvlUpdate,#lvlShare,#lvlImport,#lvlChk,#lvlShareBox,#lvlImportBox){display:none}
+:root:not([data-editor="1"]) :is(#lvlAdd,#lvlUpdate,#lvlShare,#lvlImport,#lvlChk,#lvlShareBox,#lvlImportBox,#achFoot){display:none}
+.ach-foot{display:flex;justify-content:flex-end;margin-top:18px;padding-top:10px;border-top:1px dashed var(--line)}
 .lvl-row .nm-ro{font-size:12.5px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lvl-row .chk.ok{color:var(--c2)}
 .lvl-row .ops button[data-share]{color:var(--c2)}
@@ -1605,6 +1606,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
     <p class="sub">Earned on this device &middot; nothing here makes the game easier</p>
     <div id="achBody"></div>
+    <!-- editor only (v153): wipe the badges and their counters for testing -->
+    <div class="ach-foot" id="achFoot"><button type="button" class="btn sm danger" id="achReset" title="Forget every badge and counter on this device">Reset achievements</button></div>
   </div>
 </div>
 <!-- a completed ladder gets the card (v151) -->
@@ -1714,7 +1717,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v152"></script>
+<script src="./app.js?v=v153"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1727,8 +1730,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v152";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-14 17:26";          /* and when it was built, for ?diag */
+  var BUILD = "v153";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-14 17:35";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

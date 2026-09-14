@@ -873,7 +873,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .ptabs{--lc:var(--ink-2)}
 .ptabs .tab{font-family:"Archivo",sans-serif;font-size:12.5px}
 .gtabs{margin:8px 0 6px}
-#twoSplit{display:none;position:absolute;inset:0;pointer-events:none;z-index:1}
+#twoSplit{display:none;position:absolute;inset:-1px;pointer-events:none;z-index:1}   /* over the section's own 1 px border */
 :root[data-two="1"] #twoSplit{display:block}
 #twoSplit::before{content:"";position:absolute;left:50%;top:44px;bottom:8px;border-left:1px dashed var(--line-2)}
 /* the tint's strength is a registered property so a tap can animate it (v143) */
@@ -881,15 +881,15 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 /* v144: no wash over the wheel (Oscar: it took the contrast) - each half is marked by
    a bar along its outer edge, in its ring's colour; --ta is the bar's strength, so a
    tap makes it flare */
-#twoSplit span{position:absolute;top:8px;bottom:8px;width:50%;display:flex;align-items:flex-end;padding:0 14px 6px;
-  font-family:"Archivo",sans-serif;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;--ta:13}
-#twoSplit span::before{content:"";position:absolute;top:0;bottom:0;width:4px;border-radius:2px;background:var(--tc);opacity:calc(var(--ta) / 40)}
+/* v145: the edge is a border that turns the section's own corners, as the ring
+   card's coloured left edge does (Oscar's screenshot); its strength is --ta */
+#twoSplit span{position:absolute;top:0;bottom:0;width:50%;display:flex;align-items:flex-end;padding:0 16px 8px;
+  font-family:"Archivo",sans-serif;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;--ta:13;
+  border:0 solid color-mix(in srgb,var(--tc) calc(var(--ta) * 2.5%),transparent)}
 #twoSplit span b{font-weight:600;display:inline-block}
-#twoSplit .ts-l{left:0;--tc:var(--c2);color:var(--tc)}
-#twoSplit .ts-l::before{left:0}
+#twoSplit .ts-l{left:0;--tc:var(--c2);color:var(--tc);border-left-width:3px;border-radius:14px 0 0 14px}
 #twoSplit .ts-l b{transform-origin:left bottom}
-#twoSplit .ts-r{right:0;justify-content:flex-end;--tc:var(--c1);color:var(--tc)}
-#twoSplit .ts-r::before{right:0}
+#twoSplit .ts-r{right:0;justify-content:flex-end;--tc:var(--c1);color:var(--tc);border-right-width:3px;border-radius:0 14px 14px 0}
 #twoSplit .ts-r b{transform-origin:right bottom}
 #twoSplit span[data-miss="1"]{--tc:var(--c3)}
 .pane{padding-top:14px}
@@ -1594,7 +1594,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v144"></script>
+<script src="./app.js?v=v145"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1607,8 +1607,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v144";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-14 09:57";          /* and when it was built, for ?diag */
+  var BUILD = "v145";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-14 10:07";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

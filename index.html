@@ -1105,6 +1105,14 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
    sight of below the fold */
 #sessBtn,#tapGame{--pc:var(--c3)}                  /* their pulse is the .pulse-host layer (v157) */
 #tapGame:not([data-on="1"]){border-color:var(--c2);color:var(--ink)}   /* teal edge at rest, like the share buttons (Oscar, v158) */
+/* a paused game (v163, Oscar): Resume pulses in orange, Stop game keeps its pink edge but
+   stops pulsing until the game resumes */
+#tapPause{--pc:var(--c1)}
+#tapPause[data-on="1"]{border-color:var(--c1);color:var(--ink);background:color-mix(in srgb,var(--c1) 16%,transparent)}
+:root[data-gpause="1"] #tapGame::after{animation:none;opacity:0}
+/* the game's own line ("Level 26 of 130 · attempt 1 · run 1") is noise next to the head
+   and the card (Oscar, v163): hidden while a game runs, the hint keeps its other uses */
+:root[data-game="1"] #tapHint{display:none!important}
 #tapGame[data-on="1"]{border-color:var(--c3);background:color-mix(in srgb,var(--c3) 16%,transparent);color:var(--ink)}
 /* the whole panel is an advanced-only feature */
 :root[data-ui="simple"] #sessionPanel,
@@ -1465,7 +1473,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
          under the name, then a "Modes:" rule before the tabs, like the "Levels:" one -->
     <div class="game-ctl">
       <button class="btn sm lead pulse-host" id="tapGame" data-on="0" title="Clear the dots by tapping them in time"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg> <span id="tapGameTxt">Play game</span></button>
-      <button class="btn sm" id="tapPause" disabled title="Pause the game">Pause</button>
+      <button class="btn sm pulse-host" id="tapPause" disabled title="Pause the game">Pause</button>
     </div>
     <!-- achievements: one slim row, the count and the last three earned; opens the sheet (v151); above the modes since v161 - awards span every mode -->
     <button type="button" class="ach-row pulse-host" id="achRow" title="Awards">
@@ -1738,7 +1746,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v162"></script>
+<script src="./app.js?v=v163"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1751,8 +1759,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v162";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-15 09:52";          /* and when it was built, for ?diag */
+  var BUILD = "v163";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-15 10:13";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

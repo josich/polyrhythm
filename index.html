@@ -361,6 +361,9 @@ input[type=range]::-moz-range-thumb{
 .along-star{color:var(--dot-off);font-size:15px;line-height:1}
 .along-star[data-on="1"]{color:var(--c1)}
 .along-loops{margin-left:auto;font-size:11px;color:var(--ink-3)}
+.along-pct{font-size:14px;font-weight:600;color:var(--c1)}
+.along-hist{margin:6px 0 0;font-size:11px;color:var(--ink-3);text-align:center;letter-spacing:.02em}
+.along-hist b{color:var(--ink-2);font-weight:500}
 #alongCv{display:block;width:100%;height:46px;margin-top:8px;border-radius:8px;background:var(--sunk);border:1px solid var(--line)}
 .along-ends{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-top:5px;padding:0 2px}
 .along-ends span:nth-child(2){color:var(--c2)}
@@ -1317,11 +1320,14 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <span class="lbl along-lbl">Precision</span>
       <span class="along-word" id="alongWord" data-kind=""></span>
       <span class="along-star" id="alongStar" hidden aria-label="Precision star">&#9733;</span>
+      <span class="along-pct mono" id="alongPct" hidden></span>
       <span class="along-loops mono" id="alongLoops"></span>
       <button class="icobtn" id="alongX" title="Close" aria-label="Close the precision banner">&times;</button>
     </div>
     <canvas id="alongCv" height="46" aria-label="Your taps: early to the left, late to the right"></canvas>
     <div class="along-ends"><span>early</span><span>the beat</span><span>late</span></div>
+    <!-- v171: the run's score against this pattern's own history (same content, same tempo) -->
+    <p class="along-hist" id="alongHist" hidden></p>
   </section>
 
   <div class="stage">
@@ -1791,7 +1797,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v170"></script>
+<script src="./app.js?v=v171"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1804,8 +1810,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v170";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-16 15:46";          /* and when it was built, for ?diag */
+  var BUILD = "v171";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-16 15:51";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

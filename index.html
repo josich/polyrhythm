@@ -320,11 +320,12 @@ input[type=range]::-moz-range-thumb{
 :root[data-stage="1"] #stageBar{display:flex;flex-direction:column;justify-content:center;gap:10px;order:-1;padding:4px 2px}
 :root[data-stage="1"] .canvas-hold{max-width:min(100%,max(220px,calc(100vh - 260px)));max-width:min(100%,max(220px,calc(100lvh - 260px)))}   /* the floor: a short viewport must not collapse the wheel */
 :root[data-stage="1"] .play{width:clamp(70px,30%,150px)}
-:root[data-stage="1"] :is(#scoreBtn,#shareBtn,#alongBtn,.hint){display:none}
+:root[data-stage="1"] :is(#scoreBtn,#shareBtn,#alongBtn,#flashBtn,.hint){display:none}   /* v173: the bolt too - the flash keeps the wheel's setting */
 :root[data-stage="1"] #dialRatio{font-size:24px}
 :root[data-stage="1"] .dial-foot{min-height:44px;margin-top:12px}
 :root[data-stage="1"] :is(#sessNowIn,#tapNowIn,#beatNowIn){font-size:30px}
-.stage-x{color:var(--ink-3)}
+#stageX{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));width:28px;height:28px;border-radius:8px;align-self:center}   /* by id: .icobtn, declared later, out-ranked the class */
+:root[data-stage="1"] #stageX{grid-column:7}   /* the rightmost place: Share's column, free on stage (v173) */
 .stage-bpm-row{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .stage-bpm{display:flex;align-items:baseline;justify-content:center;flex:1 1 auto;min-width:0}
 .stage-num{font-size:clamp(64px,19vh,150px);font-size:clamp(64px,19lvh,150px);font-weight:500;line-height:.9;letter-spacing:-.04em;color:var(--ink)}
@@ -1838,7 +1839,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v172"></script>
+<script src="./app.js?v=v173"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1851,8 +1852,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v172";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-16 16:32";          /* and when it was built, for ?diag */
+  var BUILD = "v173";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-16 16:47";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

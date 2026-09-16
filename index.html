@@ -339,7 +339,15 @@ input[type=range]::-moz-range-thumb{
 /* Play along (v167): the target between the bolt and Share; teal glyph at rest, filled while a run is on */
 #alongBtn{grid-column:6;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none;color:var(--c2)}
 #alongBtn svg{width:16px;height:16px;display:block}
+#alongBtn{--pc:var(--c2)}                                 /* its pulse is the .pulse-host layer */
 #alongBtn[data-on="1"]{background:var(--c2);border-color:var(--c2);color:var(--ground)}
+/* v168 (Oscar): a run is a mode. The hub button goes (a tap on the centre paused the
+   wheel by accident) and everything but the wheel box and the banner is greyed and out
+   of reach, so a stray finger cannot mute a dot or press a control; the pulsing
+   Precision button is the one way to stop. */
+:root[data-along="1"] .play{display:none}
+:root[data-along="1"] canvas{cursor:pointer}
+:root[data-along="1"] :is(#rack,#sessionPanel,#seqPanel,#patPanel,#tapPanel,.bpm-block,.bpm-row,.note-row,.fold-bpm,#tap,#countBtn,#scoreBtn,#shareBtn,#flashBtn){opacity:.45;pointer-events:none}
 /* the timing banner: its own slim section between Tempo and the wheel, so the hand never
    covers it; shown only during and after a run. No numbers anywhere but the loop count. */
 .along-sec{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:10px 14px 12px;margin-bottom:18px}
@@ -1306,11 +1314,11 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
        tap: the centre is the beat, left early, right late, the lighter middle third the pocket. -->
   <section class="along-sec" id="alongSec" hidden>
     <div class="along-row">
-      <span class="lbl along-lbl">Play along</span>
+      <span class="lbl along-lbl">Precision</span>
       <span class="along-word" id="alongWord" data-kind=""></span>
       <span class="along-star" id="alongStar" hidden aria-label="Precision star">&#9733;</span>
       <span class="along-loops mono" id="alongLoops"></span>
-      <button class="icobtn" id="alongX" title="Close" aria-label="Close the timing banner">&times;</button>
+      <button class="icobtn" id="alongX" title="Close" aria-label="Close the precision banner">&times;</button>
     </div>
     <canvas id="alongCv" height="46" aria-label="Your taps: early to the left, late to the right"></canvas>
     <div class="along-ends"><span>early</span><span>the beat</span><span>late</span></div>
@@ -1329,7 +1337,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         <button class="icobtn chal-head-x" id="gameWin" hidden title="Cheat: clear this level now" aria-label="Clear this level now">&#9733;</button>
         <button class="icobtn" id="flashBtn" data-on="0" aria-pressed="false" title="Flash the screen's edge on ring 1's beats" aria-label="Beat flash"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L5 14h6l-1 8 9-13h-6l0-7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
         <!-- Play along (v167): tap with the wheel and see the timing, nothing fails -->
-        <button class="icobtn" id="alongBtn" data-on="0" aria-pressed="false" title="Play along: tap with the wheel and see your timing" aria-label="Play along"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg></button>
+        <button class="icobtn pulse-host" id="alongBtn" data-on="0" aria-pressed="false" title="Precision: play along and see your timing" aria-label="Precision"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="13" width="3.2" height="7.5" rx="1" fill="currentColor"/><rect x="8.4" y="7.5" width="3.2" height="13" rx="1" fill="currentColor"/><rect x="13.3" y="3.5" width="3.2" height="17" rx="1" fill="currentColor"/><rect x="18.2" y="10.5" width="3.2" height="10" rx="1" fill="currentColor"/></svg></button>
       <button class="icobtn" id="shareBtn" title="Share a clip of the wheel as audio" aria-label="Share a clip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="6" cy="12" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="19" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8.1 10.8l7.8-4.6M8.1 13.2l7.8 4.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
       </div>
       <!-- Two fingers (v142): the wheel box is two tap areas while such a game runs -
@@ -1783,7 +1791,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v167"></script>
+<script src="./app.js?v=v168"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1796,8 +1804,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v167";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-16 14:05";          /* and when it was built, for ?diag */
+  var BUILD = "v168";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-16 15:19";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

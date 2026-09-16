@@ -327,16 +327,20 @@ input[type=range]::-moz-range-thumb{
 #stageX{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));width:28px;height:28px;border-radius:8px;align-self:center}   /* by id: .icobtn, declared later, out-ranked the class */
 :root[data-stage="1"] #stageX{grid-column:7}   /* the rightmost place: Share's column, free on stage (v173) */
 .stage-bpm-row{display:flex;align-items:center;justify-content:space-between;gap:14px}
-.stage-bpm{display:flex;align-items:baseline;justify-content:center;flex:1 1 auto;min-width:0}
-.stage-num{font-size:clamp(64px,19vh,150px);font-size:clamp(64px,19lvh,150px);font-weight:500;line-height:.9;letter-spacing:-.04em;color:var(--ink)}
-.stage-unit{font-size:12px;letter-spacing:.16em;color:var(--ink-3);font-weight:600;margin-left:10px}
-.stage-jump{width:64px;height:64px;font-size:18px;border-radius:16px;flex:none}
+.stage-bpm{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1 1 auto;min-width:0;gap:2px}   /* v177: BPM under the number, so the row is the digits and the two buttons */
+/* v177 (Oscar: three digits overlapped the -5 button): the size is the smaller of a fifth of
+   the height and what the width leaves beside the two buttons - 3 tabular digits are 1.8 em,
+   the row keeps 2 x 56 px buttons, 2 x 14 px gaps and the page's 40 px of padding */
+.stage-num{font-size:min(clamp(44px,19vh,150px),calc((100vw - 190px) / 1.85));font-size:min(clamp(44px,19lvh,150px),calc((100vw - 190px) / 1.85));font-weight:500;line-height:.9;letter-spacing:-.04em;color:var(--ink);white-space:nowrap}
+.stage-unit{font-size:12px;letter-spacing:.16em;color:var(--ink-3);font-weight:600}
+.stage-jump{width:56px;height:56px;font-size:17px;border-radius:14px;flex:none}
 /* a wide landscape screen (a tablet, a phone on its side): the wheel fills the height on
    the left, the tempo column stands on the right */
 @media (min-width:600px) and (orientation:landscape){
   :root[data-stage="1"] .stage{grid-template-columns:minmax(0,1fr) minmax(240px,36%);align-items:center;gap:20px}
   :root[data-stage="1"] #stageBar{order:2}
   :root[data-stage="1"] .stage-bpm-row{flex-direction:column;gap:18px}
+  :root[data-stage="1"] .stage-num{font-size:min(clamp(44px,19vh,150px),calc((36vw - 60px) / 1.85));font-size:min(clamp(44px,19lvh,150px),calc((36vw - 60px) / 1.85))}   /* the tempo column is 36 % wide */
   :root[data-stage="1"] .canvas-hold{max-width:min(100%,max(220px,calc(100vh - 130px)));max-width:min(100%,max(220px,calc(100lvh - 130px)))}
 }
 .dial{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px 18px 18px}
@@ -1839,7 +1843,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v176"></script>
+<script src="./app.js?v=v177"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1852,8 +1856,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v176";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-16 17:23";          /* and when it was built, for ?diag */
+  var BUILD = "v177";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-16 18:06";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -309,6 +309,35 @@ input[type=range]::-moz-range-thumb{
 }
 
 .stage{display:grid;grid-template-columns:minmax(0,1fr) 342px;gap:18px;align-items:start}
+/* Stage mode (v172, Oscar: "without glasses the numbers and the dots are hard to see"):
+   one screen with the wheel as big as it fits, the tempo in very big digits, and nothing
+   else. A view, not a setting - the app always opens in the normal view. */
+.btn.mode[data-on="1"]{border-color:var(--c2);color:var(--ink);background:color-mix(in srgb,var(--c2) 15%,transparent)}
+:root[data-stage="1"] .wrap{max-width:none;padding-top:calc(12px + env(safe-area-inset-top, 0px))}
+:root[data-stage="1"] .wrap > :not(.stage){display:none}
+:root[data-stage="1"] .stage{grid-template-columns:minmax(0,1fr);gap:12px}
+:root[data-stage="1"] #rack{display:none}
+:root[data-stage="1"] #stageBar{display:flex;flex-direction:column;justify-content:center;gap:10px;order:-1;padding:4px 2px}
+:root[data-stage="1"] .canvas-hold{max-width:min(100%,max(220px,calc(100vh - 260px)));max-width:min(100%,max(220px,calc(100lvh - 260px)))}   /* the floor: a short viewport must not collapse the wheel */
+:root[data-stage="1"] .play{width:clamp(70px,30%,150px)}
+:root[data-stage="1"] :is(#scoreBtn,#shareBtn,#alongBtn,.hint){display:none}
+:root[data-stage="1"] #dialRatio{font-size:24px}
+:root[data-stage="1"] .dial-foot{min-height:44px;margin-top:12px}
+:root[data-stage="1"] :is(#sessNowIn,#tapNowIn,#beatNowIn){font-size:30px}
+.stage-x{color:var(--ink-3)}
+.stage-bpm-row{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.stage-bpm{display:flex;align-items:baseline;justify-content:center;flex:1 1 auto;min-width:0}
+.stage-num{font-size:clamp(64px,19vh,150px);font-size:clamp(64px,19lvh,150px);font-weight:500;line-height:.9;letter-spacing:-.04em;color:var(--ink)}
+.stage-unit{font-size:12px;letter-spacing:.16em;color:var(--ink-3);font-weight:600;margin-left:10px}
+.stage-jump{width:64px;height:64px;font-size:18px;border-radius:16px;flex:none}
+/* a wide landscape screen (a tablet, a phone on its side): the wheel fills the height on
+   the left, the tempo column stands on the right */
+@media (min-width:600px) and (orientation:landscape){
+  :root[data-stage="1"] .stage{grid-template-columns:minmax(0,1fr) minmax(240px,36%);align-items:center;gap:20px}
+  :root[data-stage="1"] #stageBar{order:2}
+  :root[data-stage="1"] .stage-bpm-row{flex-direction:column;gap:18px}
+  :root[data-stage="1"] .canvas-hold{max-width:min(100%,max(220px,calc(100vh - 130px)));max-width:min(100%,max(220px,calc(100lvh - 130px)))}
+}
 .dial{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px 18px 18px}
 .dial{position:relative}
 /* Three fixed columns with the name in the middle one: the two 1fr sides are
@@ -1237,6 +1266,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <h1>Polyorbit <span class="sub">Polyrhythm metronome</span></h1>
     <div class="np-right">
       <button class="btn mode" id="uiBtn">Advanced</button>
+      <!-- Stage mode (v172): the wheel and the tempo, big, nothing else -->
+      <button class="btn mode" id="stageBtn" data-on="0" title="Stage: the wheel and the tempo, big">Stage</button>
       <button class="info" id="infoBtn" title="How this works" aria-label="How this works">i</button>
       <button class="btn skin" id="skin" title="Switch skin">
         <svg id="skinIcon" viewBox="0 0 24 24" aria-hidden="true"></svg>
@@ -1339,6 +1370,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         <!-- the score is what the wheel writes out, so its button lives on the wheel -->
         <button class="icobtn score-ico" id="scoreBtn" title="Write it out as notation" aria-label="Score"><svg class="note" viewBox="0 0 22 30" aria-hidden="true"><ellipse cx="8" cy="22.5" rx="5.4" ry="3.7" transform="rotate(-22 8 22.5)" fill="currentColor"/><path d="M12.9 21.6V3.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M12.9 3.5c3.6 2.2 6 5.2 4.4 10.2" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg></button>
         <button class="icobtn chal-head-x" id="gameX" hidden title="Leave the game" aria-label="Leave the game">&times;</button>
+        <button class="icobtn chal-head-x stage-x" id="stageX" hidden title="Leave stage mode" aria-label="Leave stage mode">&times;</button>
         <!-- editor cheat (v154): clear the level at once, with the attempts as they stand -->
         <button class="icobtn chal-head-x" id="gameWin" hidden title="Cheat: clear this level now" aria-label="Clear this level now">&#9733;</button>
         <button class="icobtn" id="flashBtn" data-on="0" aria-pressed="false" title="Flash the screen's edge on ring 1's beats" aria-label="Beat flash"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L5 14h6l-1 8 9-13h-6l0-7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
@@ -1379,6 +1411,15 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </section>
 
     <section class="rack" id="rack"></section>
+    <!-- Stage mode (v172): the tempo in big digits, above the wheel on a phone, beside it on
+         a wide landscape screen. The buttons drive the Tempo section's own -5 / +5. -->
+    <div class="stage-bar" id="stageBar" hidden>
+      <div class="stage-bpm-row">
+        <button class="jump wide stage-jump" id="stDown" aria-label="Tempo down 5">&minus;5</button>
+        <div class="stage-bpm"><span class="stage-num mono" id="stBpm">96</span><span class="stage-unit">BPM</span></div>
+        <button class="jump wide stage-jump" id="stUp" aria-label="Tempo up 5">+5</button>
+      </div>
+    </div>
   </div>
 
   <section class="presets foldsec" id="sessionPanel">
@@ -1797,7 +1838,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v171"></script>
+<script src="./app.js?v=v172"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1810,8 +1851,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v171";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-16 15:51";          /* and when it was built, for ?diag */
+  var BUILD = "v172";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-16 16:32";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

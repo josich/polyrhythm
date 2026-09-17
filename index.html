@@ -401,6 +401,7 @@ input[type=range]::-moz-range-thumb{
 .along-hist{margin:6px 0 0;font-size:11px;color:var(--ink-3);text-align:center;letter-spacing:.02em}
 .along-hist b{color:var(--ink-2);font-weight:500}
 #alongCv{display:block;width:100%;height:46px;margin-top:8px;border-radius:8px;background:var(--sunk);border:1px solid var(--line)}
+#alongSec[data-two="1"] #alongCv{background:transparent;border-color:transparent}   /* v181: two boxes of its own, drawn on the canvas */
 .along-ends{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-top:5px;padding:0 2px}
 .along-ends span:nth-child(2){color:var(--c2)}
 #shareBtn:not(:disabled){border-color:var(--c2)}
@@ -1847,7 +1848,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v180"></script>
+<script src="./app.js?v=v181"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1860,8 +1861,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v180";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-17 09:50";          /* and when it was built, for ?diag */
+  var BUILD = "v181";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-17 09:57";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

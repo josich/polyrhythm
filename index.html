@@ -700,6 +700,7 @@ input[type=range]::-moz-range-thumb{
 .lvl-row .meta .stars.none{color:var(--line-2)}
 .lvl-row .meta .k{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-left:4px}
 .lvl-row .meta .num{font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:700;color:var(--c1);margin-left:-2px}
+.lvl-row .meta .stick{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.02em;color:var(--ink-2)}   /* a rudiment's sticking (v198) */
 .lvl-lbl{margin:4px 0 10px;font-size:12.5px}
 .lvl-note{font-size:11.5px;color:var(--ink-3);margin:8px 0 0}
 .lvl-note:empty{display:none}
@@ -1602,6 +1603,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <button class="tab" data-ptab="mine" data-on="1">Presets</button>
       <button class="tab" data-ptab="rhythms" data-on="0">Rhythms</button>
       <button class="tab" data-ptab="classic" data-on="0">Classic ratios</button>
+      <button class="tab" data-ptab="rudiments" data-on="0">Rudiments</button>
     </div>
 
     <div class="pane" data-pane="mine">
@@ -1623,6 +1625,12 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <div class="pane" data-pane="classic" hidden>
       <!-- the classic ratios as rows, the same box as the levels (Oscar, v114) -->
       <div class="lvl-list rlist" id="pgrid"></div>
+    </div>
+
+    <div class="pane" data-pane="rudiments" hidden>
+      <!-- drum rudiments as two-hand wheels (Oscar, v198): ring 1 the right hand, ring 2 the left -->
+      <div class="lvl-list rlist" id="rudgrid"></div>
+      <p class="empty">Ring 1 is the right hand, ring 2 the left. A grace note is a plain stroke just before its accented main stroke.</p>
     </div>
 
     <div class="keys">
@@ -1952,7 +1960,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v197"></script>
+<script src="./app.js?v=v198"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1965,8 +1973,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v197";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-17 16:51";          /* and when it was built, for ?diag */
+  var BUILD = "v198";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-17 17:14";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

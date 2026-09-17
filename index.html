@@ -427,7 +427,24 @@ input[type=range]::-moz-range-thumb{
 .along-pct[data-cmp="same"]{color:var(--c1)}   /* within a point */
 .along-hist{margin:6px 0 0;font-size:11px;color:var(--ink-3);text-align:center;letter-spacing:.02em}
 .along-tgt{display:flex;align-items:center;gap:6px;margin-top:8px}
-.along-tgt .k{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-right:2px}
+.along-tgt .k{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-right:2px;min-width:44px}
+.along-tgt{flex-wrap:wrap}
+.along-tgt .hands-row{display:flex;align-items:center;gap:6px;width:100%}
+#alongBtn[data-on="2"]{border-color:var(--c2);background:color-mix(in srgb,var(--c2) 15%,transparent);color:var(--c2)}   /* armed: the banner is open, the next press starts (v193) */
+/* the results card (v193) */
+.along-card{max-width:380px}
+.along-card .chal-kicker{font-size:clamp(26px,7vw,34px);color:var(--c2)}
+.along-card-pct{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;font-size:64px;font-weight:500;line-height:1;letter-spacing:-.03em;margin:10px 0 2px;color:var(--ink)}
+.along-card-pct[data-cmp="up"]{color:var(--c2)}
+.along-card-pct[data-cmp="down"]{color:var(--c3)}
+.along-card-pct[data-cmp="same"]{color:var(--c1)}
+.along-card-word{font-family:var(--title);font-stretch:110%;font-weight:600;font-size:18px;margin:0 0 12px;color:var(--ink-2)}
+.along-card-word .star{color:var(--c1);margin-left:6px}
+.along-card-line{margin:4px 0;font-size:14px;color:var(--ink-2)}
+.along-card-line:empty{display:none}
+.along-card-line b{color:var(--ink)}
+.along-card-line.bench{color:var(--ink-3);font-size:13px;margin-bottom:16px}
+.along-card .ask-btns .btn.lead{border-color:var(--c2);color:var(--ink)}
 .along-tgt button{border:1px solid var(--line-2);background:var(--sunk);color:var(--ink-3);border-radius:8px;padding:3px 9px;font-size:11px;font-weight:600;font-family:inherit;cursor:pointer}
 .along-tgt button[data-on="1"]{border-color:var(--lc,var(--c2));color:var(--ink);background:color-mix(in srgb,var(--lc,var(--c2)) 16%,transparent)}
 .along-hist b{color:var(--ink-2);font-weight:500}
@@ -1723,6 +1740,21 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   <div class="coach-txt"><div class="t" id="coachT"></div><div class="d" id="coachD"></div></div>
   <button type="button" class="btn sm" id="coachOk">Got it</button>
 </div>
+<!-- Precision results (v193): a card at the end of a run, the figures big, Run again / Close -->
+<div class="modal ask-modal" id="alongModal" hidden>
+  <div class="sheet ask-sheet along-card" role="dialog" aria-modal="true" aria-labelledby="alongCardK">
+    <p class="chal-kicker" id="alongCardK">PRECISION</p>
+    <div class="along-card-pct" id="alongCardPct">0 %</div>
+    <div class="along-card-word" id="alongCardWord"></div>
+    <p class="along-card-line" id="alongCardCover"></p>
+    <p class="along-card-line" id="alongCardHands"></p>
+    <p class="along-card-line bench" id="alongCardBench"></p>
+    <div class="ask-btns">
+      <button type="button" class="btn" id="alongCardClose">Close</button>
+      <button type="button" class="btn lead" id="alongCardAgain">Run again</button>
+    </div>
+  </div>
+</div>
 <div class="modal ask-modal" id="askModal" hidden>
   <div class="sheet ask-sheet" role="alertdialog" aria-modal="true" aria-labelledby="askTitle" aria-describedby="askText">
     <div class="chal-brand"><svg viewBox="0 0 512 512" width="22" height="22" aria-hidden="true"><path d="M256 256L256 56 A200 200 0 1 1 82.8 156.0 Z" fill="var(--ink)" opacity=".12"/><circle cx="256" cy="256" r="200" fill="none" stroke="var(--line-2)" stroke-width="10"/><path d="M256 256L70.7 149.0" stroke="var(--ink)" stroke-width="7" stroke-linecap="round"/><circle cx="256.0" cy="56.0" r="30" fill="var(--c1)"/><circle cx="456.0" cy="256.0" r="26" fill="var(--c2)"/><circle cx="256.0" cy="456.0" r="26" fill="var(--c2)"/><circle cx="56.0" cy="256.0" r="26" fill="var(--c2)"/><circle cx="256" cy="256" r="26" fill="var(--ink)"/></svg><span id="askTitle">Polyorbit</span></div>
@@ -1910,7 +1942,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v192"></script>
+<script src="./app.js?v=v193"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1923,8 +1955,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v192";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-17 15:23";          /* and when it was built, for ?diag */
+  var BUILD = "v193";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-17 15:52";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

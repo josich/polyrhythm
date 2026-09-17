@@ -396,7 +396,9 @@ input[type=range]::-moz-range-thumb{
 .along-star[data-on="1"]{color:var(--c1)}
 #alongTwo svg{width:16px;height:16px;display:block}
 #alongTwo[data-on="1"]{border-color:var(--c2);color:var(--c2);background:color-mix(in srgb,var(--c2) 15%,transparent)}
-.along-pct{font-size:15px;font-weight:600;color:var(--ink-2);margin-left:auto}
+.along-pct{font-size:15px;font-weight:600;color:var(--ink-2);white-space:nowrap}
+.along-btns{margin-left:auto;display:flex;gap:8px;flex:none}   /* the buttons keep their place (v184) */
+.along-word{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .along-pct[data-cmp="up"]{color:var(--c2)}     /* better than the benchmark */
 .along-pct[data-cmp="down"]{color:var(--c3)}   /* worse */
 .along-pct[data-cmp="same"]{color:var(--c1)}   /* within a point */
@@ -1363,8 +1365,10 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <span class="along-star" id="alongStar" hidden aria-label="Precision star">&#9733;</span>
       <span class="along-pct mono" id="alongPct" hidden></span>
       <!-- v179: Two fingers - ring 1 on the right, ring 2 on the left, one histogram half per hand -->
-      <button class="icobtn" id="alongTwo" data-on="0" hidden title="Two fingers: ring 1 on the right, ring 2 on the left" aria-label="Two fingers" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-hand"/></svg></button>
-      <button class="icobtn" id="alongX" title="Close" aria-label="Close the precision banner">&times;</button>
+      <span class="along-btns"><!-- v184: pinned to the right whatever the row shows, so the icons never move -->
+        <button class="icobtn" id="alongTwo" data-on="0" hidden title="Two fingers: ring 1 on the right, ring 2 on the left" aria-label="Two fingers" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-hand"/></svg></button>
+        <button class="icobtn" id="alongX" title="Close" aria-label="Close the precision banner">&times;</button>
+      </span>
     </div>
     <canvas id="alongCv" height="46" aria-label="Your taps: early to the left, late to the right"></canvas>
     <div class="along-ends"><span>early</span><span>the beat</span><span>late</span></div>
@@ -1849,7 +1853,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v183"></script>
+<script src="./app.js?v=v184"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1862,8 +1866,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v183";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-17 11:01";          /* and when it was built, for ?diag */
+  var BUILD = "v184";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-17 11:10";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

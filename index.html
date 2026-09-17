@@ -381,7 +381,7 @@ input[type=range]::-moz-range-thumb{
    Precision button is the one way to stop. */
 :root[data-along="1"] .play{display:none}
 :root[data-along="1"] canvas{cursor:pointer}
-:root[data-along="1"] :is(#rack,#sessionPanel,#seqPanel,#patPanel,#tapPanel,.bpm-block,.bpm-row,.note-row,.fold-bpm,#tap,#countBtn,#scoreBtn,#shareBtn,#flashBtn){opacity:.45;pointer-events:none}
+:root[data-along="1"] :is(#rack,#sessionPanel,#seqPanel,#patPanel,#tapPanel,.bpm-block,.bpm-row,.note-row,.fold-bpm,#tap,#countBtn){opacity:.45;pointer-events:none}
 /* the timing banner: its own slim section between Tempo and the wheel, so the hand never
    covers it; shown only during and after a run. No numbers anywhere but the loop count. */
 .along-sec{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:10px 14px 12px;margin-bottom:18px}
@@ -663,6 +663,10 @@ input[type=range]::-moz-range-thumb{
    for one cross that leaves (Oscar, v109: the Game button was off screen) */
 .chal-head-x[hidden]{display:none}
 #gameX{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
+#alongStop{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));grid-column:4 / -1;justify-self:end}   /* v195: spans the icon columns, sits at the right corner */
+:root[data-along="1"] :is(#scoreBtn,#shareBtn,#flashBtn,#alongBtn){display:none}   /* a run: the head is the ratio and the cross, as in a game (v195) */
+:root[data-stage="1"] #alongStop{display:none}
+:root[data-along="2"] .play,:root[data-along="2"] .play:hover{opacity:.95;background:var(--c2);border-color:var(--c2);color:var(--ground)}   /* ready: the centre press starts the run (v195) */
 #gameWin{color:var(--c1);border-color:color-mix(in srgb,var(--c1) 45%,var(--line));font-size:13px}   /* editor cheat (v154) */
 :is(:root[data-game="1"],:root[data-chal="1"]) :is(#scoreBtn,#shareBtn,#flashBtn,#alongBtn){display:none}
 /* the card arrives with a small pop; a pressed button bounces and flashes its ring
@@ -1442,6 +1446,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         <button class="icobtn chal-head-x stage-x" id="stageX" hidden title="Leave stage mode" aria-label="Leave stage mode">&times;</button>
         <!-- editor cheat (v154): clear the level at once, with the attempts as they stand -->
         <button class="icobtn chal-head-x" id="gameWin" hidden title="Cheat: clear this level now" aria-label="Clear this level now">&#9733;</button>
+        <!-- Precision (v195): the run's one stop, at the head's right corner; the hub starts it -->
+        <button class="icobtn chal-head-x" id="alongStop" hidden title="Stop the Precision run" aria-label="Stop the Precision run">&times;</button>
         <button class="icobtn" id="flashBtn" data-on="0" aria-pressed="false" title="Flash the screen's edge on ring 1's beats" aria-label="Beat flash"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L5 14h6l-1 8 9-13h-6l0-7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
         <!-- Play along (v167): tap with the wheel and see the timing, nothing fails -->
         <button class="icobtn pulse-host" id="alongBtn" data-on="0" aria-pressed="false" title="Precision: play along and see your timing" aria-label="Precision"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="13" width="3.2" height="7.5" rx="1" fill="currentColor"/><rect x="8.4" y="7.5" width="3.2" height="13" rx="1" fill="currentColor"/><rect x="13.3" y="3.5" width="3.2" height="17" rx="1" fill="currentColor"/><rect x="18.2" y="10.5" width="3.2" height="10" rx="1" fill="currentColor"/></svg></button>
@@ -1943,7 +1949,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v194"></script>
+<script src="./app.js?v=v195"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1956,8 +1962,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v194";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-17 16:05";          /* and when it was built, for ?diag */
+  var BUILD = "v195";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-17 16:20";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

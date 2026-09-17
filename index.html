@@ -426,6 +426,10 @@ input[type=range]::-moz-range-thumb{
 .along-pct[data-cmp="down"]{color:var(--c3)}   /* worse */
 .along-pct[data-cmp="same"]{color:var(--c1)}   /* within a point */
 .along-hist{margin:6px 0 0;font-size:11px;color:var(--ink-3);text-align:center;letter-spacing:.02em}
+.along-tgt{display:flex;align-items:center;gap:6px;margin-top:8px}
+.along-tgt .k{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-right:2px}
+.along-tgt button{border:1px solid var(--line-2);background:var(--sunk);color:var(--ink-3);border-radius:8px;padding:3px 9px;font-size:11px;font-weight:600;font-family:inherit;cursor:pointer}
+.along-tgt button[data-on="1"]{border-color:var(--lc,var(--c2));color:var(--ink);background:color-mix(in srgb,var(--lc,var(--c2)) 16%,transparent)}
 .along-hist b{color:var(--ink-2);font-weight:500}
 #alongCv{display:block;width:100%;height:46px;margin-top:8px;border-radius:8px;background:var(--sunk);border:1px solid var(--line)}
 #alongSec[data-two="1"] #alongCv{background:transparent;border-color:transparent}   /* v181: two boxes of its own, drawn on the canvas */
@@ -1393,6 +1397,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         <button class="icobtn" id="alongX" title="Close" aria-label="Close the precision banner">&times;</button>
       </span>
     </div>
+    <!-- v192: what a tap is judged against - the whole pattern, or one ring (the pulse) -->
+    <div class="along-tgt" id="alongTgt" hidden></div>
     <canvas id="alongCv" height="46" aria-label="Your taps: early to the left, late to the right"></canvas>
     <div class="along-ends"><span>early</span><span>the beat</span><span>late</span></div>
     <!-- v171: the run's score against this pattern's own history (same content, same tempo) -->
@@ -1904,7 +1910,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v191"></script>
+<script src="./app.js?v=v192"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1917,8 +1923,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v191";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-17 15:00";          /* and when it was built, for ?diag */
+  var BUILD = "v192";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-17 15:23";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -398,6 +398,9 @@ input[type=range]::-moz-range-thumb{
 #alongTwo[data-on="1"]{border-color:var(--c2);color:var(--c2);background:color-mix(in srgb,var(--c2) 15%,transparent)}
 .along-pct{font-size:15px;font-weight:600;color:var(--ink-2);white-space:nowrap}
 .along-btns{margin-left:auto;display:flex;gap:8px;flex:none}   /* the buttons keep their place (v184) */
+#alongFlash{position:absolute;inset:-1px;border-radius:14px;pointer-events:none;opacity:0;z-index:4;
+  border:3px solid var(--c2);box-shadow:0 0 0 5px color-mix(in srgb,var(--c2) 35%,transparent)}
+#beatNowIn .lp{color:var(--c2);font-weight:600}   /* the loop count, teal once the benchmark's length is passed (v185) */
 .along-word{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .along-pct[data-cmp="up"]{color:var(--c2)}     /* better than the benchmark */
 .along-pct[data-cmp="down"]{color:var(--c3)}   /* worse */
@@ -1378,6 +1381,9 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   <div class="stage">
     <section class="dial">
+      <!-- Precision (v185): the section's edge flashes teal once the run has passed the
+           benchmark's length - an opacity layer, never an animated border -->
+      <div id="alongFlash" aria-hidden="true"></div>
       <div class="dial-head">
         <span class="metric mono" id="dialRatio">4 : 3</span>
         <span class="metric sub mono pat" id="dialPat" hidden></span>
@@ -1853,7 +1859,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v184"></script>
+<script src="./app.js?v=v185"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1866,8 +1872,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v184";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-17 11:10";          /* and when it was built, for ?diag */
+  var BUILD = "v185";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-17 11:19";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

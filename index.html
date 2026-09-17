@@ -445,6 +445,7 @@ input[type=range]::-moz-range-thumb{
 .along-card-line b{color:var(--ink)}
 .along-card-line.bench{color:var(--ink-3);font-size:13px;margin-bottom:16px}
 .along-card .ask-btns .btn.lead{border-color:var(--c2);color:var(--ink)}
+.along-card .ask-btns #alongCardClose{border-color:var(--c3);color:var(--ink)}
 .along-tgt button{border:1px solid var(--line-2);background:var(--sunk);color:var(--ink-3);border-radius:8px;padding:3px 9px;font-size:11px;font-weight:600;font-family:inherit;cursor:pointer}
 .along-tgt button[data-on="1"]{border-color:var(--lc,var(--c2));color:var(--ink);background:color-mix(in srgb,var(--lc,var(--c2)) 16%,transparent)}
 .along-hist b{color:var(--ink-2);font-weight:500}
@@ -1942,7 +1943,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v193"></script>
+<script src="./app.js?v=v194"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1955,8 +1956,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v193";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-17 15:52";          /* and when it was built, for ?diag */
+  var BUILD = "v194";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-17 16:05";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -967,7 +967,8 @@ canvas{
 .ring-card[data-rec="1"] .sub-btns,
 .ring-card[data-rec="1"] input[data-div],
 .ring-card[data-rec="1"] .off-head,
-.ring-card[data-rec="1"] input[data-off]{opacity:.32; pointer-events:none}
+.ring-card[data-rec="1"] input[data-off],
+.ring-card[data-rec="1"] input[data-swing]{opacity:.32; pointer-events:none}
 .ring-card[data-rec="1"] .div-num{color:var(--lc)}
 .rc-top{display:flex;align-items:center;gap:8px;margin-bottom:9px}
 .rc-top .spacer{margin-left:auto}
@@ -1012,7 +1013,7 @@ canvas{
 .ring-card .btn.perbtn[data-on="1"]{border-color:var(--lc);color:var(--panel);background:var(--lc)}   /* the ring's colour, not the generic teal (v209) */
 /* the Each-beat mode: everything but this ring's dots, its xN buttons and the toggle steps back */
 :root[data-perbeat="1"] :is(.bpm-block,.bpm-row,.note-row,.fold-bpm,#tap,#countBtn,#sessionPanel,#seqPanel,#patPanel,#tapPanel,#alongSec,#scoreBtn,#shareBtn,#flashBtn,#alongBtn,#rack .tabs .tab:not([data-active="1"])){opacity:.35;pointer-events:none}   /* the mode's own tab stays live: it folds and unfolds the card (v208) */
-.ring-card[data-pbmode="1"] :is(.rc-top,.div-row,input[data-div],.tap-row,.off-head,input[data-off],.grid2){opacity:.32;pointer-events:none}
+.ring-card[data-pbmode="1"] :is(.rc-top,.div-row,input[data-div],.tap-row,.off-head,input[data-off],input[data-swing],.grid2){opacity:.32;pointer-events:none}
 .subbtn{
   width:29px;height:25px;flex:none;border-radius:7px;cursor:pointer;
   border:1px solid var(--line);background:var(--sunk);color:var(--ink-3);
@@ -1960,6 +1961,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <li><b>Divisions</b> per rotation.</li>
       <li>&times;2 to &times;6 <b>subdivide</b> every beat. <b>Each beat</b> gives one beat its own: tap a beat on the wheel, then a &times; button.</li>
       <li><b>Offset</b> nudges the ring off the beat.</li>
+      <li><b>Swing</b> slides the off-beats later, from straight to a triplet feel (Advanced, on &times;2, &times;4 or &times;6).</li>
       <li>Each ring has its own <b>sound</b>, level and mute.</li>
       <li><b>Tap pattern</b> creates the beats as you play them.</li>
     </ul>
@@ -2001,7 +2003,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v209"></script>
+<script src="./app.js?v=v210"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2014,8 +2016,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v209";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-18 15:31";          /* and when it was built, for ?diag */
+  var BUILD = "v210";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-18 15:57";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

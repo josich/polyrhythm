@@ -847,9 +847,9 @@ canvas{
 .pulse-host{position:relative}
 .pulse-host::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
   box-shadow:0 0 0 4px color-mix(in srgb,var(--pc,var(--c3)) 45%,transparent);opacity:0}
-.pulse-host[data-on="1"]::after,.ach-row[data-fresh="1"]::after{animation:pulseFade 1.8s ease-in-out infinite;will-change:opacity}
+.pulse-host[data-on="1"]:not(.tab)::after,.pulse-host[data-pulse="1"]::after,.ach-row[data-fresh="1"]::after{animation:pulseFade 1.8s ease-in-out infinite;will-change:opacity}   /* a ring tab's data-on is its selected state, so its pulse is data-pulse only */   /* data-pulse: hosts whose data-on means something else, the ring tabs (v208) */
 @keyframes pulseFade{0%,100%{opacity:0}50%{opacity:1}}
-@media (prefers-reduced-motion:reduce){ .pulse-host[data-on="1"]::after,.ach-row[data-fresh="1"]::after{animation:none;opacity:.6} }
+@media (prefers-reduced-motion:reduce){ .pulse-host[data-on="1"]:not(.tab)::after,.pulse-host[data-pulse="1"]::after,.ach-row[data-fresh="1"]::after{animation:none;opacity:.6} }
 /* the tempo numbers jump on a tap (bpmPop): transforms need a box, and the jump
    must paint over its neighbours */
 #bpmNum,#fbNum,#tapNowBpm{display:inline-block;transform-origin:center;position:relative}
@@ -1006,9 +1006,10 @@ canvas{
 .sub-btns{display:flex;gap:4px;flex:none}
 .sub-row{display:flex;align-items:center;gap:8px;margin-top:9px}   /* v207: subdivisions on their own row */
 .sub-row .lbl{margin-right:auto}
+.perbtn{--pc:var(--lc)}                                            /* its pulse is the .pulse-host layer (v208) */
 .perbtn[data-on="1"]{border-color:var(--lc);color:var(--ink);background:color-mix(in srgb,var(--lc) 16%,transparent)}
 /* the Each-beat mode: everything but this ring's dots, its xN buttons and the toggle steps back */
-:root[data-perbeat="1"] :is(.bpm-block,.bpm-row,.note-row,.fold-bpm,#tap,#countBtn,#sessionPanel,#seqPanel,#patPanel,#tapPanel,#alongSec,#scoreBtn,#shareBtn,#flashBtn,#alongBtn,#rack .tabs){opacity:.35;pointer-events:none}
+:root[data-perbeat="1"] :is(.bpm-block,.bpm-row,.note-row,.fold-bpm,#tap,#countBtn,#sessionPanel,#seqPanel,#patPanel,#tapPanel,#alongSec,#scoreBtn,#shareBtn,#flashBtn,#alongBtn,#rack .tabs .tab:not([data-active="1"])){opacity:.35;pointer-events:none}   /* the mode's own tab stays live: it folds and unfolds the card (v208) */
 .ring-card[data-pbmode="1"] :is(.rc-top,.div-row,input[data-div],.tap-row,.off-head,input[data-off],.grid2){opacity:.32;pointer-events:none}
 .subbtn{
   width:29px;height:25px;flex:none;border-radius:7px;cursor:pointer;
@@ -1998,7 +1999,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v207"></script>
+<script src="./app.js?v=v208"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2011,8 +2012,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v207";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-18 14:45";          /* and when it was built, for ?diag */
+  var BUILD = "v208";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-18 15:01";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

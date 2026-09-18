@@ -456,6 +456,10 @@ input[type=range]::-moz-range-thumb{
 #alongSec[data-two="1"] #alongCv{background:transparent;border-color:transparent}   /* v181: two boxes of its own, drawn on the canvas */
 .along-ends{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-top:5px;padding:0 2px}
 .along-ends span:nth-child(2){color:var(--c2)}
+.along-ends b{font-weight:700;color:var(--ink-2)}   /* a hand's word under its box (v201) */
+.along-ends b[data-kind="tight"]{color:var(--c2)}
+.along-ends b[data-kind="rush"],.along-ends b[data-kind="drag"]{color:var(--c1)}
+.along-ends b[data-kind="loose"]{color:var(--c3)}
 #shareBtn:not(:disabled){border-color:var(--c2)}
 #shareBtn svg{width:15px;height:15px;display:block}
 .icobtn:disabled{opacity:.4;cursor:default}
@@ -1960,7 +1964,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v200"></script>
+<script src="./app.js?v=v201"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1973,8 +1977,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v200";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-17 17:54";          /* and when it was built, for ?diag */
+  var BUILD = "v201";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-18 11:11";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

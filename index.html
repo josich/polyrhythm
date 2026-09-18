@@ -1585,6 +1585,16 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         <option value="2">every other</option>
         <option value="1">all but first</option>
       </select>
+      <!-- v206: random gaps INSIDE the bar - about 1 in N sounding hits drops out, from the second loop
+           of each pattern on (the review's "speed trainer" point, the half the session did not have) -->
+      <span class="sess-txt sess-gap">Beat gaps</span>
+      <select class="snd sess-sel" id="sGap" aria-label="Random beat gaps">
+        <option value="0">off</option>
+        <option value="8">1 in 8</option>
+        <option value="6">1 in 6</option>
+        <option value="4">1 in 4</option>
+        <option value="3">1 in 3</option>
+      </select>
     </div>
 
     <div class="sess-foot">
@@ -1982,7 +1992,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v205"></script>
+<script src="./app.js?v=v206"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1995,8 +2005,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v205";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-18 12:13";          /* and when it was built, for ?diag */
+  var BUILD = "v206";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-18 13:18";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -1961,7 +1961,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <li><b>Divisions</b> per rotation.</li>
       <li>&times;2 to &times;6 <b>subdivide</b> every beat. <b>Each beat</b> gives one beat its own: tap a beat on the wheel, then a &times; button.</li>
       <li><b>Offset</b> nudges the ring off the beat.</li>
-      <li><b>Swing</b> slides the off-beats later, from straight to a triplet feel (Advanced, on &times;2, &times;4 or &times;6).</li>
+      <li><b>Swing</b> slides the off-beats later, up to a triplet feel, or earlier, to a snap (Advanced, on &times;2, &times;4 or &times;6).</li>
       <li>Each ring has its own <b>sound</b>, level and mute.</li>
       <li><b>Tap pattern</b> creates the beats as you play them.</li>
     </ul>
@@ -2003,7 +2003,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v210"></script>
+<script src="./app.js?v=v211"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2016,8 +2016,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v210";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-18 15:57";          /* and when it was built, for ?diag */
+  var BUILD = "v211";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-18 16:13";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -1003,7 +1003,13 @@ canvas{
   font-size:28px;font-weight:500;line-height:1;width:2.2ch;text-align:right;
 }
 .div-sub{font-size:10px;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;line-height:1.25}
-.sub-btns{margin-left:auto;display:flex;gap:4px;flex:none}
+.sub-btns{display:flex;gap:4px;flex:none}
+.sub-row{display:flex;align-items:center;gap:8px;margin-top:9px}   /* v207: subdivisions on their own row */
+.sub-row .lbl{margin-right:auto}
+.perbtn[data-on="1"]{border-color:var(--lc);color:var(--ink);background:color-mix(in srgb,var(--lc) 16%,transparent)}
+/* the Each-beat mode: everything but this ring's dots, its xN buttons and the toggle steps back */
+:root[data-perbeat="1"] :is(.bpm-block,.bpm-row,.note-row,.fold-bpm,#tap,#countBtn,#sessionPanel,#seqPanel,#patPanel,#tapPanel,#alongSec,#scoreBtn,#shareBtn,#flashBtn,#alongBtn,#rack .tabs){opacity:.35;pointer-events:none}
+.ring-card[data-pbmode="1"] :is(.rc-top,.div-row,input[data-div],.tap-row,.off-head,input[data-off],.grid2){opacity:.32;pointer-events:none}
 .subbtn{
   width:29px;height:25px;flex:none;border-radius:7px;cursor:pointer;
   border:1px solid var(--line);background:var(--sunk);color:var(--ink-3);
@@ -1992,7 +1998,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v206"></script>
+<script src="./app.js?v=v207"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2005,8 +2011,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v206";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-18 13:18";          /* and when it was built, for ?diag */
+  var BUILD = "v207";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-18 14:45";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

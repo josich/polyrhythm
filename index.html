@@ -1263,6 +1263,11 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .lvl-row .ops button[data-seq]{color:var(--c1)}
 .lvl-row .ops button[data-play][data-on="1"]{background:color-mix(in srgb,var(--c2) 18%,transparent);color:var(--ink);border-color:var(--c2)}
 .lvl-row .ops button[data-seq] svg{width:13px;height:13px;vertical-align:-2px}
+/* v204, Oscar: every cross that closes a sheet, leaves a mode or removes something is pink (c3),
+   like the game's and the stage's - the sheets' closes, the banner's, the challenge's, the awards',
+   the ring card's remove, and the x on preset / level / sequence rows */
+#alongX,#chalQuit,#planClose,#scoreClose,#achClose,#shareClose,#helpClose,.icobtn.chal-x,#rack .icobtn[data-del]{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
+.lvl-row .ops button[data-del]{color:var(--c3)}
 .empty{color:var(--ink-3);font-size:12px;margin-top:11px}
 .keys{margin-top:16px;color:var(--ink-3);font-size:11.5px;display:flex;gap:18px;flex-wrap:wrap}
 kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(--line-2);border-bottom-width:2px;border-radius:5px;padding:1px 5px;color:var(--ink-2);background:var(--sunk)}
@@ -1967,7 +1972,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v203"></script>
+<script src="./app.js?v=v204"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -1980,8 +1985,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v203";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-18 11:53";          /* and when it was built, for ?diag */
+  var BUILD = "v204";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-18 11:58";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -1295,8 +1295,9 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .seq-list .lvl-row[data-sel="1"]{border-color:var(--c1);box-shadow:0 0 0 2px color-mix(in srgb,var(--c1) 22%,transparent)}
 /* v213: the panel shows a step's stored settings - the six boxes in orange; a dashed orange once
    they have been changed and not stored again */
-#sessionPanel[data-ramp="1"] :is(#sFrom,#sTo,#sStep,#sPer,#sSil,#sGap){border-color:var(--c1)}
-#sessionPanel[data-ramp="2"] :is(#sFrom,#sTo,#sStep,#sPer,#sSil,#sGap){border-color:var(--c1);border-style:dashed}
+/* v214, Oscar: each box on its own - orange while it shows the value stored on the selected step,
+   plain grey as soon as it differs, orange again once the clock stores it */
+#sessionPanel :is(#sFrom,#sTo,#sStep,#sPer,#sSil,#sGap)[data-kept="1"]{border-color:var(--c1)}
 #sessLink{color:var(--c1);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 #sessLink .btn.sm{font-size:11px;padding:3px 9px}
 #rtOpen{color:var(--c1);font-weight:600;font-size:12.5px;margin:0 0 8px;display:flex;align-items:center;gap:8px}
@@ -2041,7 +2042,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v213"></script>
+<script src="./app.js?v=v214"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2054,8 +2055,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v213";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-19 17:56";          /* and when it was built, for ?diag */
+  var BUILD = "v214";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-19 18:07";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

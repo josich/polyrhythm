@@ -1286,10 +1286,22 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .rt-list:empty{display:none}
 .rt-list .lvl-row[data-on="1"]{border-color:var(--c1)}
 #seqPanel[data-edit="1"] #seqRow{border-color:color-mix(in srgb,var(--c1) 55%,var(--line))}
+.rt-list .lvl-row{grid-template-columns:minmax(0,1fr) auto}   /* v213: no position number, so the name takes the room and the buttons sit right */
+/* v213: the clock on a step lights orange once the step keeps its own settings */
 .lvl-row .ops button[data-ramp][data-on="1"]{color:var(--c1);border-color:var(--c1)}
-.lvl-row .ops button[data-ramp][data-link="1"]{background:color-mix(in srgb,var(--c1) 18%,transparent);color:var(--ink)}
+.lvl-row .ops button[data-ramp] svg{width:13px;height:13px}
 .lvl-row .meta .ramp{color:var(--c1)}
-#sessLink{color:var(--c1)}
+/* v213: the SELECTED step (Oscar): tapped once, orange like a loaded preset; tapped again, plain */
+.seq-list .lvl-row[data-sel="1"]{border-color:var(--c1);box-shadow:0 0 0 2px color-mix(in srgb,var(--c1) 22%,transparent)}
+/* v213: the panel shows a step's stored settings - the six boxes in orange; a dashed orange once
+   they have been changed and not stored again */
+#sessionPanel[data-ramp="1"] :is(#sFrom,#sTo,#sStep,#sPer,#sSil,#sGap){border-color:var(--c1)}
+#sessionPanel[data-ramp="2"] :is(#sFrom,#sTo,#sStep,#sPer,#sSil,#sGap){border-color:var(--c1);border-style:dashed}
+#sessLink{color:var(--c1);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#sessLink .btn.sm{font-size:11px;padding:3px 9px}
+#rtOpen{color:var(--c1);font-weight:600;font-size:12.5px;margin:0 0 8px;display:flex;align-items:center;gap:8px}
+#rtOpen .k{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+#rtSave{border-color:var(--c2);color:var(--ink)}              /* v213: Save is the teal action, like the presets' */
 #psave{border-color:var(--c2);color:var(--ink)}               /* the presets' save is a teal action (v205) */
 /* v205: a pattern just landed in the Sequence - the folded bar blinks twice (the live overlay, opacity
    only) and the new row blinks in place; both stop by themselves */
@@ -1575,7 +1587,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <button class="btn pulse-host" id="sessBtn" data-on="0">Start</button>
     </div>
 
-    <p class="empty sec-help" id="sessLink" hidden></p>
+    <p class="empty sec-help" id="sessLink" hidden><span id="sessLinkTxt"></span><button class="btn sm" id="sessForget" type="button" title="Take the stored settings off this step">Forget</button></p>
     <div class="sess-row">
       <span class="sess-txt">Tempo from</span>
       <input class="sess-in mono" id="sFrom" type="number" min="1" max="660" step="1" value="100" aria-label="Starting tempo">
@@ -1635,6 +1647,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <p class="empty sec-help">Organize patterns in sequence and play them all in a practice session.</p>
     <!-- the steps as rows in the levels' box (Oscar, v115); patterns arrive through the
          list-plus button on any row of the Patterns section -->
+    <!-- v213: the open routine's name, above its steps, until it is closed -->
+    <p id="rtOpen" hidden><span class="k">Routine</span><span id="rtOpenName"></span></p>
     <div class="lvl-list seq-list" id="seqRow"></div>
     <!-- v212: routines (Oscar) - the sequence kept with each step's ramp, folded under a heading;
          tapping one opens it in the list above; Create / Save / Close work the list -->
@@ -1643,11 +1657,11 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <div class="lvl-list rt-list" id="rtList"></div>
       <div class="saverow rt-bar" id="rtBar">
         <input type="text" id="rtName" placeholder="Name this routine" maxlength="28">
-        <button class="btn lead" id="rtCreate" title="Keep the sequence above, with each step's ramp, as a routine">Create</button>
+        <button class="btn lead" id="rtCreate" title="Keep the sequence above, with each step's own settings, as a routine">Create</button>
         <button class="btn lead" id="rtSave" hidden title="Write the sequence above back into this routine">Save</button>
         <button class="btn danger" id="rtClose" hidden title="Put the sequence back as it was, without saving">Close</button>
       </div>
-      <p class="empty sec-help" id="rtHelp">A routine keeps the sequence with each step's ramp. Tap a row to open it above, play it, or change it and save.</p>
+      <p class="empty sec-help" id="rtHelp">A routine keeps the sequence with each step's own session settings. Tap a row to open it above, play it, or change it and save.</p>
     </div>
   </section>
 
@@ -2027,7 +2041,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v212"></script>
+<script src="./app.js?v=v213"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2040,8 +2054,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v212";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-18 16:53";          /* and when it was built, for ?diag */
+  var BUILD = "v213";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-19 17:56";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

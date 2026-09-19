@@ -1592,7 +1592,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <button class="btn pulse-host" id="sessBtn" data-on="0">Start</button>
     </div>
 
-    <p class="empty sec-help" id="sessLink" hidden><span id="sessLinkTxt"></span><button class="btn sm" id="sessForget" type="button" title="Take the stored settings off this step">Forget</button></p>
+    <p class="empty sec-help" id="sessLink" hidden><span id="sessLinkTxt"></span></p>
     <div class="sess-row">
       <span class="sess-txt">Tempo from</span>
       <input class="sess-in mono" id="sFrom" type="number" min="1" max="660" step="1" value="100" aria-label="Starting tempo">
@@ -2044,7 +2044,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v217"></script>
+<script src="./app.js?v=v218"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2057,8 +2057,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v217";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-19 21:41";          /* and when it was built, for ?diag */
+  var BUILD = "v218";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-19 21:50";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

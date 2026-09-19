@@ -1,4 +1,4 @@
-/* Polyorbit v219 - built from polyrhythm-circle.html by build-pwa.sh; edit the source, not this file */
+/* Polyorbit v220 - built from polyrhythm-circle.html by build-pwa.sh; edit the source, not this file */
 (function(){"use strict";var SOUNDS=[{id:"kick",name:"Kick"},{id:"snare",name:"Snare"},{id:"hihat",name:"Hi-hat"},{id:"wood",name:"Wood block"},{id:"click",name:"Click"},{id:"clap",name:"Clap"},{id:"beep",name:"Beep"},{id:"bell",name:"Bell"},{id:"rim",name:"Rim"}];var DEFAULT_SOUND=["kick","wood","beep","rim"];var BPM_MIN=1,BPM_MAX=660;var S={bpm:96,noteDen:4,noteDot:false,master:0.9,muted:false,active:0,ptab:"mine",seq:[],levels:[],levels2:[],levels2Build:"",levelsBuild:"",tapMode:"",sessLoop:false,sessPong:false,fold:{},rfold:{},countIn:false,playing:false,rings:[mkRing(0,4),mkRing(1,3)]};var MAX_STEPS=48;var SUB_LEVEL=0.12;var SUB_PITCH=1.5;function mkRing(i,div){return{div:div,sub:1,sound:DEFAULT_SOUND[i]||"click",vol:i===0?0.95:0.8,off:0,swing:0,mute:false,steps:filled(div),nextTick:0,lastTick:null,flash:[]};}
 function filled(n){var a=[],i;for(i=0;i<n;i++)a.push(i===0?2:1);return a;}
 function normSteps(arr){var legacy=arr.some(function(v){return typeof v==="boolean";});var out=arr.map(function(v){return v===2?2:(v?1:0);});if(legacy&&out[0])out[0]=2;return out;}
@@ -897,9 +897,10 @@ function seqPaintSel(){var rows=seqRow.children,i;for(i=0;i<rows.length;i++)rows
 function rampToPanel(rp){sFrom.value=rp.from;sTo.value=rp.to;sStep.value=rp.step;sPer.value=rp.per;sSil.value=rp.sil||0;sGap.value=rp.gap||0;if(!run)paintPlan();queueSave();}
 function rampSame(a,b){return!!a&&!!b&&a.from===b.from&&a.to===b.to&&a.step===b.step&&a.per===b.per&&(a.sil||0)===(b.sil||0)&&(a.gap||0)===(b.gap||0);}
 function rampStore(i){var st=S.seq[i];if(!st)return;if(st.ramp&&!seqStepDirty(i)){delete st.ramp;seqRender();paintPlan();paintSessLink();queueSave();return;}
-st.ramp=rampNow();if(seqSel!==i){applyConfig(stepCfg(st));rowMark("seq:"+i);seqSel=i;if(!sessStash)sessStash=rampNow();}
+st.ramp=rampNow();sessBoxFlash();if(seqSel!==i){applyConfig(stepCfg(st));rowMark("seq:"+i);seqSel=i;if(!sessStash)sessStash=rampNow();}
 seqRender();paintPlan();paintSessLink();queueSave();var b=seqRow.children[i]&&seqRow.children[i].querySelector("[data-ramp]");if(b&&typeof bump==="function")bump(b);}
 function rampForget(){var st=seqSel>=0?S.seq[seqSel]:null;if(!st)return;delete st.ramp;seqRender();paintPlan();paintSessLink();queueSave();}
+var sessFlashT=null;function sessBoxFlash(){delete sessionPanel.dataset.flash;void sessionPanel.offsetWidth;sessionPanel.dataset.flash="1";clearTimeout(sessFlashT);sessFlashT=setTimeout(function(){delete sessionPanel.dataset.flash;},700);}
 function seqStepDirty(i){var st=S.seq[i];return seqSel===i&&!!(st&&st.ramp)&&!rampSame(st.ramp,rampNow());}
 function rampFollow(){paintSessLink();}
 function paintSessLink(){var st=seqSel>=0?S.seq[seqSel]:null,has=!!(st&&st.ramp),now=rampNow();sessionPanel.dataset.ramp=has?(rampSame(st.ramp,now)?"1":"2"):"0";[["from",sFrom],["to",sTo],["step",sStep],["per",sPer],["sil",sSil],["gap",sGap]].forEach(function(p){p[1].dataset.kept=(has&&(st.ramp[p[0]]||0)===(now[p[0]]||0))?"1":"0";});var rows=seqRow.children,ri;for(ri=0;ri<rows.length;ri++){var dirty=seqStepDirty(ri),ck=rows[ri].querySelector("[data-ramp]");rows[ri].dataset.dirty=dirty?"1":"0";if(ck&&S.seq[ri]&&S.seq[ri].ramp)ck.title=dirty?"Store the changed settings on this step":"Forget this step's session settings";}

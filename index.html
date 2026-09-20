@@ -358,9 +358,12 @@ input[type=range]::-moz-range-thumb{
   grid-template-columns:minmax(0,1fr) fit-content(46%) minmax(0,1fr) auto auto auto auto;   /* + Play along (v167) */
   align-items:baseline;gap:8px;margin-bottom:2px;
 }
-#dialRatio{grid-column:1;text-align:left}
+#dialRatio{grid-column:1;text-align:left;font-size:18px}   /* v221: the name left the head, the ratio grows */
 #dialRatio .ratio-sep{color:var(--ink-3)}
-#dialPat{grid-column:2;justify-self:stretch;text-align:center}
+/* v221: the pattern's name under the wheel - bigger, half-strength (Oscar's sketch); the head keeps
+   the ratio and the buttons only, so the ratio has the room */
+.patname{margin:0 0 3px;padding:0 12px;text-align:center;font-size:15px;font-weight:500;color:var(--ink);opacity:.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+:root[data-stage="1"] .patname{font-size:22px}
 #posLbl{grid-column:3;text-align:right}
 /* the note that opens the score: a small round button at the header's end */
 #scoreBtn{grid-column:4;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none;border-color:var(--c4)}   /* purple, ring 4's colour (Oscar, v144) */
@@ -1163,6 +1166,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .caret:hover{color:var(--ink)}
 .foldsec[data-fold="1"]{padding-top:13px;padding-bottom:13px;cursor:pointer}
 .foldsec[data-fold="1"] > *:not(.sess-head){display:none}
+.foldsec[data-fold="1"] > :is(#sessLink,#rtOpen){display:none}   /* v221: these two set display by id */
 .foldsec[data-fold="1"] .sess-head{margin-bottom:0}
 .foldsec[data-fold="1"] .sess-head > *:not(.caret):not(.lbl):not(.fold-bpm):not(.fold-ico){display:none}
 /* a folded bar carries a glyph for what is inside: a clock for the session, a
@@ -1310,7 +1314,8 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .rt-list .lvl-row[data-dirty="1"] .nm-ro::before,#rtOpen[data-dirty="1"] #rtOpenName::before,
 .seq-list .lvl-row[data-dirty="1"] .nm-ro::before{content:"* ";color:var(--c1);font-weight:700}   /* v217: a step whose panel values are not stored yet */
 #rtOpen .k{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
-#rtSave{border-color:var(--c2);color:var(--ink)}              /* v213: Save is the teal action, like the presets' */
+#rtSave{color:var(--ink)}
+#rtOpen[data-dirty="1"] #rtSave{border-color:var(--c2)}        /* v221: teal only with changes to save */
 #psave{border-color:var(--c2);color:var(--ink)}               /* the presets' save is a teal action (v205) */
 /* v205: a pattern just landed in the Sequence - the folded bar blinks twice (the live overlay, opacity
    only) and the new row blinks in place; both stop by themselves */
@@ -1503,7 +1508,6 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <div class="ghost" id="coachHand2" hidden aria-hidden="true"></div>
       <div class="dial-head">
         <span class="metric mono" id="dialRatio">4 : 3</span>
-        <span class="metric sub mono pat" id="dialPat" hidden></span>
         <span class="metric sub mono" id="posLbl">stopped</span>
         <!-- the score is what the wheel writes out, so its button lives on the wheel -->
         <button class="icobtn score-ico" id="scoreBtn" title="Write it out as notation" aria-label="Score"><svg class="note" viewBox="0 0 22 30" aria-hidden="true"><ellipse cx="8" cy="22.5" rx="5.4" ry="3.7" transform="rotate(-22 8 22.5)" fill="currentColor"/><path d="M12.9 21.6V3.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M12.9 3.5c3.6 2.2 6 5.2 4.4 10.2" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg></button>
@@ -1533,6 +1537,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       </div>
       <!-- one fixed-height slot, so swapping tip for readout cannot resize the dial -->
       <div class="dial-foot">
+        <!-- v221: the pattern in play (a session's step) sits under the wheel, above the line -->
+        <p class="patname mono" id="dialPat" hidden></p>
         <p class="hint" id="dialHint">Tap a dot: on &middot; silent &middot; accent.<span class="adv-only"> Drag a ring to offset it.</span></p>
         <p class="sessnow" id="sessNow" hidden><span class="mono" id="sessNowIn"></span></p>
         <p class="sessnow tapnow" id="tapNow" hidden><span class="mono" id="tapNowIn"></span></p>
@@ -2048,7 +2054,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v220"></script>
+<script src="./app.js?v=v221"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2061,8 +2067,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v220";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-19 21:59";          /* and when it was built, for ?diag */
+  var BUILD = "v221";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-20 10:13";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -1,4 +1,4 @@
-/* Polyorbit v222 - built from polyrhythm-circle.html by build-pwa.sh; edit the source, not this file */
+/* Polyorbit v223 - built from polyrhythm-circle.html by build-pwa.sh; edit the source, not this file */
 (function(){"use strict";var SOUNDS=[{id:"kick",name:"Kick"},{id:"snare",name:"Snare"},{id:"hihat",name:"Hi-hat"},{id:"wood",name:"Wood block"},{id:"click",name:"Click"},{id:"clap",name:"Clap"},{id:"beep",name:"Beep"},{id:"bell",name:"Bell"},{id:"rim",name:"Rim"}];var DEFAULT_SOUND=["kick","wood","beep","rim"];var BPM_MIN=1,BPM_MAX=660;var S={bpm:96,noteDen:4,noteDot:false,master:0.9,muted:false,active:0,ptab:"mine",seq:[],levels:[],levels2:[],levels2Build:"",levelsBuild:"",tapMode:"",sessLoop:false,sessPong:false,fold:{},rfold:{},countIn:false,playing:false,rings:[mkRing(0,4),mkRing(1,3)]};var MAX_STEPS=48;var SUB_LEVEL=0.12;var SUB_PITCH=1.5;function mkRing(i,div){return{div:div,sub:1,sound:DEFAULT_SOUND[i]||"click",vol:i===0?0.95:0.8,off:0,swing:0,mute:false,steps:filled(div),nextTick:0,lastTick:null,flash:[]};}
 function filled(n){var a=[],i;for(i=0;i<n;i++)a.push(i===0?2:1);return a;}
 function normSteps(arr){var legacy=arr.some(function(v){return typeof v==="boolean";});var out=arr.map(function(v){return v===2?2:(v?1:0);});if(legacy&&out[0])out[0]=2;return out;}
@@ -285,9 +285,9 @@ planBody.innerHTML=rows;var note=planNote(p);if(!p.names.length&&p.cfg.pat==="se
 planNoteEl.innerHTML=note;planNoteEl.hidden=!note;}
 function swapRings(cfg){S.rings=(cfg.rings||[]).slice(0,4).map(function(rc,i){var r=mkRing(i,Math.max(1,Math.min(32,rc.div||4)));if(rc.sound)r.sound=rc.sound;if(typeof rc.vol==="number")r.vol=rc.vol;if(typeof rc.off==="number")r.off=normOff(rc.off);r.mute=!!rc.mute;r.sub=fitSub(r.div,Math.max(1,Math.min(6,rc.sub||1)));subsIn(r,rc.subs);r.swing=swingIn(rc.swing);r.steps=filled(total(r));if(Array.isArray(rc.steps)&&rc.steps.length===total(r))r.steps=normSteps(rc.steps);return r;});if(!S.rings.length)S.rings=[mkRing(0,4)];S.active=0;S.rings.forEach(function(r){realign(r);});buildRack();paintRack();paintTransport();}
 function loopOrder(n){var seq=[],i;for(i=0;i<n;i++)seq.push(i);if(S.sessPong)for(i=n-2;i>0;i--)seq.push(i);return seq;}
-function applyLoop(idx){var l=run.plan.loops[idx];if(run.plan.patterns&&run.lastStage!==l.stage){swapRings(run.plan.patterns[l.stage]);}
-run.lastStage=l.stage;if(S.bpm!==l.bpm){S.bpm=l.bpm;paintTransport();}
-S.rings.forEach(function(r){realign(r);});paintPlan();}
+function applyLoop(idx){var l=run.plan.loops[idx],changed=false;if(run.plan.patterns&&run.lastStage!==l.stage){swapRings(run.plan.patterns[l.stage]);changed=true;}
+run.lastStage=l.stage;if(S.bpm!==l.bpm){S.bpm=l.bpm;paintTransport();changed=true;}
+S.rings.forEach(function(r){realign(r);});paintPlan();if(changed&&!scoreSheet.hidden&&scoreSrc==="wheel")paintScore();}
 function startSession(){if(run)return;if(S.playing)stop();var plan=sessPlan||buildPlan();run={plan:plan,seq:loopOrder(plan.loops.length),i:0,cur:0,base:0,pass:1,lastStage:-1,snapshot:sessionSnapshot(),scale:null,t0:performance.now(),routine:null,done:false};sessBtn.textContent="Stop";sessBtn.dataset.on="1";syncSessBtn();paintFolds();applyLoop(0);start();paintPlan();}
 function finishSession(){if(!run)return;var snap=run.snapshot;if(run.routine){rlog.push({t:Date.now(),id:run.routine.id,name:run.routine.name,secs:Math.round((performance.now()-(run.t0||performance.now()))/1000),done:run.done?1:0});rlogSave();setTimeout(paintRoutines,0);}
 if(snap)delete snap.sess;run=null;sessBtn.textContent="Start";sessBtn.dataset.on="0";syncSessBtn();paintFolds();clearSessNow();applySession(snap);buildRack();paintTransport();paintRack();paintCount();paintPlan();}

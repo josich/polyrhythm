@@ -1238,6 +1238,63 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
   margin-top:12px;padding-top:11px;border-top:1px dashed var(--line);
 }
 .sess-foot #planBtn{flex:none;margin:0}
+/* v227: the practice log's row - under the plan, left, behind a line; orange with a dot when new */
+.sess-log{margin-top:11px;padding-top:11px;border-top:1px solid var(--line);display:flex;justify-content:flex-start}
+#logBtn{position:relative;display:inline-flex;align-items:center;gap:8px;color:var(--ink-2)}
+#logBtn svg{width:15px;height:15px;flex:none}
+#logBtn[data-new="1"]{border-color:var(--c1);color:var(--c1)}
+#logBtn[data-new="1"]::after{content:"";position:absolute;top:-5px;right:-5px;width:10px;height:10px;border-radius:50%;background:var(--c1);border:2px solid var(--panel)}
+/* v227: a running session breathes on the section's edge unfolded too - the edge only, no tint over
+   the settings (the folded bar keeps its tint) */
+#sessionPanel:not([data-fold="1"])[data-live="1"]::after{animation:pulseFade 2s ease-in-out infinite;will-change:opacity;background:transparent;border-width:2px}
+@media (prefers-reduced-motion:reduce){ #sessionPanel:not([data-fold="1"])[data-live="1"]::after{animation:none;opacity:.6} }
+/* the sheet */
+.log-sheet{max-width:480px}
+.log-sheet h2{display:flex;align-items:center;gap:8px}
+.log-sheet .log-ico svg{width:18px;height:18px;color:var(--c1);display:block}
+.log-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+.log-tile{background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:9px 10px;min-width:0}
+.log-tile .k{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.log-tile .v{font-family:"IBM Plex Mono",monospace;font-size:19px;font-weight:600;color:var(--c1);line-height:1.2;margin-top:2px;white-space:nowrap}
+.log-tile .v small{font-size:11px;color:var(--ink-3);font-weight:400;margin-left:1px}
+.log-tile .d{font-size:11px;color:var(--ink-3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.log-rule{display:flex;align-items:center;gap:10px;margin-top:14px;margin-bottom:6px}
+.log-rule .lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:600;flex:none}
+.log-rule::after{content:"";flex:1;border-top:1px dashed var(--line-2);order:1}
+.log-rule .seg{order:2;display:flex;gap:2px;background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:2px}
+.log-rule .seg button{font:inherit;font-size:11px;padding:3px 8px;border:1px solid transparent;border-radius:6px;background:none;color:var(--ink-3);cursor:pointer}
+.log-rule .seg button[aria-pressed="true"]{background:var(--panel);color:var(--ink);border-color:var(--line-2)}
+.log-scroll{overflow-x:auto}
+.log-sheet table{width:100%;border-collapse:collapse;font-size:12.5px}
+.log-sheet th{text-align:left;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600;padding:0 6px 6px 6px}
+.log-sheet th.r{text-align:right}
+.log-sheet td{padding:8px 6px;border-top:1px solid var(--line);vertical-align:top}
+.log-days tr.day{cursor:pointer}
+.log-days td.date{white-space:nowrap;width:1%}
+.log-days td.date b{display:block;font-weight:600;color:var(--ink)}
+.log-days td.date span{font-size:11px;color:var(--ink-3)}
+.log-days td.min{white-space:nowrap;width:1%;text-align:right;font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--ink)}
+.log-days td.min small{font-size:10px;color:var(--ink-3);margin-left:1px}
+.log-chips{display:flex;flex-wrap:wrap;gap:4px}
+.log-chip{font-size:11px;padding:2px 7px;border-radius:7px;border:1px solid var(--line-2);color:var(--ink-2);white-space:nowrap;background:var(--sunk)}
+.log-chip.sess{border-color:color-mix(in srgb,var(--c2) 60%,var(--line-2));color:var(--c2)}
+.log-chip.cut{border-color:color-mix(in srgb,var(--c3) 60%,var(--line-2));color:var(--c3)}
+.log-chip.game{border-color:color-mix(in srgb,var(--c4) 60%,var(--line-2));color:var(--c4)}
+.log-chip.prec{border-color:color-mix(in srgb,var(--c1) 60%,var(--line-2));color:var(--c1)}
+.log-days tr.detail td{border-top:0;padding:0 6px 10px 6px}
+.log-dl{display:flex;flex-direction:column;gap:4px;background:var(--sunk);border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-size:12px;color:var(--ink-2)}
+.log-dl div{display:flex;gap:8px;align-items:baseline}
+.log-dl i{display:inline-block;width:7px;height:7px;border-radius:50%;flex:none;margin-top:5px}
+.log-dl .m{font-family:"IBM Plex Mono",monospace;color:var(--ink)}
+.log-dl .mute{color:var(--ink-3)}
+.log-dl i.sess{background:var(--c2)}.log-dl i.cut{background:var(--c3)}.log-dl i.game{background:var(--c4)}.log-dl i.prec{background:var(--c1)}
+.log-pat td{white-space:nowrap;font-family:"IBM Plex Mono",monospace}
+.log-pat td.name{white-space:normal;font-family:inherit;color:var(--ink);font-weight:500}
+.log-pat td.name small{display:block;font-weight:400;color:var(--ink-3);font-size:11px}
+.log-pat td.up{color:var(--c2)}.log-pat td.down{color:var(--c3)}.log-pat td.same{color:var(--c1)}
+.log-more,.log-note{font-size:12px;color:var(--ink-3);margin:8px 0 0;text-align:center}
+.log-note{text-align:left;margin-top:10px}
+.log-empty{font-size:12.5px;color:var(--ink-3);padding:10px 6px;border-top:1px solid var(--line)}
 .sess-plan{
   margin:0;flex:1 1 auto;min-width:0;
   font-size:12px;color:var(--ink-2);line-height:1.6;
@@ -1656,6 +1713,11 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <p class="sess-plan" id="sPlan"></p>
       <button class="btn sm lead" id="planBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="4" width="13" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.5 4v16M4.5 8.5h4M4.5 12h4M4.5 15.5h4M12.5 9h4M12.5 12.5h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Plan</button>
     </div>
+    <!-- v227: the practice log (Oscar): its own row under the plan, left, behind a line; orange with a
+         dot while it holds entries not looked at yet -->
+    <div class="sess-log">
+      <button class="btn sm" id="logBtn" data-new="0" title="Days, sessions, game progress and Precision runs"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 9.5h17M8 3v4M16 3v4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M7.5 13h3M13.5 13h3M7.5 16.5h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Practice calendar log</button>
+    </div>
   </section>
 
   <section class="presets foldsec" id="seqPanel">
@@ -1942,6 +2004,22 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </defs>
 </svg>
 <!-- the achievements sheet (v151) -->
+<!-- v227: the practice log sheet - days first, then the patterns Precision has measured -->
+<div class="modal" id="logModal" hidden>
+  <div class="sheet log-sheet" role="dialog" aria-modal="true" aria-labelledby="logTitle">
+    <div class="sheet-head">
+      <h2 id="logTitle"><span class="log-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 9.5h17M8 3v4M16 3v4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M7.5 13h3M13.5 13h3M7.5 16.5h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>Practice log</h2>
+      <button class="icobtn" id="logClose" title="Close" aria-label="Close">&times;</button>
+    </div>
+    <div class="log-tiles" id="logTiles"></div>
+    <div class="log-rule"><span class="lbl">Days</span><span class="seg" id="logRange" role="group" aria-label="Range"><button data-r="14" aria-pressed="true">2 weeks</button><button data-r="31" aria-pressed="false">Month</button><button data-r="0" aria-pressed="false">All</button></span></div>
+    <div class="log-scroll"><table class="log-days"><thead><tr><th>Day</th><th class="r">Time</th><th>What happened</th></tr></thead><tbody id="logDays"></tbody></table></div>
+    <p class="log-more" id="logMore"></p>
+    <div class="log-rule"><span class="lbl">Patterns</span><span class="seg" id="logSort" role="group" aria-label="Sort"><button data-s="recent" aria-pressed="true">Recent</button><button data-s="best" aria-pressed="false">Best</button></span></div>
+    <div class="log-scroll"><table class="log-pat"><thead><tr><th>Pattern</th><th>Best</th><th>Last</th><th>Runs</th><th>When</th></tr></thead><tbody id="logPats"></tbody></table></div>
+    <p class="log-note" id="logNote">Best is the Precision benchmark of the pattern at that tempo. Last is coloured against it: teal above, pink below, orange within a point.</p>
+  </div>
+</div>
 <div class="modal" id="achModal" hidden>
   <div class="sheet ach-sheet" role="dialog" aria-modal="true" aria-labelledby="achTitle">
     <div class="sheet-head">
@@ -2063,7 +2141,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v226"></script>
+<script src="./app.js?v=v227"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2076,8 +2154,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v226";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-20 21:04";          /* and when it was built, for ?diag */
+  var BUILD = "v227";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-21 18:07";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

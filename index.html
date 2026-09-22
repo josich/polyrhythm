@@ -1260,52 +1260,79 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 #sessionPanel:not([data-fold="1"])[data-live="1"]::after{animation:pulseFade 2s ease-in-out infinite;will-change:opacity;background:transparent;border-width:2px}
 @media (prefers-reduced-motion:reduce){ #sessionPanel:not([data-fold="1"])[data-live="1"]::after{animation:none;opacity:.6} }
 /* the sheet */
-.log-sheet{max-width:480px}
+.log-sheet{max-width:480px;max-height:86vh;display:flex;flex-direction:column;overflow:hidden;--lg-wheel:var(--ink-3);--lg-sess:var(--c2);--lg-rout:var(--c3);--lg-game:var(--c4);--lg-prec:var(--c1)}   /* v229: the tiles and the charts stay put, the days scroll between them */
+.log-sheet .sheet-head{flex:none}
 .log-sheet h2{display:flex;align-items:center;gap:8px}
 .log-sheet .log-ico svg{width:18px;height:18px;color:var(--c1);display:block}
-.log-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+.log-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px;flex:none}
 .log-tile{background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:9px 10px;min-width:0}
 .log-tile .k{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
-.log-tile .v{font-family:"IBM Plex Mono",monospace;font-size:19px;font-weight:600;color:var(--c1);line-height:1.2;margin-top:2px;white-space:nowrap}
+.log-tile .v{font-family:"IBM Plex Mono",monospace;font-size:21px;font-weight:600;color:var(--c1);line-height:1.2;margin-top:2px;white-space:nowrap}
 .log-tile .v small{font-size:11px;color:var(--ink-3);font-weight:400;margin-left:1px}
 .log-tile .d{font-size:11px;color:var(--ink-3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.log-rule{display:flex;align-items:center;gap:10px;margin-top:14px;margin-bottom:6px}
+.log-tile .d.wk{display:flex;gap:3px;align-items:center;height:14px}   /* v229: the week as seven dots - the chain */
+.log-tile .d.wk i{width:8px;height:8px;border-radius:50%;background:var(--line-2);flex:none}
+.log-tile .d.wk i.on{background:var(--c2)}
+.log-tile .d.wk i.now{box-shadow:0 0 0 1.5px var(--panel),0 0 0 2.5px var(--ink-3)}
+.log-tabs{display:flex;gap:2px;background:var(--sunk);border:1px solid var(--line);border-radius:9px;padding:2px;margin-top:12px;flex:none}
+.log-tabs button{flex:1;font:inherit;font-size:12px;padding:5px 8px;border:1px solid transparent;border-radius:7px;background:none;color:var(--ink-3);cursor:pointer}
+.log-tabs button[aria-pressed="true"]{background:var(--panel);color:var(--ink);border-color:var(--line-2)}
+.log-pane{display:flex;flex-direction:column;min-height:0;flex:1 1 auto}
+.log-pane[hidden]{display:none}
+.log-rule{display:flex;align-items:center;gap:10px;margin-top:12px;margin-bottom:6px;flex:none}
 .log-rule .lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:600;flex:none}
 .log-rule::after{content:"";flex:1;border-top:1px dashed var(--line-2);order:1}
 .log-rule .seg{order:2;display:flex;gap:2px;background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:2px}
 .log-rule .seg button{font:inherit;font-size:11px;padding:3px 8px;border:1px solid transparent;border-radius:6px;background:none;color:var(--ink-3);cursor:pointer}
 .log-rule .seg button[aria-pressed="true"]{background:var(--panel);color:var(--ink);border-color:var(--line-2)}
-.log-scroll{overflow-x:auto}
+/* the days: a scroll box like the level list; a row is the date, five bars, the time */
+.log-list{flex:1 1 auto;min-height:120px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;padding:3px;scrollbar-width:thin;border:1px solid var(--line);border-radius:10px;background:var(--sunk)}
+.log-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:12px;padding:7px 10px;border:1px solid var(--line);border-radius:9px;background:var(--panel);cursor:pointer;text-align:left;font:inherit;color:inherit;width:100%}
+.log-row[aria-expanded="true"]{border-color:var(--line-2)}
+.log-row .date{min-width:0}
+.log-row .date b{display:block;font-weight:600;color:var(--ink);font-size:13px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.log-row .date span{font-size:11px;color:var(--ink-3)}
+.log-hist{display:flex;align-items:flex-end;gap:3px;height:24px}
+.log-hist i{display:block;width:6px;border-radius:2px 2px 0 0;background:var(--line);min-height:2px}
+.log-hist i.on{background:var(--lc)}
+.log-row .min{font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--ink);white-space:nowrap;min-width:46px;text-align:right}
+.log-row .min small{font-size:10px;color:var(--ink-3);margin-left:1px}
+.log-year{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:600;display:flex;align-items:center;gap:8px;padding:6px 6px 2px}
+.log-year::after{content:"";flex:1;border-top:1px dashed var(--line-2)}
+.log-det{display:flex;flex-wrap:wrap;gap:6px;padding:2px 4px 8px}
+.log-det[hidden]{display:none}
+.log-det .mute{font-size:12px;color:var(--ink-3);padding:2px 4px}
+.log-chip{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:12px;padding:5px 9px 5px 7px;border-radius:9px;border:1px solid var(--line-2);border-left:3px solid var(--lc);color:var(--ink-2);background:var(--panel);cursor:pointer;max-width:100%;min-width:0}
+.log-chip svg{width:14px;height:14px;flex:none;color:var(--lc);display:block}
+.log-chip b{color:var(--ink);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.log-chip span{color:var(--ink-3);white-space:nowrap}
+.log-chip.cut{border-style:dashed;border-left-style:solid}
+.wheel{--lc:var(--lg-wheel)}.sess{--lc:var(--lg-sess)}.rout{--lc:var(--lg-rout)}.game{--lc:var(--lg-game)}.prec{--lc:var(--lg-prec)}
+/* the fixed charts under the box: the ring of shares and the bars by category */
+.log-charts{display:grid;grid-template-columns:100px minmax(0,1fr);gap:14px;align-items:center;margin-top:10px;flex:none}
+.log-charts[hidden]{display:none}
+.log-donut{width:100px;height:100px;display:block}
+.log-donut text{font-family:"IBM Plex Mono",monospace;fill:var(--ink);font-size:14px;font-weight:600}
+.log-donut text.u{font-size:8px;fill:var(--ink-3);font-weight:400;letter-spacing:.1em}
+.log-bars{display:flex;flex-direction:column;gap:5px;min-width:0}
+.log-bar{display:grid;grid-template-columns:64px minmax(0,1fr) 40px;align-items:center;gap:8px;font-size:11px}
+.log-bar .k{color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.log-bar .bar{height:8px;background:var(--sunk);border:1px solid var(--line);border-radius:5px;overflow:hidden}
+.log-bar .bar i{display:block;height:100%;border-radius:4px;background:var(--lc)}
+.log-bar .v{font-family:"IBM Plex Mono",monospace;color:var(--ink);text-align:right;white-space:nowrap}
+.log-bar .v small{color:var(--ink-3);font-size:9px}
+.log-scroll{overflow:auto;min-height:0;flex:1 1 auto}
 .log-sheet table{width:100%;border-collapse:collapse;font-size:12.5px}
 .log-sheet th{text-align:left;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600;padding:0 6px 6px 6px}
 .log-sheet th.r{text-align:right}
 .log-sheet td{padding:8px 6px;border-top:1px solid var(--line);vertical-align:top}
-.log-days tr.day{cursor:pointer}
-.log-days td.date{white-space:nowrap;width:1%}
-.log-days td.date b{display:block;font-weight:600;color:var(--ink)}
-.log-days td.date span{font-size:11px;color:var(--ink-3)}
-.log-days td.min{white-space:nowrap;width:1%;text-align:right;font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--ink)}
-.log-days td.min small{font-size:10px;color:var(--ink-3);margin-left:1px}
-.log-chips{display:flex;flex-wrap:wrap;gap:4px}
-.log-chip{font-size:11px;padding:2px 7px;border-radius:7px;border:1px solid var(--line-2);color:var(--ink-2);white-space:nowrap;background:var(--sunk)}
-.log-chip.sess{border-color:color-mix(in srgb,var(--c2) 60%,var(--line-2));color:var(--c2)}
-.log-chip.cut{border-color:color-mix(in srgb,var(--c3) 60%,var(--line-2));color:var(--c3)}
-.log-chip.game{border-color:color-mix(in srgb,var(--c4) 60%,var(--line-2));color:var(--c4)}
-.log-chip.prec{border-color:color-mix(in srgb,var(--c1) 60%,var(--line-2));color:var(--c1)}
-.log-days tr.detail td{border-top:0;padding:0 6px 10px 6px}
-.log-dl{display:flex;flex-direction:column;gap:4px;background:var(--sunk);border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-size:12px;color:var(--ink-2)}
-.log-dl div{display:flex;gap:8px;align-items:baseline}
-.log-dl i{display:inline-block;width:7px;height:7px;border-radius:50%;flex:none;margin-top:5px}
-.log-dl .m{font-family:"IBM Plex Mono",monospace;color:var(--ink)}
-.log-dl .mute{color:var(--ink-3)}
-.log-dl i.sess{background:var(--c2)}.log-dl i.cut{background:var(--c3)}.log-dl i.game{background:var(--c4)}.log-dl i.prec{background:var(--c1)}
 .log-pat td{white-space:nowrap;font-family:"IBM Plex Mono",monospace}
 .log-pat td.name{white-space:normal;font-family:inherit;color:var(--ink);font-weight:500}
 .log-pat td.name small{display:block;font-weight:400;color:var(--ink-3);font-size:11px}
 .log-pat td.up{color:var(--c2)}.log-pat td.down{color:var(--c3)}.log-pat td.same{color:var(--c1)}
-.log-more,.log-note{font-size:12px;color:var(--ink-3);margin:8px 0 0;text-align:center}
+.log-more,.log-note{font-size:12px;color:var(--ink-3);margin:6px 0 0;text-align:center;flex:none}
 .log-note{text-align:left;margin-top:10px}
-.log-empty{font-size:12.5px;color:var(--ink-3);padding:10px 6px;border-top:1px solid var(--line)}
+.log-empty{font-size:12.5px;color:var(--ink-3);padding:10px 8px}
 .sess-plan{
   margin:0;flex:1 1 auto;min-width:0;
   font-size:12px;color:var(--ink-2);line-height:1.6;
@@ -2025,12 +2052,21 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <button class="icobtn" id="logClose" title="Close" aria-label="Close">&times;</button>
     </div>
     <div class="log-tiles" id="logTiles"></div>
-    <div class="log-rule"><span class="lbl">Days</span><span class="seg" id="logRange" role="group" aria-label="Range"><button data-r="14" aria-pressed="true">2 weeks</button><button data-r="31" aria-pressed="false">Month</button><button data-r="0" aria-pressed="false">All</button></span></div>
-    <div class="log-scroll"><table class="log-days"><thead><tr><th>Day</th><th class="r">Time</th><th>What happened</th></tr></thead><tbody id="logDays"></tbody></table></div>
-    <p class="log-more" id="logMore"></p>
-    <div class="log-rule"><span class="lbl">Patterns</span><span class="seg" id="logSort" role="group" aria-label="Sort"><button data-s="recent" aria-pressed="true">Recent</button><button data-s="best" aria-pressed="false">Best</button></span></div>
-    <div class="log-scroll"><table class="log-pat"><thead><tr><th>Pattern</th><th>Best</th><th>Last</th><th>Runs</th><th>When</th></tr></thead><tbody id="logPats"></tbody></table></div>
-    <p class="log-note" id="logNote">Best is the Precision benchmark of the pattern at that tempo. Last is coloured against it: teal above, pink below, orange within a point.</p>
+    <div class="log-tabs" id="logTabs" role="tablist"><button data-t="days" aria-pressed="true">Days</button><button data-t="pats" aria-pressed="false">Patterns</button></div>
+    <!-- v229, Oscar's spec: the tiles stay put; the days scroll in their own box (a row = date, a mini
+         histogram by category, the day's time; a tap opens the day's chips, a chip opens what it names);
+         under the box the fixed charts - a ring of the categories' shares and their bars -->
+    <div class="log-pane" id="logPaneDays">
+      <div class="log-rule"><span class="lbl">Days</span><span class="seg" id="logRange" role="group" aria-label="Range"><button data-r="14" aria-pressed="true">2 weeks</button><button data-r="31" aria-pressed="false">Month</button><button data-r="0" aria-pressed="false">All</button></span></div>
+      <div class="log-list" id="logDays"></div>
+      <p class="log-more" id="logMore"></p>
+      <div class="log-charts" id="logCharts"></div>
+    </div>
+    <div class="log-pane" id="logPanePats" hidden>
+      <div class="log-rule"><span class="lbl">Patterns</span><span class="seg" id="logSort" role="group" aria-label="Sort"><button data-s="recent" aria-pressed="true">Recent</button><button data-s="best" aria-pressed="false">Best</button></span></div>
+      <div class="log-scroll"><table class="log-pat"><thead><tr><th>Pattern</th><th>Best</th><th>Last</th><th>Runs</th><th>When</th></tr></thead><tbody id="logPats"></tbody></table></div>
+      <p class="log-note" id="logNote">Best is the Precision benchmark of the pattern at that tempo. Last is coloured against it: teal above, pink below, orange within a point.</p>
+    </div>
   </div>
 </div>
 <div class="modal" id="achModal" hidden>
@@ -2154,7 +2190,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v228"></script>
+<script src="./app.js?v=v229"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2167,8 +2203,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v228";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-22 12:40";          /* and when it was built, for ?diag */
+  var BUILD = "v229";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-22 14:55";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

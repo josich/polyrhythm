@@ -313,7 +313,7 @@ input[type=range]::-moz-range-thumb{
    one screen with the wheel as big as it fits, the tempo in very big digits, and nothing
    else. A view, not a setting - the app always opens in the normal view. */
 .btn.mode[data-on="1"]{border-color:var(--c2);color:var(--ink);background:color-mix(in srgb,var(--c2) 15%,transparent)}
-:root[data-stage="1"] .wrap{max-width:none;padding-top:calc(12px + env(safe-area-inset-top, 0px))}
+:root[data-stage="1"] .wrap{max-width:none;padding:calc(12px + env(safe-area-inset-top, 0px)) 20px calc(12px + env(safe-area-inset-bottom, 0px))}   /* v228: the page's 64 px foot pushed the landscape stage off the screen */
 :root[data-stage="1"] .wrap > :not(.stage){display:none}
 :root[data-stage="1"] .stage{grid-template-columns:minmax(0,1fr);gap:12px}
 :root[data-stage="1"] #rack{display:none}
@@ -341,7 +341,10 @@ input[type=range]::-moz-range-thumb{
   :root[data-stage="1"] #stageBar{order:2}
   :root[data-stage="1"] .stage-bpm-row{flex-direction:column;gap:18px}
   :root[data-stage="1"] .stage-num{font-size:min(clamp(44px,19vh,150px),calc((36vw - 60px) / 1.85));font-size:min(clamp(44px,19lvh,150px),calc((36vw - 60px) / 1.85))}   /* the tempo column is 36 % wide */
-  :root[data-stage="1"] .canvas-hold{max-width:min(100%,max(220px,calc(100vh - 130px)));max-width:min(100%,max(220px,calc(100lvh - 130px)))}
+  :root[data-stage="1"] .canvas-hold{max-width:min(100%,max(160px,calc(100vh - 136px)));max-width:min(100%,max(160px,calc(100svh - 136px)))}   /* v228: the smallest viewport - a browser bar must not push the wheel off the screen; 136 = paddings + head + foot */
+  :root[data-stage="1"] .dial{padding:10px 14px 12px}
+  :root[data-stage="1"] .dial-foot{min-height:38px;margin-top:4px}
+  :root[data-stage="1"] :is(#sessNowIn,#tapNowIn,#beatNowIn){font-size:26px}
 }
 .dial{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px 18px 18px}
 .dial{position:relative}
@@ -364,6 +367,13 @@ input[type=range]::-moz-range-thumb{
    the ratio and the buttons only, so the ratio has the room */
 .patname{margin:0 0 3px;padding:0 12px;text-align:center;font-size:15px;font-weight:500;color:var(--ink);opacity:.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 :root[data-stage="1"] .patname{font-size:22px}
+/* v228: the portrait stage had a big empty space under the wheel (Oscar) - the wheel's notation goes
+   there with the score sheet's red line running; the line is a transform-only layer, never a
+   repainted SVG attribute (the no-paint rule) */
+#stageScore{display:none;position:relative;margin:10px 0 0}
+:root[data-stage="1"] #stageScore:not([hidden]){display:block}
+#stageScore .stline{position:absolute;top:0;left:0;width:2px;border-radius:1px;background:#E5484D;opacity:.9;will-change:transform;pointer-events:none}
+@media (min-width:600px) and (orientation:landscape){ :root[data-stage="1"] #stageScore:not([hidden]){display:none} }   /* portrait-only (Oscar); after the show rule so it wins at equal specificity */
 #posLbl{grid-column:3;text-align:right}
 /* the note that opens the score: a small round button at the header's end */
 #scoreBtn{grid-column:4;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none;border-color:var(--c4)}   /* purple, ring 4's colour (Oscar, v144) */
@@ -708,6 +718,7 @@ input[type=range]::-moz-range-thumb{
 .lvl-row .meta{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lvl-row .meta .stars{color:var(--c1);font-size:13px;letter-spacing:.04em}
 .lvl-row .meta .stars.none{color:var(--line-2)}
+.lvl-row .meta .stars i{font-style:normal;color:var(--ink-3)}   /* v228: the unearned stars grey, so a small screen cannot read them as filled */
 .lvl-row .meta .k{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-left:4px}
 .lvl-row .meta .num{font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:700;color:var(--c1);margin-left:-2px}
 .lvl-row .meta .stick{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.02em;color:var(--ink-2)}   /* a rudiment's sticking (v198) */
@@ -1613,6 +1624,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
           <button type="button" class="icobtn" id="chalQuit" title="Leave the challenge" aria-label="Leave the challenge">&times;</button>
         </span></p>
       </div>
+      <!-- v228: the wheel as notation under the wheel on the portrait stage, the red line running -->
+      <div class="score stage-score" id="stageScore" hidden aria-hidden="true"></div>
       <!-- an achievement just earned: a toast over the row under the wheel, three seconds (v151) -->
       <div class="ach-toast" id="achToast" hidden aria-live="polite">
         <span class="badge md earned" id="achToastBadge"><svg viewBox="0 0 24 24"><use id="achToastUse" href="#i-star"/></svg></span>
@@ -2141,7 +2154,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v227"></script>
+<script src="./app.js?v=v228"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2154,8 +2167,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v227";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-21 18:07";          /* and when it was built, for ?diag */
+  var BUILD = "v228";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-22 12:40";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -1417,7 +1417,8 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 #alongX,#chalQuit,#planClose,#scoreClose,#achClose,#shareClose,#helpClose,.icobtn.chal-x,#rack .icobtn[data-del]{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
 .lvl-row .ops button[data-del]{color:var(--c3)}
 .empty{color:var(--ink-3);font-size:12px;margin-top:11px}
-.sec-help{margin:2px 0 10px}                                  /* a section's one-line purpose (v205) */
+.sec-help{margin:2px 0 10px}
+.sec-help .help-ico{width:14px;height:14px;vertical-align:-3px;color:var(--ink-2);margin-left:1px}   /* v235: the Practice session's clock beside the words */                                  /* a section's one-line purpose (v205) */
 /* v225: the empty sequence's advice, with the add button drawn as on the rows, 1.5x, in orange */
 .seq-empty{margin:-4px 0 10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .seq-empty .seq-ico{display:inline-grid;place-items:center;width:30px;height:30px;border:1px solid var(--line-2);border-radius:8px;background:var(--sunk);color:var(--c1);flex:none}
@@ -1807,7 +1808,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <span class="fold-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h10M4 12h10M4 18h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M18 11v8M14 15h8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>
       <span class="seq-note" id="seqNote"></span>
     </div>
-    <p class="empty sec-help">Organize patterns in sequence and play them all in a practice session.</p>
+    <p class="empty sec-help">Organize patterns in sequence and play them all in a practice session <svg class="help-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>.</p>
     <!-- v225: the empty list's advice, under the help line, with the row's add button at 1.5x -->
     <p class="empty seq-empty" id="seqEmpty" hidden>Add patterns with the <span class="seq-ico" aria-label="add to sequence"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M4 12h10M4 18h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M18 11v8M14 15h8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span> button in Patterns</p>
     <!-- the steps as rows in the levels' box (Oscar, v115); patterns arrive through the
@@ -2235,7 +2236,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v234"></script>
+<script src="./app.js?v=v235"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2248,8 +2249,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v234";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-22 16:27";          /* and when it was built, for ?diag */
+  var BUILD = "v235";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-22 16:35";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

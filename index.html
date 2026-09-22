@@ -1250,11 +1250,18 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 }
 .sess-foot #planBtn{flex:none;margin:0}
 /* v227: the practice log's row - under the plan, left, behind a line; orange with a dot when new */
-.sess-log{margin-top:11px;padding-top:11px;border-top:1px solid var(--line);display:flex;justify-content:flex-start}
-#logBtn{position:relative;display:inline-flex;align-items:center;gap:8px;color:var(--ink-2)}
-#logBtn svg{width:15px;height:15px;flex:none}
-#logBtn[data-new="1"]{border-color:var(--c1);color:var(--c1)}
-#logBtn[data-new="1"]::after{content:"";position:absolute;top:-5px;right:-5px;width:10px;height:10px;border-radius:50%;background:var(--c1);border:2px solid var(--panel)}
+.log-door{position:relative;display:flex;align-items:center;gap:10px;width:100%;margin:0 0 12px;padding:9px 14px;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);font:inherit;color:var(--ink-2);cursor:pointer;text-align:left}   /* v236: the log's bar above Tempo */
+.log-door .cal{width:16px;height:16px;flex:none;color:var(--c1)}
+.log-door .lbl{margin-right:auto}
+.log-door .wk{display:flex;gap:3px;align-items:center;padding-right:3px}
+.log-door .wk i{width:7px;height:7px;border-radius:50%;background:var(--line-2);flex:none}
+.log-door .wk i.on{background:var(--c2)}
+.log-door .wk i.now{box-shadow:0 0 0 1.5px var(--panel),0 0 0 2.5px var(--ink-3)}
+.log-door .streak{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink);white-space:nowrap;margin-left:6px}
+.log-door .streak small{font-size:10px;color:var(--ink-3);margin-left:2px}
+.log-door[data-new="1"]{border-color:var(--c1)}
+.log-door[data-new="1"] .lbl{color:var(--c1)}
+.log-door[data-new="1"]::after{content:"";position:absolute;top:-5px;right:-5px;width:10px;height:10px;border-radius:50%;background:var(--c1);border:2px solid var(--ground)}
 /* v227: a running session breathes on the section's edge unfolded too - the edge only, no tint over
    the settings (the folded bar keeps its tint) */
 #sessionPanel:not([data-fold="1"])[data-live="1"]::after{animation:pulseFade 2s ease-in-out infinite;will-change:opacity;background:transparent;border-width:2px}
@@ -1336,8 +1343,11 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 /* the unfolded pattern (v234): best and last, every kept run as a figure with its change, the Precision button */
 .log-det.pdet{flex-direction:column;align-items:flex-start;gap:8px}
 .log-pd{display:flex;flex-direction:column;gap:8px;width:100%}
-.log-pd-head{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--ink-3)}
-.log-pd-head b{color:var(--ink);font-family:"IBM Plex Mono",monospace;font-weight:600}
+.log-pd-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:12px;color:var(--ink-3);padding:0 2px}   /* v236: numbers only - best left, last right */
+.log-pd-head .star{font-style:normal;color:var(--c1);font-size:11px;margin-right:5px}
+.log-pd-head b small{font-size:9px;color:var(--ink-3);margin-left:1px}
+.log-pd-head b.dl{margin-left:7px;font-size:12px}
+.log-pd-head b{color:var(--ink);font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:15px}
 .log-pd-head b.up{color:var(--c2)}.log-pd-head b.down{color:var(--c3)}.log-pd-head b.same{color:var(--c1)}
 .log-runs{display:flex;flex-wrap:wrap;gap:5px}
 .log-run{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink-2);border:1px solid var(--line-2);border-radius:8px;padding:4px 8px;background:var(--panel);white-space:nowrap}
@@ -1549,6 +1559,14 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
   </header>
 
+  <!-- v236 (Oscar's option B): the practice log as a slim bar above Tempo - a glance (the week's dots, the
+       streak) and the door to the log window; orange with a dot while there is something new -->
+  <button type="button" class="log-door" id="logBtn" data-new="0" title="Practice log: days, sessions, game progress and Precision runs">
+    <svg class="cal" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 9.5h17M8 3v4M16 3v4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M7.5 13h3M13.5 13h3M7.5 16.5h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <span class="lbl">Practice log</span>
+    <span class="wk" id="logBarDots" aria-hidden="true"></span>
+    <span class="streak" id="logBarStreak" title="Days in a row with practice"></span>
+  </button>
   <section class="transport foldsec" id="tempoPanel">
     <div class="sess-head">
       <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
@@ -1795,9 +1813,6 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
     <!-- v227: the practice log (Oscar): its own row under the plan, left, behind a line; orange with a
          dot while it holds entries not looked at yet -->
-    <div class="sess-log">
-      <button class="btn sm" id="logBtn" data-new="0" title="Days, sessions, game progress and Precision runs"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 9.5h17M8 3v4M16 3v4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M7.5 13h3M13.5 13h3M7.5 16.5h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Practice calendar log</button>
-    </div>
   </section>
 
   <section class="presets foldsec" id="seqPanel">
@@ -2236,7 +2251,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v235"></script>
+<script src="./app.js?v=v236"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2249,8 +2264,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v235";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-22 16:35";          /* and when it was built, for ?diag */
+  var BUILD = "v236";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-22 16:48";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

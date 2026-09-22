@@ -1322,6 +1322,22 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .log-bar .v{font-family:"IBM Plex Mono",monospace;color:var(--ink);text-align:right;white-space:nowrap}
 .log-bar .v small{color:var(--ink-3);font-size:9px}
 .log-scroll{overflow:auto;min-height:0;flex:1 1 auto}
+/* the pattern rows (v231): a five-run sparkline on a fixed 0-100 scale, the last point coloured against the best */
+.log-row .spark{width:64px;height:26px;display:block}
+.log-row .spark polyline{fill:none;stroke:var(--ink-3);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+.log-row .spark circle{fill:var(--ink-3)}
+.log-row .spark circle.up{fill:var(--c2)}.log-row .spark circle.down{fill:var(--c3)}.log-row .spark circle.same{fill:var(--c1)}.log-row .spark circle.one{fill:var(--ink)}
+.log-row .pct{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink);width:64px;text-align:center}
+.log-trend{display:flex;flex-direction:column;gap:6px;min-width:0}
+.log-trend svg{width:100%;height:44px;display:block}
+.log-trend svg polyline{fill:none;stroke:var(--c1);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+.log-trend svg path{fill:var(--c1);opacity:.14}
+.log-trend svg line{stroke:var(--line-2);stroke-width:1;stroke-dasharray:2 3}
+.log-trend .k{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600;display:flex;justify-content:space-between;gap:8px}
+.log-trend .k b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ink);letter-spacing:0;text-transform:none}
+.log-trend .legend{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:11px;color:var(--ink-2)}
+.log-trend .legend i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px;vertical-align:0}
+.up{--lc:var(--c2)}.same{--lc:var(--c1)}.down{--lc:var(--c3)}.one{--lc:var(--line-2)}
 .log-sheet table{width:100%;border-collapse:collapse;font-size:12.5px}
 .log-sheet th{text-align:left;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600;padding:0 6px 6px 6px}
 .log-sheet th.r{text-align:right}
@@ -2065,8 +2081,12 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
     <div class="log-pane" id="logPanePats" hidden>
       <div class="log-rule"><span class="lbl">Patterns</span><span class="seg" id="logSort" role="group" aria-label="Sort"><button data-s="recent" aria-pressed="true">Recent</button><button data-s="best" aria-pressed="false">Best</button></span></div>
-      <div class="log-scroll"><table class="log-pat"><thead><tr><th>Pattern</th><th>Best</th><th>Last</th><th>Runs</th><th>When</th></tr></thead><tbody id="logPats"></tbody></table></div>
-      <p class="log-note" id="logNote">Best is the Precision benchmark of the pattern at that tempo. Last is coloured against it: teal above, pink below, orange within a point.</p>
+      <!-- v231, Oscar's spec: rows in the same fixed box - the pattern, its tempo, a mini chart of the last
+           five runs (one run: the figure), the run count; a tap opens Precision on it; the fixed chart
+           under the box shows how the patterns are moving -->
+      <div class="log-list" id="logPats"></div>
+      <p class="log-more" id="logPatMore"></p>
+      <div class="log-charts" id="logPatCharts"></div>
     </div>
     <!-- editor only (v230): fake progress to look at the log with, and a wipe -->
     <div class="log-foot" id="logFoot"><button type="button" class="btn sm" id="logFake" title="Two months of random practice, added to what is there">Fake progress</button> <button type="button" class="btn sm danger" id="logWipe" title="Forget every day, routine run and Precision run on this device">Wipe log</button></div>
@@ -2193,7 +2213,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v230"></script>
+<script src="./app.js?v=v231"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2206,8 +2226,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v230";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-22 15:14";          /* and when it was built, for ?diag */
+  var BUILD = "v231";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-22 15:49";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

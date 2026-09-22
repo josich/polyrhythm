@@ -1190,7 +1190,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 /* the level editor is a maker's tool: hidden unless this device has been let in */
 /* the Levels section is for everyone (v93): players see the ladder as far as they
    have cleared it plus the next level; the editing controls stay behind the cheat */
-:root:not([data-editor="1"]) :is(#lvlAdd,#lvlUpdate,#lvlShare,#lvlImport,#lvlChk,#lvlShareBox,#lvlImportBox,#achFoot,#gameWin){display:none}
+:root:not([data-editor="1"]) :is(#lvlAdd,#lvlUpdate,#lvlShare,#lvlImport,#lvlChk,#lvlShareBox,#lvlImportBox,#achFoot,#gameWin,#logFoot){display:none}
 .ach-foot{display:flex;justify-content:flex-end;margin-top:18px;padding-top:10px;border-top:1px dashed var(--line)}
 .lvl-row .nm-ro{font-size:12.5px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lvl-row .chk.ok{color:var(--c2)}
@@ -1333,6 +1333,7 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .log-more,.log-note{font-size:12px;color:var(--ink-3);margin:6px 0 0;text-align:center;flex:none}
 .log-note{text-align:left;margin-top:10px}
 .log-empty{font-size:12.5px;color:var(--ink-3);padding:10px 8px}
+.log-foot{display:flex;gap:8px;justify-content:flex-end;margin-top:10px;flex:none}
 .sess-plan{
   margin:0;flex:1 1 auto;min-width:0;
   font-size:12px;color:var(--ink-2);line-height:1.6;
@@ -2067,6 +2068,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <div class="log-scroll"><table class="log-pat"><thead><tr><th>Pattern</th><th>Best</th><th>Last</th><th>Runs</th><th>When</th></tr></thead><tbody id="logPats"></tbody></table></div>
       <p class="log-note" id="logNote">Best is the Precision benchmark of the pattern at that tempo. Last is coloured against it: teal above, pink below, orange within a point.</p>
     </div>
+    <!-- editor only (v230): fake progress to look at the log with, and a wipe -->
+    <div class="log-foot" id="logFoot"><button type="button" class="btn sm" id="logFake" title="Two months of random practice, added to what is there">Fake progress</button> <button type="button" class="btn sm danger" id="logWipe" title="Forget every day, routine run and Precision run on this device">Wipe log</button></div>
   </div>
 </div>
 <div class="modal" id="achModal" hidden>
@@ -2190,7 +2193,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v229"></script>
+<script src="./app.js?v=v230"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2203,8 +2206,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v229";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-22 14:55";          /* and when it was built, for ?diag */
+  var BUILD = "v230";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-22 15:14";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

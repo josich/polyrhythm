@@ -1289,6 +1289,10 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .log-list{flex:1 1 auto;min-height:120px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;padding:3px;scrollbar-width:thin;border:1px solid var(--line);border-radius:10px;background:var(--sunk)}
 .log-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:12px;padding:7px 10px;border:1px solid var(--line);border-radius:9px;background:var(--panel);cursor:pointer;text-align:left;font:inherit;color:inherit;width:100%}
 .log-row[aria-expanded="true"]{border-color:var(--line-2)}
+/* v232: rows holding data newer than the previous look are orange with the button's dot, until tapped */
+.log-row{position:relative}
+.log-row[data-new="1"]{border-color:var(--c1)}
+.log-row[data-new="1"]::after{content:"";position:absolute;top:-5px;right:-5px;width:10px;height:10px;border-radius:50%;background:var(--c1);border:2px solid var(--panel)}
 .log-row .date{min-width:0}
 .log-row .date b{display:block;font-weight:600;color:var(--ink);font-size:13px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .log-row .date span{font-size:11px;color:var(--ink-3)}
@@ -2213,7 +2217,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v231"></script>
+<script src="./app.js?v=v232"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2226,8 +2230,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v231";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-22 15:49";          /* and when it was built, for ?diag */
+  var BUILD = "v232";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-22 16:04";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -663,6 +663,12 @@ input[type=range]::-moz-range-thumb{
 .ask-sheet{max-width:340px;text-align:center;padding:22px 22px 18px}
 .ask-sheet .chal-brand{margin-bottom:12px}
 .ask-text{margin:0 0 18px;font-size:15px;line-height:1.45;color:var(--ink)}
+/* v243: an optional choice inside the confirm box, with its own warning line */
+.ask-opt{display:flex;gap:10px;align-items:flex-start;text-align:left;margin:-6px 0 16px;padding:10px 12px;border:1px dashed var(--line-2);border-radius:10px;cursor:pointer;font-size:13px;color:var(--ink-2)}
+.ask-opt[hidden]{display:none}
+.ask-opt input{width:18px;height:18px;margin:1px 0 0;accent-color:var(--c3);flex:none}
+.ask-opt b{display:block;color:var(--ink);font-weight:600}
+.ask-opt small{display:block;font-size:11.5px;line-height:1.4;color:var(--c3);margin-top:3px}
 .ask-btns{display:flex;gap:10px;justify-content:center}
 .ask-btns .btn{min-width:110px}
 .btn.danger{border-color:var(--c3);color:var(--c3)}
@@ -2049,6 +2055,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   <div class="sheet ask-sheet" role="alertdialog" aria-modal="true" aria-labelledby="askTitle" aria-describedby="askText">
     <div class="chal-brand"><svg viewBox="0 0 512 512" width="22" height="22" aria-hidden="true"><path d="M256 256L256 56 A200 200 0 1 1 82.8 156.0 Z" fill="var(--ink)" opacity=".12"/><circle cx="256" cy="256" r="200" fill="none" stroke="var(--line-2)" stroke-width="10"/><path d="M256 256L70.7 149.0" stroke="var(--ink)" stroke-width="7" stroke-linecap="round"/><circle cx="256.0" cy="56.0" r="30" fill="var(--c1)"/><circle cx="456.0" cy="256.0" r="26" fill="var(--c2)"/><circle cx="256.0" cy="456.0" r="26" fill="var(--c2)"/><circle cx="56.0" cy="256.0" r="26" fill="var(--c2)"/><circle cx="256" cy="256" r="26" fill="var(--ink)"/></svg><span id="askTitle">Polyorbit</span></div>
     <p class="ask-text" id="askText"></p>
+    <label class="ask-opt" id="askOpt" hidden><input type="checkbox" id="askOptBox"><span><b id="askOptLabel"></b><small id="askOptNote"></small></span></label>
     <div class="ask-btns">
       <button type="button" class="btn" id="askNo">Cancel</button>
       <button type="button" class="btn danger" id="askYes">OK</button>
@@ -2272,7 +2279,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v242"></script>
+<script src="./app.js?v=v243"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2285,8 +2292,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v242";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-23 11:35";          /* and when it was built, for ?diag */
+  var BUILD = "v243";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-23 11:45";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

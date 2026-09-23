@@ -931,6 +931,7 @@ canvas{
 .game-ctl{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin:2px 0 12px}   /* right side (Oscar, v161) */
 .game-ctl .btn.sm{padding:8px 14px;font-size:13px}
 #gtabs{margin-bottom:14px}
+#gtabs .tab{--lc:var(--c4)}   /* v239: the chosen mode in the game's purple, the log's category colour */
 #tapPanel .lvl-lbl{margin:4px 0 12px}
 .ach-row .n b{color:var(--c1);font-weight:600}
 .ach-row .recent{margin-left:auto;display:flex;gap:5px}
@@ -1267,7 +1268,7 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 #sessionPanel:not([data-fold="1"])[data-live="1"]::after{animation:pulseFade 2s ease-in-out infinite;will-change:opacity;background:transparent;border-width:2px}
 @media (prefers-reduced-motion:reduce){ #sessionPanel:not([data-fold="1"])[data-live="1"]::after{animation:none;opacity:.6} }
 /* the sheet */
-.log-sheet{max-width:480px;max-height:86vh;display:flex;flex-direction:column;overflow:hidden;--lg-wheel:var(--ink-3);--lg-sess:var(--c2);--lg-rout:var(--c3);--lg-game:var(--c4);--lg-prec:var(--c1)}   /* v229: the tiles and the charts stay put, the days scroll between them */
+.log-sheet{max-width:480px;max-height:86vh;display:flex;flex-direction:column;overflow:hidden;--lg-wheel:var(--c1);--lg-sess:var(--c3);--lg-rout:var(--ink-3);--lg-game:var(--c4);--lg-prec:var(--c2)}   /* v239, Oscar's map: wheel orange, session pink, routine grey, game purple, Precision teal */   /* v229: the tiles and the charts stay put, the days scroll between them */
 .log-sheet .sheet-head{flex:none}
 .log-sheet h2{display:flex;align-items:center;gap:8px}
 .log-sheet .log-ico svg{width:18px;height:18px;color:var(--c1);display:block}
@@ -1426,7 +1427,7 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 /* v204, Oscar: every cross that closes a sheet, leaves a mode or removes something is pink (c3),
    like the game's and the stage's - the sheets' closes, the banner's, the challenge's, the awards',
    the ring card's remove, and the x on preset / level / sequence rows */
-#alongX,#chalQuit,#planClose,#scoreClose,#achClose,#shareClose,#helpClose,.icobtn.chal-x,#rack .icobtn[data-del]{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
+#alongX,#chalQuit,#planClose,#scoreClose,#achClose,#shareClose,#helpClose,#logClose,.icobtn.chal-x,#rack .icobtn[data-del]{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
 .lvl-row .ops button[data-del]{color:var(--c3)}
 .empty{color:var(--ink-3);font-size:12px;margin-top:11px}
 .sec-help{margin:2px 0 10px}
@@ -2253,7 +2254,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v238"></script>
+<script src="./app.js?v=v239"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2266,8 +2267,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v238";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-23 09:06";          /* and when it was built, for ?diag */
+  var BUILD = "v239";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-23 10:35";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

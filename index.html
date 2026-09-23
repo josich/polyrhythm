@@ -1385,6 +1385,15 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .log-note{text-align:left;margin-top:10px}
 .log-empty{font-size:12.5px;color:var(--ink-3);padding:10px 8px}
 .log-foot{display:flex;gap:8px;justify-content:flex-end;margin-top:10px;flex:none}
+.log-back{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--line);flex:none}   /* v240 */
+.log-back .btn{display:inline-flex;align-items:center;gap:6px}
+.log-back .btn svg{width:14px;height:14px;flex:none}
+#logExport{border-color:var(--c2)}
+#logExport svg{color:var(--c2)}
+#logImport svg{color:var(--ink-3)}
+.log-back-note{font-size:11.5px;color:var(--ink-3);flex:1 1 100%;min-width:0}
+.log-back-note:empty{display:none}
+.log-back-note.ok{color:var(--c2)}.log-back-note.bad{color:var(--c3)}
 .sess-plan{
   margin:0;flex:1 1 auto;min-width:0;
   font-size:12px;color:var(--ink-2);line-height:1.6;
@@ -2129,6 +2138,14 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <p class="log-more" id="logPatMore"></p>
       <div class="log-charts" id="logPatCharts"></div>
     </div>
+    <!-- v240: backup - one file with everything this phone has earned, shared or saved; Restore merges a file
+         into the phone without removing anything -->
+    <div class="log-back" id="logBack">
+      <button type="button" class="btn sm" id="logExport" title="Save everything as one file - share it to Drive, mail or keep it"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11M7.5 9.5L12 14l4.5-4.5M4 15v3.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Backup</button>
+      <button type="button" class="btn sm" id="logImport" title="Restore a backup file into this phone - it adds to what is here"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14V3M7.5 7.5L12 3l4.5 4.5M4 15v3.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Restore</button>
+      <input type="file" id="logFile" accept=".json,application/json,text/plain" hidden>
+      <span class="log-back-note" id="logBackNote"></span>
+    </div>
     <!-- editor only (v230): fake progress to look at the log with, and a wipe -->
     <div class="log-foot" id="logFoot"><button type="button" class="btn sm" id="logFake" title="Two months of random practice, added to what is there">Fake progress</button> <button type="button" class="btn sm danger" id="logWipe" title="Forget every day, routine run and Precision run on this device">Wipe log</button></div>
   </div>
@@ -2254,7 +2271,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v239"></script>
+<script src="./app.js?v=v240"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2267,8 +2284,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v239";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-23 10:35";          /* and when it was built, for ?diag */
+  var BUILD = "v240";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-23 11:13";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

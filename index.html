@@ -155,7 +155,7 @@ button,input,select{font:inherit;color:inherit;-webkit-tap-highlight-color:trans
    the way a score does. */
 .transport > .note-row{grid-column:1/-1;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 /* v250: the drone row - label, on/off, the note, its level */
-.transport > .drone-row{grid-column:1/-1;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.transport > .drone-row{grid-column:1/-1;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:12px;margin-top:4px}   /* v252: a rule sets the drone apart from the tempo settings (Oscar) */
 .drone-row select.snd{width:auto;flex:0 0 auto;padding:5px 8px;font-size:12px}
 .drone-row input[type=range]{flex:1 1 80px;min-width:80px;max-width:220px}
 #droneBtn{color:var(--ink)}
@@ -1660,10 +1660,11 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
     <!-- v250 (Oscar): a drone - one low note held under the wheel while it plays, to tune and lock in
          against; its own level, past the limiter so it never squeezes the clicks -->
-    <div class="drone-row" id="droneRow">
+    <div class="drone-row adv-only" id="droneRow">
       <span class="lbl">Drone</span>
       <button class="btn sm" id="droneBtn" data-on="0" aria-pressed="false" title="Hold a low note under the wheel while it plays">Off</button>
       <select class="snd drone-note" id="droneNote" aria-label="Drone note"></select>
+      <select class="snd drone-chord" id="droneChord" aria-label="Drone chord"><option value="none">Note</option><option value="maj">Major</option><option value="min">Minor</option><option value="dim">Diminished</option><option value="aug">Augmented</option></select>
       <input type="range" id="droneVol" min="0" max="1" step="0.01" value="0.35" aria-label="Drone level">
     </div>
   </section>
@@ -2245,7 +2246,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <li>Switching notes keeps the speed and converts the number.</li>
       <li><b>Tap tempo</b> sets it by feel.</li>
       <li><b>Count-in</b> plays three beats first.</li>
-      <li><b>Drone</b> holds a low note under the wheel while it plays, to tune and lock in against.</li>
+      <li><b>Drone</b> holds a low note, or a triad on it, under the wheel while it plays, to tune and lock in against.</li>
     </ul>
 
     <h3>Ring tabs</h3>
@@ -2295,7 +2296,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v251"></script>
+<script src="./app.js?v=v252"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2308,8 +2309,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v251";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-23 18:39";          /* and when it was built, for ?diag */
+  var BUILD = "v252";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-23 18:56";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

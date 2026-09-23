@@ -1,4 +1,4 @@
-/* Polyorbit v237 - built from polyrhythm-circle.html by build-pwa.sh; edit the source, not this file */
+/* Polyorbit v238 - built from polyrhythm-circle.html by build-pwa.sh; edit the source, not this file */
 (function(){"use strict";var SOUNDS=[{id:"kick",name:"Kick"},{id:"snare",name:"Snare"},{id:"hihat",name:"Hi-hat"},{id:"wood",name:"Wood block"},{id:"click",name:"Click"},{id:"clap",name:"Clap"},{id:"beep",name:"Beep"},{id:"bell",name:"Bell"},{id:"rim",name:"Rim"}];var DEFAULT_SOUND=["kick","wood","beep","rim"];var BPM_MIN=1,BPM_MAX=660;var S={bpm:96,noteDen:4,noteDot:false,master:0.9,muted:false,active:0,ptab:"mine",seq:[],levels:[],levels2:[],levels2Build:"",levelsBuild:"",tapMode:"",sessLoop:false,sessPong:false,fold:{},rfold:{},countIn:false,playing:false,rings:[mkRing(0,4),mkRing(1,3)]};var MAX_STEPS=48;var SUB_LEVEL=0.12;var SUB_PITCH=1.5;function mkRing(i,div){return{div:div,sub:1,sound:DEFAULT_SOUND[i]||"click",vol:i===0?0.95:0.8,off:0,swing:0,mute:false,steps:filled(div),nextTick:0,lastTick:null,flash:[]};}
 function filled(n){var a=[],i;for(i=0;i<n;i++)a.push(i===0?2:1);return a;}
 function normSteps(arr){var legacy=arr.some(function(v){return typeof v==="boolean";});var out=arr.map(function(v){return v===2?2:(v?1:0);});if(legacy&&out[0])out[0]=2;return out;}
@@ -290,7 +290,8 @@ run.lastStage=l.stage;if(S.bpm!==l.bpm){S.bpm=l.bpm;paintTransport();changed=tru
 S.rings.forEach(function(r){realign(r);});paintPlan();if(changed&&!scoreSheet.hidden&&scoreSrc==="wheel")paintScore();if(changed&&stageOn)stageScorePaint();}
 function startSession(){achPlayTick(false);if(run)return;if(S.playing)stop();var plan=sessPlan||buildPlan();run={plan:plan,seq:loopOrder(plan.loops.length),i:0,cur:0,base:0,pass:1,lastStage:-1,snapshot:sessionSnapshot(),scale:null,t0:performance.now(),routine:null,done:false};sessBtn.textContent="Stop";sessBtn.dataset.on="1";syncSessBtn();paintFolds();applyLoop(0);start();paintPlan();}
 function finishSession(){achPlayTick(false);if(run&&!run.routine)dayAddSess();if(!run)return;var snap=run.snapshot;if(run.routine){rlog.push({t:Date.now(),id:run.routine.id,name:run.routine.name,secs:Math.round((performance.now()-(run.t0||performance.now()))/1000),done:run.done?1:0});rlogSave();setTimeout(function(){paintRoutines();paintLogBtn();},0);}
-if(snap)delete snap.sess;run=null;sessBtn.textContent="Start";sessBtn.dataset.on="0";syncSessBtn();paintFolds();clearSessNow();applySession(snap);buildRack();paintTransport();paintRack();paintCount();paintPlan();}
+if(snap){delete snap.sess;delete snap.seq;}
+run=null;sessBtn.textContent="Start";sessBtn.dataset.on="0";syncSessBtn();paintFolds();clearSessNow();applySession(snap);buildRack();paintTransport();paintRack();paintCount();paintPlan();}
 function sessionTick(t){if(!run||!S.playing)return;var cd=cycleDur();var nextPhase=run.base+1;var tB=refTime+(nextPhase-refPhase)*cd;if(t+LOOKAHEAD<tB)return;var ni=run.i+1;if(ni>=run.seq.length){if(!S.sessLoop){if(run.endAt===undefined)run.endAt=tB;if(t>=run.endAt-0.005){run.done=true;stop();finishSession();}
 return;}
 ni=0;run.pass=(run.pass||1)+1;}

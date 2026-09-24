@@ -436,6 +436,10 @@ input[type=range]::-moz-range-thumb{
 .ghost .ring{transform-origin:center;transform-box:fill-box;opacity:0;animation:ghostRing 1.8s ease-out infinite}
 .ghost .ring.r2{animation-delay:.16s}
 @keyframes ghostTap{0%,14%{transform:translateY(0) scale(1)}26%{transform:translateY(5%) scale(.97)}40%,100%{transform:translateY(0) scale(1)}}
+/* v278: calibration's hand taps with the clicks - the loop is one click long and offset so its tap (26 % in)
+   lands when each click is heard */
+.ghost.calsync .hand,.ghost.calsync .ring{animation-duration:var(--cyc,.6s);animation-delay:var(--d0,0s)}
+.ghost.calsync .ring.r2{animation-delay:calc(var(--d0,0s) + .05s)}
 @keyframes ghostRing{0%,24%{transform:scale(.25);opacity:0}26%{transform:scale(.3);opacity:.95}70%,100%{transform:scale(1.35);opacity:0}}
 @media (prefers-reduced-motion:reduce){ .ghost .hand{animation:none} .ghost .ring{animation:none;opacity:.6;transform:scale(1)} }
 /* the coach card: fixed at the foot of the screen, under the sheets, until Got it */
@@ -2306,7 +2310,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v277"></script>
+<script src="./app.js?v=v278"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2319,8 +2323,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v277";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-24 14:35";          /* and when it was built, for ?diag */
+  var BUILD = "v278";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-24 14:37";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

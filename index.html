@@ -2077,6 +2077,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
      count, a title, one or two lines, Next; Skip small and dim in its corner - and a hand that points
      at what the step is about -->
 <div class="ghost tour-hand" id="tourHand" hidden aria-hidden="true"></div>
+<div class="ghost tour-hand" id="tourHand2" hidden aria-hidden="true"></div>
 <div class="tour" id="tourCard" hidden role="dialog" aria-labelledby="tourT">
   <button type="button" class="tour-skip" id="tourSkip">Skip tour</button>
   <div class="tour-k"><span id="tourStage"></span><span id="tourCount"></span></div>
@@ -2329,7 +2330,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v257"></script>
+<script src="./app.js?v=v258"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2342,8 +2343,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v257";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-24 10:51";          /* and when it was built, for ?diag */
+  var BUILD = "v258";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-24 11:17";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

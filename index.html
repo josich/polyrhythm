@@ -2166,6 +2166,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   <defs>
     <g id="i-star"><path d="M12 3.2l2.7 5.7 6.1.8-4.5 4.2 1.2 6.1L12 17l-5.5 3 1.2-6.1L3.2 9.7l6.1-.8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></g>
     <g id="i-star-f"><path d="M12 3.2l2.7 5.7 6.1.8-4.5 4.2 1.2 6.1L12 17l-5.5 3 1.2-6.1L3.2 9.7l6.1-.8z" fill="currentColor"/></g>
+    <g id="i-star2"><path transform="translate(-.4 5.3) scale(.58)" d="M12 3.2l2.7 5.7 6.1.8-4.5 4.2 1.2 6.1L12 17l-5.5 3 1.2-6.1L3.2 9.7l6.1-.8z" fill="currentColor"/><path transform="translate(10.4 5.3) scale(.58)" d="M12 3.2l2.7 5.7 6.1.8-4.5 4.2 1.2 6.1L12 17l-5.5 3 1.2-6.1L3.2 9.7l6.1-.8z" fill="currentColor"/></g>
+    <g id="i-star3"><path transform="translate(6.1 .4) scale(.5)" d="M12 3.2l2.7 5.7 6.1.8-4.5 4.2 1.2 6.1L12 17l-5.5 3 1.2-6.1L3.2 9.7l6.1-.8z" fill="currentColor"/><path transform="translate(.6 10.6) scale(.5)" d="M12 3.2l2.7 5.7 6.1.8-4.5 4.2 1.2 6.1L12 17l-5.5 3 1.2-6.1L3.2 9.7l6.1-.8z" fill="currentColor"/><path transform="translate(11.6 10.6) scale(.5)" d="M12 3.2l2.7 5.7 6.1.8-4.5 4.2 1.2 6.1L12 17l-5.5 3 1.2-6.1L3.2 9.7l6.1-.8z" fill="currentColor"/></g>
     <g id="i-flame"><path d="M12 3c.6 3.2 3.6 4.6 4.6 7.6.9 2.7-.2 6.4-3.6 7.3.8-1.4.6-2.9-.4-4.2-.6 1.1-1.5 1.6-2.4 2.1-1.4-1.9-.9-3.8.3-5.4-1.9.8-3.3 2.6-3.4 5.1-2.4-1.9-2.9-6.3 0-8.5.2 1.4.9 2.2 1.9 2.7-.4-2.6.7-5 3-6.7z" fill="currentColor"/></g>
     <g id="i-crown"><path d="M4.5 17.5h15l1.5-9.5-5 3.6L12 5l-4 6.6-5-3.6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M5.5 20.5h13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></g>
     <g id="i-trophy"><path d="M8 4h8v5.5a4 4 0 0 1-8 0zM8 6H5.2a2.8 2.8 0 0 0 2.8 4.2M16 6h2.8a2.8 2.8 0 0 1-2.8 4.2M12 13.5v3.5M8.5 20.5h7M10 17h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g>
@@ -2312,7 +2314,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v286"></script>
+<script src="./app.js?v=v287"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2325,8 +2327,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v286";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-24 15:33";          /* and when it was built, for ?diag */
+  var BUILD = "v287";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-24 15:38";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

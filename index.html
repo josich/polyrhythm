@@ -839,6 +839,7 @@ input[type=range]::-moz-range-thumb{
 .info:hover{color:var(--ink);border-color:var(--ink-3)}
 .modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:grid;place-items:center;padding:20px}
 .modal[hidden]{display:none}
+#logModal{padding:12px}   /* v285 (Oscar): the log window takes the height of the screen - the lists get the room */
 /* v263: the tour's log demo - the window at the top, ending above the tour card, no Backup row */
 :root[data-tourlog="1"] #logModal{place-items:start center;padding-top:max(12px,env(safe-area-inset-top))}
 :root[data-tourlog="1"] #logModal .log-sheet{max-height:var(--tl-h,60svh)}
@@ -1331,7 +1332,7 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 #sessionPanel:not([data-fold="1"])[data-live="1"]::after{animation:pulseFade 2s ease-in-out infinite;will-change:opacity;background:transparent;border-width:2px}
 @media (prefers-reduced-motion:reduce){ #sessionPanel:not([data-fold="1"])[data-live="1"]::after{animation:none;opacity:.6} }
 /* the sheet */
-.log-sheet{max-width:480px;max-height:86vh;display:flex;flex-direction:column;overflow:hidden;--lg-wheel:var(--c1);--lg-sess:var(--c3);--lg-rout:var(--ink-3);--lg-game:var(--c4);--lg-prec:var(--c2)}   /* v239, Oscar's map: wheel orange, session pink, routine grey, game purple, Precision teal */   /* v229: the tiles and the charts stay put, the days scroll between them */
+.log-sheet{max-width:480px;height:min(900px, calc(100svh - 24px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)));max-height:none;display:flex;flex-direction:column;overflow:hidden;--lg-wheel:var(--c1);--lg-sess:var(--c3);--lg-rout:var(--ink-3);--lg-game:var(--c4);--lg-prec:var(--c2)}   /* v239, Oscar's map: wheel orange, session pink, routine grey, game purple, Precision teal */   /* v229: the tiles and the charts stay put, the days scroll between them */
 /* v261 (QA V1): on a short screen (a phone turned sideways) the fixed parts leave no room, and the day list
    covered Backup / Restore - there the whole window scrolls instead, the lists at a fixed height */
 @media (max-height:480px){ .log-sheet{overflow-y:auto} .log-sheet .log-list{flex:none;height:160px} #logPaneDays,#logPanePats{flex:none} }
@@ -2310,7 +2311,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v284"></script>
+<script src="./app.js?v=v285"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2323,8 +2324,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v284";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-24 15:25";          /* and when it was built, for ?diag */
+  var BUILD = "v285";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-24 15:27";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

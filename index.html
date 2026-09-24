@@ -456,6 +456,8 @@ input[type=range]::-moz-range-thumb{
 .tour-d{margin-top:4px;font-size:13px;color:var(--ink-2);line-height:1.45}
 .tour-btns{display:flex;justify-content:flex-end;margin-top:12px}
 #tourNext{min-width:104px;border-color:var(--c2);color:var(--ink)}
+#tourNext:disabled{opacity:.35;border-color:var(--line);cursor:default}   /* v257: greyed until the step's action is done */
+:root[data-tour="1"] [data-tour-lock="1"]{pointer-events:none}   /* v257: shown but not for touching in this step */
 .tour-run-row{margin:6px 0 2px}
 #tourRun{border-color:var(--c2);color:var(--ink)}
 .along-word{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -2327,7 +2329,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v256"></script>
+<script src="./app.js?v=v257"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2340,8 +2342,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v256";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-24 10:33";          /* and when it was built, for ?diag */
+  var BUILD = "v257";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-24 10:51";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

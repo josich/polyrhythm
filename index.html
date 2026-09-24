@@ -326,7 +326,7 @@ input[type=range]::-moz-range-thumb{
 :root[data-stage="1"] .canvas-hold{max-width:min(100%,max(220px,calc(100vh - 260px)));max-width:min(100%,max(220px,calc(100lvh - 260px)))}   /* the floor: a short viewport must not collapse the wheel */
 :root[data-stage="1"] .play{width:clamp(70px,30%,150px)}
 :root[data-stage="1"] :is(#scoreBtn,#shareBtn,#alongBtn,#flashBtn,.hint){display:none}   /* v173: the bolt too - the flash keeps the wheel's setting */
-:root[data-stage="1"] #dialRatio{font-size:24px}
+:root[data-stage="1"] #dialRatio{font-size:26px}
 :root[data-stage="1"] .dial-foot{min-height:44px;margin-top:12px}
 :root[data-stage="1"] :is(#sessNowIn,#tapNowIn,#beatNowIn){font-size:30px}
 #stageX{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));width:28px;height:28px;border-radius:8px;align-self:center}   /* by id: .icobtn, declared later, out-ranked the class */
@@ -366,8 +366,8 @@ input[type=range]::-moz-range-thumb{
   grid-template-columns:minmax(0,1fr) fit-content(46%) minmax(0,1fr) auto auto auto auto;   /* + Play along (v167) */
   align-items:baseline;gap:8px;margin-bottom:2px;
 }
-#dialRatio{grid-column:1;text-align:left;font-size:18px}   /* v221: the name left the head, the ratio grows */
-#dialRatio .ratio-sep{color:var(--ink-3)}
+#dialRatio{grid-column:1 / 4;text-align:left;font-size:20px}   /* v221: the name left the head, the ratio grows; v254 (Oscar: "the last number is not visible"): it takes the whole left side, 20 px */
+#dialRatio .ratio-sep,.ratio-sep{color:var(--ink-3);letter-spacing:-.28em;margin-right:.28em}   /* v254: the mono spaces round the colon tightened, so the numbers get the room (the margin gives back the last letter's negative spacing) */
 /* v221: the pattern's name under the wheel - bigger, half-strength (Oscar's sketch); the head keeps
    the ratio and the buttons only, so the ratio has the room */
 .patname{margin:0 0 3px;padding:0 12px;text-align:center;font-size:15px;font-weight:500;color:var(--ink);opacity:.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -379,7 +379,7 @@ input[type=range]::-moz-range-thumb{
 :root[data-stage="1"] #stageScore:not([hidden]){display:block}
 #stageScore .stline{position:absolute;top:0;left:0;width:2px;border-radius:1px;background:#E5484D;opacity:.9;will-change:transform;pointer-events:none}
 @media (min-width:600px) and (orientation:landscape){ :root[data-stage="1"] #stageScore:not([hidden]){display:none} }   /* portrait-only (Oscar); after the show rule so it wins at equal specificity */
-#posLbl{grid-column:3;text-align:right}
+#posLbl{grid-column:3;text-align:right;display:none}   /* v254: always empty since v72, it held half the ratio's room */
 /* the note that opens the score: a small round button at the header's end */
 #scoreBtn{grid-column:4;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none;border-color:var(--c4)}   /* purple, ring 4's colour (Oscar, v144) */
 #scoreBtn svg.note{width:11px;height:15px;display:block}
@@ -2296,7 +2296,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v253"></script>
+<script src="./app.js?v=v254"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2309,8 +2309,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v253";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-24 09:05";          /* and when it was built, for ?diag */
+  var BUILD = "v254";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-24 09:11";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

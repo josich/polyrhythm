@@ -449,12 +449,13 @@ input[type=range]::-moz-range-thumb{
   padding:14px 16px 12px;border:1px solid color-mix(in srgb,var(--c2) 55%,var(--line));border-radius:14px;background:var(--panel);box-shadow:var(--shadow)}
 .tour[hidden]{display:none}
 .tour.top{z-index:79}   /* v256: over a sheet (the log), under the confirm box */
-.tour-skip{position:absolute;top:6px;right:8px;padding:6px 6px;border:0;background:none;font-size:10.5px;letter-spacing:.04em;color:var(--ink-3);opacity:.45;cursor:pointer}
-.tour-k{display:flex;gap:10px;padding-right:74px;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--c2)}
-.tour-k #tourCount{color:var(--ink-3);letter-spacing:.06em}
+.tour-skip{padding:8px 4px;border:0;background:none;font-size:10.5px;letter-spacing:.04em;color:var(--ink-3);opacity:.45;cursor:pointer}
+.tour-k{display:flex;gap:10px;align-items:baseline;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--c2)}
+.tour-k #tourStage{min-width:0}
+.tour-k #tourCount{margin-left:auto;flex:none;white-space:nowrap;color:var(--ink-3);letter-spacing:.06em}
 .tour-t{margin-top:6px;font-size:16px;font-weight:600;color:var(--ink);line-height:1.3}
 .tour-d{margin-top:4px;font-size:13px;color:var(--ink-2);line-height:1.45}
-.tour-btns{display:flex;justify-content:flex-end;margin-top:12px}
+.tour-btns{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
 #tourNext{min-width:104px;border-color:var(--c2);color:var(--ink)}
 #tourNext:disabled{opacity:.35;border-color:var(--line);cursor:default}   /* v257: greyed until the step's action is done */
 :root[data-tour="1"] [data-tour-lock="1"]{pointer-events:none}   /* v257: shown but not for touching in this step */
@@ -2079,11 +2080,12 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 <div class="ghost tour-hand" id="tourHand" hidden aria-hidden="true"></div>
 <div class="ghost tour-hand" id="tourHand2" hidden aria-hidden="true"></div>
 <div class="tour" id="tourCard" hidden role="dialog" aria-labelledby="tourT">
-  <button type="button" class="tour-skip" id="tourSkip">Skip tour</button>
   <div class="tour-k"><span id="tourStage"></span><span id="tourCount"></span></div>
   <div class="tour-t" id="tourT"></div>
   <div class="tour-d" id="tourD"></div>
-  <div class="tour-btns"><button type="button" class="btn" id="tourNext">Next</button></div>
+  <!-- v260 (Oscar's screenshot): Skip left the header's corner for the bottom-left, level with Next -
+       the header line had no room for the stage name and the step count on a narrow phone -->
+  <div class="tour-btns"><button type="button" class="tour-skip" id="tourSkip">Skip tour</button><button type="button" class="btn" id="tourNext">Next</button></div>
 </div>
 <!-- Precision results (v193): a card at the end of a run, the figures big, Run again / Close -->
 <div class="modal ask-modal" id="alongModal" hidden>
@@ -2330,7 +2332,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v259"></script>
+<script src="./app.js?v=v260"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2343,8 +2345,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v259";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-24 11:46";          /* and when it was built, for ?diag */
+  var BUILD = "v260";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-24 11:59";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -439,6 +439,24 @@ input[type=range]::-moz-range-thumb{
 .coach .t{font-size:14px;font-weight:600;color:var(--ink);line-height:1.3}
 .coach .d{font-size:12px;color:var(--ink-3);margin-top:2px}
 .coach .btn{margin-left:auto;flex:none}
+/* v255: the tour. Everything the current step does not show is hidden (data-tour-hide, set by the
+   engine on the page's top-level parts and on the step's own inner parts); the page gets room at its
+   foot so the card never covers the last thing shown */
+:root[data-tour="1"] [data-tour-hide="1"]{display:none!important}
+:root[data-tour="1"] .wrap{padding-bottom:calc(230px + env(safe-area-inset-bottom, 0px))}
+.ghost.tour-hand{position:fixed;z-index:47}
+.tour{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom, 0px));z-index:48;max-width:420px;margin:0 auto;
+  padding:14px 16px 12px;border:1px solid color-mix(in srgb,var(--c2) 55%,var(--line));border-radius:14px;background:var(--panel);box-shadow:var(--shadow)}
+.tour[hidden]{display:none}
+.tour-skip{position:absolute;top:6px;right:8px;padding:6px 6px;border:0;background:none;font-size:10.5px;letter-spacing:.04em;color:var(--ink-3);opacity:.45;cursor:pointer}
+.tour-k{display:flex;gap:10px;padding-right:74px;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--c2)}
+.tour-k #tourCount{color:var(--ink-3);letter-spacing:.06em}
+.tour-t{margin-top:6px;font-size:16px;font-weight:600;color:var(--ink);line-height:1.3}
+.tour-d{margin-top:4px;font-size:13px;color:var(--ink-2);line-height:1.45}
+.tour-btns{display:flex;justify-content:flex-end;margin-top:12px}
+#tourNext{min-width:104px;border-color:var(--c2);color:var(--ink)}
+.tour-run-row{margin:6px 0 2px}
+#tourRun{border-color:var(--c2);color:var(--ink)}
 .along-word{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .along-pct[data-cmp="up"]{color:var(--c2)}     /* better than the benchmark */
 .along-pct[data-cmp="down"]{color:var(--c3)}   /* worse */
@@ -2052,6 +2070,17 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   <div class="coach-txt"><div class="t" id="coachT"></div><div class="d" id="coachD"></div></div>
   <button type="button" class="btn sm" id="coachOk">Got it</button>
 </div>
+<!-- the tour (v255, Oscar's first-launch tutorial): a card fixed at the foot - the stage, the step
+     count, a title, one or two lines, Next; Skip small and dim in its corner - and a hand that points
+     at what the step is about -->
+<div class="ghost tour-hand" id="tourHand" hidden aria-hidden="true"></div>
+<div class="tour" id="tourCard" hidden role="dialog" aria-labelledby="tourT">
+  <button type="button" class="tour-skip" id="tourSkip">Skip tour</button>
+  <div class="tour-k"><span id="tourStage"></span><span id="tourCount"></span></div>
+  <div class="tour-t" id="tourT"></div>
+  <div class="tour-d" id="tourD"></div>
+  <div class="tour-btns"><button type="button" class="btn" id="tourNext">Next</button></div>
+</div>
 <!-- Precision results (v193): a card at the end of a run, the figures big, Run again / Close -->
 <div class="modal ask-modal" id="alongModal" hidden>
   <div class="sheet ask-sheet along-card" role="dialog" aria-modal="true" aria-labelledby="alongCardK">
@@ -2229,6 +2258,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <p class="build mono" id="buildTag"></p>
     <!-- the installed app has no address bar: this is the way to the ?diag page from inside it (v121) -->
     <p class="build mono"><a href="./?diag" class="diaglink">Diagnostics</a> &middot; frame times and this device's own readings</p>
+    <p class="tour-run-row"><button type="button" class="btn sm" id="tourRun">Run the tour</button></p>
 
     <h3>The wheel</h3>
     <ul>
@@ -2296,7 +2326,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v254"></script>
+<script src="./app.js?v=v255"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2309,8 +2339,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v254";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-24 09:11";          /* and when it was built, for ?diag */
+  var BUILD = "v255";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-24 10:16";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 
@@ -2339,7 +2369,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       var root = document.documentElement, play = document.getElementById("play"), sess = document.getElementById("sessBtn");
       return (play && play.dataset.on === "1") || (sess && sess.dataset.on === "1") ||
              root.dataset.game === "1" || root.dataset.video === "1" || root.dataset.rec === "1" ||
-             root.dataset.cal === "1" || root.dataset.chal === "1" || !!document.querySelector(".modal:not([hidden])");
+             root.dataset.cal === "1" || root.dataset.chal === "1" || root.dataset.tour === "1" || !!document.querySelector(".modal:not([hidden])");
     };
     var reloadWhenIdle = function(){
       if(reloaded) return;

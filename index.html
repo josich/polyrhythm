@@ -82,6 +82,7 @@ html:root[data-skin="light"]{
 *{box-sizing:border-box}
 body{
   margin:0;
+  overflow-x:clip;   /* v261 (QA V2): the Tap tempo ping grew past the screen's edge and gave the page a sideways scroll */
   background:var(--ground);
   color:var(--ink);
   font-family:"Archivo","Helvetica Neue",Arial,sans-serif;
@@ -1302,6 +1303,9 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 @media (prefers-reduced-motion:reduce){ #sessionPanel:not([data-fold="1"])[data-live="1"]::after{animation:none;opacity:.6} }
 /* the sheet */
 .log-sheet{max-width:480px;max-height:86vh;display:flex;flex-direction:column;overflow:hidden;--lg-wheel:var(--c1);--lg-sess:var(--c3);--lg-rout:var(--ink-3);--lg-game:var(--c4);--lg-prec:var(--c2)}   /* v239, Oscar's map: wheel orange, session pink, routine grey, game purple, Precision teal */   /* v229: the tiles and the charts stay put, the days scroll between them */
+/* v261 (QA V1): on a short screen (a phone turned sideways) the fixed parts leave no room, and the day list
+   covered Backup / Restore - there the whole window scrolls instead, the lists at a fixed height */
+@media (max-height:480px){ .log-sheet{overflow-y:auto} .log-sheet .log-list{flex:none;height:160px} #logPaneDays,#logPanePats{flex:none} }
 .log-sheet .sheet-head{flex:none}
 .log-sheet h2{display:flex;align-items:center;gap:8px}
 .log-sheet .log-ico svg{width:18px;height:18px;color:var(--c1);display:block}
@@ -2332,7 +2336,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v260"></script>
+<script src="./app.js?v=v261"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2345,8 +2349,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v260";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-24 11:59";          /* and when it was built, for ?diag */
+  var BUILD = "v261";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-24 12:18";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

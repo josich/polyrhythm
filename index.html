@@ -1464,6 +1464,7 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .log-back-note.ok{color:var(--c2)}.log-back-note.bad{color:var(--c3)}
 #askYes.okay{border-color:var(--c2);color:var(--ink)}   /* v242 */
 #askNo{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}   /* v244: Cancel always in the alert colour (Oscar) */
+#askYes.danger{color:var(--c4);border-color:color-mix(in srgb,var(--c4) 70%,var(--line))}   /* v289 (Oscar): the destructive action purple, so it never matches Cancel's pink */
 .sess-plan{
   margin:0;flex:1 1 auto;min-width:0;
   font-size:12px;color:var(--ink-2);line-height:1.6;
@@ -2314,7 +2315,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v288"></script>
+<script src="./app.js?v=v289"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2327,8 +2328,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v288";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-24 15:49";          /* and when it was built, for ?diag */
+  var BUILD = "v289";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-24 15:56";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

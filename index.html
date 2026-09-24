@@ -838,7 +838,9 @@ input[type=range]::-moz-range-thumb{
 :root[data-tourlog="1"] #logModal{place-items:start center;padding-top:max(12px,env(safe-area-inset-top))}
 :root[data-tourlog="1"] #logModal .log-sheet{max-height:var(--tl-h,60svh)}
 :root[data-tourlog="1"] #logModal :is(#logBack,#logFoot,#logMore){display:none}
-:root[data-tourlog="1"] #logModal .log-list{min-height:56px}   /* a short phone keeps the charts whole: the day list gives way */
+:root[data-tourlog="1"] #logModal .log-list{min-height:56px}
+/* v274: an unfolded day in the tour's demo - the charts step aside so the list box can hold its chips */
+:root[data-tourlog="1"] #logModal .log-pane:has(.log-row[aria-expanded="true"]) .log-charts{display:none}   /* a short phone keeps the charts whole: the day list gives way */
 .sheet{
   background:var(--panel);border:1px solid var(--line);border-radius:16px;
   box-shadow:var(--shadow);max-width:430px;width:100%;max-height:82vh;overflow:auto;
@@ -2303,7 +2305,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v273"></script>
+<script src="./app.js?v=v274"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2316,8 +2318,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v273";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-24 14:26";          /* and when it was built, for ?diag */
+  var BUILD = "v274";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-24 14:30";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

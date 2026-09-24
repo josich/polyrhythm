@@ -462,6 +462,7 @@ input[type=range]::-moz-range-thumb{
 #tourNext:disabled{opacity:.35;border-color:var(--line);cursor:default}   /* v257: greyed until the step's action is done */
 :root[data-tour="1"] [data-tour-lock="1"]{pointer-events:none}   /* v257: shown but not for touching in this step */
 .tour-run-row{margin:6px 0 2px}
+#tourHand.over{z-index:79}
 /* v264: the lessons in the (i) window - the rhythm list's rows, in the sheet's own scroll */
 .lvl-list.lesson-list{max-height:none;overflow:visible;margin-top:12px}
 .lesson-list .rcat{position:static}
@@ -971,6 +972,7 @@ canvas{
 .badge.xl.earned{box-shadow:0 0 0 7px color-mix(in srgb,var(--bc) 16%,transparent),0 0 0 14px color-mix(in srgb,var(--bc) 6%,transparent),0 12px 34px -10px color-mix(in srgb,var(--bc) 70%,transparent)}
 .ach-row{display:flex;align-items:center;gap:10px;width:100%;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);margin:0 0 12px;cursor:pointer;font-family:inherit;color:var(--ink);text-align:left}
 .ach-row:hover{border-color:var(--line-2)}
+.log-sheet .ach-row{margin:10px 0 0;flex:none}   /* v265: between the log's tiles and its tabs */
 .ach-row .ico{width:18px;height:18px;color:var(--c1);flex:none}
 .ach-row .t{font-size:12.5px;font-weight:600}
 .ach-row .n{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-3);white-space:nowrap}   /* "10 / 21" broke over two lines on the phone (v160) */
@@ -1987,12 +1989,6 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <button class="btn sm pulse-host" id="tapPause" disabled title="Pause the game">Pause</button>
       <button class="btn sm lead pulse-host" id="tapGame" data-on="0" title="Clear the dots by tapping them in time"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg> <span id="tapGameTxt">Play game</span></button>
     </div>
-    <!-- achievements: one slim row, the count and the last three earned; opens the sheet (v151); above the modes since v161 - awards span every mode -->
-    <button type="button" class="ach-row pulse-host" id="achRow" title="Awards">
-      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-trophy"/></svg>
-      <span class="t">Awards</span><span class="n" id="achRowN"><b>0</b> / 0</span>
-      <span class="recent" id="achRowRecent"></span><span class="chev">&rsaquo;</span>
-    </button>
     <div class="share-lbl lvl-lbl"><span>Modes:</span><i></i></div>
     <!-- game modes (v141): each tab is its own ladder, progress and best card -->
     <div class="tabs ptabs gtabs" id="gtabs" role="tablist" aria-label="Game mode">
@@ -2185,6 +2181,13 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <g id="i-gem"><path d="M7 3.5h10l4 5.5-9 11.5L3 9zM3 9h18M7 3.5l5 17M17 3.5l-5 17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></g>
     <g id="i-orbit"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="3.5" r="1.9" fill="currentColor"/><circle cx="19.4" cy="16.2" r="1.9" fill="currentColor"/><circle cx="4.6" cy="16.2" r="1.9" fill="currentColor"/></g>
     <g id="i-link"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.2 1.2M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.2-1.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></g>
+    <g id="i-cal"><rect x="3.5" y="5" width="17" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 9.5h17M8 3v4M16 3v4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="14.5" r="1.9" fill="currentColor"/></g>
+    <g id="i-prec"><rect x="3.5" y="13" width="3.2" height="7.5" rx="1" fill="currentColor"/><rect x="8.4" y="7.5" width="3.2" height="13" rx="1" fill="currentColor"/><rect x="13.3" y="3.5" width="3.2" height="17" rx="1" fill="currentColor"/><rect x="18.2" y="10.5" width="3.2" height="10" rx="1" fill="currentColor"/></g>
+    <g id="i-target"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4.8" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/></g>
+    <g id="i-up"><path d="M4 18l5.5-5.5 3.5 3.5L20 9M14.5 9H20v5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-list"><path d="M4 6h10M4 12h10M4 18h7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M18 11v8M14 15h8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></g>
+    <g id="i-info"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7.8" r="1.2" fill="currentColor"/></g>
+    <g id="i-cap"><path d="M2.5 9.5L12 5l9.5 4.5L12 14z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M6.5 11.6v4.2c1.6 1.5 3.4 2.2 5.5 2.2s3.9-.7 5.5-2.2v-4.2M21.5 9.5v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g>
   </defs>
 </svg>
 <!-- the achievements sheet (v151) -->
@@ -2196,6 +2199,12 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <button class="icobtn" id="logClose" title="Close" aria-label="Close">&times;</button>
     </div>
     <div class="log-tiles" id="logTiles"></div>
+    <!-- awards: the count and the last three earned; opens the sheet (v151); in the log since v265, with all the progress -->
+    <button type="button" class="ach-row pulse-host" id="achRow" title="Awards">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-trophy"/></svg>
+      <span class="t">Awards</span><span class="n" id="achRowN"><b>0</b> / 0</span>
+      <span class="recent" id="achRowRecent"></span><span class="chev">&rsaquo;</span>
+    </button>
     <div class="log-tabs" id="logTabs" role="tablist"><button data-t="days" aria-pressed="true">Days</button><button data-t="pats" aria-pressed="false">Patterns</button></div>
     <!-- v229, Oscar's spec: the tiles stay put; the days scroll in their own box (a row = date, a mini
          histogram by category, the day's time; a tap opens the day's chips, a chip opens what it names);
@@ -2287,7 +2296,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v264"></script>
+<script src="./app.js?v=v265"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2300,8 +2309,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v264";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-24 13:03";          /* and when it was built, for ?diag */
+  var BUILD = "v265";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-24 13:24";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

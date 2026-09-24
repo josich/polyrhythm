@@ -448,6 +448,7 @@ input[type=range]::-moz-range-thumb{
 .tour{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom, 0px));z-index:48;max-width:420px;margin:0 auto;
   padding:14px 16px 12px;border:1px solid color-mix(in srgb,var(--c2) 55%,var(--line));border-radius:14px;background:var(--panel);box-shadow:var(--shadow)}
 .tour[hidden]{display:none}
+.tour.top{z-index:79}   /* v256: over a sheet (the log), under the confirm box */
 .tour-skip{position:absolute;top:6px;right:8px;padding:6px 6px;border:0;background:none;font-size:10.5px;letter-spacing:.04em;color:var(--ink-3);opacity:.45;cursor:pointer}
 .tour-k{display:flex;gap:10px;padding-right:74px;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--c2)}
 .tour-k #tourCount{color:var(--ink-3);letter-spacing:.06em}
@@ -1831,7 +1832,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
 
     <div class="sess-row">
-      <span class="sess-txt">Change pattern</span>
+      <span class="sess-txt" id="sPatLbl">Change pattern</span>
       <select class="snd sess-sel" id="sPat" aria-label="Change pattern each step">
         <!-- v205, Oscar: two choices for now - the wheel as it is, or the Sequence's steps in order
              (the Rhythms / Classic ratios / Presets pools are still in patternSource, unreachable) -->
@@ -2326,7 +2327,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v255"></script>
+<script src="./app.js?v=v256"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2339,8 +2340,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v255";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-24 10:16";          /* and when it was built, for ?diag */
+  var BUILD = "v256";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-24 10:33";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

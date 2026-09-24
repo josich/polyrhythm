@@ -260,6 +260,12 @@ button,input,select{font:inherit;color:inherit;-webkit-tap-highlight-color:trans
 .btn.tap{font-size:13.5px;border-radius:12px;line-height:1.25;position:relative}
 /* one of these per tap, growing out of the button and fading, the way a dot
    flashes on its tick. Several can overlap while you are tapping. */
+/* v266 (Oscar: "the tour card jumps around while tapping"): the ping grew 23 px past a 360 px screen,
+   the page became 383 px wide for half a second and the fixed tour card stretched and dropped with it
+   (a phone zooms out as well). body{overflow-x:clip} did not stop the page itself from widening; the
+   row the button sits in now trims the ping a little past its own edge - it still grows on every side
+   that has room. */
+.tools{overflow-x:clip;overflow-clip-margin:10px}
 .tap-ping{
   position:absolute;inset:0;border-radius:12px;pointer-events:none;
   border:1px solid var(--c1);background:color-mix(in srgb,var(--c1) 13%,transparent);
@@ -2296,7 +2302,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v265"></script>
+<script src="./app.js?v=v266"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2309,8 +2315,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v265";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-24 13:24";          /* and when it was built, for ?diag */
+  var BUILD = "v266";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-24 14:00";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

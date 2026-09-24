@@ -462,6 +462,13 @@ input[type=range]::-moz-range-thumb{
 #tourNext:disabled{opacity:.35;border-color:var(--line);cursor:default}   /* v257: greyed until the step's action is done */
 :root[data-tour="1"] [data-tour-lock="1"]{pointer-events:none}   /* v257: shown but not for touching in this step */
 .tour-run-row{margin:6px 0 2px}
+/* v264: the lessons in the (i) window - the rhythm list's rows, in the sheet's own scroll */
+.lvl-list.lesson-list{max-height:none;overflow:visible;margin-top:12px}
+.lesson-list .rcat{position:static}
+.lesson-list .lvl-row .body{cursor:pointer}
+.lesson-list .seen{font-style:normal;color:var(--c2);margin-left:7px;font-size:12px}
+.lesson-list .tour-row{border-color:color-mix(in srgb,var(--c2) 45%,var(--line))}
+.lesson-list .tour-row .nm-ro{color:var(--c2);font-weight:600}
 #tourRun{border-color:var(--c2);color:var(--ink)}
 .along-word{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .along-pct[data-cmp="up"]{color:var(--c2)}     /* better than the benchmark */
@@ -2275,75 +2282,12 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <p class="build mono" id="buildTag"></p>
     <!-- the installed app has no address bar: this is the way to the ?diag page from inside it (v121) -->
     <p class="build mono"><a href="./?diag" class="diaglink">Diagnostics</a> &middot; frame times and this device's own readings</p>
-    <p class="tour-run-row"><button type="button" class="btn sm" id="tourRun">Run the tour</button></p>
-
-    <h3>The wheel</h3>
-    <ul>
-      <li><b>Ring 1</b> is the click, at the tempo you set.</li>
-      <li>More <b>rings</b> make a polyrhythm. Four at most.</li>
-      <li><svg class="hnote" viewBox="0 0 22 30" role="img" aria-label="eighth note"><ellipse cx="8" cy="22.5" rx="5.4" ry="3.7" transform="rotate(-22 8 22.5)" fill="currentColor"/><path d="M12.9 21.6V3.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M12.9 3.5c3.6 2.2 6 5.2 4.4 10.2" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg> <b>Score</b> writes it out as notation, one bar each.</li>
-      <li>Tap a <b>dot</b> to cycle it: on &rarr; silent &rarr; accent &rarr; ghost &rarr; on. A ghost note is a soft hit, drawn as a small x.</li>
-      <li>To <b>offset</b> a ring, hold it until it lights, then drag.</li>
-    </ul>
-
-    <h3>Tempo</h3>
-    <ul>
-      <li>Set the <b>BPM</b> between clicks of Ring 1.</li>
-      <li>The <b>note</b> row says what one click is worth: <svg class="hnote" viewBox="0 0 22 30" role="img" aria-label="eighth note"><ellipse cx="8" cy="22.5" rx="5.4" ry="3.7" transform="rotate(-22 8 22.5)" fill="currentColor"/><path d="M12.9 21.6V3.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M12.9 3.5c3.6 2.2 6 5.2 4.4 10.2" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg> = 200 is 200 eighths a minute.</li>
-      <li>Switching notes keeps the speed and converts the number.</li>
-      <li><b>Tap tempo</b> sets it by feel.</li>
-      <li><b>Count-in</b> plays three beats first.</li>
-      <li><b>Drone</b> holds a low note, or a triad on it, under the wheel while it plays, to tune and lock in against.</li>
-    </ul>
-
-    <h3>Ring tabs</h3>
-    <ul>
-      <li><b>Divisions</b> per rotation.</li>
-      <li>&times;2 to &times;6 <b>subdivide</b> every beat. <b>Each beat</b> gives one beat its own: tap a beat on the wheel, then a &times; button.</li>
-      <li><b>Offset</b> nudges the ring off the beat.</li>
-      <li><b>Swing</b> slides the off-beats later, up to a triplet feel, or earlier, to a snap (Advanced, on &times;2, &times;4 or &times;6).</li>
-      <li>Each ring has its own <b>sound</b>, level and mute.</li>
-      <li><b>Tap pattern</b> creates the beats as you play them.</li>
-    </ul>
-
-    <h3><svg class="hico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Practice session</h3>
-    <ul>
-      <li>Program a practice session.</li>
-      <li>Random <b>silent</b> loops.</li>
-      <li>Swaps <b>patterns</b> each step.</li>
-      <li><svg class="hico" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="4" width="13" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.5 4v16M4.5 8.5h4M4.5 12h4M4.5 15.5h4M12.5 9h4M12.5 12.5h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg> <b>Plan</b> shows what is scheduled.</li>
-      <li><b>Repeat</b> plays the plan again.</li>
-      <li><b>Out and back</b> runs it there and home.</li>
-    </ul>
-
-    <h3><svg class="hico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg> Play time</h3>
-    <ul>
-      <li><svg class="hico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg> <b>Game</b>: it counts you in and plays one grey loop. Listen.</li>
-      <li>Then tap the wheel on every dot before the loop ends.</li>
-      <li>Clear the loop to climb a level.</li>
-      <li>A stray tap or a dot left over costs the loop; the dots come back at the bar line.</li>
-      <li><b>Pause</b> stops the clock.</li>
-      <li><b>Calibrate</b> measures the device's own delay: ten clicks, tap along. Run it again when the note asks.</li>
-    </ul>
-
-    <h3><svg class="hnote" viewBox="0 0 22 30" role="img" aria-label="eighth note"><ellipse cx="8" cy="22.5" rx="5.4" ry="3.7" transform="rotate(-22 8 22.5)" fill="currentColor"/><path d="M12.9 21.6V3.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M12.9 3.5c3.6 2.2 6 5.2 4.4 10.2" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg> Sequence</h3>
-    <ul>
-      <li>The practice session can play the <b>sequence</b> in order.</li>
-      <li><b>+</b> adds a pattern. Tap a box to change it.</li>
-      <li><b>Drag</b> a box onto another to swap.</li>
-    </ul>
-
-    <h3><svg class="hico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.2" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="3.8" r="2" fill="currentColor"/><circle cx="19.1" cy="16.1" r="2" fill="currentColor"/><circle cx="4.9" cy="16.1" r="2" fill="currentColor"/></svg> Patterns</h3>
-    <ul>
-      <li>Everything <b>autosaves</b>.</li>
-      <li><b>Presets</b>: save your patterns.</li>
-      <li><b>Rhythms</b>: world patterns.</li>
-      <li><b>Classic ratios</b>: basic patterns to start from.</li>
-    </ul>
+    <!-- v264 (Oscar): one row per concept; a tap plays that part of the tour, with hands and cards -->
+    <div class="lvl-list rlist lesson-list" id="lessonList"></div>
   </div>
 </div>
 
-<script src="./app.js?v=v263"></script>
+<script src="./app.js?v=v264"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2356,8 +2300,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v263";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-24 12:42";          /* and when it was built, for ?diag */
+  var BUILD = "v264";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-24 13:03";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

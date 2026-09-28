@@ -853,6 +853,7 @@ input[type=range]::-moz-range-thumb{
 :root[data-tourlog="1"] #logModal .log-list{min-height:56px}
 /* v274: an unfolded day in the tour's demo - the charts step aside so the list box can hold its chips */
 :root[data-tourlog="1"] #logModal .log-pane:has(.log-row[aria-expanded="true"]) .log-charts{display:none}   /* a short phone keeps the charts whole: the day list gives way */
+@media (max-height:700px){ :root[data-tourlog="1"] #logModal .log-sheet:has(.log-row[aria-expanded="true"]) .log-tiles{display:none} }   /* v298 (QA V1): on a short phone the tiles step aside too while a day is open, so its chips fit */
 .sheet{
   background:var(--panel);border:1px solid var(--line);border-radius:16px;
   box-shadow:var(--shadow);max-width:430px;width:100%;max-height:82vh;overflow:auto;
@@ -1352,7 +1353,7 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .log-tile .v small{font-size:11px;color:var(--ink-3);font-weight:400;margin-left:1px}
 .log-tile .d{font-size:11px;color:var(--ink-3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .log-tile .d.wk{display:flex;gap:2px;align-items:center;height:14px;overflow:visible;padding-right:3px}   /* v229: the week as seven dots - the chain; v233: smaller, today's ring no longer clipped */
-.log-tile .d.wk i{width:7px;height:7px;border-radius:50%;background:var(--line-2);flex:none}
+.log-tile .d.wk i{width:7px;height:7px;border-radius:50%;background:var(--line-2);flex:0 1 7px;min-width:4px;height:auto;aspect-ratio:1/1}   /* v298 (QA V1): the dots shrink a little on a narrow tile */
 .log-tile .d.wk i.on{background:var(--c2)}
 .log-tile .d.wk i.now{box-shadow:0 0 0 1.5px var(--panel),0 0 0 2.5px var(--ink-3)}
 .log-tabs{display:flex;gap:2px;background:var(--sunk);border:1px solid var(--line);border-radius:9px;padding:2px;margin-top:12px;flex:none}
@@ -2320,7 +2321,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v297"></script>
+<script src="./app.js?v=v298"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2333,8 +2334,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v297";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-28 13:45";          /* and when it was built, for ?diag */
+  var BUILD = "v298";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-28 15:44";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

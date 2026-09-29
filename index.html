@@ -462,6 +462,32 @@ input[type=range]::-moz-range-thumb{
   padding:14px 16px 12px;border:1px solid color-mix(in srgb,var(--c2) 55%,var(--line));border-radius:14px;background:var(--panel);box-shadow:var(--shadow)}
 .tour[hidden]{display:none}
 .tour.top{z-index:79}   /* v256: over a sheet (the log), under the confirm box */
+/* v301 (Oscar): the tour opens on a big welcome card, the challenge pop-up's look */
+.modal.tour-welcome{z-index:70;background:rgba(0,0,0,.72)}
+.tw-sheet{position:relative;max-width:380px;text-align:center;padding:30px 24px 18px;border-color:color-mix(in srgb,var(--c2) 45%,var(--line))}
+.tw-k{margin:0;font-size:15px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.tw-logo{display:flex;align-items:center;justify-content:center;gap:14px;margin:18px 0 6px}
+.tw-logo svg{width:78px;height:78px;flex:none}
+.tw-logo span{font-family:var(--title);font-stretch:var(--title-stretch);font-weight:700;font-size:clamp(34px,10vw,46px);line-height:1;letter-spacing:-.015em;color:var(--ink)}
+.tw-sub{margin:0 0 24px;font-size:14px;color:var(--ink-3)}
+#twNext{position:relative;animation:twBeat 1.6s ease-in-out infinite}
+#twNext::after{content:"";position:absolute;inset:-2px;border-radius:inherit;pointer-events:none;opacity:0;
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--c2) 45%,transparent),0 0 22px 4px color-mix(in srgb,var(--c2) 40%,transparent);animation:twGlow 1.6s ease-in-out infinite}
+@keyframes twBeat{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes twGlow{0%,100%{opacity:0}50%{opacity:1}}
+.tw-skip{margin-top:10px}
+/* v301 (Oscar): a hand on a slider or a drag slides - down onto the thumb, along to the right, up, and back */
+.ghost.slide svg{animation:ghostSlide 2.4s ease-in-out infinite}
+.ghost.slide .hand{animation:none}
+.ghost.slide .ring{display:none}
+@keyframes ghostSlide{
+  0%{transform:translate(0,-10%);opacity:.35}
+  12%{transform:translate(0,0);opacity:1}
+  20%{transform:translate(0,3%);opacity:1}
+  62%{transform:translate(3.2em,3%);opacity:1}
+  72%{transform:translate(3.2em,-10%);opacity:.35}
+  92%,100%{transform:translate(0,-10%);opacity:.35}}
+@media (prefers-reduced-motion:reduce){ #twNext,#twNext::after,.ghost.slide svg{animation:none} }
 .tour-skip{padding:8px 4px;border:0;background:none;font-size:12.5px;letter-spacing:.04em;color:var(--ink-2);opacity:.8;text-decoration:underline;text-underline-offset:3px;text-decoration-color:color-mix(in srgb,var(--ink-2) 50%,transparent);cursor:pointer}   /* v290 (Oscar): more noticeable, still quieter than Next */
 .tour-k{display:flex;gap:10px;align-items:baseline;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--c2)}
 .tour-k #tourStage{min-width:0}
@@ -2116,6 +2142,15 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
      at what the step is about -->
 <div class="ghost tour-hand" id="tourHand" hidden aria-hidden="true"></div>
 <div class="ghost tour-hand" id="tourHand2" hidden aria-hidden="true"></div>
+<div class="modal tour-welcome" id="tourWelcome" hidden>
+  <div class="sheet tw-sheet" role="dialog" aria-modal="true" aria-labelledby="twK">
+    <p class="tw-k" id="twK">Welcome to</p>
+    <div class="tw-logo" id="twLogo"><span>Polyorbit</span></div>
+    <p class="tw-sub">Polyrhythm metronome</p>
+    <button type="button" class="btn chal-cta" id="twNext">Next</button>
+    <button type="button" class="tour-skip tw-skip" id="twSkip">Skip tour</button>
+  </div>
+</div>
 <div class="tour" id="tourCard" hidden role="dialog" aria-labelledby="tourT">
   <div class="tour-k"><span id="tourStage"></span><span id="tourCount"></span></div>
   <div class="tour-t" id="tourT"></div>
@@ -2321,7 +2356,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v300"></script>
+<script src="./app.js?v=v301"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2334,8 +2369,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v300";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-28 16:49";          /* and when it was built, for ?diag */
+  var BUILD = "v301";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-29 09:29";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

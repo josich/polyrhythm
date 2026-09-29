@@ -281,13 +281,15 @@ button,input,select{font:inherit;color:inherit;-webkit-tap-highlight-color:trans
   background:color-mix(in srgb,var(--c1) 14%,transparent);
 }
 .btn.mode[data-adv="0"]{color:var(--ink-3)}
+#uiBtn{--pc:var(--c1)}   /* v303: its pulse (data-pulse) is the .pulse-host layer */
 
 /* Simplified layout: the extras come out of the page entirely rather than
    sitting there greyed, and the cards close up around the gap */
 :root[data-ui="simple"] #countBtn,
 :root[data-ui="simple"] .sub-btns,
 :root[data-ui="simple"] .off-head,
-:root[data-ui="simple"] .ring-card input[data-off]{display:none}
+:root[data-ui="simple"] .ring-card input[data-off],
+:root[data-ui="simple"] .sub-head{display:none}   /* v303 (QA v302 V2): the heading of an empty row */
 :root[data-ui="simple"] .grid2{margin-top:12px}
 /* don't advertise dragging while offsets are switched off */
 :root[data-ui="simple"] .adv-only{display:none}
@@ -637,6 +639,10 @@ input[type=range]::-moz-range-thumb{
 .seg button + button{border-left:1px solid var(--line-2)}
 .seg button[data-on="1"]{background:color-mix(in srgb,var(--c1) 16%,var(--sunk));color:var(--ink)}
 .seg button:disabled{opacity:.4;cursor:default}
+.score-sheet .seg{flex:none}   /* v303 (QA v302 V1): never squeezed under the share icon */
+.score-sheet .sheet-head h2{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.score-sheet .sheet-head .icobtn{flex:none}
+@media (max-width:370px){ .score-sheet .sheet-head{gap:6px} .score-sheet .seg{margin-right:2px} .score-sheet .seg button{padding:5px 7px} }
 .score{margin:12px 0 0}
 .score + .score{padding-top:12px;border-top:1px dashed var(--line)}
 .score-title{display:flex;align-items:baseline;gap:10px;margin:0 0 2px;flex-wrap:wrap}
@@ -1080,7 +1086,8 @@ canvas{
 .ring-card[data-rec="1"] input[data-div],
 .ring-card[data-rec="1"] .off-head,
 .ring-card[data-rec="1"] input[data-off],
-.ring-card[data-rec="1"] input[data-swing]{opacity:.32; pointer-events:none}
+.ring-card[data-rec="1"] input[data-swing],
+:root[data-rec="1"] #rack .ring-card [data-del]{opacity:.32; pointer-events:none}   /* v303: no ring removed while Tap pattern listens */
 .ring-card[data-rec="1"] .div-num{color:var(--lc)}
 .rc-top{display:flex;align-items:center;gap:8px;margin-bottom:9px}
 .rc-top .spacer{margin-left:auto}
@@ -1664,7 +1671,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   <header class="nameplate">
     <h1>Polyorbit <span class="sub">Polyrhythm metronome</span></h1>
     <div class="np-right">
-      <button class="btn mode" id="uiBtn">Advanced</button>
+      <button class="btn mode pulse-host" id="uiBtn">Advanced</button>
       <!-- Stage mode (v172): the wheel and the tempo, big, nothing else -->
       <button class="btn mode" id="stageBtn" data-on="0" title="Stage: the wheel and the tempo, big">Stage</button>
       <button class="info" id="infoBtn" title="How this works" aria-label="How this works">i</button>
@@ -2356,7 +2363,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v302"></script>
+<script src="./app.js?v=v303"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2369,8 +2376,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v302";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-29 10:39";          /* and when it was built, for ?diag */
+  var BUILD = "v303";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-29 13:39";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

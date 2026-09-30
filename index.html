@@ -1345,6 +1345,65 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 /* the Levels section is for everyone (v93): players see the ladder as far as they
    have cleared it plus the next level; the editing controls stay behind the cheat */
 :root:not([data-editor="1"]) :is(#lvlAdd,#lvlUpdate,#lvlShare,#lvlImport,#lvlChk,#lvlShareBox,#lvlImportBox,#achFoot,#gameWin,#logFoot,#courseFoot){display:none}
+/* ---- v317: the course screen - one focused screen, like Stage: the top bar, the tempo, the hands (the Precision
+   banner's two boxes), the sticking strip, the wheel, the ladder, one button; the whole screen split in two halves ---- */
+#courseBar,#courseTempo,#courseStrip,#courseFoot{display:none}
+:root[data-course="1"] .wrap > :not(#courseBar):not(#courseTempo):not(#alongSec):not(.stage){display:none!important}
+:root[data-course="1"] .stage{grid-template-columns:minmax(0,1fr);gap:10px}
+:root[data-course="1"] :is(#rack,#stageBar,#stageScore,.dial-head,.dial-foot){display:none!important}
+:root[data-course="1"] .dial{padding:10px 12px}
+:root[data-course="1"] .canvas-hold{max-width:min(100%,max(180px,calc(100vh - 500px)));max-width:min(100%,max(180px,calc(100svh - 500px)))}   /* the ready screen fits whole */
+@media (max-height:700px){
+  :root[data-course="1"] #courseTempo{display:none!important}   /* the tempo is in the button and the ladder */
+  :root[data-course="1"] .canvas-hold{max-width:min(100%,max(170px,calc(100vh - 445px)));max-width:min(100%,max(170px,calc(100svh - 445px)))}
+}
+:root[data-course="1"] #courseBar{display:grid;grid-template-columns:auto 1fr 34px;align-items:center;gap:8px;margin:0 0 8px}
+.cb-mode{display:flex;align-items:center;gap:5px;font-size:11px;padding:5px 9px;border-radius:999px;border:1px solid color-mix(in srgb,var(--c2) 55%,var(--line));color:var(--ink-2);white-space:nowrap}
+.cb-mode svg{width:13px;height:13px;color:var(--c2)}
+.cb-ttl{text-align:center;min-width:0}
+.cb-ttl b{display:block;font-family:var(--title);font-stretch:var(--title-stretch);font-weight:800;font-size:18px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cb-ttl span{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+#cbX{width:34px;height:34px;border-radius:10px;color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));font-size:18px}
+:root[data-course="1"] #courseTempo{display:flex;align-items:baseline;justify-content:center;gap:8px;margin:0 0 8px}
+#courseTempo b{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:52px;line-height:.9;letter-spacing:-.03em}
+#courseTempo span{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+#courseTempo em{font-style:normal;font-size:12px;color:var(--ink-3);margin-left:6px}
+:root[data-course="1"] #alongSec :is(.along-row,#alongTgt,#alongHist){display:none!important}
+:root[data-course="1"] #alongSec{margin-bottom:10px;padding:8px 10px}
+:root[data-course="1"] #courseStrip{display:grid;order:-1;gap:4px}
+.course-strip .tk{height:40px;border-radius:9px;background:var(--sunk);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;gap:1px;font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:16px;position:relative;min-width:0}
+.course-strip .tk .g{font-size:10.5px;color:var(--dot-off);font-weight:500;align-self:flex-start;margin-top:8px}
+.course-strip .tk.R{color:var(--c1)} .course-strip .tk.L{color:var(--c2)} .course-strip .tk.rest{color:var(--line-2)}
+.course-strip .tk.acc::after{content:">";position:absolute;top:-1px;font-size:9px;color:var(--ink-3)}
+.course-strip .tk.lit.R{background:color-mix(in srgb,var(--c1) 22%,var(--sunk));border-color:var(--c1)}
+.course-strip .tk.lit.L{background:color-mix(in srgb,var(--c2) 22%,var(--sunk));border-color:var(--c2)}
+:root[data-course="1"] #courseFoot{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.ctrack{display:flex;align-items:center;margin:0 6px}
+.ctrack i{flex:1;height:3px;background:var(--line)} .ctrack i.ok{background:var(--c2)}
+.ctrack b{width:12px;height:12px;border-radius:50%;background:var(--line-2);flex:none}
+.ctrack b.ok{background:var(--c2)} .ctrack b.now{background:var(--c1);box-shadow:0 0 0 4px color-mix(in srgb,var(--c1) 22%,transparent)}
+.ctrack b.goal{background:transparent;border:2px dashed var(--c4)} .ctrack b.goal.ok{background:var(--c4);border-style:solid}
+.ctrackl{display:flex;justify-content:space-between;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3);margin:-2px 0 0}
+.ctrackl .n{color:var(--c1);font-weight:600} .ctrackl .g{color:var(--c4)}
+.course-go{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:13px;border:1.5px solid var(--c2);font:inherit;font-weight:700;font-size:15px;background:color-mix(in srgb,var(--c2) 12%,transparent);color:var(--ink);cursor:pointer}
+.course-go svg{width:17px;height:17px;color:var(--c2)}
+.course-lock{margin:0;text-align:center;font-size:12px;color:var(--ink-3)}
+:root[data-course="1"][data-along="1"] :is(#courseGo,#courseTempo,#courseLock){display:none!important}
+/* the whole screen is the tap surface: the Two fingers split, fixed to the screen's edges */
+:root[data-course="1"] #twoSplit{position:fixed;inset:0;z-index:30}
+:root[data-course="1"] #twoSplit::before{top:12px;bottom:12px}
+:root[data-course="1"] #twoSplit span{padding:0 18px 16px;font-size:12px}
+.modal.course-sheet-wrap{z-index:70;align-items:flex-end;background:color-mix(in srgb,var(--ground) 55%,transparent)}
+.course-sheet{width:min(100%,440px);margin:0 auto 12px;background:var(--panel);border:1px solid var(--line-2);border-radius:20px;padding:18px 16px 16px;text-align:center;display:flex;flex-direction:column;gap:8px;box-shadow:0 -10px 40px -10px rgba(0,0,0,.6)}
+.cs-k{font-family:var(--title);font-stretch:var(--title-stretch);font-weight:800;font-size:26px;letter-spacing:.03em;color:var(--c2)}
+.cs-k[data-k="no"]{color:var(--c3)} .cs-k[data-k="short"]{color:var(--ink-3)} .cs-k[data-k="goal"]{color:var(--c4)}
+.cs-pct{font-family:"IBM Plex Mono",monospace;font-size:48px;font-weight:500;line-height:1;color:var(--c2)}
+.cs-pct[data-k="no"]{color:var(--c3)} .cs-pct[data-k="short"]{color:var(--ink-3)}
+.cs-line{margin:0;font-size:13px;color:var(--ink-2)} .cs-line b{color:var(--ink)} .cs-line:empty{display:none}
+.cs-two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.course-sheet[data-arm="0"] button{pointer-events:none;opacity:.35}
+.course-sheet button{transition:opacity .25s}
+#csAgain{border-color:var(--c2)} #csBack{border-color:var(--c3)}
 /* ---- v316: Courses ---- */
 #ctabs .tab{--lc:var(--c4)}
 #ctabs .tab small{display:block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-top:1px}
@@ -1925,6 +1984,13 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   <!-- Play along (v167): the timing banner. Between Tempo and the wheel on purpose - the
        hand never covers it - and on the page only during and after a run. One thin line per
        tap: the centre is the beat, left early, right late, the lighter middle third the pocket. -->
+  <!-- v317: the course screen's top bar and tempo (shown only in a course; the rest of the page steps aside) -->
+  <div class="course-bar" id="courseBar">
+    <span class="cb-mode" id="cbMode"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M11 18.5h2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Phone</span>
+    <div class="cb-ttl"><b id="cbName">Rudiment</b><span id="cbSub"></span></div>
+    <button type="button" class="icobtn cb-x" id="cbX" title="Leave the course screen" aria-label="Leave the course screen">&times;</button>
+  </div>
+  <div class="course-tempo" id="courseTempo"><b id="ctBpm">0</b><span>bpm</span><em id="ctStep"></em></div>
   <section class="along-sec" id="alongSec" hidden>
     <div class="along-row">
       <span class="lbl along-lbl">Precision</span>
@@ -1947,6 +2013,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </section>
 
   <div class="stage">
+    <div class="course-strip" id="courseStrip" aria-label="The sticking"></div>
     <section class="dial">
       <!-- Precision (v185): the section's edge flashes teal once the run has passed the
            benchmark's length - an opacity layer, never an animated border -->
@@ -2007,6 +2074,12 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       </div>
     </section>
 
+    <div class="course-foot" id="courseFoot">
+      <div class="ctrack" id="courseTrack"></div>
+      <div class="ctrackl" id="courseTrackL"></div>
+      <button type="button" class="course-go" id="courseGo"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><rect x="3" y="12" width="3.2" height="8" rx="1"/><rect x="8.3" y="7" width="3.2" height="13" rx="1"/><rect x="13.6" y="4" width="3.2" height="16" rx="1"/><rect x="18.9" y="10" width="3.2" height="10" rx="1"/></g></svg><span id="courseGoT">Practice</span></button>
+      <p class="course-lock" id="courseLock"></p>
+    </div>
     <section class="rack" id="rack"></section>
     <!-- Stage mode (v172): the tempo in big digits, above the wheel on a phone, beside it on
          a wide landscape screen. The buttons drive the Tempo section's own -5 / +5. -->
@@ -2350,6 +2423,16 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   <div class="tour-btns"><button type="button" class="tour-skip" id="tourSkip">Skip tour</button><button type="button" class="btn" id="tourNext">Next</button></div>
 </div>
 <!-- Precision results (v193): a card at the end of a run, the figures big, Run again / Close -->
+<div class="modal course-sheet-wrap" id="courseSheet" hidden>
+  <div class="course-sheet" id="courseSheetCard" data-arm="1" role="dialog" aria-modal="true" aria-labelledby="csK">
+    <div class="cs-k" id="csK">CLEAN</div>
+    <div class="cs-pct" id="csPct">0 %</div>
+    <p class="cs-line" id="csLine"></p>
+    <p class="cs-line" id="csHands"></p>
+    <button type="button" class="course-go" id="csGo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg><span id="csGoT">Next step</span></button>
+    <div class="cs-two"><button type="button" class="btn" id="csAgain">Again</button><button type="button" class="btn" id="csBack">Back to the course</button></div>
+  </div>
+</div>
 <div class="modal ask-modal" id="alongModal" hidden>
   <div class="sheet ask-sheet along-card" role="dialog" aria-modal="true" aria-labelledby="alongCardK">
     <p class="chal-kicker" id="alongCardK">PRECISION</p>
@@ -2549,7 +2632,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v316"></script>
+<script src="./app.js?v=v317"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2562,8 +2645,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v316";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-30 15:46";          /* and when it was built, for ?diag */
+  var BUILD = "v317";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-30 16:05";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

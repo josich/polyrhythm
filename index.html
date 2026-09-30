@@ -1389,6 +1389,16 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .course-go{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:13px;border:1.5px solid var(--c2);font:inherit;font-weight:700;font-size:15px;background:color-mix(in srgb,var(--c2) 12%,transparent);color:var(--ink);cursor:pointer}
 .course-go svg{width:17px;height:17px;color:var(--c2)}
 .course-lock{margin:0;text-align:center;font-size:12px;color:var(--ink-3)}
+.course-go.exam{border-color:var(--c4);background:color-mix(in srgb,var(--c4) 14%,transparent)} .course-go.exam svg{color:var(--c4)}
+.course-go[hidden]{display:none}
+/* v319: the exam - the same screen in the exam's purple */
+:root[data-cexam="1"] .dial{border-color:var(--c4)!important}
+:root[data-cexam="1"] #cbSub{color:var(--c4)}
+:root[data-cexam="1"] :is(#alongSec,#courseGo,#courseExam,#courseLock,#courseTempo){display:none!important}
+:root[data-course="1"][data-along="1"] #courseExam{display:none!important}
+.cs-stars{font-size:34px;letter-spacing:6px;color:var(--c1);line-height:1.1}
+.cs-stars i{font-style:normal;color:var(--line-2)}
+.cs-pct[data-k="stars"]{display:none}
 :root[data-course="1"][data-along="1"] :is(#courseGo,#courseTempo,#courseLock){display:none!important}
 /* the whole screen is the tap surface: the Two fingers split, fixed to the screen's edges */
 :root[data-course="1"] #twoSplit{position:fixed;inset:0;z-index:30}
@@ -1460,6 +1470,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .cdet .cgo{display:flex;align-items:center;gap:8px;width:100%;justify-content:center;margin-top:8px;border-color:var(--c2);color:var(--ink)}
 .cdet .cgo svg{width:14px;height:14px;color:var(--c2)}
 .cdet .cgo.pad{border-color:var(--c1)} .cdet .cgo.pad svg{color:var(--c1)}
+.cdet .cgo.cexgo{border-color:var(--c4)} .cdet .cgo.cexgo svg{color:var(--c4)}
 .cdet .cex{display:flex;align-items:center;gap:6px;justify-content:center;margin-top:8px;font-size:12px;color:var(--ink-3)}
 .cdet .cex svg{width:13px;height:13px;color:var(--c4)}
 .cdet .csm{font-size:11.5px;color:var(--ink-3);margin:6px 2px 0}
@@ -2079,6 +2090,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <div class="ctrack" id="courseTrack"></div>
       <div class="ctrackl" id="courseTrackL"></div>
       <button type="button" class="course-go" id="courseGo"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><rect x="3" y="12" width="3.2" height="8" rx="1"/><rect x="8.3" y="7" width="3.2" height="13" rx="1"/><rect x="13.6" y="4" width="3.2" height="16" rx="1"/><rect x="18.9" y="10" width="3.2" height="10" rx="1"/></g></svg><span id="courseGoT">Practice</span></button>
+      <button type="button" class="course-go exam" id="courseExam" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg><span id="courseExamT">Exam</span></button>
       <p class="course-lock" id="courseLock"></p>
     </div>
     <section class="rack" id="rack"></section>
@@ -2633,7 +2645,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v318"></script>
+<script src="./app.js?v=v319"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2646,8 +2658,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v318";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-30 16:45";          /* and when it was built, for ?diag */
+  var BUILD = "v319";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-30 16:50";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -1344,7 +1344,65 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 /* the level editor is a maker's tool: hidden unless this device has been let in */
 /* the Levels section is for everyone (v93): players see the ladder as far as they
    have cleared it plus the next level; the editing controls stay behind the cheat */
-:root:not([data-editor="1"]) :is(#lvlAdd,#lvlUpdate,#lvlShare,#lvlImport,#lvlChk,#lvlShareBox,#lvlImportBox,#achFoot,#gameWin,#logFoot){display:none}
+:root:not([data-editor="1"]) :is(#lvlAdd,#lvlUpdate,#lvlShare,#lvlImport,#lvlChk,#lvlShareBox,#lvlImportBox,#achFoot,#gameWin,#logFoot,#courseFoot){display:none}
+/* ---- v316: Courses ---- */
+#ctabs .tab{--lc:var(--c4)}
+#ctabs .tab small{display:block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-top:1px}
+#ctabs .tab{line-height:1.15;display:flex;flex-direction:column;align-items:center;justify-content:center;white-space:nowrap}
+#ctabs .tab:disabled{font-size:11.5px}
+#ctabs + .share-lbl{margin-top:14px}
+.clist .lvl-row{grid-template-columns:22px minmax(0,1fr) auto}
+#ctabs .tab:disabled{opacity:.5;cursor:default}
+.cmode{display:flex;border:1px solid var(--line-2);border-radius:10px;overflow:hidden}
+.cmode button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;border:0;background:var(--sunk);color:var(--ink-3);font:inherit;font-size:12.5px;font-weight:600;padding:8px 6px;cursor:pointer}
+.cmode button + button{border-left:1px solid var(--line-2)}
+.cmode button svg{width:15px;height:15px}
+.cmode button[aria-pressed="true"]{background:color-mix(in srgb,var(--c4) 16%,var(--sunk));color:var(--ink)}
+.cmode button[data-cmode="pad"][aria-pressed="true"] svg{color:var(--c1)}
+.cmode button[data-cmode="phone"][aria-pressed="true"] svg{color:var(--c2)}
+#cmodeHelp{margin:6px 2px 0}
+.cprog{display:flex;align-items:center;gap:10px;margin-top:10px;padding:9px 10px;background:var(--sunk);border:1px solid var(--line);border-radius:10px}
+.cprog .n{font-family:"IBM Plex Mono",monospace;font-size:20px;font-weight:600;color:var(--c4);white-space:nowrap}
+.cprog .n small{font-size:11px;color:var(--ink-3);font-weight:400}
+.cprog .bar{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.cprog .bar i{display:block;height:100%;background:var(--c4)}
+.cprog .t{font-size:11px;color:var(--ink-3);white-space:nowrap}
+.clist .rcat .cdone{color:var(--c2)}
+.clist .rcat[data-lock="1"]{opacity:.55}
+.clist .rcat[data-lock="1"] svg.lk{transform:none}
+.clist .rcat svg.lk{width:12px;height:12px}
+.clist .lvl-row .cst{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:800;justify-self:center}
+.clist .cst.ok{background:var(--c2);color:var(--panel)}
+.clist .cst.half{border:2px solid var(--c1);background:conic-gradient(var(--c1) var(--p),transparent 0)}
+.clist .cst.none{border:1.5px dashed var(--line-2)}
+.clist .lvl-row .nm-ro{font-weight:600}
+.clist .meta .up{color:var(--c2)} .clist .meta .o{color:var(--c1)} .clist .meta .stars{color:var(--c1);letter-spacing:1px}
+.clist .ops button[data-cprac]{color:var(--c2);border-color:color-mix(in srgb,var(--c2) 55%,var(--line))}
+.clist .ops button[data-cexam]{color:var(--c4);border-color:color-mix(in srgb,var(--c4) 55%,var(--line))}
+.clist .ops button svg{width:13px;height:13px;vertical-align:-2px}
+.clist .lvl-row[aria-expanded="true"]{border-color:var(--line-2)}
+.cdet{margin:-2px 0 4px;padding:10px;border:1px solid var(--line);border-top:0;border-radius:0 0 9px 9px;background:var(--panel)}
+.cdet .cstick{font-family:"IBM Plex Mono",monospace;font-size:15px;display:flex;flex-wrap:wrap;gap:2px 8px;margin:0 0 6px}
+.cdet .cstick .R{color:var(--c1);font-weight:600} .cdet .cstick .L{color:var(--c2);font-weight:600}
+.cdet .cstick .g{font-size:11.5px;color:var(--dot-off);font-weight:500}
+.cdet .cstick .pad .g{color:var(--ink-2)}
+.cdet .cstick .acc{text-decoration:underline;text-decoration-color:var(--ink-3);text-underline-offset:4px}
+.cdet .cstick .rest{color:var(--line-2)}
+.cdet .ctag{display:inline-flex;font-size:11px;padding:3px 8px;border-radius:999px;border:1px solid color-mix(in srgb,var(--c2) 55%,var(--line));color:var(--ink-2)}
+.cdet .ctag.pad{border-color:color-mix(in srgb,var(--c1) 55%,var(--line))}
+.cdet .clad{display:grid;grid-template-columns:repeat(auto-fit,minmax(34px,1fr));gap:4px;margin:10px 0 4px}
+.cdet .clad span{text-align:center;padding:5px 0 4px;border-radius:7px;border:1px solid var(--line);background:var(--sunk);font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-3)}
+.cdet .clad span i{display:block;font-style:normal;font-size:9px;margin-top:1px}
+.cdet .clad span.ok{border-color:color-mix(in srgb,var(--c2) 60%,var(--line));color:var(--c2)}
+.cdet .clad span.now{border-color:var(--c1);color:var(--ink);background:color-mix(in srgb,var(--c1) 14%,var(--sunk))}
+.cdet .clad span.goal{border-style:dashed;border-color:var(--c4);color:var(--c4)}
+.cdet .clad span.goal.ok{border-style:solid;background:color-mix(in srgb,var(--c4) 16%,var(--sunk))}
+.cdet .cgo{display:flex;align-items:center;gap:8px;width:100%;justify-content:center;margin-top:8px;border-color:var(--c2);color:var(--ink)}
+.cdet .cgo svg{width:14px;height:14px;color:var(--c2)}
+.cdet .cgo.pad{border-color:var(--c1)} .cdet .cgo.pad svg{color:var(--c1)}
+.cdet .cex{display:flex;align-items:center;gap:6px;justify-content:center;margin-top:8px;font-size:12px;color:var(--ink-3)}
+.cdet .cex svg{width:13px;height:13px;color:var(--c4)}
+.cdet .csm{font-size:11.5px;color:var(--ink-3);margin:6px 2px 0}
 .ach-foot{display:flex;justify-content:flex-end;margin-top:18px;padding-top:10px;border-top:1px dashed var(--line)}
 .lvl-row .nm-ro{font-size:12.5px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lvl-row .chk.ok{color:var(--c2)}
@@ -1624,6 +1682,7 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 #tapGame[data-on="1"]{border-color:var(--c3);background:color-mix(in srgb,var(--c3) 16%,transparent);color:var(--ink)}
 /* v310 (Oscar): the old Simple back - the Practice session, the Sequence and Play time are Advanced sections
    (v304 had kept them in Simple, which left the two modes barely different) */
+:root[data-ui="simple"] #coursePanel,
 :root[data-ui="simple"] #sessionPanel,
 :root[data-ui="simple"] #tapPanel,
 :root[data-ui="simple"] #seqPanel{display:none}
@@ -2130,6 +2189,32 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
   </section>
 
+  <!-- v316 (Oscar): Courses - learning paths with levels, rows and check marks; Rudiments first. Practice = Precision,
+       the exam = a game level; two ways to take a course: on the phone (main strokes judged) or on a pad (not judged) -->
+  <section class="presets foldsec" id="coursePanel">
+    <div class="sess-head">
+      <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+      <span class="lbl">Courses</span>
+      <span class="fold-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2.5 9L12 4.5 21.5 9 12 13.5zM6.5 11v4.5c1.6 1.6 3.4 2.4 5.5 2.4s3.9-.8 5.5-2.4V11M21.5 9v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg></span>
+    </div>
+    <div class="tabs ptabs ctabs" id="ctabs" role="tablist" aria-label="Course">
+      <button class="tab" data-ctab="rudiments" data-on="1">Rudiments</button>
+      <button class="tab" disabled title="Coming later">Polyrhythms <small>soon</small></button>
+      <button class="tab" disabled title="Coming later">Odd meters <small>soon</small></button>
+    </div>
+    <div class="share-lbl lvl-lbl"><span>Take it:</span><i></i></div>
+    <div class="cmode" id="cmode" role="group" aria-label="Where you play">
+      <button type="button" data-cmode="phone" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M11 18.5h2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>On the phone</button>
+      <button type="button" data-cmode="pad" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="14" rx="9" ry="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 5l6 7M19 4l-6 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>On a pad</button>
+    </div>
+    <p class="empty sec-help" id="cmodeHelp"></p>
+    <div class="cprog" id="cprog"></div>
+    <div class="share-lbl lvl-lbl"><span>Levels:</span><i></i></div>
+    <div class="lvl-list rlist clist" id="cgrid"></div>
+    <p class="lvl-note" id="cnote"></p>
+    <div class="lvl-foot" id="courseFoot"><button type="button" class="btn sm" id="courseFake">Fake course progress</button><button type="button" class="btn sm" id="courseWipe">Reset course</button></div>
+  </section>
+
   <section class="presets foldsec" id="tapPanel">
     <div class="sess-head">
       <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
@@ -2464,7 +2549,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v315"></script>
+<script src="./app.js?v=v316"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2477,8 +2562,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v315";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-30 14:09";          /* and when it was built, for ?diag */
+  var BUILD = "v316";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-30 15:46";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

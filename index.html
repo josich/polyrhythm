@@ -1375,8 +1375,9 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .course-strip .tk .g{font-size:10.5px;color:var(--dot-off);font-weight:500;align-self:flex-start;margin-top:8px}
 .course-strip .tk.R{color:var(--c1)} .course-strip .tk.L{color:var(--c2)} .course-strip .tk.rest{color:var(--line-2)}
 .course-strip .tk.acc::after{content:">";position:absolute;top:-1px;font-size:9px;color:var(--ink-3)}
-.course-strip .tk.lit.R{background:color-mix(in srgb,var(--c1) 22%,var(--sunk));border-color:var(--c1)}
-.course-strip .tk.lit.L{background:color-mix(in srgb,var(--c2) 22%,var(--sunk));border-color:var(--c2)}
+.course-strip .tk::before{content:"";position:absolute;inset:-1px;border-radius:inherit;border:1px solid var(--hc,var(--line-2));background:color-mix(in srgb,var(--hc,var(--line-2)) 22%,transparent);opacity:0;will-change:opacity;pointer-events:none}
+.course-strip .tk.R{--hc:var(--c1)} .course-strip .tk.L{--hc:var(--c2)}
+.course-strip .tk.lit::before{opacity:1}
 :root[data-course="1"] #courseFoot{display:flex;flex-direction:column;gap:8px;margin-top:4px}
 .ctrack{display:flex;align-items:center;margin:0 6px}
 .ctrack i{flex:1;height:3px;background:var(--line)} .ctrack i.ok{background:var(--c2)}
@@ -2632,7 +2633,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v317"></script>
+<script src="./app.js?v=v318"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2645,8 +2646,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v317";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-30 16:05";          /* and when it was built, for ?diag */
+  var BUILD = "v318";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-30 16:45";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

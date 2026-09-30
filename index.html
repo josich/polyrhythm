@@ -415,7 +415,7 @@ input[type=range]::-moz-range-thumb{
 .along-sec{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:10px 14px 12px;margin-bottom:18px}
 /* v309 (Oscar): while Precision is open, the wheel and its banner wear teal edges, and the row under the wheel names the mode */
 :root[data-along] .dial,:root[data-along] #alongSec{border-color:var(--c2)}
-:root[data-uilock="1"] #uiBtn{opacity:.35;pointer-events:none}   /* v313 (QA v311 C1): no mode switch while a mode owns the wheel */
+:root[data-uilock="1"] #uiBtn,:root[data-cal="1"] #logBtn{opacity:.35;pointer-events:none}   /* v315: nor a log trip while calibration has the wheel */   /* v313 (QA v311 C1): no mode switch while a mode owns the wheel */
 :root[data-along="1"] #logBtn{opacity:.35;pointer-events:none}   /* v309 (QA v308 C1): no log trips mid-run */
 :root[data-along="1"] #beatNowIn{color:var(--c2);letter-spacing:.16em;font-weight:600}
 .along-sec[hidden]{display:none}
@@ -584,6 +584,17 @@ button.along-card-pct .go i{font-style:normal;font-family:var(--title);font-size
   .along-card-next{margin-top:8px}
   .along-card .ask-btns{margin-top:8px}
   #alongModal .along-card{padding-top:12px;padding-bottom:12px}
+  .along-card .chal-kicker{font-size:16px}
+  .along-card-clean{flex-direction:row;justify-content:center;gap:8px;padding:3px 10px;margin:4px 0 0}
+  .along-card-clean b{font-size:16px}
+  .along-card-next{padding-top:4px;padding-bottom:4px;margin-top:6px}
+  .along-card .ask-btns .btn{padding-top:5px;padding-bottom:5px}
+}
+@media (max-height:340px){   /* v315 (QA v314 V2): the fullest card on the shortest screens - no kicker, a smaller figure */
+  .along-card .chal-kicker{display:none}
+  .along-card-pct{font-size:34px}
+  .along-card-word{margin-bottom:2px}
+  .along-card-line{margin:1px 0;font-size:12px}
 }
 .along-card .ask-btns #alongCardClose{border-color:var(--c3);color:var(--ink)}
 .along-tgt button{border:1px solid var(--line-2);background:var(--sunk);color:var(--ink-3);border-radius:8px;padding:3px 9px;font-size:11px;font-weight:600;font-family:inherit;cursor:pointer}
@@ -1423,6 +1434,7 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .log-tile .v{font-family:"IBM Plex Mono",monospace;font-size:21px;font-weight:600;color:var(--c1);line-height:1.2;margin-top:2px;white-space:nowrap;overflow:hidden}
 .log-tile .v small{font-size:11px;color:var(--ink-3);font-weight:400;margin-left:1px}
 .log-tile .d{font-size:11px;color:var(--ink-3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:360px){ .log-tile{padding:9px 7px} .log-tile .d{font-size:10px;letter-spacing:-.01em} }   /* v315: "since Aug 21" fits a 320 px tile */
 .log-tile .d.wk{display:flex;gap:2px;align-items:center;height:14px;overflow:visible;padding-right:3px}   /* v229: the week as seven dots - the chain; v233: smaller, today's ring no longer clipped */
 .log-tile .d.wk i{width:7px;height:7px;border-radius:50%;background:var(--line-2);flex:0 1 7px;min-width:4px;height:auto;aspect-ratio:1/1}   /* v298 (QA V1): the dots shrink a little on a narrow tile */
 .log-tile .d.wk i.on{background:var(--c2)}
@@ -1526,7 +1538,9 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .pchart-wrap .pchart-ax{flex:none}
 .pchart-scroll{flex:1 1 0;min-width:0;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
 .pchart-scroll .pchart{max-width:none}
-@media (max-height:480px){ .pchart-wrap .pchart{max-height:112px} }   /* v314 (QA v311 V3): the chart fits a landscape list box */
+.ptempos[data-cut="1"] .ptempo:nth-child(n+13){display:none}   /* v315: the first 12 tempos, the rest behind a button */
+.ptempo-more{display:block;width:100%;margin-top:6px;color:var(--ink-2)}
+@media (max-height:480px){ .pchart-wrap .pchart{height:112px;width:auto!important;max-height:none} }   /* v315 (QA v314 V1): the width follows the capped height, so the scroll lands on points */   /* v314 (QA v311 V3): the chart fits a landscape list box */
 .pchart text{fill:var(--ink-3);font:9.5px "IBM Plex Mono",monospace}
 .pchart text.clt{fill:var(--c1)}
 .pchart line.g{stroke:var(--line);stroke-width:1}
@@ -2450,7 +2464,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v314"></script>
+<script src="./app.js?v=v315"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2463,8 +2477,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v314";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-30 13:26";          /* and when it was built, for ?diag */
+  var BUILD = "v315";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-30 14:09";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

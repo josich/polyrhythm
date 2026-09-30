@@ -413,6 +413,10 @@ input[type=range]::-moz-range-thumb{
 /* the timing banner: its own slim section between Tempo and the wheel, so the hand never
    covers it; shown only during and after a run. No numbers anywhere but the loop count. */
 .along-sec{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:10px 14px 12px;margin-bottom:18px}
+/* v309 (Oscar): while Precision is open, the wheel and its banner wear teal edges, and the row under the wheel names the mode */
+:root[data-along] .dial,:root[data-along] #alongSec{border-color:var(--c2)}
+:root[data-along="1"] #logBtn{opacity:.35;pointer-events:none}   /* v309 (QA v308 C1): no log trips mid-run */
+:root[data-along="1"] #beatNowIn{color:var(--c2);letter-spacing:.16em;font-weight:600}
 .along-sec[hidden]{display:none}
 .along-row{display:flex;align-items:center;gap:10px;min-height:27px}
 .along-lbl{color:var(--c2)}
@@ -554,8 +558,14 @@ input[type=range]::-moz-range-thumb{
 .along-card-clean span{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
 .along-card-clean b{font-family:"IBM Plex Mono",monospace;font-size:22px;color:var(--c2)}
 .along-card-clean[hidden]{display:none}
-.along-card .ask-btns{margin-top:14px}
-.along-card .btn{transition:opacity .25s}
+.along-card .ask-btns{margin-top:14px;justify-content:space-between}   /* v309 (Oscar): to the sides */
+.along-card .btn,.along-card-link{transition:opacity .25s}
+.along-card-link{display:block;margin:4px auto;background:none;border:0;padding:4px 8px;font:inherit;font-size:14px;color:var(--ink-2);cursor:pointer;border-radius:8px}
+.along-card-link:not(:disabled){text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--c2) 55%,transparent);text-underline-offset:3px}
+.along-card-link .go{color:var(--c2);font-weight:700;margin-left:2px}
+.along-card-link:disabled{cursor:default;text-decoration:none}
+.along-card-link:empty{display:none}
+.along-card[data-arm="0"] .along-card-link{pointer-events:none}
 .along-card[data-arm="0"] .btn{pointer-events:none;opacity:.35}   /* v308: asleep for a second after the card appears */
 .along-card-next{width:100%;margin-top:14px;border-color:var(--c2);color:var(--ink)}
 .along-card-next:not([hidden]) + .ask-btns{margin-top:8px}   /* v306: the next step sits above the pair */
@@ -1502,6 +1512,11 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .pchart path.step{fill:none;stroke:var(--c2);stroke-width:2}
 .pchart circle.up{fill:var(--c2)}.pchart circle.down{fill:var(--c3)}
 .pchart circle.ring{fill:none;stroke:var(--c2);stroke-width:1.4}
+.pchart line.fl{stroke-width:2;stroke-linecap:round}
+.pchart line.fl.up,.pchart line.fl.new{stroke:var(--c2)}.pchart line.fl.same{stroke:var(--c1)}.pchart line.fl.down{stroke:var(--c3)}.pchart line.fl.first{stroke:var(--ink-3)}
+.pchart circle.fp.up,.pchart circle.fp.new{fill:var(--c2)}.pchart circle.fp.same{fill:var(--c1)}.pchart circle.fp.down{fill:var(--c3)}.pchart circle.fp.first{fill:var(--ink-3)}
+.pchart text.fs{font-size:9.5px;font-weight:600}
+.pchart text.fs.up,.pchart text.fs.new{fill:var(--c2)}.pchart text.fs.same{fill:var(--c1)}.pchart text.fs.down{fill:var(--c3)}.pchart text.fs.first{fill:var(--ink-2)}
 .ptempos{display:flex;flex-direction:column;gap:4px}
 .ptempo{display:grid;grid-template-columns:44px minmax(0,1fr) auto 18px;gap:8px;align-items:center;font:12.5px "IBM Plex Mono",monospace;color:var(--ink-2);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 8px;cursor:pointer;text-align:left}
 .ptempo b{color:var(--ink);font-weight:600}
@@ -2214,7 +2229,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <div class="along-card-bpm" id="alongCardBpm"></div>
     <div class="along-card-pct" id="alongCardPct">0 %</div>
     <div class="along-card-word" id="alongCardWord"></div>
-    <p class="along-card-line" id="alongCardPrev"></p>
+    <button type="button" class="along-card-line along-card-link" id="alongCardPrev"></button>   <!-- v309: opens the pattern's row in the log -->
     <p class="along-card-line" id="alongCardMiss"></p>
     <div class="along-card-clean" id="alongCardClean" hidden><span>New clean tempo</span><b id="alongCardCleanV"></b></div>
     <p class="along-card-line note" id="alongCardNote"></p>
@@ -2407,7 +2422,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v308"></script>
+<script src="./app.js?v=v309"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2420,8 +2435,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v308";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-29 17:43";          /* and when it was built, for ?diag */
+  var BUILD = "v309";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-09-30 10:41";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

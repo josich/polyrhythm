@@ -512,8 +512,8 @@ input[type=range]::-moz-range-thumb{
 .tour-picks[hidden]{display:none}
 .tour-picks button{font-weight:600;font-size:12.5px;font-family:inherit;text-align:left;border-radius:11px;border:1px solid var(--line-2);background:var(--sunk);color:var(--ink);padding:9px;display:flex;flex-direction:column;gap:3px;cursor:pointer}
 .tour-picks button small{font-weight:400;font-size:10.5px;color:var(--ink-3);line-height:1.25}
-.tour-picks .ic{display:flex;gap:3px;margin-bottom:2px}
-.tour-picks .ic i{width:7px;height:7px;border-radius:50%}
+.picos{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:3px}   /* v332 (Oscar): a preset's sections as their coloured icons */
+.picos svg{width:14px;height:14px;display:block}
 .tour-picks button[aria-pressed="true"]{border-color:var(--c2);background:color-mix(in srgb,var(--c2) 14%,var(--sunk))}
 /* v331: the ☰ menu - a panel from the right edge, as in the mockup */
 .menu-btn{position:relative;width:38px;height:34px;padding:0;display:grid;place-items:center;border-radius:10px}
@@ -542,6 +542,8 @@ input[type=range]::-moz-range-thumb{
 .sm-chk input:checked + .box::after{content:"";width:9px;height:5px;border-left:2px solid var(--panel);border-bottom:2px solid var(--panel);transform:rotate(-45deg) translate(1px,-1px)}
 .sm-chk input:focus-visible + .box{outline:2px solid var(--c2);outline-offset:2px}
 .sm-chk .sw{width:9px;height:9px;border-radius:50%;flex:none}
+.sm-chk .sico{width:22px;height:22px;flex:none;display:grid;place-items:center}
+.sm-chk .sico svg{width:21px;height:21px;display:block}
 .sm-chk .t{flex:1;min-width:0}
 .sm-chk .t small{display:block;font-size:10.5px;color:var(--ink-3);line-height:1.3}
 .sm-chk .ndot{width:9px;height:9px;border-radius:50%;background:var(--c1);flex:none}
@@ -1402,6 +1404,9 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .fold-ico svg{width:100%;height:100%;display:block}
 .fold-ico.note{width:11px;height:15px}
 .foldsec[data-fold="1"] .fold-ico{display:block}
+/* v332 (Oscar): each section's icon in its colour - the same colour the ☰ menu gives it */
+#sessionPanel .fold-ico{color:var(--c3)} #seqPanel .fold-ico{color:var(--ink-2)} #patPanel .fold-ico{color:var(--c1)}
+#coursePanel .fold-ico{color:var(--c5)} #tapPanel .fold-ico{color:var(--c4)}
 .foldsec[data-fold="1"] .sess-head .lbl{margin-right:0}
 /* the level editor is a maker's tool: hidden unless this device has been let in */
 /* the Levels section is for everyone (v93): players see the ladder as far as they
@@ -2549,10 +2554,10 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   <div class="sm-panel" id="smPanel" role="dialog" aria-modal="true" aria-labelledby="smTitle">
     <div class="sm-head"><b id="smTitle">Show</b><button class="icobtn" id="smClose" title="Close" aria-label="Close">&times;</button></div>
     <div class="sm-presets" id="smPresets">
-      <button type="button" data-p="metro">Metronome<small>the wheel, tempo, patterns</small></button>
-      <button type="button" data-p="practice">Practice<small>+ session, sequence, Precision, log</small></button>
-      <button type="button" data-p="learn">Learn<small>+ courses, Play time, log</small></button>
-      <button type="button" data-p="all">Everything<small>every part of the app</small></button>
+      <button type="button" data-p="metro"><span class="picos" data-picos="metro"></span>Metronome<small>the wheel, tempo, patterns</small></button>
+      <button type="button" data-p="practice"><span class="picos" data-picos="practice"></span>Practice<small>+ session, sequence, Precision, log</small></button>
+      <button type="button" data-p="learn"><span class="picos" data-picos="learn"></span>Learn<small>+ courses, Play time, log</small></button>
+      <button type="button" data-p="all"><span class="picos" data-picos="all"></span>Everything<small>every part of the app</small></button>
     </div>
     <div class="sm-custom" id="smCustom"></div>
     <div class="sm-rule">Sections</div>
@@ -2572,10 +2577,10 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   <div class="tour-t" id="tourT"></div>
   <div class="tour-d" id="tourD"></div>
   <div class="tour-picks" id="tourPicks" hidden>
-    <button type="button" data-p="metro"><span class="ic"><i style="background:var(--c1)"></i></span>Metronome<small>practise with the wheel</small></button>
-    <button type="button" data-p="practice"><span class="ic"><i style="background:var(--c3)"></i><i style="background:var(--c2)"></i></span>Practice<small>sessions, routines, timing</small></button>
-    <button type="button" data-p="learn"><span class="ic"><i style="background:var(--c5)"></i><i style="background:var(--c4)"></i></span>Learn<small>courses and the game</small></button>
-    <button type="button" data-p="all"><span class="ic"><i style="background:var(--c1)"></i><i style="background:var(--c3)"></i><i style="background:var(--c5)"></i></span>Everything<small>every part at once</small></button>
+    <button type="button" data-p="metro"><span class="picos" data-picos="metro"></span>Metronome<small>practise with the wheel</small></button>
+    <button type="button" data-p="practice"><span class="picos" data-picos="practice"></span>Practice<small>sessions, routines, timing</small></button>
+    <button type="button" data-p="learn"><span class="picos" data-picos="learn"></span>Learn<small>courses and the game</small></button>
+    <button type="button" data-p="all"><span class="picos" data-picos="all"></span>Everything<small>every part at once</small></button>
   </div>
   <!-- v260 (Oscar's screenshot): Skip left the header's corner for the bottom-left, level with Next -
        the header line had no room for the stage name and the step count on a narrow phone -->
@@ -2793,7 +2798,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v331"></script>
+<script src="./app.js?v=v332"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2806,8 +2811,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v331";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-01 16:22";          /* and when it was built, for ?diag */
+  var BUILD = "v332";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-01 16:33";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

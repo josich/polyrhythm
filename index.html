@@ -450,6 +450,7 @@ input[type=range]::-moz-range-thumb{
    lands when each click is heard */
 .ghost.calsync .hand,.ghost.calsync .ring{animation-duration:var(--cyc,.6s);animation-delay:var(--d0,0s)}
 .ghost.calsync .ring.r2{animation-delay:calc(var(--d0,0s) + .05s)}
+.ghost.oneshot .hand,.ghost.oneshot .ring{animation:none}   /* v324: the course's hands dip once per heard stroke (from JS) */
 @keyframes ghostRing{0%,24%{transform:scale(.25);opacity:0}26%{transform:scale(.3);opacity:.95}70%,100%{transform:scale(1.35);opacity:0}}
 @media (prefers-reduced-motion:reduce){ .ghost .hand{animation:none} .ghost .ring{animation:none;opacity:.6;transform:scale(1)} }
 /* the coach card: fixed at the foot of the screen, under the sheets, until Got it */
@@ -1355,16 +1356,25 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root[data-course="1"] :is(#rack,#stageBar,#stageScore,.dial-head,.dial-foot){display:none!important}
 :root[data-course="1"] .dial{padding:10px 12px}
 :root[data-course="1"] .wrap{padding-top:calc(14px + env(safe-area-inset-top, 0px));padding-bottom:calc(12px + env(safe-area-inset-bottom, 0px))}   /* v322: the page's 30 px head and 64 px foot made the course screen scroll */
-:root[data-course="1"] .canvas-hold{max-width:min(100%,max(170px,calc(100vh - 484px - var(--csx,0px))));max-width:min(100%,max(170px,calc(100svh - 484px - var(--csx,0px))))}   /* the ready screen fits whole */
+:root[data-course="1"] .canvas-hold{max-width:min(100%,max(170px,calc(100vh - 500px - var(--csx,0px))));max-width:min(100%,max(170px,calc(100svh - 500px - var(--csx,0px))))}   /* the ready screen fits whole */
 @media (max-height:700px){
-  :root[data-course="1"] #courseTempo{display:none!important}   /* the tempo is in the button and the ladder */
-  :root[data-course="1"] .canvas-hold{max-width:min(100%,max(140px,calc(100vh - 454px - var(--csx,0px))));max-width:min(100%,max(140px,calc(100svh - 454px - var(--csx,0px))))}   /* v322: the head gave 16 px back */
+  :root[data-course="1"] #courseTempo b{font-size:30px}   /* v324: smaller, never gone - the screen does not change between ready and run */
+  :root[data-course="1"] #courseTempo{gap:4px;margin-bottom:6px}
+  :root[data-course="1"] .course-strip .tk{height:34px}
+  :root[data-course="1"] #alongSec{margin-bottom:8px;padding:6px 8px}
+  :root[data-course="1"] #courseFoot{gap:5px}
+  :root[data-course="1"] .wrap{padding-top:calc(8px + env(safe-area-inset-top, 0px))}
+  :root[data-course="1"] .canvas-hold{max-width:min(100%,max(130px,calc(100vh - 470px - var(--csx,0px))));max-width:min(100%,max(130px,calc(100svh - 470px - var(--csx,0px))))}
 }
 /* v320 (QA v317 V3): a short landscape screen puts the wheel on the left and the strip and buttons on the right */
 @media (orientation:landscape) and (max-height:520px){
-  :root[data-course="1"] #courseTempo{display:none!important}
+  :root[data-course="1"] .wrap > #courseTempo{flex-direction:row;align-items:center;gap:14px;margin-bottom:4px}   /* v324: one row - the number, then the ladder (.wrap > outranks the later plain rules) */
+  :root[data-course="1"] .wrap > #courseTempo b{font-size:26px}
+  :root[data-course="1"] .wrap > #alongSec{margin-bottom:6px;padding:4px 8px}
+  :root[data-course="1"] .wrap > #alongSec .along-ends{display:none!important}   /* Left / Right: the boxes' colours say it */
+  :root[data-course="1"] .ct-lad{flex:1;min-width:0}
   :root[data-course="1"] .stage{grid-template-columns:auto minmax(0,1fr);grid-template-areas:"dial strip" "dial foot";align-items:start}
-  :root[data-course="1"] .dial{grid-area:dial;width:calc(100vh - 175px);width:calc(100svh - 175px);min-width:150px}
+  :root[data-course="1"] .dial{grid-area:dial;width:calc(100vh - 190px);width:calc(100svh - 190px);min-width:140px}
   :root[data-course="1"] .canvas-hold{max-width:100%}
   :root[data-course="1"] #courseStrip{grid-area:strip}
   :root[data-course="1"] #courseFoot{grid-area:foot}
@@ -1387,10 +1397,11 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .cb-ttl b{display:block;font-family:var(--title);font-stretch:var(--title-stretch);font-weight:800;font-size:18px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cb-ttl span{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
 #cbX{width:34px;height:34px;border-radius:10px;color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));font-size:18px}
-:root[data-course="1"] #courseTempo{display:flex;align-items:baseline;justify-content:center;gap:8px;margin:0 0 8px}
-#courseTempo b{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:52px;line-height:.9;letter-spacing:-.03em}
-#courseTempo span{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
-#courseTempo em{font-style:normal;font-size:12px;color:var(--ink-3);margin-left:6px}
+:root[data-course="1"] #courseTempo{display:flex;flex-direction:column;align-items:stretch;gap:6px;margin:0 0 8px}
+.ct-num{display:flex;align-items:baseline;justify-content:center;gap:8px}
+#courseTempo b{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:42px;line-height:.9;letter-spacing:-.03em;display:inline-block}
+#courseTempo .ct-num span{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.ct-lad{display:flex;flex-direction:column;gap:3px}
 :root[data-course="1"] #alongSec :is(.along-row,#alongTgt,#alongHist){display:none!important}
 :root[data-course="1"] #alongSec{margin-bottom:10px;padding:8px 10px}
 :root[data-course="1"] #courseStrip{display:grid;order:-1;gap:4px}
@@ -1409,7 +1420,8 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .ctrack b.goal{background:transparent;border:2px dashed var(--c4)} .ctrack b.goal.ok{background:var(--c4);border-style:solid}
 .ctrack b.pick{position:relative;cursor:pointer} .ctrack b.pick::after{content:"";position:absolute;inset:-12px}   /* v320: a 36 px tap zone */
 .ctrackl{display:flex;justify-content:space-between;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3);margin:-2px 0 0}
-.ctrackl .n{color:var(--c1);font-weight:600} .ctrackl .g{color:var(--c4)}
+.ctrackl .g{color:var(--c4)}
+.cwave{position:fixed;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;border:2px solid var(--wc,var(--c1));pointer-events:none;z-index:60;opacity:0}
 .course-go{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:13px;border:1.5px solid var(--c2);font:inherit;font-weight:700;font-size:15px;background:color-mix(in srgb,var(--c2) 12%,transparent);color:var(--ink);cursor:pointer}
 .course-go svg{width:17px;height:17px;color:var(--c2)}
 .course-lock{margin:0;text-align:center;font-size:12px;color:var(--ink-3)}
@@ -1419,7 +1431,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root[data-cpad="1"] .course-strip .tk .g{color:var(--ink-2)}
 :root[data-cpad="1"] #courseGo{border-color:var(--c1);background:color-mix(in srgb,var(--c1) 12%,transparent)} :root[data-cpad="1"] #courseGo svg{color:var(--c1)}
 :root[data-cpad="1"] #courseExam{border-color:var(--c1);background:transparent} :root[data-cpad="1"] #courseExam svg{color:var(--c1)}
-:root[data-cpadrun="1"] :is(#courseGo,#courseExam,#coursePadTick,#courseLock,#courseTempo){display:none!important}
+:root[data-cpadrun="1"] :is(#courseGo,#courseExam,#coursePadTick,#courseLock){display:none!important}
 .course-tick{display:flex;align-items:center;gap:10px;width:100%;padding:12px 14px;border-radius:13px;border:1.5px solid var(--c1);background:transparent;color:var(--ink);font:inherit;font-weight:700;font-size:14.5px;cursor:pointer;text-align:left}
 .course-tick .bx{width:22px;height:22px;border-radius:6px;border:2px solid var(--c1);flex:none;display:grid;place-items:center}
 .course-tick[hidden]{display:none}
@@ -1428,12 +1440,12 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 /* v319: the exam - the same screen in the exam's purple */
 :root[data-cexam="1"] .dial{border-color:var(--c4)!important}
 :root[data-cexam="1"] #cbSub{color:var(--c4)}
-:root[data-cexam="1"] :is(#alongSec,#courseGo,#courseExam,#courseLock,#courseTempo){display:none!important}
+:root[data-cexam="1"] :is(#alongSec,#courseGo,#courseExam,#courseLock){display:none!important}
 :root[data-course="1"][data-along="1"] #courseExam{display:none!important}
 .cs-stars{font-size:34px;letter-spacing:6px;color:var(--c1);line-height:1.1}
 .cs-stars i{font-style:normal;color:var(--line-2)}
 .cs-pct[data-k="stars"]{display:none}
-:root[data-course="1"][data-along="1"] :is(#courseGo,#courseTempo,#courseLock){display:none!important}
+:root[data-course="1"][data-along="1"] :is(#courseGo,#courseLock){display:none!important}   /* v324: the tempo stays (Oscar: nothing above moves) */
 /* the whole screen is the tap surface: the Two fingers split, fixed to the screen's edges */
 :root[data-course="1"] #twoSplit{position:fixed;inset:0;z-index:30}
 :root[data-course="1"] #twoSplit::before{top:12px;bottom:12px}
@@ -1482,6 +1494,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .clist .cst.ok{background:var(--c2);color:var(--panel)}
 .clist .cst.half{border:2px solid var(--c1);background:conic-gradient(var(--c1) var(--p),transparent 0)}
 .clist .cst.none{border:1.5px dashed var(--line-2)}
+.clist .lvl-row[data-lock="1"]{opacity:.45;cursor:default} .clist .cst.lock svg{width:12px;height:12px;color:var(--ink-3)}
 .clist .lvl-row .nm-ro{font-weight:600}
 .clist .meta .up{color:var(--c2)} .clist .meta .o{color:var(--c1)} .clist .meta .stars{color:var(--c1);letter-spacing:1px}
 .clist .ops button[data-cprac]{color:var(--c2);border-color:color-mix(in srgb,var(--c2) 55%,var(--line))}
@@ -1698,7 +1711,7 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .log-pd-head .l,.log-pd-head .r{font-size:12.5px;color:var(--ink-2)}
 .log-pd-head b.cln{color:var(--c1);font-size:13px}
 .pseg{align-self:flex-start;margin:0}
-.pform-note{margin:-2px 2px 0;font-size:11px;color:var(--ink-3)}
+.pform-note{margin:2px 2px -2px;font-size:11px;color:var(--ink-3)}
 .pseg button[data-on="1"]{background:color-mix(in srgb,var(--c1) 16%,var(--sunk));color:var(--ink)}
 .pchart{width:100%;height:auto;display:block}
 /* v311: the plot scrolls sideways, the percent axis stays */
@@ -2041,7 +2054,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <div class="cb-ttl"><b id="cbName">Rudiment</b><span id="cbSub"></span></div>
     <button type="button" class="icobtn cb-x" id="cbX" title="Leave the course screen" aria-label="Leave the course screen">&times;</button>
   </div>
-  <div class="course-tempo" id="courseTempo"><b id="ctBpm">0</b><span>bpm</span><em id="ctStep"></em></div>
+  <div class="course-tempo" id="courseTempo"><div class="ct-num"><b id="ctBpm">0</b><span>bpm</span></div><div class="ct-lad"><div class="ctrack" id="courseTrack"></div><div class="ctrackl" id="courseTrackL"></div></div></div>
   <section class="along-sec" id="alongSec" hidden>
     <div class="along-row">
       <span class="lbl along-lbl">Precision</span>
@@ -2126,8 +2139,6 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </section>
 
     <div class="course-foot" id="courseFoot">
-      <div class="ctrack" id="courseTrack"></div>
-      <div class="ctrackl" id="courseTrackL"></div>
       <button type="button" class="course-go" id="courseGo"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><rect x="3" y="12" width="3.2" height="8" rx="1"/><rect x="8.3" y="7" width="3.2" height="13" rx="1"/><rect x="13.6" y="4" width="3.2" height="16" rx="1"/><rect x="18.9" y="10" width="3.2" height="10" rx="1"/></g></svg><span id="courseGoT">Practice</span></button>
       <button type="button" class="course-tick" id="coursePadTick" hidden><span class="bx" aria-hidden="true"></span><span id="coursePadTickT">I played it cleanly</span></button>
       <button type="button" class="course-go exam" id="courseExam" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg><span id="courseExamT">Exam</span></button>
@@ -2596,7 +2607,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <span class="t">Awards</span><span class="n" id="achRowN"><b>0</b> / 0</span>
       <span class="recent" id="achRowRecent"></span><span class="chev">&rsaquo;</span>
     </button>
-    <div class="log-tabs" id="logTabs" role="tablist"><button data-t="days" aria-pressed="true">Days</button><button data-t="pats" aria-pressed="false">Patterns</button></div>
+    <div class="log-tabs" id="logTabs" role="tablist"><button data-t="days" aria-pressed="true">Days</button><button data-t="pats" aria-pressed="false">Precision</button></div>
     <!-- v229, Oscar's spec: the tiles stay put; the days scroll in their own box (a row = date, a mini
          histogram by category, the day's time; a tap opens the day's chips, a chip opens what it names);
          under the box the fixed charts - a ring of the categories' shares and their bars -->
@@ -2687,7 +2698,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v323"></script>
+<script src="./app.js?v=v324"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2700,8 +2711,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v323";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-09-30 19:26";          /* and when it was built, for ?diag */
+  var BUILD = "v324";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-01 10:36";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 
@@ -2953,7 +2964,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         drawLine = "\ndraw (last 1 s): mean " + (P.draw / P.n).toFixed(1) + " ms/frame · worst " + P.worst.toFixed(0) + " ms · overlay " + (P.overlay / P.n).toFixed(2) +
           " ms · game tick " + P.tick.toFixed(0) + " ms · overlay busy " + P.busy + " of " + P.n + " frames · hand jumps " + P.jumps + " (since open " + P.jumpsAll + ")" +
           " · animations " + (document.getAnimations ? document.getAnimations().length : "?") +
-          "\nforced layout (last 1 s): mean " + (P.layout / P.n).toFixed(2) + " ms/frame · worst " + P.layoutWorst.toFixed(1) + " ms";
+          "\nforced layout (last 1 s): mean " + (P.layout / P.n).toFixed(2) + " ms/frame · worst " + P.layoutWorst.toFixed(1) + " ms" +
+          "\nscheduler (since open): worst wait " + Math.round(P.schedGap || 0) + " ms · beats played late " + (P.late || 0) + " · beats dropped " + (P.dropped || 0);
         P.n = 0; P.draw = 0; P.worst = 0; P.overlay = 0; P.tick = 0; P.busy = 0; P.jumps = 0; P.layout = 0; P.layoutWorst = 0;
       }
       perf.textContent = "frames (last 3 s): mean " + mean.toFixed(1) + " ms · worst " + a[a.length - 1].toFixed(0) + " ms · over 50 ms: " +

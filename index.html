@@ -1408,7 +1408,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 #courseTempo .ct-num span{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
 .ct-lad{display:flex;flex-direction:column;gap:3px}
 .ct-step{display:none;margin:0;text-align:center;font-size:13.5px;font-weight:600;color:var(--ink);line-height:1.25}   /* v325: a polyrhythm step's words */
-:root[data-cpoly="1"] .ct-step{display:block}
+:root[data-cpoly="1"] .ct-step{display:block;min-height:2.5em}   /* v330 (QA v329 V1): one line or two, the wheel stays put */
 :root[data-cpoly="1"] #courseStrip{display:none!important}
 :root[data-course="1"] #alongSec :is(.along-row,#alongTgt,#alongHist){display:none!important}
 :root[data-course="1"] #alongSec{margin-bottom:10px;padding:8px 10px}
@@ -2712,7 +2712,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v329"></script>
+<script src="./app.js?v=v330"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2725,8 +2725,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v329";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-01 13:26";          /* and when it was built, for ?diag */
+  var BUILD = "v330";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-01 15:19";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

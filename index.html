@@ -568,7 +568,11 @@ input[type=range]::-moz-range-thumb{
 :root:not([data-tour="1"])[data-sh-flash="0"] #flashBtn,
 :root:not([data-tour="1"])[data-sh-share="0"] :is(#scoreBtn,#shareBtn),
 :root:not([data-tour="1"])[data-sh-stage="0"] #stageBtn,
-:root:not([data-tour="1"])[data-sh-drone="0"] #droneRow{display:none!important}
+:root:not([data-tour="1"])[data-sh-drone="0"] #droneRow,
+:root:not([data-tour="1"])[data-sh-rout="0"] :is(#rtHead,#rtBody),
+:root:not([data-tour="1"])[data-sh-gclassic="0"] #gtabs .tab[data-gmode="classic"],
+:root:not([data-tour="1"])[data-sh-gblind="0"] #gtabs .tab[data-gmode="blind"],
+:root:not([data-tour="1"])[data-sh-gtwo="0"] #gtabs .tab[data-gmode="two"]{display:none!important}
 #tourNext{min-width:104px;border-color:var(--c2);color:var(--ink)}
 #tourNext:disabled{opacity:.35;border-color:var(--line);cursor:default}
 #tourNext{position:relative}
@@ -2799,7 +2803,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v334"></script>
+<script src="./app.js?v=v335"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2812,8 +2816,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v334";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-01 16:40";          /* and when it was built, for ?diag */
+  var BUILD = "v335";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-01 16:44";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

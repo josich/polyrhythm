@@ -507,6 +507,65 @@ input[type=range]::-moz-range-thumb{
 .tour-t{margin-top:6px;font-size:16px;font-weight:600;color:var(--ink);line-height:1.3}
 .tour-d{margin-top:4px;font-size:13px;color:var(--ink-2);line-height:1.45}
 .tour-btns{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+/* v331: the tour's last card - what to show first */
+.tour-picks{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+.tour-picks[hidden]{display:none}
+.tour-picks button{font-weight:600;font-size:12.5px;font-family:inherit;text-align:left;border-radius:11px;border:1px solid var(--line-2);background:var(--sunk);color:var(--ink);padding:9px;display:flex;flex-direction:column;gap:3px;cursor:pointer}
+.tour-picks button small{font-weight:400;font-size:10.5px;color:var(--ink-3);line-height:1.25}
+.tour-picks .ic{display:flex;gap:3px;margin-bottom:2px}
+.tour-picks .ic i{width:7px;height:7px;border-radius:50%}
+.tour-picks button[aria-pressed="true"]{border-color:var(--c2);background:color-mix(in srgb,var(--c2) 14%,var(--sunk))}
+/* v331: the ☰ menu - a panel from the right edge, as in the mockup */
+.menu-btn{position:relative;width:38px;height:34px;padding:0;display:grid;place-items:center;border-radius:10px}
+.menu-btn svg{width:18px;height:18px}
+.menu-btn .mdot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--c1);border:2px solid var(--ground)}
+.menu-btn .mdot[hidden]{display:none}
+.showmenu{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.35);display:flex;justify-content:flex-end}
+.showmenu[hidden]{display:none}
+.sm-panel{width:min(88vw,380px);height:100%;background:var(--panel);border-left:1px solid var(--line);box-shadow:var(--shadow);padding:calc(20px + env(safe-area-inset-top,0px)) 14px calc(18px + env(safe-area-inset-bottom,0px));overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.sm-head{display:flex;align-items:center;justify-content:space-between}
+.sm-head b{font-family:var(--title);font-stretch:var(--title-stretch);font-weight:800;font-size:18px}
+#smClose{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
+.sm-presets{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sm-presets button{font-weight:600;font-size:12.5px;font-family:inherit;text-align:left;padding:8px 9px;border-radius:10px;border:1px solid var(--line-2);background:var(--sunk);color:var(--ink);cursor:pointer;display:flex;flex-direction:column;gap:2px}
+.sm-presets button small{font-weight:400;font-size:10.5px;color:var(--ink-3);line-height:1.25}
+.sm-presets button[aria-pressed="true"]{border-color:var(--c2);background:color-mix(in srgb,var(--c2) 14%,var(--sunk))}
+.sm-custom{font-size:11.5px;color:var(--c1);min-height:16px}
+.sm-rule{display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.sm-rule::after{content:"";flex:1;border-top:1px dashed var(--line-2)}
+.sm-list{display:flex;flex-direction:column}
+.sm-chk{display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid var(--line);cursor:pointer;font-size:13.5px}
+.sm-chk:last-child{border-bottom:0}
+.sm-chk input{position:absolute;opacity:0;pointer-events:none}
+.sm-chk .box{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--line-2);display:grid;place-items:center;flex:none}
+.sm-chk input:checked + .box{background:var(--c2);border-color:var(--c2)}
+.sm-chk input:checked + .box::after{content:"";width:9px;height:5px;border-left:2px solid var(--panel);border-bottom:2px solid var(--panel);transform:rotate(-45deg) translate(1px,-1px)}
+.sm-chk input:focus-visible + .box{outline:2px solid var(--c2);outline-offset:2px}
+.sm-chk .sw{width:9px;height:9px;border-radius:50%;flex:none}
+.sm-chk .t{flex:1;min-width:0}
+.sm-chk .t small{display:block;font-size:10.5px;color:var(--ink-3);line-height:1.3}
+.sm-chk .ndot{width:9px;height:9px;border-radius:50%;background:var(--c1);flex:none}
+.sm-chk.sub{margin-left:16px;padding-left:10px;border-left:1px solid var(--line);font-size:13px}
+.sm-chk.always,.sm-chk[data-off="1"]{opacity:.5;cursor:default}
+.sm-chk[data-busy="1"]{opacity:.55;cursor:default}
+.sm-chk .busy{font-size:10.5px;color:var(--c3);white-space:nowrap}
+.sm-row{display:flex;align-items:center;justify-content:space-between;padding:6px 2px;font-size:13.5px}
+.show-toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(calc(100vw - 24px),420px);z-index:55;background:var(--panel);border:1px solid var(--tc, var(--c2));border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center;font-size:13px;box-shadow:var(--shadow)}
+.show-toast[hidden]{display:none}
+.show-toast b{color:var(--tc, var(--c2))}
+.show-toast .btn{margin-left:auto;white-space:nowrap}
+/* v331: a part the menu hides - never during a tour or a guide, which show what they explain */
+:root:not([data-tour="1"])[data-sh-log="0"] #logBtn,
+:root:not([data-tour="1"])[data-sh-pat="0"] #patPanel,
+:root:not([data-tour="1"])[data-sh-sess="0"] #sessionPanel,
+:root:not([data-tour="1"])[data-sh-seq="0"] #seqPanel,
+:root:not([data-tour="1"])[data-sh-course="0"] #coursePanel,
+:root:not([data-tour="1"])[data-sh-game="0"] #tapPanel,
+:root:not([data-tour="1"])[data-sh-prec="0"] #alongBtn,
+:root:not([data-tour="1"])[data-sh-flash="0"] #flashBtn,
+:root:not([data-tour="1"])[data-sh-share="0"] :is(#scoreBtn,#shareBtn),
+:root:not([data-tour="1"])[data-sh-stage="0"] #stageBtn,
+:root:not([data-tour="1"])[data-sh-drone="0"] #droneRow{display:none!important}
 #tourNext{min-width:104px;border-color:var(--c2);color:var(--ink)}
 #tourNext:disabled{opacity:.35;border-color:var(--line);cursor:default}
 #tourNext{position:relative}
@@ -1816,12 +1875,7 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
    and the card (Oscar, v163): hidden while a game runs, the hint keeps its other uses */
 :root[data-game="1"] #tapHint{display:none!important}
 #tapGame[data-on="1"]{border-color:var(--c3);background:color-mix(in srgb,var(--c3) 16%,transparent);color:var(--ink)}
-/* v310 (Oscar): the old Simple back - the Practice session, the Sequence and Play time are Advanced sections
-   (v304 had kept them in Simple, which left the two modes barely different) */
-:root[data-ui="simple"] #coursePanel,
-:root[data-ui="simple"] #sessionPanel,
-:root[data-ui="simple"] #tapPanel,
-:root[data-ui="simple"] #seqPanel{display:none}
+/* v331: which sections show is the ☰ menu's; Simple ("Detailed ring controls" off) only hides the ring's details */
 .pchip{border:1px solid var(--line-2);background:var(--sunk);border-radius:8px;padding:7px 12px;cursor:pointer;font-family:"IBM Plex Mono",monospace;font-size:12.5px;font-weight:500}
 .pchip:hover{border-color:var(--ink);color:var(--ink)}
 .pchip small{font-family:"Archivo",sans-serif;color:var(--ink-3);margin-left:7px;font-size:10.5px}
@@ -1963,14 +2017,11 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   <header class="nameplate">
     <h1>Polyorbit <span class="sub">Polyrhythm metronome</span></h1>
     <div class="np-right">
-      <button class="btn mode pulse-host" id="uiBtn">Advanced</button>
       <!-- Stage mode (v172): the wheel and the tempo, big, nothing else -->
       <button class="btn mode" id="stageBtn" data-on="0" title="Stage: the wheel and the tempo, big">Stage</button>
-      <button class="info" id="infoBtn" title="How this works" aria-label="How this works">i</button>
-      <button class="btn skin" id="skin" title="Switch skin">
-        <svg id="skinIcon" viewBox="0 0 24 24" aria-hidden="true"></svg>
-        <span id="skinTxt">Dark</span>
-      </button>
+      <button class="info" id="infoBtn" title="Guides" aria-label="Guides">i</button>
+      <!-- v331 (Oscar): the menu that chooses what the page shows; its dot = news in a hidden part -->
+      <button class="btn menu-btn" id="menuBtn" title="Choose what the page shows" aria-label="Choose what the page shows"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="mdot" id="menuDot" hidden></span></button>
     </div>
   </header>
 
@@ -2049,7 +2100,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
     <!-- v250 (Oscar): a drone - one low note held under the wheel while it plays, to tune and lock in
          against; its own level, past the limiter so it never squeezes the clicks -->
-    <div class="drone-row adv-only" id="droneRow">
+    <div class="drone-row" id="droneRow">
       <span class="lbl">Drone</span>
       <button class="btn sm" id="droneBtn" data-on="0" aria-pressed="false" title="Hold a low note under the wheel while it plays">Off</button>
       <select class="snd drone-note" id="droneNote" aria-label="Drone note"></select>
@@ -2492,10 +2543,40 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <p class="tw-bad" id="twBad" hidden></p>
   </div>
 </div>
+<!-- v331 (Oscar, the mockup design/sections-menu-proto.html): what the page shows - four presets, each section with its
+     own parts under it, the skin -->
+<div class="showmenu" id="showMenu" hidden>
+  <div class="sm-panel" id="smPanel" role="dialog" aria-modal="true" aria-labelledby="smTitle">
+    <div class="sm-head"><b id="smTitle">Show</b><button class="icobtn" id="smClose" title="Close" aria-label="Close">&times;</button></div>
+    <div class="sm-presets" id="smPresets">
+      <button type="button" data-p="metro">Metronome<small>the wheel, tempo, patterns</small></button>
+      <button type="button" data-p="practice">Practice<small>+ session, sequence, Precision, log</small></button>
+      <button type="button" data-p="learn">Learn<small>+ courses, Play time, log</small></button>
+      <button type="button" data-p="all">Everything<small>every part of the app</small></button>
+    </div>
+    <div class="sm-custom" id="smCustom"></div>
+    <div class="sm-rule">Sections</div>
+    <div class="sm-list" id="smList"></div>
+    <div class="sm-rule">More</div>
+    <div class="sm-row"><span>Skin</span>
+      <button class="btn skin" id="skin" title="Switch skin">
+        <svg id="skinIcon" viewBox="0 0 24 24" aria-hidden="true"></svg>
+        <span id="skinTxt">Dark</span>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="show-toast" id="showToast" hidden role="status"><span id="showToastT"></span><button type="button" class="btn sm" id="showKeep">Keep it</button></div>
 <div class="tour" id="tourCard" hidden role="dialog" aria-labelledby="tourT">
   <div class="tour-k"><span id="tourStage"></span><span id="tourCount"></span></div>
   <div class="tour-t" id="tourT"></div>
   <div class="tour-d" id="tourD"></div>
+  <div class="tour-picks" id="tourPicks" hidden>
+    <button type="button" data-p="metro"><span class="ic"><i style="background:var(--c1)"></i></span>Metronome<small>practise with the wheel</small></button>
+    <button type="button" data-p="practice"><span class="ic"><i style="background:var(--c3)"></i><i style="background:var(--c2)"></i></span>Practice<small>sessions, routines, timing</small></button>
+    <button type="button" data-p="learn"><span class="ic"><i style="background:var(--c5)"></i><i style="background:var(--c4)"></i></span>Learn<small>courses and the game</small></button>
+    <button type="button" data-p="all"><span class="ic"><i style="background:var(--c1)"></i><i style="background:var(--c3)"></i><i style="background:var(--c5)"></i></span>Everything<small>every part at once</small></button>
+  </div>
   <!-- v260 (Oscar's screenshot): Skip left the header's corner for the bottom-left, level with Next -
        the header line had no room for the stage name and the step count on a narrow phone -->
   <div class="tour-btns"><button type="button" class="tour-skip" id="tourSkip">Skip tour</button><button type="button" class="btn" id="tourNext">Next</button></div>
@@ -2701,7 +2782,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 <div class="modal" id="help" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
     <div class="sheet-head">
-      <h2 id="helpTitle">How this works</h2>
+      <h2 id="helpTitle">Guides</h2>
       <button class="icobtn" id="helpClose" title="Close" aria-label="Close">&times;</button>
     </div>
     <p class="build mono" id="buildTag"></p>
@@ -2712,7 +2793,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v330"></script>
+<script src="./app.js?v=v331"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2725,8 +2806,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v330";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-01 15:19";          /* and when it was built, for ?diag */
+  var BUILD = "v331";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-01 16:22";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

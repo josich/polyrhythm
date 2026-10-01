@@ -515,6 +515,7 @@ input[type=range]::-moz-range-thumb{
 .picos{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:3px}   /* v332 (Oscar): a preset's sections as their coloured icons */
 .picos svg{width:14px;height:14px;display:block}
 .tour-picks button[aria-pressed="true"]{border-color:var(--c2);background:color-mix(in srgb,var(--c2) 14%,var(--sunk))}
+@media (max-height:420px){ .tour-picks{grid-template-columns:repeat(4,1fr);gap:5px;margin-top:6px} .tour-picks button{padding:6px} .tour-picks button small{display:none} }   /* v336 (QA V1): one row on a landscape phone */
 /* v331: the ☰ menu - a panel from the right edge, as in the mockup */
 .menu-btn{position:relative;width:38px;height:34px;padding:0;display:grid;place-items:center;border-radius:10px}
 .menu-btn svg{width:18px;height:18px}
@@ -525,7 +526,8 @@ input[type=range]::-moz-range-thumb{
 .sm-panel{width:min(88vw,380px);height:100%;background:var(--panel);border-left:1px solid var(--line);box-shadow:var(--shadow);padding:calc(20px + env(safe-area-inset-top,0px)) 14px calc(18px + env(safe-area-inset-bottom,0px));overflow-y:auto;display:flex;flex-direction:column;gap:12px}
 .sm-head{display:flex;align-items:center;justify-content:space-between}
 .sm-head b{font-family:var(--title);font-stretch:var(--title-stretch);font-weight:800;font-size:18px}
-#smClose{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
+#smClose{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));width:34px;height:34px}   /* v336 (QA V2) */
+.sm-head{position:sticky;top:calc(-20px - env(safe-area-inset-top,0px));margin-top:calc(-20px - env(safe-area-inset-top,0px));padding:calc(20px + env(safe-area-inset-top,0px)) 0 8px;background:var(--panel);z-index:2}   /* v336 (QA V2): the title and the cross stay while the list scrolls */
 .sm-presets{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .sm-presets button{font-weight:600;font-size:12.5px;font-family:inherit;text-align:left;padding:8px 9px;border-radius:10px;border:1px solid var(--line-2);background:var(--sunk);color:var(--ink);cursor:pointer;display:flex;flex-direction:column;gap:2px}
 .sm-presets button small{font-weight:400;font-size:10.5px;color:var(--ink-3);line-height:1.25}
@@ -553,7 +555,7 @@ input[type=range]::-moz-range-thumb{
 .sm-chk[data-busy="1"]{opacity:.55;cursor:default}
 .sm-chk .busy{font-size:10.5px;color:var(--c3);white-space:nowrap}
 .sm-row{display:flex;align-items:center;justify-content:space-between;padding:6px 2px;font-size:13.5px}
-.show-toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(calc(100vw - 24px),420px);z-index:55;background:var(--panel);border:1px solid var(--tc, var(--c2));border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center;font-size:13px;box-shadow:var(--shadow)}
+.show-toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(calc(100vw - 24px),420px);z-index:44;background:var(--panel);border:1px solid var(--tc, var(--c2));border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center;font-size:13px;box-shadow:var(--shadow)}
 .show-toast[hidden]{display:none}
 .show-toast b{color:var(--tc, var(--c2))}
 .show-toast .btn{margin-left:auto;white-space:nowrap}
@@ -570,6 +572,7 @@ input[type=range]::-moz-range-thumb{
 :root:not([data-tour="1"])[data-sh-stage="0"] #stageBtn,
 :root:not([data-tour="1"])[data-sh-drone="0"] #droneRow,
 :root:not([data-tour="1"])[data-sh-rout="0"] :is(#rtHead,#rtBody),
+:root:not([data-tour="1"])[data-sh-seq="0"] button[data-seq],
 :root:not([data-tour="1"])[data-sh-gclassic="0"] #gtabs .tab[data-gmode="classic"],
 :root:not([data-tour="1"])[data-sh-gblind="0"] #gtabs .tab[data-gmode="blind"],
 :root:not([data-tour="1"])[data-sh-gtwo="0"] #gtabs .tab[data-gmode="two"]{display:none!important}
@@ -2803,7 +2806,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v335"></script>
+<script src="./app.js?v=v336"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2816,8 +2819,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v335";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-01 16:44";          /* and when it was built, for ?diag */
+  var BUILD = "v336";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-01 17:54";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

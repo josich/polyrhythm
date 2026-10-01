@@ -1402,6 +1402,9 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 #courseTempo b{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:42px;line-height:.9;letter-spacing:-.03em;display:inline-block}
 #courseTempo .ct-num span{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
 .ct-lad{display:flex;flex-direction:column;gap:3px}
+.ct-step{display:none;margin:0;text-align:center;font-size:13.5px;font-weight:600;color:var(--ink);line-height:1.25}   /* v325: a polyrhythm step's words */
+:root[data-cpoly="1"] .ct-step{display:block}
+:root[data-cpoly="1"] #courseStrip{display:none!important}
 :root[data-course="1"] #alongSec :is(.along-row,#alongTgt,#alongHist){display:none!important}
 :root[data-course="1"] #alongSec{margin-bottom:10px;padding:8px 10px}
 :root[data-course="1"] #courseStrip{display:grid;order:-1;gap:4px}
@@ -1472,6 +1475,11 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 #ctabs + .share-lbl{margin-top:14px}
 .clist .lvl-row{grid-template-columns:22px minmax(0,1fr) auto}
 #ctabs .tab:disabled{opacity:.5;cursor:default}
+.cleft-row{display:flex;justify-content:flex-end;margin:-4px 0 8px}
+#cleftBtn[aria-pressed="true"]{border-color:var(--c2);background:color-mix(in srgb,var(--c2) 14%,transparent)}
+.csteps{margin:4px 0 8px;padding-left:22px;font-size:13px;color:var(--ink-2)}
+.csteps li{margin:3px 0} .csteps li.ok{color:var(--c2)} .csteps li.now{color:var(--ink);font-weight:600}
+.csteps button{all:unset;cursor:pointer;text-decoration:underline;text-decoration-color:var(--line-2);text-underline-offset:3px}
 .cmode{display:flex;border:1px solid var(--line-2);border-radius:10px;overflow:hidden}
 .cmode button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;border:0;background:var(--sunk);color:var(--ink-3);font:inherit;font-size:12.5px;font-weight:600;padding:8px 6px;cursor:pointer}
 .cmode button + button{border-left:1px solid var(--line-2)}
@@ -2054,7 +2062,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <div class="cb-ttl"><b id="cbName">Rudiment</b><span id="cbSub"></span></div>
     <button type="button" class="icobtn cb-x" id="cbX" title="Leave the course screen" aria-label="Leave the course screen">&times;</button>
   </div>
-  <div class="course-tempo" id="courseTempo"><div class="ct-num"><b id="ctBpm">0</b><span>bpm</span></div><div class="ct-lad"><div class="ctrack" id="courseTrack"></div><div class="ctrackl" id="courseTrackL"></div></div></div>
+  <div class="course-tempo" id="courseTempo"><div class="ct-num"><b id="ctBpm">0</b><span>bpm</span></div><div class="ct-lad"><div class="ctrack" id="courseTrack"></div><div class="ctrackl" id="courseTrackL"></div></div><p class="ct-step" id="ctStepT"></p></div>
   <section class="along-sec" id="alongSec" hidden>
     <div class="along-row">
       <span class="lbl along-lbl">Precision</span>
@@ -2335,8 +2343,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <span class="fold-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2.5 9L12 4.5 21.5 9 12 13.5zM6.5 11v4.5c1.6 1.6 3.4 2.4 5.5 2.4s3.9-.8 5.5-2.4V11M21.5 9v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg></span>
     </div>
     <div class="tabs ptabs ctabs" id="ctabs" role="tablist" aria-label="Course">
-      <button class="tab" data-ctab="rudiments" data-on="1">Rudiments</button>
-      <button class="tab" disabled title="Coming later">Polyrhythms <small>soon</small></button>
+      <button class="tab" data-ctab="rud" data-on="1">Rudiments</button>
+      <button class="tab" data-ctab="poly" data-on="0">Polyrhythms</button>
       <button class="tab" disabled title="Coming later">Odd meters <small>soon</small></button>
     </div>
     <div class="share-lbl lvl-lbl"><span>Take it:</span><i></i></div>
@@ -2345,6 +2353,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <button type="button" data-cmode="pad" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="14" rx="9" ry="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 5l6 7M19 4l-6 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>On a pad</button>
     </div>
     <p class="empty sec-help" id="cmodeHelp"></p>
+    <div class="cleft-row"><button type="button" class="btn sm" id="cleftBtn" aria-pressed="false" title="Left-handed: the hands swap, on the screen and in the exams">Left-handed</button></div>
     <div class="cprog" id="cprog"></div>
     <div class="share-lbl lvl-lbl"><span>Levels:</span><i></i></div>
     <div class="lvl-list rlist clist" id="cgrid"></div>
@@ -2698,7 +2707,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v324"></script>
+<script src="./app.js?v=v325"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2711,8 +2720,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v324";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-01 10:36";          /* and when it was built, for ?diag */
+  var BUILD = "v325";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-01 11:55";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

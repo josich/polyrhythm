@@ -1276,9 +1276,9 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
   font-family:"Archivo",sans-serif;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;--ta:13;
   border:0 solid color-mix(in srgb,var(--tc) calc(var(--ta) * 2.5%),transparent)}
 #twoSplit span b{font-weight:600;display:inline-block}
-#twoSplit .ts-l{left:0;--tc:var(--c2);color:var(--tc);border-left-width:3px;border-radius:14px 0 0 14px}
+#twoSplit .ts-l{left:0;--tc:var(--tcl,var(--c2));color:var(--tc);border-left-width:3px;border-radius:14px 0 0 14px}
 #twoSplit .ts-l b{transform-origin:left bottom}
-#twoSplit .ts-r{right:0;justify-content:flex-end;--tc:var(--c1);color:var(--tc);border-right-width:3px;border-radius:0 14px 14px 0}
+#twoSplit .ts-r{right:0;justify-content:flex-end;--tc:var(--tcr,var(--c1));color:var(--tc);border-right-width:3px;border-radius:0 14px 14px 0}
 #twoSplit .ts-r b{transform-origin:right bottom}
 #twoSplit span[data-miss="1"]{--tc:var(--c3)}
 .pane{padding-top:14px}
@@ -1389,13 +1389,18 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
   :root[data-course="1"] .wrap{padding-top:calc(10px + env(safe-area-inset-top, 0px))}
   :root[data-course="1"] .course-strip .tk{height:32px}
   :root[data-course="1"] #courseLock{display:none!important}
+  :root[data-course="1"][data-cpoly="1"] .dial{width:calc(100vh - 212px);width:calc(100svh - 212px);min-width:126px}   /* v328 (QA v325 V2): the step line's room */
+  :root[data-course="1"] .ct-step{font-size:12px}
 }
 :root[data-course="1"] #courseBar{display:grid;grid-template-columns:auto 1fr 34px;align-items:center;gap:8px;margin:0 0 8px}
 .cb-mode{display:flex;align-items:center;gap:5px;font-size:11px;padding:5px 9px;border-radius:999px;border:1px solid color-mix(in srgb,var(--c2) 55%,var(--line));color:var(--ink-2);white-space:nowrap}
 .cb-mode svg{width:13px;height:13px;color:var(--c2)}
 .cb-ttl{text-align:center;min-width:0}
 .cb-ttl b{display:block;font-family:var(--title);font-stretch:var(--title-stretch);font-weight:800;font-size:18px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cb-ttl span{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.cb-ttl span{display:block;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:359px){ .cb-ttl span{letter-spacing:.02em;font-size:9.5px} }   /* v328 (QA v325 V1): "Level 2 · Three against two" on one line at 320 px */
+.clist .lvl-row .nm-ro{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.2}   /* v328 (QA v325 V1): a long lesson name takes a second line */
+@media (pointer:coarse){ .clist .csteps li button{display:inline-block;padding:7px 0;min-height:32px;box-sizing:border-box} }   /* .clist li: outranks the later all:unset */   /* v328 (QA v325 V3) */
 #cbX{width:34px;height:34px;border-radius:10px;color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));font-size:18px}
 :root[data-course="1"] #courseTempo{display:flex;flex-direction:column;align-items:stretch;gap:6px;margin:0 0 8px}
 .ct-num{display:flex;align-items:baseline;justify-content:center;gap:8px}
@@ -2707,7 +2712,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v327"></script>
+<script src="./app.js?v=v328"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2720,8 +2725,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v327";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-01 12:21";          /* and when it was built, for ?diag */
+  var BUILD = "v328";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-01 13:03";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

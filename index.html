@@ -1530,8 +1530,28 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root[data-course="1"] #twoSplit{position:fixed;inset:0;z-index:30}
 :root[data-course="1"] #twoSplit::before{top:12px;bottom:12px}
 :root[data-course="1"] #twoSplit span{padding:0 18px 16px;font-size:12px}
-.modal.course-sheet-wrap{z-index:70;align-items:flex-end;background:color-mix(in srgb,var(--ground) 55%,transparent)}
-.course-sheet{width:min(100%,440px);margin:0 auto 12px;background:var(--panel);border:1px solid var(--line-2);border-radius:20px;padding:18px 16px 16px;text-align:center;display:flex;flex-direction:column;gap:8px;box-shadow:0 -10px 40px -10px rgba(0,0,0,.6)}
+.modal.course-sheet-wrap{z-index:70;align-items:center;grid-template-columns:minmax(0,1fr);background:color-mix(in srgb,var(--ground) 55%,transparent)}   /* v338 (Oscar): centred; the column never grows past the screen (a long button pushed the sheet off to the right) */
+.course-sheet{width:min(100%,440px);min-width:0;margin:0 auto;background:var(--panel);border:1px solid var(--line-2);border-radius:20px;padding:18px 16px 16px;text-align:center;display:flex;flex-direction:column;gap:8px;box-shadow:0 10px 40px -10px rgba(0,0,0,.6)}
+.course-sheet .course-go{min-width:0} .course-sheet .course-go span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cs-code{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:.72em;letter-spacing:0;color:var(--ink-2);margin-right:10px}
+:root:has(#courseSheet:not([hidden])) #alongSec{position:relative;z-index:71}   /* v338 (Oscar): the run's histogram stays lit above the result card's backdrop */
+.ccode{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:.82em;color:var(--ink-3);margin-right:7px}
+.ct-step .ccode{color:var(--c2);font-size:.9em}
+:root[data-cpoly="1"] .ct-step{cursor:pointer}
+.ctrack b{--rc:var(--line-2)} .ctrack b.ok{--rc:var(--c2)} .ctrack b.now{--rc:var(--c1)} .ctrack b.goal{--rc:var(--c4)}
+.ctrack b.cur{box-shadow:0 0 0 3px var(--ground),0 0 0 5px var(--rc)}   /* v338 (Oscar): a ring round the step being played, in its dot's colour */
+.cintro .ci-code{font-family:"IBM Plex Mono",monospace;font-size:15px;color:var(--c2);letter-spacing:.04em}
+.cintro .ci-t{font-family:var(--title);font-stretch:var(--title-stretch);font-weight:800;font-size:22px;line-height:1.15;color:var(--ink)}
+.cintro .cs-line{font-size:14px;line-height:1.35}
+.cintro #ciMeta{font-size:12px;color:var(--ink-3)}
+.cintro .ci-note{color:var(--c3)} .cintro .ci-note[hidden]{display:none}
+.cintro .course-go.pad{border-color:var(--c1);background:color-mix(in srgb,var(--c1) 12%,transparent)} .cintro .course-go.pad svg{color:var(--c1)}
+.cintro .ci-later{align-self:center;border-color:transparent;color:var(--ink-3)}
+/* v338 (Oscar): a one-hand step - its own half takes the taps, the other half is greyed */
+:root[data-course="1"][data-one] #twoSplit{display:block}
+:root[data-one="0"] #twoSplit .ts-l,:root[data-one="1"] #twoSplit .ts-r{background:color-mix(in srgb,var(--ground) 72%,transparent);border-color:transparent}
+:root[data-one="0"] #twoSplit .ts-l b,:root[data-one="1"] #twoSplit .ts-r b{visibility:hidden}
+:root[data-cexam="1"] #twoSplit .ts-l,:root[data-cexam="1"] #twoSplit .ts-r{background:none}
 .cs-k{font-family:var(--title);font-stretch:var(--title-stretch);font-weight:800;font-size:26px;letter-spacing:.03em;color:var(--c2)}
 .cs-k[data-k="no"]{color:var(--c3)} .cs-k[data-k="short"]{color:var(--ink-3)} .cs-k[data-k="goal"]{color:var(--c4)}
 .cs-pct{font-family:"IBM Plex Mono",monospace;font-size:48px;font-weight:500;line-height:1;color:var(--c2)}
@@ -2595,6 +2615,17 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   <div class="tour-btns"><button type="button" class="tour-skip" id="tourSkip">Skip tour</button><button type="button" class="btn" id="tourNext">Next</button></div>
 </div>
 <!-- Precision results (v193): a card at the end of a run, the figures big, Run again / Close -->
+<div class="modal course-sheet-wrap" id="courseIntro" hidden>
+  <div class="course-sheet cintro" role="dialog" aria-modal="true" aria-labelledby="ciT">
+    <div class="ci-code" id="ciCode"></div>
+    <div class="ci-t" id="ciT"></div>
+    <p class="cs-line" id="ciHow"></p>
+    <p class="cs-line" id="ciMeta"></p>
+    <p class="cs-line ci-note" id="ciNote" hidden></p>
+    <button type="button" class="course-go" id="ciGo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg><span id="ciGoT">Start</span></button>
+    <button type="button" class="btn sm ci-later" id="ciLater">Not now</button>
+  </div>
+</div>
 <div class="modal course-sheet-wrap" id="courseSheet" hidden>
   <div class="course-sheet" id="courseSheetCard" data-arm="1" role="dialog" aria-modal="true" aria-labelledby="csK">
     <div class="cs-k" id="csK">CLEAN</div>
@@ -2806,7 +2837,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v337"></script>
+<script src="./app.js?v=v338"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2819,8 +2850,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v337";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-01 18:04";          /* and when it was built, for ?diag */
+  var BUILD = "v338";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-02 10:05";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

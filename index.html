@@ -1446,7 +1446,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
   :root[data-course="1"] .wrap > #alongSec .along-ends{display:none!important}   /* Left / Right: the boxes' colours say it */
   :root[data-course="1"] .ct-lad{flex:1;min-width:0}
   :root[data-course="1"] .stage{grid-template-columns:auto minmax(0,1fr);grid-template-areas:"dial strip" "dial foot";align-items:start}
-  :root[data-course="1"] .dial{grid-area:dial;width:calc(100vh - 190px);width:calc(100svh - 190px);min-width:140px}
+  :root[data-course="1"] .dial{grid-area:dial;width:calc(100vh - 190px);width:calc(100svh - 190px);min-width:96px}   /* v354 (QA v353 V3): was 140, which made a 300 px screen scroll */
   :root[data-course="1"] .canvas-hold{max-width:100%}
   :root[data-course="1"] #courseStrip{grid-area:strip}
   :root[data-course="1"] #courseFoot{grid-area:foot}
@@ -1461,11 +1461,12 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
   :root[data-course="1"] .wrap{padding-top:calc(10px + env(safe-area-inset-top, 0px))}
   :root[data-course="1"] .course-strip .tk{height:32px}
   :root[data-course="1"] #courseLock{display:none!important}
-  :root[data-course="1"][data-cpoly="1"] .dial{width:calc(100vh - 212px);width:calc(100svh - 212px);min-width:126px}   /* v328 (QA v325 V2): the step line's room */
+  :root[data-course="1"][data-cpoly="1"] .dial{width:calc(100vh - 212px);width:calc(100svh - 212px);min-width:84px}   /* v328 (QA v325 V2): the step line's room */
   :root[data-course="1"] .ct-step{font-size:12px}
 }
 :root[data-course="1"] #courseBar{display:grid;grid-template-columns:auto 1fr auto 34px;align-items:center;gap:8px;margin:0 0 8px}
 #cbX{grid-column:4}   /* v351 (QA v350 V2): the cross keeps the last column when the editor's star is not there */
+@media (max-width:360px){ :root[data-course="1"] #courseBar{position:relative} :root[data-course="1"] #courseBar #courseWin{position:absolute;right:0;top:calc(100% + 4px);width:28px;height:28px;font-size:12px;z-index:2} }   /* v354 (QA v353 V2): editor only - the name keeps the star's column */
 #courseWin{width:34px;height:34px;border-radius:10px;color:var(--c1);border-color:color-mix(in srgb,var(--c1) 45%,var(--line));font-size:14px}   /* v344: the editor's cheat, as the game's (v154) */
 .cb-mode{display:flex;align-items:center;gap:5px;font-size:11px;padding:5px 9px;border-radius:999px;border:1px solid color-mix(in srgb,var(--c2) 55%,var(--line));color:var(--ink-2);white-space:nowrap}
 .cb-mode svg{width:13px;height:13px;color:var(--c2)}
@@ -1546,7 +1547,8 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .course-sheet .course-go{min-width:0} .course-sheet .course-go span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cs-code{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:.72em;letter-spacing:0;color:var(--ink-2);margin-right:10px}
 :root:has(#courseSheet:not([hidden])) #alongSec{position:relative;z-index:71}
-.modal.course-sheet-wrap#courseSheet[data-low="1"]{align-items:start}   /* v352 (Oscar): centred like every course card; moved down only as far as the lit histogram needs (courseSheetPlace) */
+.modal.course-sheet-wrap#courseSheet:is([data-low="1"],[data-low="2"]){align-items:start}
+:root:has(#courseSheet[data-low="2"]:not([hidden])) #alongSec{z-index:auto}   /* v354 (QA v353 V1): the card would overlap it - the card wins */   /* v352 (Oscar): centred like every course card; moved down only as far as the lit histogram needs (courseSheetPlace) */
 @media (max-height:520px){ :root:has(#courseSheet:not([hidden])) #alongSec{z-index:auto} }   /* a short landscape screen has no room for both: the card wins */   /* v338 (Oscar): the run's histogram stays lit above the result card's backdrop */
 .ccode{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:.82em;color:var(--ink-3);margin-right:7px}
 .ct-step .ccode{color:var(--c2);font-size:.9em}
@@ -2869,7 +2871,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v353"></script>
+<script src="./app.js?v=v354"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2882,8 +2884,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v353";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-02 14:01";          /* and when it was built, for ?diag */
+  var BUILD = "v354";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-02 14:58";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

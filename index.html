@@ -1632,6 +1632,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .cdet .clad :is(span,button).goal.ok{border-style:solid;background:color-mix(in srgb,var(--c4) 16%,var(--sunk))}
 .cdet .cgo{display:flex;align-items:center;gap:8px;width:100%;justify-content:center;margin-top:8px;border-color:var(--c2);color:var(--ink)}
 .cdet .cgo svg{width:14px;height:14px;color:var(--c2)}
+.cdet .cgo{position:relative} .cdet .cgo svg.tri{position:absolute;right:12px;top:50%;width:16px;height:16px;margin-top:-8px;color:var(--c2)}
 .cdet .cgo.pad{border-color:var(--c1)} .cdet .cgo.pad svg{color:var(--c1)}
 .cdet .cgo.cexgo{border-color:var(--c4)} .cdet .cgo.cexgo svg{color:var(--c4)}
 .cdet .cex{display:flex;align-items:center;gap:6px;justify-content:center;margin-top:8px;font-size:12px;color:var(--ink-3)}
@@ -2844,7 +2845,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v341"></script>
+<script src="./app.js?v=v342"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2857,8 +2858,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v341";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-02 10:28";          /* and when it was built, for ?diag */
+  var BUILD = "v342";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-02 10:35";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -640,6 +640,7 @@ button.along-card-pct:focus-visible{outline:2px solid var(--c2);outline-offset:2
 button.along-card-pct .go{font-size:24px;font-weight:700;color:var(--c2);margin-left:10px;letter-spacing:0;vertical-align:middle;position:relative;top:-6px}
 button.along-card-pct .go i{font-style:normal;font-family:var(--title);font-size:14px;font-weight:600;color:var(--ink-3);margin-left:4px;letter-spacing:.04em}
 .along-card[data-arm="0"] button.along-card-pct{pointer-events:none}
+.along-card[data-arm="0"] :is(.btn,button.along-card-pct){transition:none}   /* v359 (Oscar): asleep at once - the fade to .35 showed the buttons lit for a moment first */
 .along-card[data-arm="0"] .btn{pointer-events:none;opacity:.35}   /* v308: asleep for a second after the card appears */
 .along-card-next{width:100%;margin-top:14px;border-color:var(--c2);color:var(--ink)}
 .along-card-next:not([hidden]) + .ask-btns{margin-top:8px}   /* v306: the next step sits above the pair */
@@ -1585,6 +1586,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root[data-tour="1"] #cgrid [data-cstep]{pointer-events:none;cursor:default}   /* v323 (QA v322 m6): the lesson's ladder is read, not played */
 .pdet[data-course="1"] :is(.log-play,.ptempo svg){display:none}   /* v320: a course pattern is played from the course (v322: no longer listed there) */
 .course-sheet[data-arm="0"] button{pointer-events:none;opacity:.35}
+.course-sheet[data-arm="0"] button{transition:none}   /* v359: asleep at once, awake with the fade */
 .course-sheet button{transition:opacity .25s}
 #csAgain{border-color:var(--c2)} #csBack{border-color:var(--c3)}
 /* ---- v316: Courses ---- */
@@ -2871,7 +2873,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v358"></script>
+<script src="./app.js?v=v359"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2884,8 +2886,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v358";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-02 16:01";          /* and when it was built, for ?diag */
+  var BUILD = "v359";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-02 16:33";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -1547,11 +1547,9 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .cintro .ci-note{color:var(--c3)} .cintro .ci-note[hidden]{display:none}
 .cintro .course-go.pad{border-color:var(--c1);background:color-mix(in srgb,var(--c1) 12%,transparent)} .cintro .course-go.pad svg{color:var(--c1)}
 .cintro .ci-later{align-self:center;border-color:transparent;color:var(--ink-3)}
-/* v338 (Oscar): a one-hand step - its own half takes the taps, the other half is greyed */
+/* v338 (Oscar): a one-hand step - its own half takes the taps; v339: the other hand's edge and label are grey */
 :root[data-course="1"][data-one] #twoSplit{display:block}
-:root[data-one="0"] #twoSplit .ts-l,:root[data-one="1"] #twoSplit .ts-r{background:color-mix(in srgb,var(--ground) 72%,transparent);border-color:transparent}
-:root[data-one="0"] #twoSplit .ts-l b,:root[data-one="1"] #twoSplit .ts-r b{visibility:hidden}
-:root[data-cexam="1"] #twoSplit .ts-l,:root[data-cexam="1"] #twoSplit .ts-r{background:none}
+:root[data-one="0"] #twoSplit .ts-l,:root[data-one="1"] #twoSplit .ts-r{--tc:var(--line-2)}   /* v339 (Oscar): the unused hand's edge and label in grey - no veil over the screen; its taps are ignored and it never flashes */
 .cs-k{font-family:var(--title);font-stretch:var(--title-stretch);font-weight:800;font-size:26px;letter-spacing:.03em;color:var(--c2)}
 .cs-k[data-k="no"]{color:var(--c3)} .cs-k[data-k="short"]{color:var(--ink-3)} .cs-k[data-k="goal"]{color:var(--c4)}
 .cs-pct{font-family:"IBM Plex Mono",monospace;font-size:48px;font-weight:500;line-height:1;color:var(--c2)}
@@ -2837,7 +2835,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v338"></script>
+<script src="./app.js?v=v339"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2850,8 +2848,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v338";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-02 10:05";          /* and when it was built, for ?diag */
+  var BUILD = "v339";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-02 10:20";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

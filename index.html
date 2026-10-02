@@ -450,7 +450,8 @@ input[type=range]::-moz-range-thumb{
    lands when each click is heard */
 .ghost.calsync .hand,.ghost.calsync .ring{animation-duration:var(--cyc,.6s);animation-delay:var(--d0,0s)}
 .ghost.calsync .ring.r2{animation-delay:calc(var(--d0,0s) + .05s)}
-.ghost.oneshot .hand,.ghost.oneshot .ring{animation:none}   /* v324: the course's hands dip once per heard stroke (from JS) */
+.ghost.oneshot .hand,.ghost.oneshot .ring{animation:none}
+.ghost.ctint .hand{transform-origin:50% 100%}   /* v324: the course's hands dip once per heard stroke (from JS) */
 @keyframes ghostRing{0%,24%{transform:scale(.25);opacity:0}26%{transform:scale(.3);opacity:.95}70%,100%{transform:scale(1.35);opacity:0}}
 @media (prefers-reduced-motion:reduce){ .ghost .hand{animation:none} .ghost .ring{animation:none;opacity:.6;transform:scale(1)} }
 /* the coach card: fixed at the foot of the screen, under the sheets, until Got it */
@@ -2748,6 +2749,14 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <rect x="95" y="58" width="13" height="26" rx="6.5"/>
       <rect x="41" y="14" width="19" height="70" rx="9.5" stroke-opacity=".7"/>
     </g>
+    <g id="ghostHandTint" fill="var(--gr)" fill-opacity=".5" stroke="none">   <!-- v361: the course's hands wear their ring's colour -->
+      <rect x="18" y="66" width="20" height="46" rx="10" transform="rotate(-28 28 89)"/>
+      <path d="M34 74 C34 62 44 58 56 58 L92 58 C104 58 110 66 110 78 L110 104 C110 120 98 132 82 132 L50 132 C40 132 34 124 34 112 Z"/>
+      <rect x="62" y="44" width="16" height="30" rx="8"/>
+      <rect x="79" y="50" width="15" height="28" rx="7.5"/>
+      <rect x="95" y="58" width="13" height="26" rx="6.5"/>
+      <rect x="41" y="14" width="19" height="70" rx="9.5"/>
+    </g>
     <g id="i-hand"><rect x="6.3" y="3" width="3.6" height="11" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="12.6" y="5" width="3.6" height="9" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 13.5h12.5v2.5a6.25 6.25 0 0 1-12.5 0z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></g>
     <g id="i-metro"><path d="M9 3h6l3.5 17.5h-13zM12 20.5L16.5 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="20.5" r="1.3" fill="currentColor"/></g>
     <g id="i-hourglass"><path d="M6 3h12M6 21h12M8 3v3.2L12 11l4-4.8V3M8 21v-3.2L12 13l4 4.8V21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g>
@@ -2873,7 +2882,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v360"></script>
+<script src="./app.js?v=v361"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2886,8 +2895,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v360";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-02 16:40";          /* and when it was built, for ?diag */
+  var BUILD = "v361";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-02 16:52";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

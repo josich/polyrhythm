@@ -1501,6 +1501,15 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .ctrack b.pick{position:relative;cursor:pointer} .ctrack b.pick::after{content:"";position:absolute;inset:-12px}   /* v320: a 36 px tap zone */
 .ctrackl{display:flex;justify-content:space-between;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3);margin:0}
 .ctrackl .g{color:var(--c4)}
+/* v341 (Oscar): a polyrhythm lesson's track - "Steps:" above the line, each step's number under its dot */
+.ctrackk{display:none;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin:0 0 -2px}
+:root[data-cpoly="1"] .ctrackk:not([hidden]){display:block}
+.ctrack b .sn{display:none}
+:root[data-cpoly="1"] .ctrack b{position:relative}
+:root[data-cpoly="1"] .ctrack b .sn{display:block;position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);font-family:"IBM Plex Mono",monospace;font-size:10.5px;line-height:1;color:var(--ink-3);pointer-events:none}
+:root[data-cpoly="1"] .ctrack b.cur .sn{color:var(--ink)}
+:root[data-cpoly="1"] .ctrack{padding-bottom:22px}
+:root[data-cpoly="1"] .ctrackl{display:none}
 .cwave{position:fixed;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;border:2px solid var(--wc,var(--c1));pointer-events:none;z-index:60;opacity:0}
 .course-go{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:13px;border:1.5px solid var(--c2);font:inherit;font-weight:700;font-size:15px;background:color-mix(in srgb,var(--c2) 12%,transparent);color:var(--ink);cursor:pointer}
 .course-go svg{width:17px;height:17px;color:var(--c2)}
@@ -2149,7 +2158,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <div class="cb-ttl"><b id="cbName">Rudiment</b><span id="cbSub"></span></div>
     <button type="button" class="icobtn cb-x" id="cbX" title="Leave the course screen" aria-label="Leave the course screen">&times;</button>
   </div>
-  <div class="course-tempo" id="courseTempo"><div class="ct-num"><b id="ctBpm">0</b><span>bpm</span></div><div class="ct-lad"><div class="ctrack" id="courseTrack"></div><div class="ctrackl" id="courseTrackL"></div></div><p class="ct-step" id="ctStepT"></p></div>
+  <div class="course-tempo" id="courseTempo"><div class="ct-num"><b id="ctBpm">0</b><span>bpm</span></div><div class="ct-lad"><div class="ctrackk" id="courseTrackK" hidden>Steps:</div><div class="ctrack" id="courseTrack"></div><div class="ctrackl" id="courseTrackL"></div></div><p class="ct-step" id="ctStepT"></p></div>
   <section class="along-sec" id="alongSec" hidden>
     <div class="along-row">
       <span class="lbl along-lbl">Precision</span>
@@ -2835,7 +2844,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v340"></script>
+<script src="./app.js?v=v341"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2848,8 +2857,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v340";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-02 10:22";          /* and when it was built, for ?diag */
+  var BUILD = "v341";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-02 10:28";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

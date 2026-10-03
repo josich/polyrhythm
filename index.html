@@ -1463,7 +1463,8 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
   :root[data-course="1"] .wrap{padding-top:calc(10px + env(safe-area-inset-top, 0px))}
   :root[data-course="1"] .course-strip .tk{height:32px}
   :root[data-course="1"] #courseLock{display:none!important}
-  :root[data-course="1"][data-cpoly="1"] .dial{width:calc(100vh - 212px);width:calc(100svh - 212px);min-width:84px}   /* v328 (QA v325 V2): the step line's room */
+  :root[data-course="1"][data-cpoly="1"] .dial{width:calc(100vh - 212px);width:calc(100svh - 212px);min-width:84px}
+  :root[data-course="1"][data-cpoly="1"][data-cexam="1"] .dial{width:calc(100vh - 150px);width:calc(100svh - 150px);min-width:120px}   /* v364 (QA v363 V2): an exam has no step line or hand boxes - the wheel takes their room */   /* v328 (QA v325 V2): the step line's room */
   :root[data-course="1"] .ct-step{font-size:12px}
 }
 :root[data-course="1"] #courseBar{display:grid;grid-template-columns:auto 1fr auto 34px;align-items:center;gap:8px;margin:0 0 8px}
@@ -1577,7 +1578,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .cintro .ci-hand.mirror{transform:scaleX(-1)}
 .cintro .ci-hand.off{opacity:.25}
 .cintro .ci-eye{width:30px;height:30px;color:var(--ink-2);align-self:center;flex:none}
-.tapwave{position:fixed;width:84px;height:84px;border-radius:50%;border:3px solid var(--wc);pointer-events:none;z-index:46;opacity:0;will-change:transform,opacity}
+.tapwave{position:fixed;width:84px;height:84px;border-radius:50%;border:4px solid var(--wc);pointer-events:none;z-index:46;opacity:0;will-change:transform,opacity}
 .blind-flash{position:absolute;left:50%;top:50%;width:22%;aspect-ratio:1/1;opacity:0;pointer-events:none;color:var(--ink);z-index:3;transform:translate(-50%,-50%)}
 .blind-flash svg{width:100%;height:100%;display:block;overflow:visible}
 .cintro .ci-note{color:var(--c3)} .cintro .ci-note[hidden]{display:none}
@@ -2892,7 +2893,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v363"></script>
+<script src="./app.js?v=v364"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2905,8 +2906,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v363";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-03 16:48";          /* and when it was built, for ?diag */
+  var BUILD = "v364";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-03 17:46";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

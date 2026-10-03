@@ -1570,7 +1570,16 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .cintro .ci-code{font-family:"IBM Plex Mono",monospace;font-size:15px;color:var(--c2);letter-spacing:.04em}
 .cintro .ci-t{font-family:var(--title);font-stretch:var(--title-stretch);font-weight:800;font-size:22px;line-height:1.15;color:var(--ink)}
 .cintro .cs-line{font-size:14px;line-height:1.35}
-.cintro #ciMeta{font-size:12px;color:var(--ink-3)}
+.cintro #ciMeta{font-size:12px;color:var(--ink-3)} .cintro #ciMeta:empty{display:none}
+/* v362: the step's hands as icons, each in the colour of the dots it taps; a hand not used is faint */
+.cintro .ci-hands{display:flex;justify-content:center;align-items:flex-end;gap:30px;margin:4px 0 0}
+.cintro .ci-hand{width:46px;height:54px;overflow:visible;flex:none}
+.cintro .ci-hand.mirror{transform:scaleX(-1)}
+.cintro .ci-hand.off{opacity:.25}
+.cintro .ci-eye{width:30px;height:30px;color:var(--ink-2);align-self:center;flex:none}
+.tapwave{position:fixed;width:84px;height:84px;border-radius:50%;border:3px solid var(--wc);pointer-events:none;z-index:46;opacity:0;will-change:transform,opacity}
+.blind-flash{position:absolute;left:50%;top:50%;width:22%;aspect-ratio:1/1;opacity:0;pointer-events:none;color:var(--ink);z-index:3;transform:translate(-50%,-50%)}
+.blind-flash svg{width:100%;height:100%;display:block;overflow:visible}
 .cintro .ci-note{color:var(--c3)} .cintro .ci-note[hidden]{display:none}
 .cintro .course-go.pad{border-color:var(--c1);background:color-mix(in srgb,var(--c1) 12%,transparent)} .cintro .course-go.pad svg{color:var(--c1)}
 .cintro .ci-later{align-self:center;border-color:transparent;color:var(--ink-3)}
@@ -2239,6 +2248,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         </button>
         <!-- the stars of a clear land here one by one, over the wheel -->
         <div class="chal-stars" id="chalStars" hidden aria-hidden="true"><b>★</b><b>★</b><b>★</b></div>
+        <div class="blind-flash" id="blindFlash" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-eyeoff"/></svg></div>   <!-- v362 -->
       </div>
       <!-- one fixed-height slot, so swapping tip for readout cannot resize the dial -->
       <div class="dial-foot">
@@ -2882,7 +2892,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v361"></script>
+<script src="./app.js?v=v362"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2895,8 +2905,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v361";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-02 16:52";          /* and when it was built, for ?diag */
+  var BUILD = "v362";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-03 16:43";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

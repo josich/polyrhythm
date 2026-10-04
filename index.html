@@ -1578,7 +1578,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .cintro .ci-hand.mirror{transform:scaleX(-1)}
 .cintro .ci-hand.off{opacity:.25}
 .cintro .ci-eye{width:30px;height:30px;color:var(--ink-2);align-self:center;flex:none}
-.tapwave{position:fixed;width:84px;height:84px;border-radius:50%;border:4px solid var(--wc);pointer-events:none;z-index:46;opacity:0;will-change:transform,opacity}
+.tapwave{position:fixed;width:84px;height:84px;border-radius:50%;border:6px solid var(--wc);background:color-mix(in srgb,var(--wc) 18%,transparent);pointer-events:none;z-index:46;opacity:0;will-change:transform,opacity}
 .blind-flash{position:absolute;left:50%;top:50%;width:22%;aspect-ratio:1/1;opacity:0;pointer-events:none;color:var(--ink);z-index:3;transform:translate(-50%,-50%)}
 .blind-flash svg{width:100%;height:100%;display:block;overflow:visible}
 .cintro .ci-note{color:var(--c3)} .cintro .ci-note[hidden]{display:none}
@@ -1601,6 +1601,15 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .course-sheet button{transition:opacity .25s}
 #csAgain{border-color:var(--c2)} #csBack{border-color:var(--c3)}
 /* ---- v316: Courses ---- */
+#ctabs.lvl-list{max-height:none;overflow:visible}   /* v365: the course rows */
+#ctabs .lvl-row .n svg{width:18px;height:18px;color:var(--c5);display:block;margin:auto}
+#ctabs .lvl-row{grid-template-columns:26px minmax(0,1fr) auto;padding:8px 10px}
+#ctabs .lvl-row[data-on="1"]{border-color:var(--c5);box-shadow:0 0 0 2px color-mix(in srgb,var(--c5) 22%,transparent);background:color-mix(in srgb,var(--c5) 10%,var(--sunk))}
+#ctabs .lvl-row .nm-ro{font-weight:600;font-size:13.5px}
+#ctabs .lvl-row[data-lock="1"]{opacity:.45}
+#ctabs .lvl-row .meta .o{color:var(--c1)}
+#ctabs .ops button[data-cplay]{color:var(--c2);border-color:color-mix(in srgb,var(--c2) 55%,var(--line))}
+#ctabs .ops button svg{width:13px;height:13px;vertical-align:-2px}
 #ctabs .tab{--lc:var(--c4)}
 #ctabs .tab small{display:block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-top:1px}
 #ctabs .tab{line-height:1.15;display:flex;flex-direction:column;align-items:center;justify-content:center;white-space:nowrap}
@@ -2470,11 +2479,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <span class="lbl">Courses</span>
       <span class="fold-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2.5 9L12 4.5 21.5 9 12 13.5zM6.5 11v4.5c1.6 1.6 3.4 2.4 5.5 2.4s3.9-.8 5.5-2.4V11M21.5 9v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg></span>
     </div>
-    <div class="tabs ptabs ctabs" id="ctabs" role="tablist" aria-label="Course">
-      <button class="tab" data-ctab="rud" data-on="1">Rudiments</button>
-      <button class="tab" data-ctab="poly" data-on="0">Polyrhythms</button>
-      <button class="tab" disabled title="Coming later">Odd meters <small>soon</small></button>
-    </div>
+    <div class="lvl-list ccourses" id="ctabs" role="listbox" aria-label="Course"></div>   <!-- v365 (Oscar): courses as rows, each with its play -->
     <div class="share-lbl lvl-lbl"><span>Take it:</span><i></i></div>
     <div class="cmode" id="cmode" role="group" aria-label="Where you play">
       <button type="button" data-cmode="phone" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M11 18.5h2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>On the phone</button>
@@ -2744,6 +2749,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <g id="i-note"><circle cx="8.5" cy="17" r="3.2" fill="currentColor"/><path d="M11.7 17V4c.3 3.2 5.2 3.4 5.2 7.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></g>
     <g id="i-clef"><circle cx="7.6" cy="7.6" r="1.9" fill="currentColor"/><path d="M7.6 7.6c1.2-3.4 7.4-3.2 7.4 1.6 0 5.3-5 8.6-9.6 10.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="18.3" cy="6.6" r="1.2" fill="currentColor"/><circle cx="18.3" cy="10.6" r="1.2" fill="currentColor"/></g>
     <g id="i-sharp"><path d="M9.2 3v18M15 3v18M4.8 9.8l14.4-3.4M4.8 17.4l14.4-3.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></g>
+    <g id="i-mute"><path d="M3.5 9.2h3.6L12 5v14l-4.9-4.2H3.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M16 9.5l5 5M21 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></g>   <!-- v365 -->
     <g id="i-eyeoff"><path d="M3 3l18 18M10 6.3A10 10 0 0 1 12 6c6 0 10 6 10 6s-1.3 2-3.5 3.7M6.4 7.8C3.5 9.7 2 12 2 12s4 6 10 6c1.4 0 2.7-.3 3.8-.8M9.9 9.9A3 3 0 0 0 14.1 14.1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g>
     <!-- the ghost hand (v187): a pointing hand in a 112 x 132 box, the FINGERTIP at (50, 22) -
          the coach places that point on the thing to tap; mirrored, the fingertip is at (62, 22) -->
@@ -2893,7 +2899,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v364"></script>
+<script src="./app.js?v=v365"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2906,8 +2912,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v364";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-03 17:46";          /* and when it was built, for ?diag */
+  var BUILD = "v365";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-04 15:47";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

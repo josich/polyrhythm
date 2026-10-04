@@ -1471,6 +1471,13 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 #cbX{grid-column:5}
 /* v366 (Oscar's sketch): the notation over the tempo and the steps while a course run plays - it covers, it never moves anything */
 #courseNotes{grid-column:4;width:34px;height:34px;border-radius:10px;color:var(--ink-3)}
+@media (max-width:360px){ :root[data-cnotes="1"] #courseBar #courseWin{display:none} }   /* v367 (QA v366 m3): it sat under the panel and still took taps */
+@media (orientation:landscape) and (max-height:520px){ #courseNotes{visibility:hidden} }   /* v367 (QA v366 m4): the notation never shows here */
+@media (max-width:340px){ :root[data-course="1"] .cb-mode{font-size:0;gap:0;padding:6px 8px} }   /* v367 (QA v366 V2): the name gets its room back */
+@media (orientation:landscape) and (max-height:520px){ :root[data-course="1"] .dial{overflow:clip} }   /* v367 (QA v366 V3): the count-in hands stay in the box */
+#ctabs .lvl-row .meta{white-space:normal}
+#ctabs .lvl-row .meta span{white-space:normal;line-height:1.3}
+#ctabs .ops button[data-cplay]{width:34px;height:34px}
 #courseNotes svg{width:17px;height:17px}
 #courseNotes[data-on="1"]{color:var(--c4);border-color:var(--c4);background:color-mix(in srgb,var(--c4) 14%,transparent)}
 :root[data-course="1"] #courseTempo{position:relative}
@@ -2909,7 +2916,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v366"></script>
+<script src="./app.js?v=v367"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2922,8 +2929,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v366";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-04 16:27";          /* and when it was built, for ?diag */
+  var BUILD = "v367";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-04 17:19";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

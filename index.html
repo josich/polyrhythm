@@ -1467,8 +1467,17 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
   :root[data-course="1"][data-cpoly="1"][data-cexam="1"] .dial{width:calc(100vh - 150px);width:calc(100svh - 150px);min-width:120px}   /* v364 (QA v363 V2): an exam has no step line or hand boxes - the wheel takes their room */   /* v328 (QA v325 V2): the step line's room */
   :root[data-course="1"] .ct-step{font-size:12px}
 }
-:root[data-course="1"] #courseBar{display:grid;grid-template-columns:auto 1fr auto 34px;align-items:center;gap:8px;margin:0 0 8px}
-#cbX{grid-column:4}   /* v351 (QA v350 V2): the cross keeps the last column when the editor's star is not there */
+:root[data-course="1"] #courseBar{display:grid;grid-template-columns:auto 1fr auto 34px 34px;align-items:center;gap:8px;margin:0 0 8px}
+#cbX{grid-column:5}
+/* v366 (Oscar's sketch): the notation over the tempo and the steps while a course run plays - it covers, it never moves anything */
+#courseNotes{grid-column:4;width:34px;height:34px;border-radius:10px;color:var(--ink-3)}
+#courseNotes svg{width:17px;height:17px}
+#courseNotes[data-on="1"]{color:var(--c4);border-color:var(--c4);background:color-mix(in srgb,var(--c4) 14%,transparent)}
+:root[data-course="1"] #courseTempo{position:relative}
+.course-score{position:absolute;inset:-2px 0;z-index:3;pointer-events:none;background:var(--panel);border:1.5px solid var(--c4);border-radius:12px;padding:3px 6px;color:var(--ink);overflow:hidden}
+.course-score svg{display:block;width:100%;height:100%}
+.course-score .stline{position:absolute;top:0;left:0;width:2px;border-radius:1px;background:#E5484D;opacity:.9;will-change:transform;pointer-events:none}
+:root[data-cnotes="1"] #courseTempo > :not(#courseScore){pointer-events:none}   /* a tap there is a tap for its half, never a step pick */   /* v351 (QA v350 V2): the cross keeps the last column when the editor's star is not there */
 @media (max-width:360px){ :root[data-course="1"] #courseBar{position:relative} :root[data-course="1"] #courseBar #courseWin{position:absolute;right:0;top:calc(100% + 4px);width:28px;height:28px;font-size:12px;z-index:2} }   /* v354 (QA v353 V2): editor only - the name keeps the star's column */
 #courseWin{width:34px;height:34px;border-radius:10px;color:var(--c1);border-color:color-mix(in srgb,var(--c1) 45%,var(--line));font-size:14px}   /* v344: the editor's cheat, as the game's (v154) */
 .cb-mode{display:flex;align-items:center;gap:5px;font-size:11px;padding:5px 9px;border-radius:999px;border:1px solid color-mix(in srgb,var(--c2) 55%,var(--line));color:var(--ink-2);white-space:nowrap}
@@ -2196,9 +2205,10 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <span class="cb-mode" id="cbMode"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M11 18.5h2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Phone</span>
     <div class="cb-ttl"><b id="cbName">Rudiment</b><span id="cbSub"></span></div>
     <button type="button" class="icobtn" id="courseWin" title="Cheat: pass this step now" aria-label="Pass this step now">&#9733;</button>
+    <button type="button" class="icobtn" id="courseNotes" data-on="0" aria-pressed="false" title="Show the notation while you play" aria-label="Notation"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="8.2" cy="17" rx="3.9" ry="2.9" transform="rotate(-22 8.2 17)" fill="currentColor"/><path d="M11.8 16.4V4.5c2.4 1.2 4.6 2.2 6.2 4.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>   <!-- v366 -->
     <button type="button" class="icobtn cb-x" id="cbX" title="Leave the course screen" aria-label="Leave the course screen">&times;</button>
   </div>
-  <div class="course-tempo" id="courseTempo"><div class="ct-num"><b id="ctBpm">0</b><span>bpm</span></div><div class="ct-lad"><div class="ctrackk" id="courseTrackK" hidden>Steps:</div><div class="ctrack" id="courseTrack"></div><div class="ctrackl" id="courseTrackL"></div></div><p class="ct-step" id="ctStepT"></p></div>
+  <div class="course-tempo" id="courseTempo"><div class="ct-num"><b id="ctBpm">0</b><span>bpm</span></div><div class="ct-lad"><div class="ctrackk" id="courseTrackK" hidden>Steps:</div><div class="ctrack" id="courseTrack"></div><div class="ctrackl" id="courseTrackL"></div></div><p class="ct-step" id="ctStepT"></p><div class="course-score" id="courseScore" hidden aria-hidden="true"></div></div>
   <section class="along-sec" id="alongSec" hidden>
     <div class="along-row">
       <span class="lbl along-lbl">Precision</span>
@@ -2899,7 +2909,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v365"></script>
+<script src="./app.js?v=v366"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2912,8 +2922,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v365";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-04 15:47";          /* and when it was built, for ?diag */
+  var BUILD = "v366";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-04 16:27";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

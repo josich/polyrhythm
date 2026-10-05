@@ -1484,6 +1484,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root[data-gwin="1"] #tapPanel > #lvlList{flex:1 1 0;min-height:160px;max-height:none}
 /* v372: the game screen - bar, tempo, the wheel; nothing else */
 #gameBar,#gameTop{display:none}
+#tapPause{display:none}   /* v374 (Oscar): games play on their own screen, whose bar has Pause; the window's one made no sense (the screen's button still clicks it) */
 :root[data-gscr="1"] .wrap > :not(#gameBar):not(#gameTop):not(.stage){display:none!important}
 :root[data-gscr="1"] .stage{grid-template-columns:minmax(0,1fr);gap:10px}
 :root[data-gscr="1"] :is(#rack,#stageBar,#stageScore,#courseStrip,#courseFoot,.dial-head){display:none!important}
@@ -2992,7 +2993,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v373"></script>
+<script src="./app.js?v=v374"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3005,8 +3006,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v373";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-05 13:08";          /* and when it was built, for ?diag */
+  var BUILD = "v374";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-05 13:12";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

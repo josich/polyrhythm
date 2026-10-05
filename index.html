@@ -1648,6 +1648,8 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .clist .lvl-row{grid-template-columns:22px minmax(0,1fr) auto}
 #ctabs .tab:disabled{opacity:.5;cursor:default}
 .cleft-row{display:flex;justify-content:flex-end;margin:-4px 0 8px}
+#cleftBtn{display:inline-flex;align-items:center;gap:6px}
+#cleftBtn .lhand{width:15px;height:18px;flex:none;--gr:var(--c2)}   /* v371 (Oscar): a mini teal left hand - the course hands' glyph, mirrored */
 #cleftBtn[aria-pressed="true"]{border-color:var(--c2);background:color-mix(in srgb,var(--c2) 14%,transparent)}
 .csteps{margin:4px 0 8px;padding-left:22px;font-size:13px;color:var(--ink-2)}
 .csteps li{margin:3px 0} .csteps li.ok{color:var(--c2)} .csteps li.now{color:var(--ink);font-weight:600}
@@ -2526,7 +2528,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <button type="button" data-cmode="pad" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="14" rx="9" ry="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 5l6 7M19 4l-6 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>On a pad</button>
     </div>
     <p class="empty sec-help" id="cmodeHelp"></p>
-    <div class="cleft-row"><button type="button" class="btn sm" id="cleftBtn" aria-pressed="false" title="Left-handed: the hands swap, on the screen and in the exams">Left-handed</button></div>
+    <div class="cleft-row"><button type="button" class="btn sm" id="cleftBtn" aria-pressed="false" title="Left-handed: the hands swap, on the screen and in the exams"><svg class="lhand" viewBox="0 0 112 132" aria-hidden="true"><g transform="translate(112 0) scale(-1 1)"><use href="#ghostHandTint"/><use href="#ghostHandTint"/><use href="#ghostHandTint"/><use href="#ghostHandTint"/></g></svg>Left-handed</button></div>
     <div class="cprog" id="cprog"></div>
     <div class="share-lbl lvl-lbl"><span>Levels:</span><i></i></div>
     <div class="lvl-list rlist clist" id="cgrid"></div>
@@ -2939,7 +2941,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v370"></script>
+<script src="./app.js?v=v371"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2952,8 +2954,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v370";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-05 12:46";          /* and when it was built, for ?diag */
+  var BUILD = "v371";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-05 12:47";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

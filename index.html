@@ -1689,7 +1689,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 #ctabs + .share-lbl{margin-top:14px}
 .clist .lvl-row{grid-template-columns:22px minmax(0,1fr) auto}
 #ctabs .tab:disabled{opacity:.5;cursor:default}
-.cleft-row{display:flex;justify-content:flex-end;margin:-4px 0 8px}
+.cleft-row{display:flex;justify-content:flex-end;margin:10px 0 8px}   /* v375 (Oscar): room under the help line */
 #cleftBtn{display:inline-flex;align-items:center;gap:6px}
 #cleftBtn .lhand{width:15px;height:18px;flex:none;--gr:var(--c2)}   /* v371 (Oscar): a mini teal left hand - the course hands' glyph, mirrored */
 #cleftBtn[aria-pressed="true"]{border-color:var(--c2);background:color-mix(in srgb,var(--c2) 14%,transparent)}
@@ -2993,7 +2993,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v374"></script>
+<script src="./app.js?v=v375"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3006,8 +3006,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v374";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-05 13:12";          /* and when it was built, for ?diag */
+  var BUILD = "v375";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-05 13:34";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

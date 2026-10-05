@@ -1483,7 +1483,8 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 #coursePanel{position:relative}
 :root[data-cwin="1"] #cwinPop{position:absolute;right:12px;top:58px;z-index:8;width:min(330px, calc(100% - 24px));box-sizing:border-box;background:var(--panel);border:1px solid var(--line-2);border-radius:12px;padding:10px 12px 12px;box-shadow:0 12px 32px rgba(0,0,0,.5)}
 :root[data-cwin="1"] #cwinPop[hidden]{display:none}
-:root:not([data-cwin="1"]) #cwinPop{display:block!important;position:static}
+:root[data-tour="1"]:not([data-cwin="1"]) #cwinPop{display:block!important;position:static}   /* a guide shows the section in the page */
+:root:not([data-tour="1"]):not([data-cwin="1"]) #cwinPop{display:none!important}   /* v377 (Oscar): the folded bar shows nothing of it */
 #cwinPop .cleft-row{margin:10px 0 0}
 #cwinPop #courseEdFoot{margin-top:10px}
 /* v376 (Oscar): less empty room at the top of every window - the safe area or 8 px, not 30 px on top of it */
@@ -3011,7 +3012,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v376"></script>
+<script src="./app.js?v=v377"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3024,8 +3025,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v376";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-05 14:52";          /* and when it was built, for ?diag */
+  var BUILD = "v377";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-05 15:04";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

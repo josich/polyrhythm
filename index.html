@@ -1666,6 +1666,13 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .cprog .bar{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
 .cprog .bar i{display:block;height:100%;background:var(--c4)}
 .cprog .t{font-size:11px;color:var(--ink-3);white-space:nowrap}
+#cprog{display:none}   /* v369: the progress lives on each course's row */
+#ctabs .cpl{display:flex;align-items:center;gap:8px;min-width:0;margin-top:2px}
+#ctabs .cpl .n{font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:600;color:var(--c4);white-space:nowrap;line-height:1.1}
+#ctabs .cpl .n small{font-size:10px;color:var(--ink-3);font-weight:400}
+#ctabs .cpl .bar{flex:1;min-width:24px;height:5px;border-radius:3px;background:var(--line);overflow:hidden}
+#ctabs .cpl .bar i{display:block;height:100%;background:var(--c4)}
+#ctabs .cpl .t{font-size:10.5px;color:var(--ink-3);white-space:nowrap}
 .clist .rcat .cdone{color:var(--c2)}
 .clist .rcat[data-lock="1"]{opacity:.55}
 .clist .rcat[data-lock="1"] svg.lk{transform:none}
@@ -2932,7 +2939,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v368"></script>
+<script src="./app.js?v=v369"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -2945,8 +2952,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v368";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-05 12:10";          /* and when it was built, for ?diag */
+  var BUILD = "v369";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-05 12:44";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

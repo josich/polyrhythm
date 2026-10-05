@@ -1004,7 +1004,7 @@ button.along-card-pct .go i{font-style:normal;font-family:var(--title);font-size
 .info:hover{color:var(--ink);border-color:var(--ink-3)}
 .modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:grid;place-items:center;padding:20px}
 .modal[hidden]{display:none}
-#logModal{padding:12px}   /* v285 (Oscar): the log window takes the height of the screen - the lists get the room */
+#logModal{padding:max(6px, env(safe-area-inset-top, 0px)) 8px max(6px, env(safe-area-inset-bottom, 0px))}   /* v376 (Oscar): less empty room on top */   /* v285 (Oscar): the log window takes the height of the screen - the lists get the room */
 /* v263: the tour's log demo - the window at the top, ending above the tour card, no Backup row */
 :root[data-tourlog="1"] #logModal{place-items:start center;padding-top:max(12px,env(safe-area-inset-top))}
 :root[data-tourlog="1"] #logModal .log-sheet{max-height:var(--tl-h,60svh)}
@@ -1158,7 +1158,8 @@ canvas{
 .ach-row .t{font-size:12.5px;font-weight:600}
 .ach-row .n{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-3);white-space:nowrap}   /* "10 / 21" broke over two lines on the phone (v160) */
 /* the game's own row under the section name (v160) */
-.game-ctl{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin:2px 0 12px}   /* right side (Oscar, v161) */
+.game-ctl{display:flex;align-items:center;justify-content:flex-start;gap:10px;margin:2px 0 12px}   /* v376 (Oscar): left, away from the window's cross */
+:root:not([data-tour="1"]) #calBtn{display:none}   /* v376: Calibrate is in the menu; the Calibrate guide still points here */
 .game-ctl .btn.sm{padding:8px 14px;font-size:13px}
 #gtabs{margin-bottom:14px}
 #gtabs .tab{--lc:var(--c4)}   /* v239: the chosen mode in the game's purple, the log's category colour */
@@ -1473,13 +1474,27 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 }
 :root[data-course="1"] #courseBar{display:grid;grid-template-columns:auto 1fr auto 34px 34px;align-items:center;gap:8px;margin:0 0 8px}
 #cbX{grid-column:5}
+/* v376: the courses' options menu */
+#cwinOpts{display:none}
+:root[data-cwin="1"]:not([data-course="1"]) #cwinOpts{display:inline-flex;align-items:center;gap:6px;margin-left:auto;font-size:12px;padding:6px 10px}
+#cwinOpts svg{width:16px;height:16px}
+#cwinOpts[data-on="1"]{border-color:var(--c2)}
+:root[data-cwin="1"]:not([data-course="1"]) #cwinX{margin-left:8px!important}
+#coursePanel{position:relative}
+:root[data-cwin="1"] #cwinPop{position:absolute;right:12px;top:58px;z-index:8;width:min(330px, calc(100% - 24px));box-sizing:border-box;background:var(--panel);border:1px solid var(--line-2);border-radius:12px;padding:10px 12px 12px;box-shadow:0 12px 32px rgba(0,0,0,.5)}
+:root[data-cwin="1"] #cwinPop[hidden]{display:none}
+:root:not([data-cwin="1"]) #cwinPop{display:block!important;position:static}
+#cwinPop .cleft-row{margin:10px 0 0}
+#cwinPop #courseEdFoot{margin-top:10px}
+/* v376 (Oscar): less empty room at the top of every window - the safe area or 8 px, not 30 px on top of it */
+:root:is([data-cwin="1"],[data-gwin="1"]):not([data-gscr="1"]):not([data-course="1"]) .wrap{padding-top:max(8px, env(safe-area-inset-top, 0px))!important}
 /* v372: the Play time window (the Courses window's twin) */
 :root[data-gwin="1"]:not([data-gscr="1"]) .wrap > :not(#tapPanel){display:none!important}
 #gwinX{display:none}
 :root[data-gwin="1"]:not([data-gscr="1"]) #gwinX{display:grid;place-items:center;margin-left:auto;width:34px;height:34px;border-radius:10px;font-size:18px;color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
 :root[data-gwin="1"] #tapPanel > .sess-head .caret{display:none}
 :root[data-gwin="1"]:not([data-gscr="1"]) .wrap{padding-bottom:calc(12px + env(safe-area-inset-bottom, 0px))}
-:root[data-gwin="1"]:not([data-gscr="1"]) #tapPanel{display:flex;flex-direction:column;height:calc(100vh - 60px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));height:calc(100svh - 60px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));min-height:480px;box-sizing:border-box}
+:root[data-gwin="1"]:not([data-gscr="1"]) #tapPanel{display:flex;flex-direction:column;height:calc(100vh - 20px - max(8px, env(safe-area-inset-top, 0px)) - env(safe-area-inset-bottom, 0px));height:calc(100svh - 20px - max(8px, env(safe-area-inset-top, 0px)) - env(safe-area-inset-bottom, 0px));margin-top:0;min-height:480px;box-sizing:border-box}
 :root[data-gwin="1"] #tapPanel > *{flex:none}
 :root[data-gwin="1"] #tapPanel > #lvlList{flex:1 1 0;min-height:160px;max-height:none}
 /* v372: the game screen - bar, tempo, the wheel; nothing else */
@@ -1521,7 +1536,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root[data-cwin="1"]:not([data-course="1"]) #cwinX{display:grid;place-items:center;margin-left:auto;width:34px;height:34px;border-radius:10px;font-size:18px;color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
 :root[data-cwin="1"] #coursePanel > .sess-head .caret{display:none}
 :root[data-cwin="1"]:not([data-course="1"]) .wrap{padding-bottom:calc(12px + env(safe-area-inset-bottom, 0px))}
-:root[data-cwin="1"]:not([data-course="1"]) #coursePanel{display:flex;flex-direction:column;height:calc(100vh - 60px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));height:calc(100svh - 60px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));min-height:500px;box-sizing:border-box}
+:root[data-cwin="1"]:not([data-course="1"]) #coursePanel{display:flex;flex-direction:column;height:calc(100vh - 20px - max(8px, env(safe-area-inset-top, 0px)) - env(safe-area-inset-bottom, 0px));height:calc(100svh - 20px - max(8px, env(safe-area-inset-top, 0px)) - env(safe-area-inset-bottom, 0px));margin-top:0;min-height:500px;box-sizing:border-box}
 :root[data-cwin="1"] #coursePanel > *{flex:none}
 :root[data-cwin="1"] #coursePanel > #cgrid{flex:1 1 0;min-height:180px;max-height:none}
 @media (max-height:700px){ :root[data-cwin="1"] #cmodeHelp{display:none} }
@@ -1833,7 +1848,7 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 #sessionPanel:not([data-fold="1"])[data-live="1"]::after{animation:pulseFade 2s ease-in-out infinite;will-change:opacity;background:transparent;border-width:2px}
 @media (prefers-reduced-motion:reduce){ #sessionPanel:not([data-fold="1"])[data-live="1"]::after{animation:none;opacity:.6} }
 /* the sheet */
-.log-sheet{max-width:480px;height:min(900px, calc(100svh - 24px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)));max-height:none;display:flex;flex-direction:column;overflow:hidden;--lg-wheel:var(--c1);--lg-sess:var(--c3);--lg-rout:var(--ink-3);--lg-game:var(--c4);--lg-prec:var(--c2);--lg-crs:var(--c5)}   /* v239, Oscar's map: wheel orange, session pink, routine grey, game purple, Precision teal */   /* v229: the tiles and the charts stay put, the days scroll between them */
+.log-sheet{max-width:480px;height:min(900px, calc(100svh - max(6px, env(safe-area-inset-top, 0px)) - max(6px, env(safe-area-inset-bottom, 0px))));max-height:none;display:flex;flex-direction:column;overflow:hidden;--lg-wheel:var(--c1);--lg-sess:var(--c3);--lg-rout:var(--ink-3);--lg-game:var(--c4);--lg-prec:var(--c2);--lg-crs:var(--c5)}   /* v239, Oscar's map: wheel orange, session pink, routine grey, game purple, Precision teal */   /* v229: the tiles and the charts stay put, the days scroll between them */
 /* v261 (QA V1): on a short screen (a phone turned sideways) the fixed parts leave no room, and the day list
    covered Backup / Restore - there the whole window scrolls instead, the lists at a fixed height */
 @media (max-height:700px){ :root[data-editor="1"] .log-list{min-height:80px} }   /* v323 (QA v322 V1): the editor foot takes room on a short phone; the list gives it */
@@ -2569,9 +2584,11 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <div class="sess-head">
       <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
       <span class="lbl">Courses</span>
+      <button type="button" class="btn sm cwin-opts" id="cwinOpts" data-fold-keep aria-expanded="false" title="How you take the course"><span id="cwinWayT">On the phone</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>   <!-- v376 -->
       <button type="button" class="icobtn cwin-x" id="cwinX" data-fold-keep title="Close the courses" aria-label="Close the courses">&times;</button>   <!-- v368 -->
       <span class="fold-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2.5 9L12 4.5 21.5 9 12 13.5zM6.5 11v4.5c1.6 1.6 3.4 2.4 5.5 2.4s3.9-.8 5.5-2.4V11M21.5 9v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg></span>
     </div>
+    <div class="cwin-pop" id="cwinPop"></div>   <!-- v376: the options' menu (filled at boot from the parts below) -->
     <div class="lvl-list ccourses" id="ctabs" role="listbox" aria-label="Course"></div>   <!-- v365 (Oscar): courses as rows, each with its play -->
     <div class="share-lbl lvl-lbl"><span>Take it:</span><i></i></div>
     <div class="cmode" id="cmode" role="group" aria-label="Where you play">
@@ -2729,6 +2746,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <div class="sm-rule">Sections</div>
     <div class="sm-list" id="smList"></div>
     <div class="sm-rule">More</div>
+    <div class="sm-row"><span>Sound delay</span><button type="button" class="btn sm" id="menuCal" title="Measure this phone's delay: ten clicks, tap along">Calibrate</button></div>   <!-- v376 -->
     <div class="sm-row"><span>Skin</span>
       <button class="btn skin" id="skin" title="Switch skin">
         <svg id="skinIcon" viewBox="0 0 24 24" aria-hidden="true"></svg>
@@ -2993,7 +3011,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v375"></script>
+<script src="./app.js?v=v376"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3006,8 +3024,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v375";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-05 13:34";          /* and when it was built, for ?diag */
+  var BUILD = "v376";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-05 14:52";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -60,6 +60,14 @@
    it, and a khaki line family - the greys the rings are drawn against carry a
    little colour of their own. The ring hues stay cool so they read as marks on
    the surface rather than more of it. */
+html[data-skin="light"] #alongBtn[data-on="1"],
+html[data-skin="light"][data-chal="1"] .play,html[data-skin="light"][data-chal="1"] .play:hover,
+html[data-skin="light"][data-along="2"] .play,html[data-skin="light"][data-along="2"] .play:hover,
+html[data-skin="light"][data-video="1"] .play,html[data-skin="light"][data-video="1"] .play:hover,
+html[data-skin="light"] .chal-cta,html[data-skin="light"] .chal-cta:hover,
+html[data-skin="light"] .ring-card .btn.perbtn[data-on="1"],
+html[data-skin="light"] .subbtn[data-on="1"],html[data-skin="light"] .offbtn[data-on="1"],
+html[data-skin="light"] .clist .cst.ok{color:#fff}   /* v393 (QA v392 V1): a label on a filled ring colour reads white in the light skin */
 html:root[data-skin="light"]{   /* v388 (Oscar: "too bright"): surfaces and lines 25 % darker (luminance) */
   --ground:#C8C1B0;
   --panel:#DCD9D3;
@@ -71,8 +79,8 @@ html:root[data-skin="light"]{   /* v388 (Oscar: "too bright"): surfaces and line
   --line-2:#A5997E;
   --shadow:0 1px 2px rgba(43,40,34,.06), 0 8px 24px -12px rgba(43,40,34,.22);
   --dot-off:#AAA088;
-  --c1:#B5701A;
-  --c2:#0E8F86;
+  --c1:#A16417;   /* v393 (QA v392 V1): 3:1 on the darker surfaces */
+  --c2:#0C7F77;
   --c3:#C2426E;
   --c4:#5B4FD6;
   --c5:#2C6CC0;
@@ -892,7 +900,7 @@ button.along-card-pct .go i{font-style:normal;font-family:var(--title);font-size
 .chal-brand{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--ink-3);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin:0 0 16px}
 .chal-brand svg{flex:none}
 /* the header is the headline (v106, Oscar): CHALLENGE / CLEARED! big, the attempts line under it */
-.chal-kicker{margin:0;font-family:var(--title);font-stretch:var(--title-stretch);font-weight:700;font-size:clamp(32px,9vw,44px);line-height:1.05;letter-spacing:.02em;text-transform:uppercase;color:var(--ink)}
+.chal-kicker{margin:0;font-family:var(--title);font-stretch:var(--title-stretch);font-weight:700;font-size:clamp(24px,8.6vw,44px);line-height:1.05;letter-spacing:.02em;text-transform:uppercase;color:var(--ink)}
 .chal-sheet h2.chal-title{margin:8px 0 4px;font-family:inherit;font-weight:600;font-size:clamp(17px,4.6vw,21px);line-height:1.2;letter-spacing:0;color:var(--c1)}
 .chal-starline{font-size:48px;line-height:1;color:var(--c1);letter-spacing:.1em;margin:10px 0 6px}
 .chal-starline .off{color:var(--line-2)}
@@ -1367,6 +1375,7 @@ canvas{
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .field{display:flex;flex-direction:column;gap:3px}
 select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);background:var(--sunk);font-size:12.5px;width:100%}
+.ring-card .rc-foot{display:none!important}   /* v393 (Oscar): the space is worth more */
 .rc-foot{
   margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);
   display:flex;justify-content:space-between;gap:8px;font-size:11px;color:var(--ink-3);
@@ -3158,7 +3167,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v392"></script>
+<script src="./app.js?v=v393"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3171,8 +3180,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v392";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-06 19:16";          /* and when it was built, for ?diag */
+  var BUILD = "v393";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-06 19:45";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

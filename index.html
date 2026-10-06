@@ -1005,6 +1005,62 @@ button.along-card-pct .go i{font-style:normal;font-family:var(--title);font-size
 }
 .info:hover{color:var(--ink);border-color:var(--ink-3)}
 .modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:grid;place-items:center;padding:20px}
+/* ---- v384: Pro (MONETIZATION-PLAN.md). Tags, the menu's card, the pop-up sheet, the thank-you card. ---- */
+.pro-tag{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:9.5px;font-weight:600;letter-spacing:.12em;color:var(--c1);border:1.5px solid var(--c1);border-radius:5px;padding:1px 5px;margin-left:7px;line-height:1.3;vertical-align:1px;white-space:nowrap;text-transform:none}
+:root:not([data-progate="1"]) .pro-only{display:none!important}
+:root:not([data-editor="1"]) .pro-test{display:none!important}
+.pro-card{all:unset;box-sizing:border-box;display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;margin:2px 0 12px;padding:10px 12px;border:1.5px solid var(--c1);border-radius:12px;background:color-mix(in srgb,var(--c1) 8%,transparent);cursor:pointer;color:var(--ink)}
+.pro-card b{display:block;font-size:14.5px;font-weight:600}
+.pro-card small{display:block;font-size:12px;color:var(--ink-2)}
+.pro-card .pc-price{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--c1)}
+.pro-mark{width:30px;height:30px;display:block}
+.modal.pro-modal{z-index:78;place-items:end center;padding:0;background:color-mix(in srgb,var(--ground) 62%,transparent)}
+.pro-sheet{box-sizing:border-box;width:min(100%,520px);max-height:100svh;overflow-y:auto;padding:10px 22px calc(22px + env(safe-area-inset-bottom,0px));background:var(--panel);border-top:1px solid var(--line-2);border-radius:22px 22px 0 0;display:flex;flex-direction:column;gap:14px;color:var(--ink)}
+.pro-grab{align-self:center;width:40px;height:4px;border-radius:2px;background:var(--line-2);flex:none}
+.modal.pro-modal .icobtn.pro-x{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));width:40px;height:40px;font-size:20px;flex:none}
+.pro-head{display:flex;align-items:center;gap:10px}
+.pro-head .pro-name{font-family:var(--title);font-size:22px;font-weight:700}
+.pro-head .pro-badge{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;letter-spacing:.12em;color:var(--c1);border:1.5px solid var(--c1);border-radius:6px;padding:2px 7px}
+.pro-head .pro-x,.pro-reason .pro-x{margin-left:auto}
+.pro-h{margin:0;font-family:var(--title);font-stretch:92%;font-size:26px;line-height:1.12;font-weight:700}
+.pro-p{margin:0;font-size:14.5px;line-height:1.5;color:var(--ink-2)}
+.pro-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:11px}
+.pro-list li{display:flex;gap:12px;align-items:flex-start}
+.pro-list .pi{flex:none;width:32px;height:32px;border-radius:9px;background:var(--sunk);border:1px solid var(--line);display:grid;place-items:center}
+.pro-list .pi svg{width:17px;height:17px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pro-list b{display:block;font-size:14.5px;font-weight:600}
+.pro-list span{display:block;font-size:12.5px;color:var(--ink-3)}
+.pro-reason{display:grid;grid-template-columns:48px minmax(0,1fr) 40px;gap:12px;align-items:start}
+.pro-reason .pr-ico{width:48px;height:48px;border-radius:13px;background:var(--sunk);border:1px solid var(--line);display:grid;place-items:center}
+.pro-reason .pr-ico svg{width:26px;height:26px;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.pro-reason .pr-k{display:block;font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;letter-spacing:.14em;color:var(--c1)}
+.pro-reason .pr-t{display:block;font-family:var(--title);font-stretch:92%;font-size:22px;line-height:1.15;font-weight:700;margin-top:3px}
+.pro-reason .pr-s{display:block;font-size:12.5px;color:var(--ink-3);margin-top:3px}
+.pro-also{margin:0;padding:11px 13px;border:1px solid var(--line);border-radius:12px;background:var(--sunk);font-size:12.5px;line-height:1.5;color:var(--ink-3)}
+.pro-tog{display:flex;flex-direction:column;gap:9px;padding:12px 13px;border:1px dashed var(--c2);border-radius:12px}
+.pro-tog p{margin:0;font-size:13.5px;line-height:1.45;color:var(--ink-2)}
+.pro-tog p b{color:var(--ink);font-weight:600}
+.pro-tog .pt-bar{display:flex;align-items:center;gap:10px;font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-3)}
+.pro-tog .pt-bar span{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.pro-tog .pt-bar i{display:block;height:100%;background:var(--c2)}
+.pro-tog .btn,.pro-manage{align-self:flex-start}
+.pro-price{display:flex;align-items:baseline;gap:9px;border-top:1px dashed var(--line-2);padding-top:12px}
+.pro-price b{font-family:"IBM Plex Mono",monospace;font-size:30px;font-weight:500}
+.pro-price span{font-size:14.5px;color:var(--ink-2)}
+.pro-buy{all:unset;box-sizing:border-box;height:52px;border-radius:13px;border:2px solid var(--c2);background:color-mix(in srgb,var(--c2) 16%,transparent);color:var(--ink);font-size:16.5px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer}
+.pro-buy svg{width:17px;height:17px;fill:var(--c2)}
+.pro-note{margin:0;font-size:12.5px;color:var(--c1);text-align:center}
+.pro-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pro-row button{all:unset;min-height:40px;display:flex;align-items:center;padding:0 4px;font-size:13.5px;color:var(--ink-2);cursor:pointer}
+.pro-row .pro-link{text-decoration:underline;text-underline-offset:3px}
+.pro-row [data-prox]{color:var(--ink-3)}
+.pro-foot{margin:0;text-align:center;font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.04em;color:var(--ink-3)}
+.modal.pro-thanks{z-index:79}
+.pro-thanks .course-sheet{text-align:center}
+.pro-tog-line{margin:8px 0 0;font-size:12.5px;line-height:1.4;color:var(--ink-2)}
+.pro-tog-line b{color:var(--ink);font-weight:600}
+.log-row.pro-more{justify-content:space-between}
+
 .modal[hidden]{display:none}
 #logModal{padding:max(6px, env(safe-area-inset-top, 0px)) 8px max(6px, env(safe-area-inset-bottom, 0px))}   /* v376 (Oscar): less empty room on top */   /* v285 (Oscar): the log window takes the height of the screen - the lists get the room */
 /* v263: the tour's log demo - the window at the top, ending above the tour card, no Backup row */
@@ -2648,6 +2704,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <span class="best-k">Best attempts</span><span class="best-v"><b id="bestTries">0</b></span>
       <button type="button" class="best-reset" id="bestReset" title="Reset the game's progress">reset</button>
     </div>
+    <p class="pro-tog-line" id="proTogLine" hidden></p>   <!-- v384: answered challenges open Blind / Two fingers 21-30 -->
     <!-- "Levels:" and a dashed rule, the share sheet's label style, between the best run and the rows -->
     <div class="share-lbl lvl-lbl"><span>Levels:</span><i></i></div>
     <!-- the ladder, as rows: what has been cleared here and the next level. With the
@@ -2753,6 +2810,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 <div class="showmenu" id="showMenu" hidden>
   <div class="sm-panel" id="smPanel" role="dialog" aria-modal="true" aria-labelledby="smTitle">
     <div class="sm-head"><b id="smTitle">Show</b><button class="icobtn" id="smClose" title="Close" aria-label="Close">&times;</button></div>
+    <button type="button" class="pro-card pro-only" id="proCard"><svg class="pro-mark" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="12.5" fill="none" stroke="var(--ink-2)" stroke-width="2"/><circle cx="17" cy="4.5" r="4" fill="var(--c1)"/><circle cx="28" cy="22" r="2.6" fill="var(--c2)"/><circle cx="7" cy="24.5" r="2.6" fill="var(--c2)"/><circle cx="17" cy="17" r="3" fill="var(--ink-2)"/></svg><span><b>Polyorbit Pro</b><small id="proCardSub">Every course level and the extras</small></span><span class="pc-price" id="proCardPrice">&euro;4.99</span></button>   <!-- v384 -->
     <div class="sm-presets" id="smPresets">
       <button type="button" data-p="metro"><span class="picos" data-picos="metro"></span>Metronome<small>the wheel, tempo, patterns</small></button>
       <button type="button" data-p="practice"><span class="picos" data-picos="practice"></span>Practice<small>+ session, sequence, Precision, log</small></button>
@@ -2764,6 +2822,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <div class="sm-list" id="smList"></div>
     <div class="sm-rule">More</div>
     <div class="sm-row"><span id="menuCalLbl">Sound delay</span><button type="button" class="btn sm" id="menuCal" title="Measure this phone's delay: ten clicks, tap along">Calibrate</button></div>   <!-- v376 -->
+    <div class="sm-row pro-test"><span>Pro gates (test)</span><button type="button" class="btn sm" id="proGateBtn">Off</button></div>   <!-- v384: editor only -->
+    <div class="sm-row pro-test"><span>Pro owned (test)</span><button type="button" class="btn sm" id="proOwnBtn">No</button></div>
     <div class="sm-row"><span>Skin</span>
       <button class="btn skin" id="skin" title="Switch skin">
         <svg id="skinIcon" viewBox="0 0 24 24" aria-hidden="true"></svg>
@@ -2847,6 +2907,43 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
+<!-- v384: Pro - the pop-up sheet (opened only by a tap on something that is Pro) and the thank-you card -->
+<div class="modal pro-modal" id="proModal" hidden>
+  <section class="pro-sheet" role="dialog" aria-modal="true" aria-labelledby="proTitle">
+    <span class="pro-grab"></span>
+    <div class="pro-reason" id="proReason" hidden>
+      <span class="pr-ico" id="proRIco"></span>
+      <span><span class="pr-k" id="proRK">PART OF PRO</span><span class="pr-t" id="proRT"></span><span class="pr-s" id="proRS"></span></span>
+      <button type="button" class="icobtn pro-x" data-prox aria-label="Close">&times;</button>
+    </div>
+    <div class="pro-head" id="proHead"><svg class="pro-mark" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="12.5" fill="none" stroke="var(--ink-2)" stroke-width="2"/><circle cx="17" cy="4.5" r="4" fill="var(--c1)"/><circle cx="28" cy="22" r="2.6" fill="var(--c2)"/><circle cx="7" cy="24.5" r="2.6" fill="var(--c2)"/><circle cx="17" cy="17" r="3" fill="var(--ink-2)"/></svg><span class="pro-name">Polyorbit</span><span class="pro-badge">PRO</span><button type="button" class="icobtn pro-x" data-prox aria-label="Close">&times;</button></div>
+    <h2 class="pro-h" id="proTitle">One purchase.<br>Yours for good.</h2>
+    <p class="pro-p" id="proLead">The metronome stays free. Pro opens the full courses and the extras for daily practice.</p>
+    <ul class="pro-list" id="proList"><li><span class="pi"><svg viewBox="0 0 24 24" style="stroke:var(--c5)"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M7 9.5V15c0 1.5 2.2 3 5 3s5-1.5 5-3V9.5"/></svg></span><span><b>Every course level</b><span>Rudiments, Polyrhythms and Odd meters: all 26 levels</span></span></li><li><span class="pi"><svg viewBox="0 0 24 24" style="stroke:var(--c4)"><path d="M6 11h4M8 9v4"/><path d="M7 6h10a4 4 0 0 1 4 4v3a4 4 0 0 1-7 2.6l-.5-.6h-3l-.5.6A4 4 0 0 1 3 13v-3a4 4 0 0 1 4-4z"/></svg></span><span><b>Blind and Two fingers to the top</b><span>Every level past 20. Classic stays free in full.</span></span></li><li><span class="pi"><svg viewBox="0 0 24 24" style="stroke:var(--c1)"><path d="M4 6h11M4 12h11M4 18h7"/><path d="M19 15v6M16 18h6"/></svg></span><span><b>Bigger lists</b><span>30 presets, 30 routines, 32 sequence steps, every Precision pattern in the log</span></span></li><li><span class="pi"><svg viewBox="0 0 24 24" style="stroke:var(--ink-2)"><path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16.5 9a4 4 0 0 1 0 6M19 6.5a7.5 7.5 0 0 1 0 11"/></svg></span><span><b>Every sound</b><span>Shaker, cowbell, sticks, clave, tom, cabasa, tambourine</span></span></li></ul>
+    <p class="pro-also" id="proAlso" hidden>Pro also opens Blind and Two fingers past level 20, every sound and bigger lists.</p>
+    <div class="pro-tog" id="proTog" hidden>
+      <p id="proTogT"></p>
+      <div class="pt-bar"><span><i id="proTogBar"></i></span><em id="proTogN" style="font-style:normal"></em></div>
+      <button type="button" class="btn sm" id="proTogGo">Send a challenge</button>
+    </div>
+    <button type="button" class="btn sm pro-manage" id="proManage" hidden>Manage my presets</button>
+    <div class="pro-price"><b>&euro;4.99</b><span>once</span></div>
+    <button type="button" class="pro-buy" id="proBuy"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3.5v17l15-8.5z"/></svg>Buy with Google Play</button>
+    <p class="pro-note" id="proNote" hidden></p>
+    <div class="pro-row"><button type="button" class="pro-link" id="proRestore">Restore purchase</button><button type="button" class="pro-link" id="proAll" hidden>See everything in Pro</button><button type="button" data-prox>Not now</button></div>
+    <p class="pro-foot">No subscription &middot; No ads &middot; Nothing you have gets locked</p>
+  </section>
+</div>
+<div class="modal course-sheet-wrap pro-thanks" id="proThanks" hidden>
+  <div class="course-sheet cunlock" role="dialog" aria-modal="true" aria-labelledby="ptT">
+    <svg class="cu-lock" viewBox="0 0 64 64" aria-hidden="true"><path d="M21 29V19a11 11 0 0 1 21.6-3" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><rect x="11" y="29" width="42" height="30" rx="7" fill="currentColor"/><circle cx="32" cy="41" r="4.6" fill="var(--panel)"/><path d="M32 43v8" stroke="var(--panel)" stroke-width="4" stroke-linecap="round"/></svg>
+    <div class="cs-k" style="color:var(--c1)">PRO UNLOCKED</div>
+    <div class="cu-t" id="ptT">Thank you</div>
+    <p class="cs-line">Every course level is open, Blind and Two fingers go to the top, every sound is yours and the lists are bigger.</p>
+    <button type="button" class="course-go" id="ptGo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h12M12 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Go to the courses</span></button>
+    <button type="button" class="btn sm" id="ptClose" style="margin:6px auto 0">Close</button>
+  </div>
+</div>
 <div class="modal chal-modal" id="chalModal" hidden>
   <div class="sheet chal-sheet" role="dialog" aria-modal="true" aria-labelledby="chalTitle">
     <button type="button" class="icobtn chal-x" id="chalX" title="Leave the challenge" aria-label="Leave the challenge">&times;</button>
@@ -3028,7 +3125,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v383"></script>
+<script src="./app.js?v=v384"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3041,8 +3138,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v383";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-06 13:19";          /* and when it was built, for ?diag */
+  var BUILD = "v384";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-06 15:06";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

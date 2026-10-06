@@ -2073,6 +2073,12 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .log-play svg{width:14px;height:14px;color:var(--c2)}
 .log-play svg.tri{margin-left:auto;width:16px;height:16px}   /* v237: a play triangle - it does something, it is not a chip (Oscar) */
 .log-play{width:100%}
+.pd-acts{display:flex;gap:8px;align-items:stretch;margin-top:10px}   /* v387 */
+.pd-acts .log-play{flex:1 1 auto;min-width:0;width:auto;margin:0}
+.pd-acts .log-play .lp-t{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pd-acts .log-rm{flex:none;width:44px;padding:0;display:grid;place-items:center;margin:0;color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
+.pd-acts .log-rm svg{width:17px;height:17px}
+:root[data-tour="1"] .pd-acts .log-rm{display:none}
 .log-row .pct{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink);width:64px;text-align:center}
 .log-trend{display:flex;flex-direction:column;gap:6px;min-width:0}
 .log-trend svg{width:100%;height:44px;display:block}
@@ -2926,8 +2932,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
     <div class="pro-head" id="proHead"><svg class="pro-mark" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="12.5" fill="none" stroke="var(--ink-2)" stroke-width="2"/><circle cx="17" cy="4.5" r="4" fill="var(--c1)"/><circle cx="28" cy="22" r="2.6" fill="var(--c2)"/><circle cx="7" cy="24.5" r="2.6" fill="var(--c2)"/><circle cx="17" cy="17" r="3" fill="var(--ink-2)"/></svg><span class="pro-name">Polyorbit</span><span class="pro-badge">PRO</span><button type="button" class="icobtn pro-x" data-prox aria-label="Close">&times;</button></div>
     <h2 class="pro-h" id="proTitle">One purchase.<br>Yours for good.</h2>
-    <p class="pro-p" id="proLead">The metronome stays free. Pro opens the full courses and the extras for daily practice.</p>
-    <ul class="pro-list" id="proList"><li><span class="pi"><svg viewBox="0 0 24 24" style="stroke:var(--c5)"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M7 9.5V15c0 1.5 2.2 3 5 3s5-1.5 5-3V9.5"/></svg></span><span><b>Every course level</b><span>Rudiments, Polyrhythms and Odd meters: all 26 levels</span></span></li><li><span class="pi"><svg viewBox="0 0 24 24" style="stroke:var(--c4)"><path d="M6 11h4M8 9v4"/><path d="M7 6h10a4 4 0 0 1 4 4v3a4 4 0 0 1-7 2.6l-.5-.6h-3l-.5.6A4 4 0 0 1 3 13v-3a4 4 0 0 1 4-4z"/></svg></span><span><b>Blind and Two fingers to the top</b><span>Every level past 20. Classic stays free in full.</span></span></li><li><span class="pi"><svg viewBox="0 0 24 24" style="stroke:var(--c1)"><path d="M4 6h11M4 12h11M4 18h7"/><path d="M19 15v6M16 18h6"/></svg></span><span><b>Bigger lists</b><span>30 presets, 30 routines, 32 sequence steps, every Precision pattern in the log</span></span></li><li><span class="pi"><svg viewBox="0 0 24 24" style="stroke:var(--ink-2)"><path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16.5 9a4 4 0 0 1 0 6M19 6.5a7.5 7.5 0 0 1 0 11"/></svg></span><span><b>Every sound</b><span>Shaker, cowbell, sticks, clave, tom, cabasa, tambourine</span></span></li></ul>
+    <p class="pro-p" id="proLead">The metronome stays free.</p>
+    <ul class="pro-list" id="proList"><li><span class="pi"><svg viewBox="0 0 24 24" style="stroke:var(--c5)"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M7 9.5V15c0 1.5 2.2 3 5 3s5-1.5 5-3V9.5"/></svg></span><span><b>Every course level</b><span>All 26 levels</span></span></li><li><span class="pi"><svg viewBox="0 0 24 24" style="stroke:var(--c4)"><path d="M6 11h4M8 9v4"/><path d="M7 6h10a4 4 0 0 1 4 4v3a4 4 0 0 1-7 2.6l-.5-.6h-3l-.5.6A4 4 0 0 1 3 13v-3a4 4 0 0 1 4-4z"/></svg></span><span><b>Blind and Two fingers to the top</b><span>Every level past 20</span></span></li><li><span class="pi"><svg viewBox="0 0 24 24" style="stroke:var(--c1)"><path d="M4 6h11M4 12h11M4 18h7"/><path d="M19 15v6M16 18h6"/></svg></span><span><b>Bigger lists</b><span>30 presets · 30 routines · 32 steps</span></span></li><li><span class="pi"><svg viewBox="0 0 24 24" style="stroke:var(--ink-2)"><path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16.5 9a4 4 0 0 1 0 6M19 6.5a7.5 7.5 0 0 1 0 11"/></svg></span><span><b>Every sound</b><span>7 more to pick</span></span></li></ul>
     <p class="pro-also" id="proAlso" hidden>Pro also opens Blind and Two fingers past level 20, every sound and bigger lists.</p>
     <div class="pro-tog" id="proTog" hidden>
       <p id="proTogT"></p>
@@ -2947,7 +2953,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <svg class="cu-lock" viewBox="0 0 64 64" aria-hidden="true"><path d="M21 29V19a11 11 0 0 1 21.6-3" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><rect x="11" y="29" width="42" height="30" rx="7" fill="currentColor"/><circle cx="32" cy="41" r="4.6" fill="var(--panel)"/><path d="M32 43v8" stroke="var(--panel)" stroke-width="4" stroke-linecap="round"/></svg>
     <div class="cs-k" style="color:var(--c1)">PRO UNLOCKED</div>
     <div class="cu-t" id="ptT">Thank you</div>
-    <p class="cs-line">Everything below is yours now, marked <b class="new-tag">NEW</b> until you first use it.</p>
+    <p class="cs-line">Marked <b class="new-tag">NEW</b> until first use.</p>
     <ul class="pro-list" id="ptList"></ul>
     <button type="button" class="course-go" id="ptGo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h12M12 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="ptGoT">Got it</span></button>
     <button type="button" class="btn sm" id="ptClose" style="margin:6px auto 0">Close</button>
@@ -3134,7 +3140,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v386"></script>
+<script src="./app.js?v=v387"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3147,8 +3153,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v386";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-06 16:37";          /* and when it was built, for ?diag */
+  var BUILD = "v387";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-06 17:14";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

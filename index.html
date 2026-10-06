@@ -60,17 +60,17 @@
    it, and a khaki line family - the greys the rings are drawn against carry a
    little colour of their own. The ring hues stay cool so they read as marks on
    the surface rather than more of it. */
-html:root[data-skin="light"]{
-  --ground:#E4DCC9;
-  --panel:#FBF8F1;
-  --sunk:#EFE8D9;
+html:root[data-skin="light"]{   /* v388 (Oscar: "too bright"): surfaces and lines 25 % darker (luminance) */
+  --ground:#C8C1B0;
+  --panel:#DCD9D3;
+  --sunk:#D2CBBE;
   --ink:#2B2822;
-  --ink-2:#5F5646;
-  --ink-3:#877A61;
-  --line:#D2C7AE;
-  --line-2:#BCAE90;
+  --ink-2:#554D3E;
+  --ink-3:#716652;
+  --line:#B8AF99;
+  --line-2:#A5997E;
   --shadow:0 1px 2px rgba(43,40,34,.06), 0 8px 24px -12px rgba(43,40,34,.22);
-  --dot-off:#C2B69B;
+  --dot-off:#AAA088;
   --c1:#B5701A;
   --c2:#0E8F86;
   --c3:#C2426E;
@@ -1016,7 +1016,26 @@ button.along-card-pct .go i{font-style:normal;font-family:var(--title);font-size
 .pro-mark{width:30px;height:30px;display:block}
 .modal.pro-modal{z-index:78;place-items:end center;padding:0;background:color-mix(in srgb,var(--ground) 62%,transparent)}
 .pro-sheet{box-sizing:border-box;width:min(100%,520px);max-height:100svh;overflow-y:auto;padding:10px 22px calc(22px + env(safe-area-inset-bottom,0px));background:var(--panel);border-top:1px solid var(--line-2);border-radius:22px 22px 0 0;display:flex;flex-direction:column;gap:14px;color:var(--ink)}
-.pro-sheet > *,.pro-sheet > .pro-buy{flex:none}   /* v386 (QA v385 V1): the Buy button kept its 52 px on short screens */
+.pro-sheet > *,.pro-sheet > .pro-buy{flex:none}
+@media (max-height:480px){   /* v388 (QA v387 V1) */
+  .pro-sheet{gap:6px;padding-top:4px;padding-bottom:10px}
+  .pro-sheet .pro-h{font-size:17px}
+  .pro-sheet .pro-list{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px}
+  .pro-sheet .pro-list .pi{width:26px;height:26px}
+  .pro-sheet .pro-foot{display:none}
+  .pro-sheet .pro-price{padding-top:6px}
+  .pro-sheet .pro-price b{font-size:22px}
+  .pro-sheet .pro-buy{height:42px}
+  .pro-sheet .pro-reason .pr-ico{width:38px;height:38px}
+  .pro-sheet .pro-reason .pr-t{font-size:18px}
+  .pro-sheet .pro-tog{padding:8px 11px;gap:6px}
+  .pro-sheet .pro-row button{min-height:34px}
+  .pro-thx .cu-lock{display:none}
+  .pro-thx .pro-list{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px}
+}
+/* V2: buttons a finger can hit */
+#proManage,#proTogGo,#ptClose{min-height:36px;padding:0 14px}
+.pd-acts .log-rm,.pd-acts .log-play{min-height:36px}   /* v386 (QA v385 V1): the Buy button kept its 52 px on short screens */
 .pro-grab{align-self:center;width:40px;height:4px;border-radius:2px;background:var(--line-2);flex:none}
 .modal.pro-modal .icobtn.pro-x{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));width:40px;height:40px;font-size:20px;flex:none}
 .pro-head{display:flex;align-items:center;gap:10px}
@@ -2838,7 +2857,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <div class="sm-row"><span id="menuCalLbl">Sound delay</span><button type="button" class="btn sm" id="menuCal" title="Measure this phone's delay: ten clicks, tap along">Calibrate</button></div>   <!-- v376 -->
     <div class="sm-row pro-test"><span>Pro gates (test)</span><button type="button" class="btn sm" id="proGateBtn">Off</button></div>   <!-- v384: editor only -->
     <div class="sm-row pro-test"><span>Pro owned (test)</span><button type="button" class="btn sm" id="proOwnBtn">No</button></div>
-    <div class="sm-row"><span>Skin</span>
+    <div class="sm-row"><span>Skin<span id="skinTag"></span></span>
       <button class="btn skin" id="skin" title="Switch skin">
         <svg id="skinIcon" viewBox="0 0 24 24" aria-hidden="true"></svg>
         <span id="skinTxt">Dark</span>
@@ -2931,9 +2950,9 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <button type="button" class="icobtn pro-x" data-prox aria-label="Close">&times;</button>
     </div>
     <div class="pro-head" id="proHead"><svg class="pro-mark" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="12.5" fill="none" stroke="var(--ink-2)" stroke-width="2"/><circle cx="17" cy="4.5" r="4" fill="var(--c1)"/><circle cx="28" cy="22" r="2.6" fill="var(--c2)"/><circle cx="7" cy="24.5" r="2.6" fill="var(--c2)"/><circle cx="17" cy="17" r="3" fill="var(--ink-2)"/></svg><span class="pro-name">Polyorbit</span><span class="pro-badge">PRO</span><button type="button" class="icobtn pro-x" data-prox aria-label="Close">&times;</button></div>
-    <h2 class="pro-h" id="proTitle">One purchase.<br>Yours for good.</h2>
-    <p class="pro-p" id="proLead">The metronome stays free.</p>
-    <ul class="pro-list" id="proList"><li><span class="pi"><svg viewBox="0 0 24 24" style="stroke:var(--c5)"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M7 9.5V15c0 1.5 2.2 3 5 3s5-1.5 5-3V9.5"/></svg></span><span><b>Every course level</b><span>All 26 levels</span></span></li><li><span class="pi"><svg viewBox="0 0 24 24" style="stroke:var(--c4)"><path d="M6 11h4M8 9v4"/><path d="M7 6h10a4 4 0 0 1 4 4v3a4 4 0 0 1-7 2.6l-.5-.6h-3l-.5.6A4 4 0 0 1 3 13v-3a4 4 0 0 1 4-4z"/></svg></span><span><b>Blind and Two fingers to the top</b><span>Every level past 20</span></span></li><li><span class="pi"><svg viewBox="0 0 24 24" style="stroke:var(--c1)"><path d="M4 6h11M4 12h11M4 18h7"/><path d="M19 15v6M16 18h6"/></svg></span><span><b>Bigger lists</b><span>30 presets · 30 routines · 32 steps</span></span></li><li><span class="pi"><svg viewBox="0 0 24 24" style="stroke:var(--ink-2)"><path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16.5 9a4 4 0 0 1 0 6M19 6.5a7.5 7.5 0 0 1 0 11"/></svg></span><span><b>Every sound</b><span>7 more to pick</span></span></li></ul>
+    <h2 class="pro-h" id="proTitle">What the Pro plan includes:</h2>
+    <p class="pro-p" id="proLead"></p>
+    <ul class="pro-list" id="proList"><li><span class="pi"><svg viewBox="0 0 24 24" style="stroke:var(--c5)"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M7 9.5V15c0 1.5 2.2 3 5 3s5-1.5 5-3V9.5"/></svg></span><span><b>Every course level</b><span>All 26 levels</span></span></li><li><span class="pi"><svg viewBox="0 0 24 24" style="stroke:var(--c4)"><path d="M6 11h4M8 9v4"/><path d="M7 6h10a4 4 0 0 1 4 4v3a4 4 0 0 1-7 2.6l-.5-.6h-3l-.5.6A4 4 0 0 1 3 13v-3a4 4 0 0 1 4-4z"/></svg></span><span><b>Game modes Blind and Two fingers</b><span>All levels unlocked</span></span></li><li><span class="pi"><svg viewBox="0 0 24 24" style="stroke:var(--c1)"><path d="M4 6h11M4 12h11M4 18h7"/><path d="M19 15v6M16 18h6"/></svg></span><span><b>Patterns, presets, routines, log</b><span>Maximum list limits (up to 30)</span></span></li><li><span class="pi"><svg viewBox="0 0 24 24" style="stroke:var(--ink-2)"><path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16.5 9a4 4 0 0 1 0 6M19 6.5a7.5 7.5 0 0 1 0 11"/></svg></span><span><b>Sounds</b><span>All sounds</span></span></li><li><span class="pi"><svg viewBox="0 0 24 24" style="stroke:var(--c2)"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="var(--c2)"/></svg></span><span><b>Skins</b><span>The light skin</span></span></li></ul>
     <p class="pro-also" id="proAlso" hidden>Pro also opens Blind and Two fingers past level 20, every sound and bigger lists.</p>
     <div class="pro-tog" id="proTog" hidden>
       <p id="proTogT"></p>
@@ -3140,7 +3159,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v387"></script>
+<script src="./app.js?v=v388"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3153,8 +3172,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v387";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-06 17:14";          /* and when it was built, for ?diag */
+  var BUILD = "v388";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-06 18:43";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

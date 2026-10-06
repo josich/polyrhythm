@@ -1474,6 +1474,14 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
   :root[data-course="1"][data-cpoly="1"][data-cexam="1"] .dial{width:calc(100vh - 150px);width:calc(100svh - 150px);min-width:120px}   /* v364 (QA v363 V2): an exam has no step line or hand boxes - the wheel takes their room */   /* v328 (QA v325 V2): the step line's room */
   :root[data-course="1"] .ct-step{font-size:12px}
 }
+@media (max-width:400px){   /* v383 (QA v382 V1): a sequence step's buttons sit on their own line, so its name keeps the row */
+  .seq-list .lvl-row{grid-template-columns:22px minmax(0,1fr);row-gap:4px}
+  .seq-list .lvl-row .ops{grid-column:2;justify-content:flex-end}
+}
+@media (orientation:landscape) and (max-height:520px){   /* v383 (QA v382 V2): the floor is the wheel's, not the box's (its padding takes 26 px) */
+  :root[data-course="1"] .dial{min-width:122px}
+  :root[data-course="1"][data-cpoly="1"] .dial{min-width:110px}
+}
 :root[data-course="1"] #courseBar{display:grid;grid-template-columns:auto 1fr auto 34px 34px;align-items:center;gap:8px;margin:0 0 8px}
 #cbX{grid-column:5}
 /* v376: the courses' options menu */
@@ -2755,7 +2763,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <div class="sm-rule">Sections</div>
     <div class="sm-list" id="smList"></div>
     <div class="sm-rule">More</div>
-    <div class="sm-row"><span>Sound delay</span><button type="button" class="btn sm" id="menuCal" title="Measure this phone's delay: ten clicks, tap along">Calibrate</button></div>   <!-- v376 -->
+    <div class="sm-row"><span id="menuCalLbl">Sound delay</span><button type="button" class="btn sm" id="menuCal" title="Measure this phone's delay: ten clicks, tap along">Calibrate</button></div>   <!-- v376 -->
     <div class="sm-row"><span>Skin</span>
       <button class="btn skin" id="skin" title="Switch skin">
         <svg id="skinIcon" viewBox="0 0 24 24" aria-hidden="true"></svg>
@@ -3020,7 +3028,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v382"></script>
+<script src="./app.js?v=v383"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3033,8 +3041,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v382";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-06 10:29";          /* and when it was built, for ?diag */
+  var BUILD = "v383";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-06 13:19";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

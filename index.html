@@ -2872,7 +2872,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 <div class="showmenu" id="showMenu" hidden>
   <div class="sm-panel" id="smPanel" role="dialog" aria-modal="true" aria-labelledby="smTitle">
     <div class="sm-head"><b id="smTitle">Show</b><button class="icobtn" id="smClose" title="Close" aria-label="Close">&times;</button></div>
-    <button type="button" class="pro-card pro-only" id="proCard"><svg class="pro-mark" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="12.5" fill="none" stroke="var(--ink-2)" stroke-width="2"/><circle cx="17" cy="4.5" r="4" fill="var(--c1)"/><circle cx="28" cy="22" r="2.6" fill="var(--c2)"/><circle cx="7" cy="24.5" r="2.6" fill="var(--c2)"/><circle cx="17" cy="17" r="3" fill="var(--ink-2)"/></svg><span><b>Polyorbit <span class="pc-badge">PRO</span></b><small id="proCardSub">Every course level and the extras</small></span><span class="pc-price" id="proCardPrice">&euro;4.99</span></button>   <!-- v384 -->
+    <button type="button" class="pro-card pro-only" id="proCard"><svg class="pro-mark" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="12.5" fill="none" stroke="var(--ink-2)" stroke-width="2"/><circle cx="17" cy="4.5" r="4" fill="var(--c1)"/><circle cx="28" cy="22" r="2.6" fill="var(--c2)"/><circle cx="7" cy="24.5" r="2.6" fill="var(--c2)"/><circle cx="17" cy="17" r="3" fill="var(--ink-2)"/></svg><span><b>Polyorbit <span class="pc-badge">PRO</span></b><small id="proCardSub">Unlock all features with the Pro plan</small></span><span class="pc-price" id="proCardPrice">&euro;4.99</span></button>   <!-- v384 -->
     <div class="sm-presets" id="smPresets">
       <button type="button" data-p="metro"><span class="picos" data-picos="metro"></span>Metronome<small>the wheel, tempo, patterns</small></button>
       <button type="button" data-p="practice"><span class="picos" data-picos="practice"></span>Practice<small>+ session, sequence, Precision, log</small></button>
@@ -3193,7 +3193,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v399"></script>
+<script src="./app.js?v=v400"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3206,8 +3206,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v399";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-07 10:58";          /* and when it was built, for ?diag */
+  var BUILD = "v400";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-07 11:02";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

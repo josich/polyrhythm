@@ -413,10 +413,10 @@ input[type=range]::-moz-range-thumb{
 #shareBtn{grid-column:7;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none}
 /* Play along (v167): the target between the bolt and Share; teal glyph at rest, filled while a run is on */
 /* v397 (Oscar): Precision's door - a full-width bar above the wheel, teal-edged; hidden while the banner is open (it takes the same place) */
-.along-door{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;margin:0 0 14px;padding:10px 12px 10px 18px;background:var(--panel);border:1px solid color-mix(in srgb,var(--c2) 60%,var(--line));border-radius:14px;box-shadow:var(--shadow);font:inherit;color:var(--c2);cursor:pointer;text-align:left}
-.along-door .ad-lbl{font-size:13px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:color-mix(in srgb,var(--c2) 70%,var(--ink-2))}
-.along-door .ad-ico{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;border:1px solid color-mix(in srgb,var(--c2) 55%,var(--line));background:color-mix(in srgb,var(--c2) 14%,transparent);color:var(--c2);flex:none}
-.along-door .ad-ico svg{width:20px;height:20px;display:block}
+.along-door{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;margin:0 0 12px;padding:5px 6px 5px 14px;min-height:38px;box-sizing:border-box;background:var(--panel);border:1px solid color-mix(in srgb,var(--c2) 60%,var(--line));border-radius:12px;box-shadow:var(--shadow);font:inherit;color:var(--c2);cursor:pointer;text-align:left}
+.along-door .ad-lbl{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:color-mix(in srgb,var(--c2) 70%,var(--ink-2))}
+.along-door .ad-ico{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;border:1px solid color-mix(in srgb,var(--c2) 55%,var(--line));background:color-mix(in srgb,var(--c2) 14%,transparent);color:var(--c2);flex:none}
+.along-door .ad-ico svg{width:15px;height:15px;display:block}
 @media (hover:hover){ .along-door:hover .ad-ico{background:color-mix(in srgb,var(--c2) 24%,transparent)} }
 .wrap:has(> #alongSec:not([hidden])) > #alongBtn{display:none}
 /* v168 (Oscar): a run is a mode. The hub button goes (a tap on the centre paused the
@@ -3185,7 +3185,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v397"></script>
+<script src="./app.js?v=v398"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3198,8 +3198,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v397";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-07 10:40";          /* and when it was built, for ?diag */
+  var BUILD = "v398";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-07 10:49";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

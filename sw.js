@@ -1,6 +1,6 @@
 /* Offline cache for Polyorbit.
    Bump CACHE whenever you redeploy, or phones will keep serving the old app. */
-var CACHE = "polyrhythm-v400";
+var CACHE = "polyrhythm-v401";
 /* proof that a response really is this app and not a host's error page */
 var MARK = "polyrhythm-circle:session";
 var ASSETS = [
@@ -113,11 +113,18 @@ self.addEventListener("fetch", function(e){
     caches.match(req).then(function(hit){
       if(hit) return hit;
       return fetch(req).then(function(res){
-        var copy = res.clone();
-        caches.open(CACHE).then(function(c){ c.put(req, copy); }).catch(function(){});
+        /* v401 (QA v400 m5): only a good answer from this site is kept - an error or another site's
+           response was stored until the next release */
+        var same = false; try{ same = new URL(req.url).origin === self.location.origin; } catch(err){}
+        if(res && res.ok && same && res.type === "basic"){
+          var copy = res.clone();
+          caches.open(CACHE).then(function(c){ c.put(req, copy); }).catch(function(){});
+        }
         return res;
       }).catch(function(){
-        return caches.match("./index.html");
+        /* the app's page stands in only for a page; a failed script, font or image gets an honest error */
+        if(req.mode === "navigate") return caches.match("./index.html");
+        return Response.error();
       });
     })
   );

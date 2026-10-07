@@ -348,7 +348,7 @@ input[type=range]::-moz-range-thumb{
 :root[data-stage="1"] #dialRatio{font-size:26px}
 :root[data-stage="1"] .dial-foot{min-height:44px;margin-top:12px}
 :root[data-stage="1"] :is(#sessNowIn,#tapNowIn,#beatNowIn){font-size:30px}
-#stageX{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 55%,var(--line));min-width:56px;height:34px;padding:0 14px;border-radius:10px;font-size:15px;font-weight:600;align-self:center}   /* by id: .icobtn, declared later, out-ranked the class */
+#stageX{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 55%,var(--line));min-width:48px;height:30px;padding:0 11px;border-radius:9px;font-size:13.5px;font-weight:600;align-self:center}   /* v421: a bit smaller (Oscar) */   /* by id: .icobtn, declared later, out-ranked the class */
 :root[data-stage="1"] #stageX{grid-column:7}
 #stageNotes{grid-column:6;width:28px;height:28px;border-radius:8px;align-self:center;color:var(--ink-3)}   /* v368 */
 #stageNotes svg{width:15px;height:15px}
@@ -3227,7 +3227,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v420"></script>
+<script src="./app.js?v=v421"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3240,8 +3240,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v420";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-07 19:35";          /* and when it was built, for ?diag */
+  var BUILD = "v421";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-07 19:36";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

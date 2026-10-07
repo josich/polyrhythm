@@ -2209,7 +2209,8 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 #gtabs .ops button[data-gplay] svg{width:14px;height:14px;display:block;margin:auto}
 #bestCard{display:none!important}   /* v422: the Best card is gone - the rows say it */
 #gtabs .ops{gap:6px;align-items:center}
-#gtabs .ops button[data-greset]{width:30px;height:30px;color:var(--ink-3);border-color:var(--line)}
+#gtabs .ops button[data-greset]{width:30px;height:30px;color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}   /* v423: pink when it can reset (Oscar) */
+#gtabs .ops button[data-greset]:disabled{color:var(--ink-3);border-color:var(--line)}
 #gtabs .ops button[data-greset] svg{width:14px;height:14px;display:block;margin:auto}
 #gtabs .ops button[data-greset]:disabled{opacity:.3}   /* teal edge at rest, like the share buttons (Oscar, v158) */
 /* a paused game (v163, Oscar): Resume pulses in orange, Stop game keeps its pink edge but
@@ -3232,7 +3233,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v422"></script>
+<script src="./app.js?v=v423"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3245,8 +3246,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v422";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-07 20:17";          /* and when it was built, for ?diag */
+  var BUILD = "v423";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-07 20:22";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

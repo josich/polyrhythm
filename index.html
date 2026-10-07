@@ -1020,6 +1020,16 @@ button.along-card-pct .go i{font-style:normal;font-family:var(--title);font-size
 .pro-card{all:unset;box-sizing:border-box;display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;margin:2px 0 12px;padding:10px 12px;border:1.5px solid var(--c1);border-radius:12px;background:color-mix(in srgb,var(--c1) 8%,transparent);cursor:pointer;color:var(--ink)}
 .pro-card b{display:block;font-size:14.5px;font-weight:600}
 .pro-card small{display:block;font-size:12px;color:var(--ink-2)}
+.sm-support{display:flex;flex-direction:column;gap:8px;margin:2px 0 12px}   /* v396 */
+.sup-rate{all:unset;box-sizing:border-box;display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:center;width:100%;padding:9px 12px;border:1px solid var(--line-2);border-radius:12px;cursor:pointer;color:var(--ink)}
+.sup-rate .sup-stars{color:var(--c1);font-size:15px;letter-spacing:1px}
+.sup-rate b{display:block;font-size:14px;font-weight:600}
+.sup-rate small{display:block;font-size:12px;color:var(--ink-2)}
+.sup-tips{display:flex;gap:8px}
+.sup-tips .btn{flex:1 1 0;min-height:36px;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-color:var(--c2)}
+.sup-tips svg{width:15px;height:15px;fill:none;stroke:var(--c3);stroke-width:2;stroke-linejoin:round}
+.sup-note{margin:0;font-size:12.5px;color:var(--ink-2);text-align:center}
+.sup-note[data-ok="1"]{color:var(--c2)}
 .pro-card .pc-price{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--c1)}
 .pro-mark{width:30px;height:30px;display:block}
 .modal.pro-modal{z-index:78;place-items:end center;padding:0;background:color-mix(in srgb,var(--ground) 62%,transparent)}
@@ -2862,6 +2872,12 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <div class="sm-custom" id="smCustom"></div>
     <div class="sm-rule">Sections</div>
     <div class="sm-list" id="smList"></div>
+    <div class="sm-rule pro-only">Support Polyorbit</div>   <!-- v396 (Oscar): ready for the store build -->
+    <div class="sm-support pro-only">
+      <button type="button" class="sup-rate" id="supRate"><span class="sup-stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span><b>Rate Polyorbit</b><small>on Google Play</small></span></button>
+      <div class="sup-tips"><button type="button" class="btn sm" data-tip="2"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>Tip &euro;2</button><button type="button" class="btn sm" data-tip="5"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>Tip &euro;5</button></div>
+      <p class="sup-note" id="supNote" hidden></p>
+    </div>
     <div class="sm-rule">More</div>
     <div class="sm-row"><span id="menuCalLbl">Sound delay</span><button type="button" class="btn sm" id="menuCal" title="Measure this phone's delay: ten clicks, tap along">Calibrate</button></div>   <!-- v376 -->
     <div class="sm-row pro-test"><span>Pro gates (test)</span><button type="button" class="btn sm" id="proGateBtn">Off</button></div>   <!-- v384: editor only -->
@@ -3167,7 +3183,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v395"></script>
+<script src="./app.js?v=v396"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3180,8 +3196,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v395";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-07 10:02";          /* and when it was built, for ?diag */
+  var BUILD = "v396";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-07 10:32";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

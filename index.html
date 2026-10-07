@@ -1040,6 +1040,11 @@ button.along-card-pct .go i{font-style:normal;font-family:var(--title);font-size
 :root[data-proown="1"] .pro-card small{color:color-mix(in srgb,var(--c1) 55%,var(--ink-2))}
 :root[data-proown="1"] .pro-card .pc-price{width:28px;height:28px;padding:0;border-radius:50%;background:var(--c1);display:grid;place-items:center}
 .pro-card .pc-price svg{width:16px;height:16px;display:block}
+/* v414: Blind's two-finger levels - a hand on the row; the editor's toggle in teal when on */
+.lvl-row .lvl-two{width:13px;height:13px;margin-left:6px;vertical-align:-2px;color:var(--c2)}
+.lvl-row .ops button[data-hands] svg{width:15px;height:15px;display:block;margin:auto}
+.lvl-row .ops button[data-hands][data-on="1"]{color:var(--c2);border-color:color-mix(in srgb,var(--c2) 60%,var(--line))}
+.lvl-row .ops button[data-hands][data-on="0"]{color:var(--ink-3)}
 html[data-skin="light"] .pro-card .pc-price,html[data-skin="light"][data-proown="1"] .pro-card .pc-badge{color:#fff}
 .pro-mark{width:30px;height:30px;display:block}
 .modal.pro-modal{z-index:78;place-items:end center;padding:0;background:color-mix(in srgb,var(--ground) 62%,transparent)}
@@ -2759,8 +2764,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <!-- game modes (v141): each tab is its own ladder, progress and best card -->
     <div class="tabs ptabs gtabs" id="gtabs" role="tablist" aria-label="Game mode">
       <button class="tab" data-gmode="classic" data-on="1" title="Tap the dots you see">Classic</button>
-      <button class="tab" data-gmode="blind" data-on="0" title="Listen once, then clear the dots without seeing them">Blind</button>
       <button class="tab" data-gmode="two" data-on="0" title="Two tap areas: ring 1 on the right, ring 2 on the left">Two fingers</button>
+      <button class="tab" data-gmode="blind" data-on="0" title="Listen once, then clear the dots without seeing them">Blind</button>
     </div>
     <p class="tap-hint" id="tapHint"></p>
     <!-- the best run, as a card that stays whatever the game is doing -->
@@ -3196,7 +3201,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v413"></script>
+<script src="./app.js?v=v414"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3209,8 +3214,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v413";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-07 17:28";          /* and when it was built, for ?diag */
+  var BUILD = "v414";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-07 17:33";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

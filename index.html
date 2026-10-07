@@ -588,9 +588,9 @@ input[type=range]::-moz-range-thumb{
 :root:not([data-tour="1"])[data-sh-drone="0"] #droneRow,
 :root:not([data-tour="1"])[data-sh-rout="0"] :is(#rtHead,#rtBody),
 :root:not([data-tour="1"])[data-sh-seq="0"] button[data-seq],
-:root:not([data-tour="1"])[data-sh-gclassic="0"] #gtabs .tab[data-gmode="classic"],
-:root:not([data-tour="1"])[data-sh-gblind="0"] #gtabs .tab[data-gmode="blind"],
-:root:not([data-tour="1"])[data-sh-gtwo="0"] #gtabs .tab[data-gmode="two"]{display:none!important}
+:root:not([data-tour="1"])[data-sh-gclassic="0"] #gtabs .gmrow[data-gmode="classic"],
+:root:not([data-tour="1"])[data-sh-gblind="0"] #gtabs .gmrow[data-gmode="blind"],
+:root:not([data-tour="1"])[data-sh-gtwo="0"] #gtabs .gmrow[data-gmode="two"]{display:none!important}
 #tourNext{min-width:104px;border-color:var(--c2);color:var(--ink)}
 #tourNext:disabled{opacity:.35;border-color:var(--line);cursor:default}
 #tourNext{position:relative}
@@ -1042,6 +1042,13 @@ button.along-card-pct .go i{font-style:normal;font-family:var(--title);font-size
 .pro-card .pc-price svg{width:16px;height:16px;display:block}
 /* v414: Blind's two-finger levels - a hand on the row; the editor's toggle in teal when on */
 .lvl-row .lvl-two{width:13px;height:13px;margin-left:6px;vertical-align:-2px;color:var(--c2)}
+/* v415: the whole ladder for players - a locked level greyed with a grey lock, a Pro level with the orange PRO tag */
+#lvlList .lvl-row[data-lock="1"]{opacity:.45}
+#lvlList .lvl-row[data-lock="1"] .sum{cursor:default}
+#lvlList .lvl-row .lvl-lock{display:grid;place-items:center;width:30px;height:30px;color:var(--ink-3)}
+#lvlList .lvl-row .lvl-lock svg{width:14px;height:14px}
+#lvlList .lvl-row .ops button.lvl-pro{width:auto;padding:0 4px;border-color:transparent;background:none}
+#lvlList .lvl-row .ops button.lvl-pro .pro-tag{margin-left:0}
 .lvl-row .ops button[data-hands] svg{width:15px;height:15px;display:block;margin:auto}
 .lvl-row .ops button[data-hands][data-on="1"]{color:var(--c2);border-color:color-mix(in srgb,var(--c2) 60%,var(--line))}
 .lvl-row .ops button[data-hands][data-on="0"]{color:var(--ink-3)}
@@ -1279,7 +1286,7 @@ canvas{
 :root:not([data-tour="1"]) #calBtn{display:none}   /* v376: Calibrate is in the menu; the Calibrate guide still points here */
 .game-ctl .btn.sm{padding:8px 14px;font-size:13px}
 #gtabs{margin-bottom:14px}
-#gtabs .tab{--lc:var(--c4)}   /* v239: the chosen mode in the game's purple, the log's category colour */
+#gtabs .gmrow{--lc:var(--c4)}   /* v239: the chosen mode in the game's purple, the log's category colour */
 #tapPanel .lvl-lbl{margin:4px 0 12px}
 .ach-row .n b{color:var(--c1);font-weight:600}
 .ach-row .recent{margin-left:auto;display:flex;gap:5px}
@@ -2182,7 +2189,22 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
    folded bar blinks for something live inside it, so the session cannot be lost
    sight of below the fold */
 #sessBtn,#tapGame{--pc:var(--c3)}                  /* their pulse is the .pulse-host layer (v157) */
-#tapGame:not([data-on="1"]){border-color:var(--c2);color:var(--ink)}   /* teal edge at rest, like the share buttons (Oscar, v158) */
+#tapGame:not([data-on="1"]){border-color:var(--c2);color:var(--ink)}
+#tapPanel .game-ctl{display:none}   /* v416: the mode rows' play buttons start the game */
+#gtabs.lvl-list{max-height:none;overflow:visible;margin-bottom:12px}
+#gtabs .lvl-row{grid-template-columns:26px minmax(0,1fr) auto;padding:8px 10px}
+#gtabs .lvl-row .n svg{width:18px;height:18px;color:var(--c4);display:block;margin:auto}
+#gtabs .lvl-row[data-on="1"]{border-color:var(--c4);box-shadow:0 0 0 2px color-mix(in srgb,var(--c4) 22%,transparent);background:color-mix(in srgb,var(--c4) 10%,var(--sunk))}
+#gtabs .lvl-row .nm-ro{font-weight:600;font-size:13.5px}
+#gtabs .lvl-row .meta{white-space:normal}
+#gtabs .cpl{display:flex;align-items:center;gap:8px;min-width:0;margin-top:2px}
+#gtabs .cpl .n{font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:600;color:var(--c4);white-space:nowrap;line-height:1.1}
+#gtabs .cpl .n small{font-size:10px;color:var(--ink-3);font-weight:400}
+#gtabs .cpl .bar{flex:1;min-width:24px;height:5px;border-radius:3px;background:var(--line);overflow:hidden}
+#gtabs .cpl .bar i{display:block;height:100%;background:var(--c4)}
+#gtabs .cpl .t{font-size:10.5px;color:var(--ink-3);white-space:nowrap}
+#gtabs .ops button[data-gplay]{width:34px;height:34px;color:var(--c2);border-color:color-mix(in srgb,var(--c2) 55%,var(--line))}
+#gtabs .ops button[data-gplay] svg{width:14px;height:14px;display:block;margin:auto}   /* teal edge at rest, like the share buttons (Oscar, v158) */
 /* a paused game (v163, Oscar): Resume pulses in orange, Stop game keeps its pink edge but
    stops pulsing until the game resumes */
 #tapPause{--pc:var(--c1)}
@@ -2762,10 +2784,12 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
     <div class="share-lbl lvl-lbl"><span>Modes:</span><i></i></div>
     <!-- game modes (v141): each tab is its own ladder, progress and best card -->
-    <div class="tabs ptabs gtabs" id="gtabs" role="tablist" aria-label="Game mode">
-      <button class="tab" data-gmode="classic" data-on="1" title="Tap the dots you see">Classic</button>
-      <button class="tab" data-gmode="two" data-on="0" title="Two tap areas: ring 1 on the right, ring 2 on the left">Two fingers</button>
-      <button class="tab" data-gmode="blind" data-on="0" title="Listen once, then clear the dots without seeing them">Blind</button>
+    <!-- v416 (Oscar): the modes as rows, like the courses - icon, name, progress and a play button that starts at the next
+         level to clear; the Play game button above is gone (#tapGame stays, hidden: the rows click it) -->
+    <div class="lvl-list gmodes" id="gtabs" role="listbox" aria-label="Game mode">
+      <div class="lvl-row gmrow" role="option" data-gmode="classic" data-on="1" title="Tap the dots you see"><span class="n"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-orbit"/></svg></span><div class="body"><span class="nm-ro" data-lbl="Classic">Classic</span><span class="meta" data-gmeta></span></div><span class="ops"><button type="button" data-gplay title="Play from the next level" aria-label="Play Classic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></button></span></div>
+      <div class="lvl-row gmrow" role="option" data-gmode="two" data-on="0" title="Two tap areas: ring 1 on the right, ring 2 on the left"><span class="n"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-hand"/></svg></span><div class="body"><span class="nm-ro" data-lbl="Two fingers">Two fingers</span><span class="meta" data-gmeta></span></div><span class="ops"><button type="button" data-gplay title="Play from the next level" aria-label="Play Two fingers"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></button></span></div>
+      <div class="lvl-row gmrow" role="option" data-gmode="blind" data-on="0" title="Listen once, then clear the dots without seeing them"><span class="n"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-eyeoff"/></svg></span><div class="body"><span class="nm-ro" data-lbl="Blind">Blind</span><span class="meta" data-gmeta></span></div><span class="ops"><button type="button" data-gplay title="Play from the next level" aria-label="Play Blind"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></button></span></div>
     </div>
     <p class="tap-hint" id="tapHint"></p>
     <!-- the best run, as a card that stays whatever the game is doing -->
@@ -3201,7 +3225,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v414"></script>
+<script src="./app.js?v=v416"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3214,8 +3238,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v414";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-07 17:33";          /* and when it was built, for ?diag */
+  var BUILD = "v416";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-07 18:32";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

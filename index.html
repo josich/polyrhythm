@@ -348,8 +348,9 @@ input[type=range]::-moz-range-thumb{
 :root[data-stage="1"] #dialRatio{font-size:26px}
 :root[data-stage="1"] .dial-foot{min-height:44px;margin-top:12px}
 :root[data-stage="1"] :is(#sessNowIn,#tapNowIn,#beatNowIn){font-size:30px}
-#stageX{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));width:28px;height:28px;border-radius:8px;align-self:center}   /* by id: .icobtn, declared later, out-ranked the class */
-:root[data-stage="1"] #stageX{grid-column:7}
+.stage-top{display:flex;justify-content:flex-end;margin-bottom:8px}
+#stageX{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 55%,var(--line));min-width:56px;height:40px;padding:0 14px;border-radius:12px;font-size:15px;font-weight:600}   /* by id: .icobtn, declared later, out-ranked the class */
+:root[data-stage="1"] #stageNotes{grid-column:7}   /* v418: the notes button takes the head's right corner */
 #stageNotes{grid-column:6;width:28px;height:28px;border-radius:8px;align-self:center;color:var(--ink-3)}   /* v368 */
 #stageNotes svg{width:15px;height:15px}
 #stageNotes[data-on="1"]{color:var(--c4);border-color:var(--c4);background:color-mix(in srgb,var(--c4) 14%,transparent)}
@@ -2512,7 +2513,6 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         <button class="icobtn score-ico" id="scoreBtn" title="Write it out as notation" aria-label="Score"><svg class="note" viewBox="0 0 22 30" aria-hidden="true"><ellipse cx="8" cy="22.5" rx="5.4" ry="3.7" transform="rotate(-22 8 22.5)" fill="currentColor"/><path d="M12.9 21.6V3.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M12.9 3.5c3.6 2.2 6 5.2 4.4 10.2" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg></button>
         <button class="icobtn chal-head-x" id="gameX" hidden title="Leave the game" aria-label="Leave the game">&times;</button>
         <button type="button" class="icobtn" id="stageNotes" hidden data-on="1" aria-pressed="true" title="Show or hide the notation under the wheel" aria-label="Notation"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="8.2" cy="17" rx="3.9" ry="2.9" transform="rotate(-22 8.2 17)" fill="currentColor"/><path d="M11.8 16.4V4.5c2.4 1.2 4.6 2.2 6.2 4.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>   <!-- v368 -->
-        <button class="icobtn chal-head-x stage-x" id="stageX" hidden title="Leave stage mode" aria-label="Leave stage mode">&times;</button>
         <!-- editor cheat (v154): clear the level at once, with the attempts as they stand -->
         <button class="icobtn chal-head-x" id="gameWin" hidden title="Cheat: clear this level now" aria-label="Clear this level now">&#9733;</button>
         <!-- Precision (v195): the run's one stop, at the head's right corner; the hub starts it -->
@@ -2567,6 +2567,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <!-- Stage mode (v172): the tempo in big digits, above the wheel on a phone, beside it on
          a wide landscape screen. The buttons drive the Tempo section's own -5 / +5. -->
     <div class="stage-bar" id="stageBar" hidden>
+      <div class="stage-top"><button type="button" class="btn stage-close" id="stageX" hidden title="Leave stage mode">Close</button></div>   <!-- v418 (Oscar): a big Close above +5, not a small cross in the head -->
       <div class="stage-bpm-row">
         <button class="jump wide stage-jump" id="stDown" aria-label="Tempo down 5">&minus;5</button>
         <div class="stage-bpm"><span class="stage-num mono" id="stBpm">96</span><span class="stage-unit">BPM</span></div>
@@ -3227,7 +3228,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v417"></script>
+<script src="./app.js?v=v418"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3240,8 +3241,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v417";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-07 19:11";          /* and when it was built, for ?diag */
+  var BUILD = "v418";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-07 19:14";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -60,7 +60,6 @@
    it, and a khaki line family - the greys the rings are drawn against carry a
    little colour of their own. The ring hues stay cool so they read as marks on
    the surface rather than more of it. */
-html[data-skin="light"] #alongBtn[data-on="1"],
 html[data-skin="light"][data-chal="1"] .play,html[data-skin="light"][data-chal="1"] .play:hover,
 html[data-skin="light"][data-along="2"] .play,html[data-skin="light"][data-along="2"] .play:hover,
 html[data-skin="light"][data-video="1"] .play,html[data-skin="light"][data-video="1"] .play:hover,
@@ -405,18 +404,21 @@ input[type=range]::-moz-range-thumb{
 @media (min-width:600px) and (orientation:landscape){ :root[data-stage="1"] #stageScore:not([hidden]){display:none} }   /* portrait-only (Oscar); after the show rule so it wins at equal specificity */
 #posLbl{grid-column:3;text-align:right;display:none}   /* v254: always empty since v72, it held half the ratio's room */
 /* the note that opens the score: a small round button at the header's end */
-#scoreBtn{grid-column:4;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none;border-color:var(--c4)}   /* purple, ring 4's colour (Oscar, v144) */
+#scoreBtn{grid-column:5;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none;border-color:var(--c4)}   /* purple, ring 4's colour (Oscar, v144) */
 #scoreBtn svg.note{width:11px;height:15px;display:block}
 /* the share button beside it: greyed whenever a clip cannot be made */
-#flashBtn{grid-column:5;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none}
+#flashBtn{grid-column:6;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none}
 #flashBtn svg{width:15px;height:15px;display:block}
 #flashBtn[data-on="1"]{border-color:var(--c1);color:var(--c1);background:color-mix(in srgb,var(--c1) 15%,transparent)}
 #shareBtn{grid-column:7;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none}
 /* Play along (v167): the target between the bolt and Share; teal glyph at rest, filled while a run is on */
-#alongBtn{grid-column:6;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none;color:var(--c2)}
-#alongBtn svg{width:16px;height:16px;display:block}
-#alongBtn{--pc:var(--c2)}                                 /* its pulse is the .pulse-host layer */
-#alongBtn[data-on="1"]{background:var(--c2);border-color:var(--c2);color:var(--ground)}
+/* v397 (Oscar): Precision's door - a full-width bar above the wheel, teal-edged; hidden while the banner is open (it takes the same place) */
+.along-door{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;margin:0 0 14px;padding:10px 12px 10px 18px;background:var(--panel);border:1px solid color-mix(in srgb,var(--c2) 60%,var(--line));border-radius:14px;box-shadow:var(--shadow);font:inherit;color:var(--c2);cursor:pointer;text-align:left}
+.along-door .ad-lbl{font-size:13px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:color-mix(in srgb,var(--c2) 70%,var(--ink-2))}
+.along-door .ad-ico{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;border:1px solid color-mix(in srgb,var(--c2) 55%,var(--line));background:color-mix(in srgb,var(--c2) 14%,transparent);color:var(--c2);flex:none}
+.along-door .ad-ico svg{width:20px;height:20px;display:block}
+@media (hover:hover){ .along-door:hover .ad-ico{background:color-mix(in srgb,var(--c2) 24%,transparent)} }
+.wrap:has(> #alongSec:not([hidden])) > #alongBtn{display:none}
 /* v168 (Oscar): a run is a mode. The hub button goes (a tap on the centre paused the
    wheel by accident) and everything but the wheel box and the banner is greyed and out
    of reach, so a stray finger cannot mute a dot or press a control; the pulsing
@@ -618,7 +620,7 @@ input[type=range]::-moz-range-thumb{
 .along-tgt .k{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-right:2px;min-width:44px}
 .along-tgt{flex-wrap:wrap}
 .along-tgt .hands-row{display:flex;align-items:center;gap:6px;width:100%}
-#alongBtn[data-on="2"]{border-color:var(--c2);background:color-mix(in srgb,var(--c2) 15%,transparent);color:var(--c2)}   /* armed: the banner is open, the next press starts (v193) */
+/* v397: the bar hides while the banner is open, so it has no armed look of its own */
 /* the results card (v193) */
 .along-card{max-width:380px}
 .along-card .chal-kicker{font-size:clamp(26px,7vw,34px);color:var(--c2)}
@@ -2430,6 +2432,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <button type="button" class="icobtn cb-x" id="gbX" title="Leave the game" aria-label="Leave the game">&times;</button>
   </div>
   <div class="game-top" id="gameTop"><div class="ct-num"><b id="gbBpm">0</b><span>bpm</span></div></div>
+  <!-- v397 (Oscar): Precision is a main feature - a bar of its own above the wheel, not an icon in the wheel's head -->
+  <button type="button" class="along-door" id="alongBtn" data-on="0" aria-pressed="false" title="Precision: play along and see your timing"><span class="ad-lbl">Precision</span><span class="ad-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="13" width="3.2" height="7.5" rx="1" fill="currentColor"/><rect x="8.4" y="7.5" width="3.2" height="13" rx="1" fill="currentColor"/><rect x="13.3" y="3.5" width="3.2" height="17" rx="1" fill="currentColor"/><rect x="18.2" y="10.5" width="3.2" height="10" rx="1" fill="currentColor"/></svg></span></button>
   <section class="along-sec" id="alongSec" hidden>
     <div class="along-row">
       <span class="lbl along-lbl">Precision</span>
@@ -2474,8 +2478,6 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         <!-- Precision (v195): the run's one stop, at the head's right corner; the hub starts it -->
         <button class="icobtn chal-head-x" id="alongStop" hidden title="Stop the Precision run" aria-label="Stop the Precision run">&times;</button>
         <button class="icobtn" id="flashBtn" data-on="0" aria-pressed="false" title="Flash the screen's edge on ring 1's beats" aria-label="Beat flash"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L5 14h6l-1 8 9-13h-6l0-7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
-        <!-- Play along (v167): tap with the wheel and see the timing, nothing fails -->
-        <button class="icobtn pulse-host" id="alongBtn" data-on="0" aria-pressed="false" title="Precision: play along and see your timing" aria-label="Precision"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="13" width="3.2" height="7.5" rx="1" fill="currentColor"/><rect x="8.4" y="7.5" width="3.2" height="13" rx="1" fill="currentColor"/><rect x="13.3" y="3.5" width="3.2" height="17" rx="1" fill="currentColor"/><rect x="18.2" y="10.5" width="3.2" height="10" rx="1" fill="currentColor"/></svg></button>
       <button class="icobtn" id="shareBtn" title="Share a clip of the wheel as audio" aria-label="Share a clip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="6" cy="12" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="19" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8.1 10.8l7.8-4.6M8.1 13.2l7.8 4.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
       </div>
       <!-- Two fingers (v142): the wheel box is two tap areas while such a game runs -
@@ -3183,7 +3185,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v396"></script>
+<script src="./app.js?v=v397"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3196,8 +3198,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v396";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-07 10:32";          /* and when it was built, for ?diag */
+  var BUILD = "v397";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-07 10:40";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

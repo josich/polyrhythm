@@ -1641,6 +1641,9 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 /* v373: the whole screen is the tap area - the split's edges follow the screen, as in the course */
 :root[data-gscr="1"] #twoSplit{position:fixed;inset:0;z-index:30}
 :root[data-gscr="1"] #twoSplit::before{top:12px;bottom:12px}
+:is(:root[data-gscr="1"],:root[data-course="1"]) #twoSplit::before{   /* v403 (QA v401 V1): no seam through the hub's countdown */
+  -webkit-mask-image:linear-gradient(to bottom,#000 var(--sg0,9999px),transparent var(--sg0,9999px),transparent var(--sg1,9999px),#000 var(--sg1,9999px));
+  mask-image:linear-gradient(to bottom,#000 var(--sg0,9999px),transparent var(--sg0,9999px),transparent var(--sg1,9999px),#000 var(--sg1,9999px))}
 :root[data-gscr="1"] #twoSplit span{padding:0 18px 16px;font-size:12px}
 :root[data-gscr="1"] #gameTop{display:flex;justify-content:center;margin:0 0 8px}
 #gameTop b{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:42px;line-height:.9;letter-spacing:-.03em;display:inline-block}
@@ -3193,7 +3196,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v402"></script>
+<script src="./app.js?v=v403"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3206,8 +3209,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v402";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-07 12:31";          /* and when it was built, for ?diag */
+  var BUILD = "v403";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-07 12:37";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

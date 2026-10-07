@@ -425,7 +425,7 @@ input[type=range]::-moz-range-thumb{
    Precision button is the one way to stop. */
 :root[data-along="1"] .play{display:none}
 :root[data-along="1"] canvas{cursor:pointer}
-:root[data-along="1"] :is(#rack,#sessionPanel,#seqPanel,#patPanel,#tapPanel,.bpm-block,.bpm-row,.note-row,.fold-bpm,#tap,#countBtn){opacity:.45;pointer-events:none}
+:root[data-along="1"] :is(#rack,#sessionPanel,#seqPanel,#patPanel,#tapPanel,#coursePanel,#droneRow,.bpm-block,.bpm-row,.note-row,.fold-bpm,#tap,#countBtn){opacity:.45;pointer-events:none}
 /* the timing banner: its own slim section between Tempo and the wheel, so the hand never
    covers it; shown only during and after a run. No numbers anywhere but the loop count. */
 .along-sec{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:10px 14px 12px;margin-bottom:18px}
@@ -1600,6 +1600,8 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 @media (max-width:400px){   /* v383 (QA v382 V1): a sequence step's buttons sit on their own line, so its name keeps the row */
   .seq-list .lvl-row{grid-template-columns:22px minmax(0,1fr);row-gap:4px}
   .seq-list .lvl-row .ops{grid-column:2;justify-content:flex-end}
+  :root[data-editor="1"] #lvlList .lvl-row{grid-template-columns:22px minmax(0,1fr);row-gap:4px}   /* v417 (QA v414 V1) */
+  :root[data-editor="1"] #lvlList .lvl-row .ops{grid-column:2;justify-content:flex-end}
 }
 @media (orientation:landscape) and (max-height:520px){   /* v383 (QA v382 V2): the floor is the wheel's, not the box's (its padding takes 26 px) */
   :root[data-course="1"] .dial{min-width:122px}
@@ -3225,7 +3227,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v416"></script>
+<script src="./app.js?v=v417"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3238,8 +3240,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v416";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-07 18:32";          /* and when it was built, for ?diag */
+  var BUILD = "v417";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-07 19:11";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

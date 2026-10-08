@@ -344,7 +344,8 @@ input[type=range]::-moz-range-thumb{
 :root[data-stage="1"] #stageBar{display:flex;flex-direction:column;justify-content:center;gap:10px;order:-1;padding:4px 2px}
 :root[data-stage="1"] .canvas-hold{max-width:min(100%,max(220px,calc(100vh - 260px)));max-width:min(100%,max(220px,calc(100lvh - 260px)))}   /* the floor: a short viewport must not collapse the wheel */
 :root[data-stage="1"] .play{width:clamp(70px,30%,150px)}
-:root[data-stage="1"] :is(#scoreBtn,#shareBtn,#alongBtn,#flashBtn,.hint){display:none}   /* v173: the bolt too - the flash keeps the wheel's setting */
+:root[data-stage="1"] :is(#scoreBtn,#shareBtn,#alongBtn,.hint){display:none}
+:root[data-stage="1"] #flashBtn{grid-column:5;grid-row:1}   /* v428 (Oscar): the bolt back on stage, beside the notes */
 :root[data-stage="1"] #dialRatio{font-size:26px}
 :root[data-stage="1"] .dial-foot{min-height:44px;margin-top:12px}
 :root[data-stage="1"] :is(#sessNowIn,#tapNowIn,#beatNowIn){font-size:30px}
@@ -1782,12 +1783,26 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 #rtsDone{border-color:var(--c2);color:var(--ink)}
 #rtsListen[data-on="1"]{border-color:var(--c2);color:var(--ink)}
 @media (pointer:coarse){ #rtsListen,#rrPause,#sessSave{min-height:36px} }   /* v427 (QA v426 V6) */
-.rt-tabs{display:flex;flex-wrap:wrap;gap:6px}   /* v427 (QA v426 V4): wraps instead of hiding tabs */
+/* v428 (Oscar): chips in one row that scrolls sideways (more tabs can come); a fade on the edge that has more */
+.rt-tabs,#ptabs.ptabs{display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.rt-tabs::-webkit-scrollbar,#ptabs.ptabs::-webkit-scrollbar{display:none}
+.rt-tabs[data-ovf="r"],#ptabs.ptabs[data-ovf="r"]{-webkit-mask-image:linear-gradient(to right,#000 82%,transparent);mask-image:linear-gradient(to right,#000 82%,transparent)}
+.rt-tabs[data-ovf="l"],#ptabs.ptabs[data-ovf="l"]{-webkit-mask-image:linear-gradient(to left,#000 82%,transparent);mask-image:linear-gradient(to left,#000 82%,transparent)}
+.rt-tabs[data-ovf="lr"],#ptabs.ptabs[data-ovf="lr"]{-webkit-mask-image:linear-gradient(to right,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(to right,transparent,#000 14%,#000 86%,transparent)}
+#ptabs.ptabs .tab{all:unset;box-sizing:border-box;flex:none;border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-family:"Archivo",sans-serif;font-size:12.5px;color:var(--ink-3);cursor:pointer;white-space:nowrap}
+#ptabs.ptabs .tab[hidden]{display:none}
+#ptabs.ptabs .tab[data-on="1"]{border-color:var(--c1);color:var(--c1)}
+#ptabs.ptabs .tab:focus-visible{outline:2px solid var(--c2);outline-offset:2px}
+.rt-tabs button{white-space:nowrap}
+.rt-pick .rt-pplay{width:32px;height:32px;box-sizing:border-box;border-radius:9px;border:1px solid var(--c2);background:none;color:var(--c2);display:grid;place-items:center;padding:0;cursor:pointer}
+.rt-pick .rt-pplay svg{width:14px;height:14px;display:block}
+.rt-pick .rt-pplay[data-on="1"]{background:color-mix(in srgb,var(--c2) 18%,transparent);color:var(--ink)}
+.rt-pick button.rt-padd{background:none;padding:0;cursor:pointer}
 .rt-tabs button{all:unset;flex:none;border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-size:12.5px;color:var(--ink-3);cursor:pointer}
 .rt-tabs button[aria-pressed="true"]{border-color:var(--c1);color:var(--c1)}
 .rt-tabs button[hidden]{display:none}
 .rt-sheet > .rt-picks{flex:1 1 0;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding:2px}
-.rt-pick{all:unset;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);cursor:pointer;flex:none}
+.rt-pick{box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);flex:none}
 .rt-pick .nm{display:block;font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:13px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rt-pick .mt{display:block;font-size:11px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rt-padd{width:32px;height:32px;box-sizing:border-box;border-radius:9px;border:1px solid var(--c1);color:var(--c1);display:grid;place-items:center;font-size:19px;line-height:1}
@@ -1813,12 +1828,16 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root[data-rscr="1"] .dial{padding:10px 12px}
 :root[data-rscr="1"] .wrap{padding-top:calc(14px + env(safe-area-inset-top, 0px));padding-bottom:calc(12px + env(safe-area-inset-bottom, 0px))}
 :root[data-rscr="1"] .canvas-hold{max-width:min(100%,max(170px,calc(100vh - 340px)));max-width:min(100%,max(170px,calc(100svh - 340px)))}
-:root[data-rscr="1"] #rtRunBar{display:grid;grid-template-columns:minmax(0,1fr) auto 34px;align-items:center;gap:8px;margin:0 0 8px}
+:root[data-rscr="1"] #rtRunBar{display:grid;grid-template-columns:minmax(0,1fr) auto 34px 34px;align-items:center;gap:8px;margin:0 0 8px}
 #rtRunBar .rr-ttl{min-width:0;display:grid;gap:1px}
 #rtRunBar .rr-ttl b{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #rtRunBar .rr-ttl span{font-size:11.5px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;white-space:nowrap}
 #rrX{width:34px;height:34px;border-radius:10px;color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));font-size:18px}
 #rrPause[data-on="1"]{border-color:var(--c1);color:var(--ink)}
+#rrFlash{width:34px;height:34px;border-radius:10px}
+#rrFlash svg{width:16px;height:16px;display:block}
+#rrFlash[data-on="1"]{border-color:var(--c1);color:var(--c1);background:color-mix(in srgb,var(--c1) 15%,transparent)}
+:root:not([data-tour="1"])[data-sh-flash="0"] #rrFlash{display:none}
 :root[data-rscr="1"] #rtRunTop{display:grid;gap:8px;margin:0 0 8px}
 .rr-bpm{text-align:center}
 .rr-bpm b{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:42px;line-height:.9;letter-spacing:-.03em;display:block}
@@ -1827,6 +1846,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rr-next b{font-family:"IBM Plex Mono",monospace;color:var(--ink);font-weight:600;border:1px solid var(--line-2);border-radius:999px;padding:1px 8px;margin:0 3px}
 @media (max-height:640px){ :root[data-rscr="1"] .rr-bpm b{font-size:30px} :root[data-rscr="1"] .canvas-hold{max-width:min(100%,max(150px,calc(100svh - 300px)))} }
 @media (orientation:landscape) and (max-height:520px){
+  :root[data-rscr="1"] #rrStrip{width:min(100%,300px);margin:0 auto}   /* v428 (QA v427 V2) */
   :root[data-rscr="1"] .rr-bpm{display:none}
   :root[data-rscr="1"] .canvas-hold{max-width:min(100%,max(110px,calc(100svh - 190px)))}
 }
@@ -2623,6 +2643,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   <div class="rt-runbar" id="rtRunBar">
     <span class="rr-ttl"><b id="rrName">Routine</b><span id="rrSub"></span></span>
     <button type="button" class="btn sm" id="rrPause">Pause</button>
+    <button type="button" class="icobtn" id="rrFlash" title="Beat flash" aria-label="Beat flash" aria-pressed="false"></button>
     <button type="button" class="icobtn" id="rrX" title="Stop the routine" aria-label="Stop the routine">&times;</button>
   </div>
   <div class="rt-runtop" id="rtRunTop">
@@ -3442,7 +3463,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v427"></script>
+<script src="./app.js?v=v428"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3455,8 +3476,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v427";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-08 12:47";          /* and when it was built, for ?diag */
+  var BUILD = "v428";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-08 14:47";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

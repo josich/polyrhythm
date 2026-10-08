@@ -3233,7 +3233,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v423"></script>
+<script src="./app.js?v=v424"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3246,8 +3246,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v423";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-07 20:22";          /* and when it was built, for ?diag */
+  var BUILD = "v424";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-08 10:23";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 
@@ -3500,7 +3500,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
           " ms · game tick " + P.tick.toFixed(0) + " ms · overlay busy " + P.busy + " of " + P.n + " frames · hand jumps " + P.jumps + " (since open " + P.jumpsAll + ")" +
           " · animations " + (document.getAnimations ? document.getAnimations().length : "?") +
           "\nforced layout (last 1 s): mean " + (P.layout / P.n).toFixed(2) + " ms/frame · worst " + P.layoutWorst.toFixed(1) + " ms" +
-          "\nscheduler (since open): worst wait " + Math.round(P.schedGap || 0) + " ms · beats played late " + (P.late || 0) + " · beats dropped " + (P.dropped || 0);
+          "\nscheduler (since open): worst wait " + Math.round(P.schedGap || 0) + " ms · beats played late " + (P.late || 0) + " · beats dropped " + (P.dropped || 0) +
+          "\naudio: " + (P.audioState || "?") + " · output stamp drift " + (P.stampDrift == null ? "-" : P.stampDrift + " ms") + " · stale stamps " + (P.stampBad || 0) + " · wakes " + (P.wakes || 0);
         P.n = 0; P.draw = 0; P.worst = 0; P.overlay = 0; P.tick = 0; P.busy = 0; P.jumps = 0; P.layout = 0; P.layoutWorst = 0;
       }
       perf.textContent = "frames (last 3 s): mean " + mean.toFixed(1) + " ms · worst " + a[a.length - 1].toFixed(0) + " ms · over 50 ms: " +

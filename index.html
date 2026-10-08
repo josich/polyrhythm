@@ -1729,7 +1729,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rt-ehead{display:flex;align-items:center;gap:8px;margin:0 0 10px;min-width:0}
 .rt-ehead .icobtn{width:34px;height:34px;border-radius:10px;font-size:18px;color:var(--ink-2);flex:none}
 #rtBell svg{width:18px;height:18px;display:block}
-#rtBell[data-on="1"]{color:var(--c1);border-color:color-mix(in srgb,var(--c1) 55%,var(--line))}
+.rt-ehead #rtBell[data-on="1"]{color:var(--c1);border-color:var(--c1);background:var(--sunk)}   /* v434 (Oscar): an orange bell, an orange edge - not the pink fill of .icobtn[data-on] */
 #rtBell[data-on="1"] .off{display:none}
 #rtBell[data-on="0"]{color:var(--ink-3)}
 #rtEName{flex:1;min-width:0;border:0;border-bottom:1px dashed transparent;background:transparent;color:var(--ink);font:inherit;font-weight:700;font-size:16px;padding:5px 0;border-radius:0}
@@ -3472,7 +3472,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v433"></script>
+<script src="./app.js?v=v434"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3485,8 +3485,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v433";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-08 15:16";          /* and when it was built, for ?diag */
+  var BUILD = "v434";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-08 15:27";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

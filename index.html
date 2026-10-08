@@ -1850,6 +1850,9 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rr-bpm{text-align:center}
 .rr-bpm b{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:42px;line-height:.9;letter-spacing:-.03em;display:block}
 .rr-bpm span{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-top:3px}
+:root[data-rscr="1"] #sessNowIn .sil{display:none}   /* v435 (Oscar): SILENT ran out of the box; it sits under the tempo here */
+.rr-bpm i{font-style:normal;color:var(--c3);margin-left:.6em;font-weight:600}
+.rr-bpm i[hidden]{display:none}
 .rr-next{margin:0;text-align:center;font-size:12px;color:var(--ink-3);min-height:18px}
 .rr-next b{font-family:"IBM Plex Mono",monospace;color:var(--ink);font-weight:600;border:1px solid var(--line-2);border-radius:999px;padding:1px 8px;margin:0 3px}
 @media (max-height:640px){ :root[data-rscr="1"] .rr-bpm b{font-size:30px} :root[data-rscr="1"] .canvas-hold{max-width:min(100%,max(150px,calc(100svh - 300px)))} }
@@ -2656,7 +2659,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
   <div class="rt-runtop" id="rtRunTop">
     <div class="rstrip" id="rrStrip"></div>
-    <div class="rr-bpm"><b id="rrBpm">0</b><span>bpm</span></div>
+    <div class="rr-bpm"><b id="rrBpm">0</b><span>bpm<i id="rrSil" hidden>silent</i></span></div>
     <p class="rr-next" id="rrNext"></p>
   </div>
   <div class="game-bar" id="gameBar">
@@ -3472,7 +3475,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v434"></script>
+<script src="./app.js?v=v435"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3485,8 +3488,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v434";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-08 15:27";          /* and when it was built, for ?diag */
+  var BUILD = "v435";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-08 15:38";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

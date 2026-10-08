@@ -1832,7 +1832,8 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 #rtRunBar,#rtRunTop{display:none}
 :root[data-rscr="1"] .wrap > :not(#rtRunBar):not(#rtRunTop):not(.stage){display:none!important}
 :root[data-rscr="1"] .stage{grid-template-columns:minmax(0,1fr);gap:10px}
-:root[data-rscr="1"] :is(#rack,#stageBar,#stageScore,#courseStrip,#courseFoot,.dial-head){display:none!important}
+:root[data-rscr="1"] :is(#rack,#stageBar,#stageScore,#courseStrip,#courseFoot,#dialPat){display:none!important}
+:root[data-rscr="1"] .dial-head > :not(#dialRatio){display:none!important}   /* v437 (Oscar): the ratio in the wheel's top-left corner, as everywhere else */
 :root[data-rscr="1"] .dial{padding:10px 12px}
 :root[data-rscr="1"] .wrap{padding-top:calc(14px + env(safe-area-inset-top, 0px));padding-bottom:calc(12px + env(safe-area-inset-bottom, 0px))}
 :root[data-rscr="1"] .canvas-hold{max-width:min(100%,max(170px,calc(100vh - 340px)));max-width:min(100%,max(170px,calc(100svh - 340px)))}
@@ -1848,7 +1849,8 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root:not([data-tour="1"])[data-sh-flash="0"] #rrFlash{display:none}
 :root[data-rscr="1"] #rtRunTop{display:grid;gap:8px;margin:0 0 8px}
 :root[data-rscr="1"] #rrStrip{cursor:pointer;user-select:none;-webkit-user-select:none;padding:6px 0;margin:-6px 0}   /* v436: drag to go back or ahead */
-#rrStrip[data-seek="1"] .rs-head{box-shadow:0 0 0 3px color-mix(in srgb,var(--ink) 25%,transparent)}
+#sStrip[data-live="1"]{touch-action:none;cursor:pointer;user-select:none;-webkit-user-select:none}   /* v437 */
+#sStrip[data-seek="1"] .rs-head,#rrStrip[data-seek="1"] .rs-head{box-shadow:0 0 0 3px color-mix(in srgb,var(--ink) 25%,transparent)}
 .rr-bpm{text-align:center}
 .rr-bpm b{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:42px;line-height:.9;letter-spacing:-.03em;display:block}
 .rr-bpm span{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-top:3px}
@@ -3477,7 +3479,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v436"></script>
+<script src="./app.js?v=v437"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3490,8 +3492,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v436";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-08 16:03";          /* and when it was built, for ?diag */
+  var BUILD = "v437";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-08 16:34";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

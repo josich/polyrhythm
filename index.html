@@ -1045,6 +1045,8 @@ button.along-card-pct .go i{font-style:normal;font-family:var(--title);font-size
 /* v415: the whole ladder for players - a locked level greyed with a grey lock, a Pro level with the orange PRO tag */
 #lvlList .lvl-row[data-lock="1"]{opacity:.45}
 #lvlList .lvl-row[data-lock="1"] .sum{cursor:default}
+#lvlList .lvl-row[data-lock="1"]{cursor:pointer}
+#lvlList .lvl-row .sum[data-say="1"]{color:var(--ink);font-weight:600}
 #lvlList .lvl-row .lvl-lock{display:grid;place-items:center;width:30px;height:30px;color:var(--ink-3)}
 #lvlList .lvl-row .lvl-lock svg{width:14px;height:14px}
 #lvlList .lvl-row .ops button.lvl-pro{width:auto;padding:0 4px;border-color:transparent;background:none}
@@ -2205,6 +2207,8 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 #gtabs .cpl .bar{flex:1;min-width:24px;height:5px;border-radius:3px;background:var(--line);overflow:hidden}
 #gtabs .cpl .bar i{display:block;height:100%;background:var(--c4)}
 #gtabs .cpl .t{font-size:10.5px;color:var(--ink-3);white-space:nowrap}
+#gtabs .cpl{overflow:hidden}   /* v425 (QA v424 V1) */
+@media (max-width:359px){ #gtabs .cpl{gap:5px} #gtabs .cpl .bar{min-width:12px} #gtabs .cpl .n{font-size:13.5px} #gtabs .cpl .t{font-size:10px} #gtabs .lvl-row{padding:8px 8px} #gtabs .ops{gap:4px} }
 #gtabs .ops button[data-gplay]{width:34px;height:34px;color:var(--c2);border-color:color-mix(in srgb,var(--c2) 55%,var(--line))}
 #gtabs .ops button[data-gplay] svg{width:14px;height:14px;display:block;margin:auto}
 #bestCard{display:none!important}   /* v422: the Best card is gone - the rows say it */
@@ -3233,7 +3237,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v424"></script>
+<script src="./app.js?v=v425"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3246,8 +3250,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v424";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-08 10:23";          /* and when it was built, for ?diag */
+  var BUILD = "v425";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-08 11:05";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 
@@ -3501,7 +3505,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
           " · animations " + (document.getAnimations ? document.getAnimations().length : "?") +
           "\nforced layout (last 1 s): mean " + (P.layout / P.n).toFixed(2) + " ms/frame · worst " + P.layoutWorst.toFixed(1) + " ms" +
           "\nscheduler (since open): worst wait " + Math.round(P.schedGap || 0) + " ms · beats played late " + (P.late || 0) + " · beats dropped " + (P.dropped || 0) +
-          "\naudio: " + (P.audioState || "?") + " · output stamp drift " + (P.stampDrift == null ? "-" : P.stampDrift + " ms") + " · stale stamps " + (P.stampBad || 0) + " · wakes " + (P.wakes || 0);
+          "\naudio: " + (P.audioState || "?") + " · output stamp drift " + (P.stampDrift == null ? "-" : P.stampDrift + " ms") + " · stale stamps " + (P.stampBad || 0) + " · wakes " + (P.wakes || 0) + " · clock stops " + (P.frozen || 0) + " · audio rebuilds " + (P.rebuilds || 0) +
+          (function(){ try{ var L = JSON.parse(localStorage.getItem("polyrhythm-circle:audiodiag-prev") || "null"); if(!L) return ""; return "\nlast launch (" + new Date(L.t).toLocaleTimeString() + "): " + L.s + " · drift " + (L.d == null ? "-" : L.d + " ms") + " · stale " + L.b + " · wakes " + L.w + " · clock stops " + L.f + " · rebuilds " + L.r; } catch(err){ return ""; } })();
         P.n = 0; P.draw = 0; P.worst = 0; P.overlay = 0; P.tick = 0; P.busy = 0; P.jumps = 0; P.layout = 0; P.layoutWorst = 0;
       }
       perf.textContent = "frames (last 3 s): mean " + mean.toFixed(1) + " ms · worst " + a[a.length - 1].toFixed(0) + " ms · over 50 ms: " +

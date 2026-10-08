@@ -586,7 +586,6 @@ input[type=range]::-moz-range-thumb{
 :root:not([data-tour="1"])[data-sh-share="0"] :is(#scoreBtn,#shareBtn),
 :root:not([data-tour="1"])[data-sh-stage="0"] #stageBtn,
 :root:not([data-tour="1"])[data-sh-drone="0"] #droneRow,
-:root:not([data-tour="1"])[data-sh-rout="0"] :is(#rtHead,#rtBody),
 :root:not([data-tour="1"])[data-sh-seq="0"] button[data-seq],
 :root:not([data-tour="1"])[data-sh-gclassic="0"] #gtabs .gmrow[data-gmode="classic"],
 :root:not([data-tour="1"])[data-sh-gblind="0"] #gtabs .gmrow[data-gmode="blind"],
@@ -1537,7 +1536,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .caret:hover{color:var(--ink)}
 .foldsec[data-fold="1"]{padding-top:13px;padding-bottom:13px;cursor:pointer}
 .foldsec[data-fold="1"] > *:not(.sess-head){display:none}
-.foldsec[data-fold="1"] > :is(#sessLink,#rtOpen,#seqEmpty){display:none}   /* v221, v225: these set display themselves */
+.foldsec[data-fold="1"] > :is(#sessLink,#rtOpen,#seqEmpty,.rt-view){display:none!important}   /* v221, v225: these set display themselves */
 .foldsec[data-fold="1"] .sess-head{margin-bottom:0}
 .foldsec[data-fold="1"] .sess-head > *:not(.caret):not(.lbl):not(.fold-bpm):not(.fold-ico){display:none}
 /* a folded bar carries a glyph for what is inside: a clock for the session, a
@@ -1676,6 +1675,158 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
   :root[data-gscr="1"] .canvas-hold{max-width:min(100%,max(120px,calc(100svh - 190px)))}
   :root[data-gscr="1"] #gameTop{margin-bottom:2px}
   :root[data-gscr="1"] #gameTop b{font-size:24px}
+}
+
+/* ---- v426: Routines (Oscar's rework, design/routines-proto.html) ------------------------------------------------
+   every plan is a strip: width = time, height = tempo, hatched = a silent loop, dotted = beat gaps */
+#sPlan,#planBtn,#sPatLbl,#sPat,#sessLink{display:none!important}
+.lvl-row .ops button[data-seq]{display:none!important}   /* steps arrive through a routine's Add step now */
+.sess-strip{margin:12px 0 4px}
+.sess-foot #sessSave{margin-left:auto}
+.rstrip{display:grid;gap:4px;min-width:0}
+.rs-plot{position:relative;min-width:0}
+.rs-plot svg{width:100%;height:auto;display:block}
+.rs-head{position:absolute;left:0;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--ink);border-radius:1px;pointer-events:none;will-change:transform}
+.rs-head[hidden]{display:none}
+.rs-lg{display:flex;justify-content:space-between;gap:8px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3);white-space:nowrap}
+.rs-lg b{color:var(--ink);font-weight:600}
+.rs-empty{font-size:12px;color:var(--ink-3);padding:4px 0}
+/* the window: the page's sections step aside */
+#rwinX{display:none}
+:root[data-rwin="1"]:not([data-rscr="1"]) .wrap > :not(#seqPanel){display:none!important}
+:root[data-rwin="1"]:not([data-rscr="1"]) #rwinX{display:grid;place-items:center;margin-left:auto;width:34px;height:34px;border-radius:10px;font-size:18px;color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
+:root[data-rwin="1"] #seqPanel > .sess-head .caret{display:none}
+:root[data-rwin="1"]:not([data-rscr="1"]) .wrap{padding-top:max(8px, env(safe-area-inset-top, 0px))!important;padding-bottom:calc(12px + env(safe-area-inset-bottom, 0px))}
+:root[data-rwin="1"]:not([data-rscr="1"]) #seqPanel{display:flex;flex-direction:column;height:calc(100vh - 20px - max(8px, env(safe-area-inset-top, 0px)) - env(safe-area-inset-bottom, 0px));height:calc(100svh - 20px - max(8px, env(safe-area-inset-top, 0px)) - env(safe-area-inset-bottom, 0px));margin-top:0;min-height:460px;box-sizing:border-box}
+:root[data-rwin="1"] #seqPanel > *{flex:none}
+:root[data-rwin="1"]:not([data-rscr="1"]) #seqPanel > .rt-view:not([hidden]){flex:1 1 0;min-height:0;display:flex;flex-direction:column}
+:root[data-rwin="1"] .rt-view > *{flex:none}
+:root[data-rwin="1"] #rtList,:root[data-rwin="1"] #seqRow{flex:1 1 0;min-height:70px;max-height:none}
+@media (orientation:landscape) and (max-height:520px){
+  :root[data-rwin="1"]:not([data-rscr="1"]) #seqPanel{min-height:0!important;height:auto!important}
+  :root[data-rwin="1"] #rtList,:root[data-rwin="1"] #seqRow{flex:none!important;height:180px}
+}
+/* the list of routines */
+.rt-list,.rt-cards{display:flex;flex-direction:column;gap:8px;max-height:342px;overflow-y:auto;padding:2px;scrollbar-width:thin;position:relative}
+.rt-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;background:var(--sunk);border:1px solid var(--line);border-radius:12px;padding:9px 10px}
+.rt-row[data-play="1"]{border-color:var(--c2);box-shadow:0 0 0 2px color-mix(in srgb,var(--c2) 22%,transparent)}
+.rt-body{all:unset;box-sizing:border-box;min-width:0;display:grid;gap:5px;cursor:pointer}
+.rt-body .nm{font-weight:600;font-size:13.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rt-body .mt{font-size:11px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rt-play{width:40px;height:40px;border-radius:10px;border:1px solid var(--c2);background:none;color:var(--c2);display:grid;place-items:center;cursor:pointer;padding:0}
+.rt-play svg,.rt-playall svg{width:16px;height:16px;display:block}
+.rt-play:disabled{opacity:.3;cursor:default}
+.rt-play[data-on="1"]{background:color-mix(in srgb,var(--c2) 18%,transparent);color:var(--ink)}
+.rt-new{all:unset;box-sizing:border-box;display:block;width:100%;text-align:center;border:1px dashed var(--line-2);border-radius:12px;padding:12px;color:var(--ink-2);font-weight:600;font-size:13.5px;cursor:pointer;margin-top:8px}
+.rt-new:disabled{opacity:.35;cursor:default}
+.rt-new:focus-visible,.rt-body:focus-visible,.rt-card:focus-visible,.rt-pick:focus-visible,.rt-playall:focus-visible{outline:2px solid var(--c2);outline-offset:2px}
+.rt-help{margin:4px 0 0}
+.rt-help[hidden]{display:none}
+/* one routine */
+#rtEdit{position:relative}
+.rt-ehead{display:flex;align-items:center;gap:8px;margin:0 0 10px;min-width:0}
+.rt-ehead .icobtn{width:34px;height:34px;border-radius:10px;font-size:18px;color:var(--ink-2);flex:none}
+#rtEName{flex:1;min-width:0;border:0;border-bottom:1px dashed transparent;background:transparent;color:var(--ink);font:inherit;font-weight:700;font-size:16px;padding:5px 0;border-radius:0}
+#rtEName:focus{outline:none;border-bottom-color:var(--line-2)}
+.rt-menu{position:absolute;right:0;top:44px;z-index:8;display:flex;flex-direction:column;min-width:170px;background:var(--panel);border:1px solid var(--line-2);border-radius:12px;padding:6px;box-shadow:0 12px 32px -8px rgba(0,0,0,.55)}
+.rt-menu[hidden]{display:none}
+.rt-menu button{all:unset;box-sizing:border-box;padding:11px 12px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--ink);cursor:pointer}
+.rt-menu button:hover{background:var(--sunk)}
+.rt-menu button.del{color:var(--c3)}
+#rtStrip{margin:0 0 8px}
+.rt-note{font-size:11.5px;color:var(--c2);margin:0 0 8px}
+.rt-note:empty{display:none}
+.rt-card{display:grid;grid-template-columns:16px 34px minmax(0,1fr) auto;gap:9px;align-items:center;background:var(--sunk);border:1px solid var(--line);border-left:3px solid var(--sc);border-radius:12px;padding:8px 9px;cursor:pointer;touch-action:pan-y;transition:transform .12s ease,border-color .12s ease}
+.rt-card[data-drag="1"]{transform:scale(1.02);border-color:var(--sc)}
+.rt-card[data-over="1"]{border-color:var(--c2)}
+.rt-card[data-play="1"]{border-color:var(--c2);box-shadow:0 0 0 2px color-mix(in srgb,var(--c2) 22%,transparent)}
+.rt-card .no{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-3);text-align:center}
+.rt-mw{width:34px;height:34px;display:block}
+.rt-card .mid{min-width:0;display:grid;gap:3px}
+.rt-card .nm{font-weight:600;font-size:13.5px;font-family:"IBM Plex Mono",monospace;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rt-card .pl{display:flex;align-items:center;gap:6px;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-2);flex-wrap:wrap;min-width:0}
+.rt-card .grip{color:var(--ink-3);font-size:14px;letter-spacing:-2px;padding:0 2px}
+.rt-dots{display:inline-flex;flex-wrap:wrap;gap:2px;align-items:center}
+.rt-dots i{width:5px;height:5px;border-radius:50%;background:var(--sc);display:block}
+.rt-dots i.h{background:none;box-shadow:inset 0 0 0 1.2px var(--sc)}
+.rt-ic{display:inline-flex;color:var(--ink-3)}
+.rt-ic svg{width:12px;height:12px;display:block}
+.rt-playall{all:unset;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:10px;padding:12px;border-radius:12px;background:var(--c2);color:#062320;font-weight:700;font-size:15px;cursor:pointer}
+.rt-playall:disabled{opacity:.35;cursor:default}
+.rt-playall[data-on="1"]{background:color-mix(in srgb,var(--c2) 18%,transparent);color:var(--ink);box-shadow:inset 0 0 0 1px var(--c2)}
+:root[data-skin="light"] .rt-playall:not([data-on="1"]){color:#fff}
+/* the sheets */
+.modal.rt-modal{z-index:60;place-items:end center;padding:0;background:color-mix(in srgb,var(--ground) 62%,transparent)}
+.rt-sheet{box-sizing:border-box;width:min(100%,520px);max-height:92svh;overflow-y:auto;padding:10px 16px calc(16px + env(safe-area-inset-bottom,0px));background:var(--panel);border-top:1px solid var(--line-2);border-radius:20px 20px 0 0;display:flex;flex-direction:column;gap:11px;color:var(--ink)}
+.rt-sheet > *{flex:none}
+.rt-sheet.tall{height:min(640px, 88svh);overflow:hidden}
+.rt-grab{width:38px;height:4px;border-radius:2px;background:var(--line-2);margin:0 auto}
+.rt-shead{display:flex;align-items:center;gap:8px;min-width:0}
+.rt-st{flex:1;min-width:0;font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rt-st .mono{font-family:"IBM Plex Mono",monospace}
+.rt-sheet .icobtn.rt-x{width:36px;height:36px;border-radius:10px;font-size:19px;color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));flex:none}
+.rt-seg{display:flex;background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:3px;gap:3px}
+.rt-seg button{all:unset;flex:1;text-align:center;color:var(--ink-3);font-weight:600;font-size:13.5px;padding:9px 6px;border-radius:7px;cursor:pointer}
+.rt-seg button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:0 0 0 1px var(--line-2)}
+.rt-boxes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.rt-boxes[data-kind="ramp"]{grid-template-columns:repeat(4,minmax(0,1fr))}
+.rt-boxes[data-kind="steady"] .rt-ramponly{display:none}
+.rt-fld{display:grid;gap:4px;min-width:0}
+.rt-fld > span{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rt-fld input,.rt-fld select{box-sizing:border-box;width:100%;min-width:0;background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:8px 6px;color:var(--ink);font-size:13px;font-family:inherit}
+.rt-fld input{font-family:"IBM Plex Mono",monospace;font-size:15px;text-align:center}
+.rt-fld.on input{border-color:var(--c1)}
+.rt-sbtns{display:flex;gap:8px;flex-wrap:wrap}
+.rt-sbtns .btn{flex:1;padding:10px 8px;font-size:13px}
+#rtsDone{border-color:var(--c2);color:var(--ink)}
+#rtsListen[data-on="1"]{border-color:var(--c2);color:var(--ink)}
+.rt-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.rt-tabs button{all:unset;flex:none;border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-size:12.5px;color:var(--ink-3);cursor:pointer}
+.rt-tabs button[aria-pressed="true"]{border-color:var(--c1);color:var(--c1)}
+.rt-tabs button[hidden]{display:none}
+.rt-sheet > .rt-picks{flex:1 1 0;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding:2px}
+.rt-pick{all:unset;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);cursor:pointer;flex:none}
+.rt-pick .nm{display:block;font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:13px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rt-pick .mt{display:block;font-size:11px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rt-padd{width:32px;height:32px;box-sizing:border-box;border-radius:9px;border:1px solid var(--c1);color:var(--c1);display:grid;place-items:center;font-size:19px;line-height:1}
+.rt-pick[data-done="1"] .rt-padd{border-color:var(--c2);color:var(--c2)}
+.rt-phdr{flex:none;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:600;padding:8px 2px 2px}
+.rt-acount{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--c2);white-space:nowrap}
+.rt-anote{font-size:11.5px;color:var(--ink-3);margin:0}
+/* a routine played to its end */
+.modal.rt-done-modal{z-index:62}
+.rt-done{box-sizing:border-box;width:min(100%,420px);background:var(--panel);border:1px solid var(--line-2);border-radius:20px;padding:18px 16px 16px;display:flex;flex-direction:column;gap:10px;text-align:center}
+.rt-done .k{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--c2);font-weight:600}
+.rt-done h3{margin:0;font-size:20px;font-weight:700;overflow-wrap:anywhere}
+.rt-done .mt{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink-2)}
+.rt-dbtns{display:flex;gap:8px}
+.rt-dbtns .btn{flex:1;padding:11px 8px;font-size:13.5px}
+#rdAgain{border-color:var(--c2);color:var(--ink)}
+#rdClose{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
+/* the run screen: the bar, the strip and the tempo, the wheel; nothing else */
+#rtRunBar,#rtRunTop{display:none}
+:root[data-rscr="1"] .wrap > :not(#rtRunBar):not(#rtRunTop):not(.stage){display:none!important}
+:root[data-rscr="1"] .stage{grid-template-columns:minmax(0,1fr);gap:10px}
+:root[data-rscr="1"] :is(#rack,#stageBar,#stageScore,#courseStrip,#courseFoot,.dial-head){display:none!important}
+:root[data-rscr="1"] .dial{padding:10px 12px}
+:root[data-rscr="1"] .wrap{padding-top:calc(14px + env(safe-area-inset-top, 0px));padding-bottom:calc(12px + env(safe-area-inset-bottom, 0px))}
+:root[data-rscr="1"] .canvas-hold{max-width:min(100%,max(170px,calc(100vh - 340px)));max-width:min(100%,max(170px,calc(100svh - 340px)))}
+:root[data-rscr="1"] #rtRunBar{display:grid;grid-template-columns:minmax(0,1fr) auto 34px;align-items:center;gap:8px;margin:0 0 8px}
+#rtRunBar .rr-ttl{min-width:0;display:grid;gap:1px}
+#rtRunBar .rr-ttl b{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#rtRunBar .rr-ttl span{font-size:11.5px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;white-space:nowrap}
+#rrX{width:34px;height:34px;border-radius:10px;color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));font-size:18px}
+#rrPause[data-on="1"]{border-color:var(--c1);color:var(--ink)}
+:root[data-rscr="1"] #rtRunTop{display:grid;gap:8px;margin:0 0 8px}
+.rr-bpm{text-align:center}
+.rr-bpm b{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:42px;line-height:.9;letter-spacing:-.03em;display:block}
+.rr-bpm span{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-top:3px}
+.rr-next{margin:0;text-align:center;font-size:12px;color:var(--ink-3);min-height:18px}
+.rr-next b{font-family:"IBM Plex Mono",monospace;color:var(--ink);font-weight:600;border:1px solid var(--line-2);border-radius:999px;padding:1px 8px;margin:0 3px}
+@media (max-height:640px){ :root[data-rscr="1"] .rr-bpm b{font-size:30px} :root[data-rscr="1"] .canvas-hold{max-width:min(100%,max(150px,calc(100svh - 300px)))} }
+@media (orientation:landscape) and (max-height:520px){
+  :root[data-rscr="1"] .rr-bpm{display:none}
+  :root[data-rscr="1"] .canvas-hold{max-width:min(100%,max(110px,calc(100svh - 190px)))}
 }
 /* v368: the courses' window */
 :root[data-cwin="1"]:not([data-course="1"]) .wrap > :not(#coursePanel){display:none!important}
@@ -2280,15 +2431,7 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 @media (prefers-reduced-motion:reduce){#sessionPanel[data-flash="1"] :is(#sFrom,#sTo,#sStep,#sPer,#sSil,#sGap){animation:none}}
 #sessLink{color:var(--c1);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 #sessLink .btn.sm{font-size:11px;padding:3px 9px}
-#rtOpen{color:var(--c1);font-weight:600;font-size:12.5px;margin:0 0 8px;display:flex;align-items:center;gap:8px}
-#rtOpen #rtSave{margin-left:auto}
-/* v215: a routine changed and not saved wears an asterisk - on its row and on the name line */
-.rt-list .lvl-row[data-dirty="1"] .nm-ro::before,#rtOpen[data-dirty="1"] #rtOpenName::before,
-.seq-list .lvl-row[data-dirty="1"] .nm-ro::before{content:"* ";color:var(--c1);font-weight:700}   /* v217: a step whose panel values are not stored yet */
-#rtOpenName{min-width:0;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}   /* v386 (QA v385 V3) */
-#rtOpen .k{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
-#rtSave{color:var(--ink)}
-#rtOpen[data-dirty="1"] #rtSave{border-color:var(--c2)}        /* v221: teal only with changes to save */
+
 #psave{border-color:var(--c2);color:var(--ink)}               /* the presets' save is a teal action (v205) */
 /* v205: a pattern just landed in the Sequence - the folded bar blinks twice (the live overlay, opacity
    only) and the new row blinks in place; both stop by themselves */
@@ -2474,6 +2617,17 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
   <div class="course-tempo" id="courseTempo"><div class="ct-num"><b id="ctBpm">0</b><span>bpm</span></div><div class="ct-lad"><div class="ctrackk" id="courseTrackK" hidden>Steps:</div><div class="ctrack" id="courseTrack"></div><div class="ctrackl" id="courseTrackL"></div></div><p class="ct-step" id="ctStepT"></p><div class="course-score" id="courseScore" hidden aria-hidden="true"></div></div>
   <!-- v372 (Oscar): the game's own screen - the course screen's look, opened from the Play time window -->
+  <!-- v426: a routine plays on its own screen - its name and step, the strip with a playhead, the tempo, the wheel -->
+  <div class="rt-runbar" id="rtRunBar">
+    <span class="rr-ttl"><b id="rrName">Routine</b><span id="rrSub"></span></span>
+    <button type="button" class="btn sm" id="rrPause">Pause</button>
+    <button type="button" class="icobtn" id="rrX" title="Stop the routine" aria-label="Stop the routine">&times;</button>
+  </div>
+  <div class="rt-runtop" id="rtRunTop">
+    <div class="rstrip" id="rrStrip"></div>
+    <div class="rr-bpm"><b id="rrBpm">0</b><span>bpm</span></div>
+    <p class="rr-next" id="rrNext"></p>
+  </div>
   <div class="game-bar" id="gameBar">
     <span class="cb-mode" id="gbMode"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg><span id="gbModeT">Classic</span></span>
     <div class="cb-ttl"><b id="gbName">Level 1</b><span id="gbSub"></span></div>
@@ -2662,40 +2816,46 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       </select>
     </div>
 
+    <div class="rstrip sess-strip" id="sStrip"></div>
     <div class="sess-foot">
       <p class="sess-plan" id="sPlan"></p>
+      <button class="btn sm" id="sessSave" title="Keep the wheel with this plan as a routine">Save as routine</button>
       <button class="btn sm lead" id="planBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="4" width="13" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.5 4v16M4.5 8.5h4M4.5 12h4M4.5 15.5h4M12.5 9h4M12.5 12.5h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Plan</button>
     </div>
     <!-- v227: the practice log (Oscar): its own row under the plan, left, behind a line; orange with a
          dot while it holds entries not looked at yet -->
   </section>
 
+  <!-- v426 (Oscar's rework, design/routines-proto.html): one thing, a ROUTINE - a list of steps, each a pattern with its own
+       plan. A folded bar on the page that opens a window (like Courses); the list of routines, then one routine's editor. -->
   <section class="presets foldsec" id="seqPanel">
     <div class="sess-head">
       <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
-      <span class="lbl">Sequence</span><span id="seqNewTag"></span>
-      <!-- v205: the folded glyph is the list-plus the Patterns rows use to add a step -->
+      <span class="lbl">Routines</span>
       <span class="fold-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h10M4 12h10M4 18h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M18 11v8M14 15h8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>
-      <span class="seq-note" id="seqNote"></span>
+      <button class="icobtn" id="rwinX" title="Close" aria-label="Close">&times;</button>
     </div>
-    <p class="empty sec-help">Organize patterns in sequence and play them all in a practice session <svg class="help-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>.</p>
-    <!-- v225: the empty list's advice, under the help line, with the row's add button at 1.5x -->
-    <p class="empty seq-empty" id="seqEmpty" hidden>Add patterns with the <span class="seq-ico" aria-label="add to sequence"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M4 12h10M4 18h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M18 11v8M14 15h8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span> button in Patterns</p>
-    <!-- the steps as rows in the levels' box (Oscar, v115); patterns arrive through the
-         list-plus button on any row of the Patterns section -->
-    <!-- v213: the open routine's name, above its steps, until it is closed -->
-    <p id="rtOpen" hidden><span class="k">Routine</span><span id="rtOpenName"></span><button class="btn sm" id="rtSave" title="Write the sequence above back into this routine">Save</button><button class="btn sm danger" id="rtClose" title="Put the sequence back as it was, without saving">Close</button></p>
-    <div class="lvl-list seq-list" id="seqRow"></div>
-    <!-- v212: routines (Oscar) - the sequence kept with each step's ramp, folded under a heading;
-         tapping one opens it in the list above; Create / Save / Close work the list -->
-    <div class="rcat rt-cat" id="rtHead" role="button" aria-expanded="false" title="Show routines"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="rgname">Routines<span id="rtNewTag"></span></span><span class="rgcount" id="rtCount">0</span></div>
-    <div id="rtBody" hidden>
-      <div class="lvl-list rt-list" id="rtList"></div>
-      <div class="saverow rt-bar" id="rtBar">
-        <input type="text" id="rtName" placeholder="Name this routine" maxlength="28">
-        <button class="btn lead" id="rtCreate" title="Keep the sequence above, with each step's own settings, as a routine">Create</button>
+    <div class="rt-view" id="rtListView">
+      <div class="rt-list" id="rtList"></div>
+      <p class="empty rt-help" id="rtEmpty">A routine plays its steps in order. Each step is a pattern with its own plan.</p>
+      <button type="button" class="rt-new" id="rtNew">+ New routine<span id="rtNewTag"></span></button>
+    </div>
+    <div class="rt-view" id="rtEdit" hidden>
+      <div class="rt-ehead">
+        <button type="button" class="icobtn" id="rtBack" title="All routines" aria-label="All routines">&#8249;</button>
+        <input type="text" id="rtEName" maxlength="28" aria-label="Routine name" autocomplete="off">
+        <button type="button" class="icobtn" id="rtMore" title="Share, duplicate, delete" aria-label="More" aria-expanded="false">&#8943;</button>
       </div>
-      <p class="empty sec-help" id="rtHelp">A routine keeps the sequence with each step's own session settings. Tap a row to open it above, play it, or change it and save.</p>
+      <div class="rt-menu" id="rtMenu" hidden>
+        <button type="button" id="rtShare">Share</button>
+        <button type="button" id="rtDup">Duplicate</button>
+        <button type="button" class="del" id="rtDel">Delete</button>
+      </div>
+      <div class="rstrip" id="rtStrip"></div>
+      <p class="rt-note" id="rtNote"></p>
+      <div class="rt-cards" id="seqRow"></div>
+      <button type="button" class="rt-new" id="rtAdd">+ Add step<span id="seqNewTag"></span></button>
+      <button type="button" class="rt-playall" id="rtPlay"></button>
     </div>
   </section>
 
@@ -2863,7 +3023,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <div class="sheet-head">
       <h2 id="scoreTitle">Score</h2>
       <span class="seg" id="scoreSrc" role="group" aria-label="What to write out">
-        <button type="button" data-src="wheel">Wheel</button><button type="button" data-src="seq">Sequence</button>
+        <button type="button" data-src="wheel">Wheel</button><button type="button" data-src="seq">Routine</button>
       </span>
       <button class="icobtn" id="scoreShare" title="Share or save the score" aria-label="Share the score"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="6" cy="12" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="19" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8.1 10.8l7.8-4.6M8.1 13.2l7.8 4.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
       <button class="icobtn" id="scoreClose" title="Close" aria-label="Close">&times;</button>
@@ -3016,6 +3176,49 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <button type="button" class="btn" id="askNo">Cancel</button>
       <button type="button" class="btn danger" id="askYes">OK</button>
     </div>
+  </div>
+</div>
+
+<!-- v426: a routine step's plan, as a sheet from the bottom -->
+<div class="modal rt-modal" id="rtStepSheet" hidden>
+  <div class="rt-sheet" role="dialog" aria-modal="true" aria-labelledby="rtsTitle">
+    <div class="rt-grab"></div>
+    <div class="rt-shead"><span class="rt-st" id="rtsTitle">Step</span><button type="button" class="btn sm" id="rtsListen">Listen</button><button type="button" class="icobtn rt-x" id="rtsX" title="Close" aria-label="Close">&times;</button></div>
+    <div class="rt-seg" role="group" aria-label="Plan"><button type="button" id="rtsSteady" aria-pressed="true">Steady</button><button type="button" id="rtsRamp" aria-pressed="false">Ramp</button></div>
+    <div class="rt-boxes" id="rtsBoxes" data-kind="steady">
+      <label class="rt-fld on"><span id="rtsFromLbl">Tempo</span><input class="mono" type="number" inputmode="numeric" min="1" max="660" id="rtsFrom"></label>
+      <label class="rt-fld on rt-ramponly"><span>To</span><input class="mono" type="number" inputmode="numeric" min="1" max="660" id="rtsTo"></label>
+      <label class="rt-fld on rt-ramponly"><span>Step</span><input class="mono" type="number" inputmode="numeric" min="1" max="60" id="rtsStep"></label>
+      <label class="rt-fld on"><span>Loops</span><input class="mono" type="number" inputmode="numeric" min="1" max="32" id="rtsPer"></label>
+    </div>
+    <div class="rt-boxes">
+      <label class="rt-fld"><span>Silent loops</span><select id="rtsSil"><option value="0">off</option><option value="8">1 in 8</option><option value="6">1 in 6</option><option value="4">1 in 4</option><option value="3">1 in 3</option><option value="2">every other</option><option value="1">all but first</option></select></label>
+      <label class="rt-fld"><span>Beat gaps</span><select id="rtsGap"><option value="0">off</option><option value="8">1 in 8</option><option value="6">1 in 6</option><option value="4">1 in 4</option><option value="3">1 in 3</option></select></label>
+    </div>
+    <div class="rstrip" id="rtsStrip"></div>
+    <div class="rt-sbtns"><button type="button" class="btn" id="rtsChange">Change pattern</button><button type="button" class="btn danger" id="rtsDel">Remove</button><button type="button" class="btn" id="rtsDone">Done</button></div>
+  </div>
+</div>
+<!-- v426: add a step - the lists you know, in one sheet -->
+<div class="modal rt-modal" id="rtAddSheet" hidden>
+  <div class="rt-sheet tall" role="dialog" aria-modal="true" aria-labelledby="rtaTitle">
+    <div class="rt-grab"></div>
+    <div class="rt-shead"><span class="rt-st" id="rtaTitle">Add a step</span><span class="rt-acount" id="rtaCount"></span><button type="button" class="icobtn rt-x" id="rtaX" title="Close" aria-label="Close">&times;</button></div>
+    <div class="rt-tabs" id="rtaTabs">
+      <button type="button" data-rta="wheel">The wheel</button><button type="button" data-rta="mine">Presets</button><button type="button" data-rta="ratio">Ratios</button><button type="button" data-rta="rhy">Rhythms</button><button type="button" data-rta="rud">Rudiments</button>
+    </div>
+    <div class="rt-picks" id="rtaList"></div>
+    <p class="rt-anote" id="rtaNote">A new step starts steady: its own tempo, 4 loops.</p>
+  </div>
+</div>
+<!-- v426: a routine played to its end -->
+<div class="modal rt-done-modal" id="rtDone" hidden>
+  <div class="rt-done" role="dialog" aria-modal="true" aria-labelledby="rdName">
+    <span class="k">Routine done</span>
+    <h3 id="rdName"></h3>
+    <div class="rstrip" id="rdStrip"></div>
+    <span class="mt" id="rdMeta"></span>
+    <div class="rt-dbtns"><button type="button" class="btn" id="rdClose">Close</button><button type="button" class="btn" id="rdAgain">Play again</button></div>
   </div>
 </div>
 
@@ -3237,7 +3440,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v425"></script>
+<script src="./app.js?v=v426"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3250,8 +3453,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v425";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-08 11:05";          /* and when it was built, for ?diag */
+  var BUILD = "v426";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-08 11:51";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 
@@ -3280,7 +3483,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       var root = document.documentElement, play = document.getElementById("play"), sess = document.getElementById("sessBtn");
       return (play && play.dataset.on === "1") || (sess && sess.dataset.on === "1") ||
              root.dataset.game === "1" || root.dataset.video === "1" || root.dataset.rec === "1" ||
-             root.dataset.cal === "1" || root.dataset.chal === "1" || root.dataset.tour === "1" || root.dataset.course === "1" || root.dataset.cwin === "1" || root.dataset.gwin === "1" || !!root.dataset.along || !!document.querySelector(".modal:not([hidden])");
+             root.dataset.cal === "1" || root.dataset.chal === "1" || root.dataset.tour === "1" || root.dataset.course === "1" || root.dataset.cwin === "1" || root.dataset.gwin === "1" || root.dataset.rwin === "1" || !!root.dataset.along || !!document.querySelector(".modal:not([hidden])");
     };
     var reloadWhenIdle = function(){
       if(reloaded) return;

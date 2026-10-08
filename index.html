@@ -1751,7 +1751,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rt-card .mid{min-width:0;display:grid;gap:3px}
 .rt-card .nm{font-weight:600;font-size:13.5px;font-family:"IBM Plex Mono",monospace;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rt-card .pl{display:flex;align-items:center;gap:6px;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-2);flex-wrap:wrap;min-width:0}
-.rt-card .grip{color:var(--ink-3);font-size:16px;letter-spacing:-2px;padding:10px 8px 10px 12px;margin:-8px -9px -8px 0;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}   /* v433: the drag handle, a finger-sized zone */
+.rt-card .grip{color:var(--ink-3);font-size:16px;letter-spacing:-2px;padding:10px 10px 10px 16px;margin:-8px -11px -8px -4px;display:inline-block;min-width:34px;box-sizing:border-box;text-align:center;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}   /* v433: the drag handle, a finger-sized zone */
 .rt-card[data-drag="1"] .grip{color:var(--c2);cursor:grabbing}
 .rt-dots{display:inline-flex;flex-wrap:wrap;gap:2px;align-items:center}
 .rt-dots i{width:5px;height:5px;border-radius:50%;background:var(--sc);display:block}
@@ -1861,9 +1861,12 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rr-next b{font-family:"IBM Plex Mono",monospace;color:var(--ink);font-weight:600;border:1px solid var(--line-2);border-radius:999px;padding:1px 8px;margin:0 3px}
 @media (max-height:640px){ :root[data-rscr="1"] .rr-bpm b{font-size:30px} :root[data-rscr="1"] .canvas-hold{max-width:min(100%,max(150px,calc(100svh - 300px)))} }
 @media (orientation:landscape) and (max-height:520px){
-  :root[data-rscr="1"] #rrStrip{width:min(100%,300px);margin:0 auto}   /* v428 (QA v427 V2) */
-  :root[data-rscr="1"] .rr-bpm{display:none}
-  :root[data-rscr="1"] .canvas-hold{max-width:min(100%,max(110px,calc(100svh - 190px)))}
+  :root[data-rscr="1"] .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);column-gap:16px;align-items:start}   /* v438 (QA v436 V2): the strip and tempo beside the wheel */
+  :root[data-rscr="1"] #rtRunBar{grid-column:1;grid-row:1}
+  :root[data-rscr="1"] #rtRunTop{grid-column:1;grid-row:2}
+  :root[data-rscr="1"] .stage{grid-column:2;grid-row:1 / span 2}
+  :root[data-rscr="1"] .rr-bpm b{font-size:28px}
+  :root[data-rscr="1"] .canvas-hold{max-width:min(100%,max(110px,calc(100svh - 120px)))}
 }
 /* v368: the courses' window */
 :root[data-cwin="1"]:not([data-course="1"]) .wrap > :not(#coursePanel){display:none!important}
@@ -3479,7 +3482,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v437"></script>
+<script src="./app.js?v=v438"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3492,8 +3495,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v437";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-08 16:34";          /* and when it was built, for ?diag */
+  var BUILD = "v438";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-08 17:12";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

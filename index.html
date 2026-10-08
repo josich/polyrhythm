@@ -1791,6 +1791,9 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rt-tabs[data-ovf="lr"],#ptabs.ptabs[data-ovf="lr"]{-webkit-mask-image:linear-gradient(to right,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(to right,transparent,#000 14%,#000 86%,transparent)}
 #ptabs.ptabs .tab{all:unset;box-sizing:border-box;flex:none;border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-family:"Archivo",sans-serif;font-size:12.5px;color:var(--ink-3);cursor:pointer;white-space:nowrap}
 #ptabs.ptabs .tab[hidden]{display:none}
+.foldsec[data-fold="1"] > #ptabs.ptabs{display:none}   /* v429 (Oscar's screenshot): the folded bar shows no chips */
+.rt-tabs,#ptabs.ptabs{touch-action:pan-x pan-y;cursor:grab}
+.rt-tabs[data-drag="1"],#ptabs.ptabs[data-drag="1"]{cursor:grabbing}
 #ptabs.ptabs .tab[data-on="1"]{border-color:var(--c1);color:var(--c1)}
 #ptabs.ptabs .tab:focus-visible{outline:2px solid var(--c2);outline-offset:2px}
 .rt-tabs button{white-space:nowrap}
@@ -3463,7 +3466,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v428"></script>
+<script src="./app.js?v=v429"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3476,8 +3479,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v428";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-08 14:47";          /* and when it was built, for ?diag */
+  var BUILD = "v429";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-08 14:52";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -2901,7 +2901,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <div class="tabs ptabs" id="ptabs">
       <button class="tab" data-ptab="mine" data-on="1">Presets</button>
       <button class="tab" data-ptab="rhythms" data-on="0">Rhythms</button>
-      <button class="tab" data-ptab="classic" data-on="0">Classic ratios</button>
+      <button class="tab" data-ptab="classic" data-on="0">Ratios</button>
       <button class="tab" data-ptab="rudiments" data-on="0">Rudiments</button>
     </div>
 
@@ -3466,7 +3466,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v430"></script>
+<script src="./app.js?v=v431"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3479,8 +3479,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v430";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-08 15:01";          /* and when it was built, for ?diag */
+  var BUILD = "v431";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-08 15:03";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

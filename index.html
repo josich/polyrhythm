@@ -935,11 +935,11 @@ button.along-card-pct .go i{font-style:normal;font-family:var(--title);font-size
 .chal-sheet .btn,.chal-sheet .icobtn{transition:transform .08s ease}
 .chal-sheet .btn:active,.chal-sheet .icobtn:active{transform:scale(.95)}
 .chal-sheet .bump,.lvl-row .bump{animation:btnBump .36s ease-out}
-@keyframes btnBump{
-  0%  {transform:scale(1);   box-shadow:0 0 0 0 color-mix(in srgb,var(--c2) 0%,transparent)}
-  35% {transform:scale(1.08);box-shadow:0 0 0 8px color-mix(in srgb,var(--c2) 45%,transparent);filter:brightness(1.15)}
+@keyframes btnBump{   /* v452: transform only - the shadow and filter it animated were repaints */
+  0%  {transform:scale(1)}
+  35% {transform:scale(1.08)}
   70% {transform:scale(.96)}
-  100%{transform:scale(1);   box-shadow:0 0 0 0 color-mix(in srgb,var(--c2) 0%,transparent)}
+  100%{transform:scale(1)}
 }
 @media (prefers-reduced-motion:reduce){ .chal-modal:not([hidden]) .chal-sheet,.chal-sheet .bump{animation:none} }
 .chal-ops:empty{display:none}
@@ -1325,10 +1325,9 @@ canvas{
 .ach-row{--pc:var(--c1)}
 .ach-row[data-fresh="1"]{border-color:var(--c1)}   /* the pulse itself is the .pulse-host layer (v157) */
 .ach-cell .badge.fresh{animation:achBlink 1.2s ease-in-out infinite}
-@keyframes achBlink{
-  0%,100%{box-shadow:0 0 0 4px color-mix(in srgb,var(--bc) 18%,transparent),0 6px 18px -8px color-mix(in srgb,var(--bc) 60%,transparent);transform:scale(1)}
-  50%    {box-shadow:0 0 0 8px color-mix(in srgb,var(--bc) 55%,transparent),0 6px 22px -6px color-mix(in srgb,var(--bc) 90%,transparent);transform:scale(1.06)}
-}
+.ach-cell .badge.fresh::after{content:"";position:absolute;inset:-2px;border-radius:50%;pointer-events:none;opacity:0;animation:pulseFade 1.2s ease-in-out infinite;
+  box-shadow:0 0 0 8px color-mix(in srgb,var(--bc) 55%,transparent),0 6px 22px -6px color-mix(in srgb,var(--bc) 90%,transparent)}
+@keyframes achBlink{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}   /* v452: the glow is the ::after's opacity */
 @media (prefers-reduced-motion:reduce){ .ach-cell .badge.fresh{animation:none} }
 .cal-foot{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:10px}
 .cal-note{font-size:11.5px;color:var(--c1);text-align:right}
@@ -1454,13 +1453,6 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
   border:1px solid var(--nc);background:color-mix(in srgb,var(--nc) 16%,transparent)}
 .tab.add[data-hint="1"]::after{animation:pulseFade 2s ease-in-out infinite;will-change:opacity}   /* v157: opacity, not colours */
 @media (prefers-reduced-motion:reduce){ .tab.add[data-hint="1"]::after{animation:none} }
-@keyframes addPulse{
-  0%,100%    {border-color:var(--line);   background:var(--sunk);                                          color:var(--ink-3)}
-  12.5%,87.5%{border-color:color-mix(in srgb,var(--nc) 38%,var(--line)); background:color-mix(in srgb,var(--nc) 6%,var(--sunk));  color:color-mix(in srgb,var(--ink) 38%,var(--ink-3))}
-  25%,75%    {border-color:color-mix(in srgb,var(--nc) 71%,var(--line)); background:color-mix(in srgb,var(--nc) 11%,var(--sunk)); color:color-mix(in srgb,var(--ink) 71%,var(--ink-3))}
-  37.5%,62.5%{border-color:color-mix(in srgb,var(--nc) 92%,var(--line)); background:color-mix(in srgb,var(--nc) 15%,var(--sunk)); color:color-mix(in srgb,var(--ink) 92%,var(--ink-3))}
-  50%        {border-color:var(--nc);     background:color-mix(in srgb,var(--nc) 16%,var(--sunk));         color:var(--ink)}
-}
 @media (prefers-reduced-motion:reduce){ .tab.add[data-hint="1"]{animation:none} }
 .tab.add:disabled{opacity:.35;cursor:not-allowed}
 
@@ -1480,8 +1472,11 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 /* v145: the edge is a border that turns the section's own corners, as the ring
    card's coloured left edge does (Oscar's screenshot); its strength is --ta */
 #twoSplit span{position:absolute;top:0;bottom:0;width:50%;display:flex;align-items:flex-end;padding:0 16px 8px;
-  font-family:"Archivo",sans-serif;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;--ta:13;
-  border:0 solid color-mix(in srgb,var(--tc) calc(var(--ta) * 2.5%),transparent)}
+  font-family:"Archivo",sans-serif;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  border:0 solid color-mix(in srgb,var(--tc) 32.5%,transparent)}
+/* v452: a tap's flare is this overlay's OPACITY (composited) - it used to animate --ta, the border's colour, which repainted the
+   full-height edges every frame of every two-hand tap (the v155-v157 rule: never animate what paints) */
+#twoSplit span::after{content:"";position:absolute;inset:0;border:inherit;border-color:var(--tc);border-radius:inherit;opacity:0;pointer-events:none;will-change:opacity}
 #twoSplit span b{font-weight:600;display:inline-block}
 #twoSplit .ts-l{left:0;--tc:var(--tcl,var(--c2));color:var(--tc);border-left-width:3px;border-radius:14px 0 0 14px}
 #twoSplit .ts-l b{transform-origin:left bottom}
@@ -1677,6 +1672,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .prac-card{display:flex;align-items:center;gap:10px;padding:10px 10px 10px 12px;border-radius:14px;background:color-mix(in srgb,var(--c1) 10%,var(--panel));border:1.5px solid color-mix(in srgb,var(--c1) 55%,var(--line))}
 :root[data-wgame="1"] .wrap > :not(.stage),:root[data-wgame="1"] .stage > :not(.dial):not(#pracCard){opacity:.35;pointer-events:none}   /* v450 (Oscar): a wheel game, in place */
 .prac-card[hidden],:root:not([data-gscr="1"]):not([data-wgame="1"]) .prac-card{display:none!important}
+#alongSec,.prac-card{contain:layout style}   /* v452 (Oscar: hitches at the loop's end): their text changes stay inside them, not a page layout */
 :root:has(#pracCard:not([hidden])) #coachCard{display:none!important}   /* v450: the practice card wins over the first game's coach card */
 .prac-card .pc-ico{flex:none;width:30px;height:30px;color:var(--c1)} .prac-card .pc-ico svg{width:100%;height:100%;display:block}
 .prac-card .pc-txt{flex:1;min-width:0;display:grid;gap:2px}
@@ -2159,13 +2155,6 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
   border:1px solid var(--c1);background:color-mix(in srgb,var(--c1) 10%,transparent)}
 .foldsec[data-fold="1"][data-live="1"]::after{animation:pulseFade 2s ease-in-out infinite;will-change:opacity}   /* v157: opacity, not colours */
 @media (prefers-reduced-motion:reduce){ .foldsec[data-fold="1"][data-live="1"]::after{animation:none} }
-@keyframes secPulse{
-  0%,100%    {border-color:var(--line);                                  background:var(--panel)}
-  12.5%,87.5%{border-color:color-mix(in srgb,var(--c1) 38%,var(--line)); background:color-mix(in srgb,var(--c1) 4%,var(--panel))}
-  25%,75%    {border-color:color-mix(in srgb,var(--c1) 71%,var(--line)); background:color-mix(in srgb,var(--c1) 7%,var(--panel))}
-  37.5%,62.5%{border-color:color-mix(in srgb,var(--c1) 92%,var(--line)); background:color-mix(in srgb,var(--c1) 9%,var(--panel))}
-  50%        {border-color:var(--c1);                                    background:color-mix(in srgb,var(--c1) 10%,var(--panel))}
-}
 @media (prefers-reduced-motion:reduce){ .foldsec[data-fold="1"][data-live="1"]{animation:none} }
 .sess-head .lbl{margin-right:auto}
 /* the plan, stage by stage: one line each, tempo first */
@@ -3528,7 +3517,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v451"></script>
+<script src="./app.js?v=v452"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3541,8 +3530,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v451";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-09 13:14";          /* and when it was built, for ?diag */
+  var BUILD = "v452";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-09 13:30";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -3517,7 +3517,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v452"></script>
+<script src="./app.js?v=v453"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3530,8 +3530,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v452";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-09 13:30";          /* and when it was built, for ?diag */
+  var BUILD = "v453";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-09 13:59";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 
@@ -3642,6 +3642,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   if(!/[?&]diag/.test(location.search)) return;
 
   var box = document.createElement("pre");
+  box.className = "dgbox";   /* v453: both panels carry the class - the Copy button reads them */
   box.style.cssText = "margin:18px auto;max-width:1180px;padding:14px 18px;" +
     "background:var(--panel);border:1px solid var(--line);border-radius:12px;" +
     "color:var(--ink-2);font:12px/1.6 ui-monospace,Menlo,Consolas,monospace;" +
@@ -3672,6 +3673,23 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     var bar = document.createElement("div"); bar.className = "dgbar";
     bar.style.cssText = "margin:0 auto 6px;max-width:1180px;display:flex;flex-wrap:wrap;gap:8px;font:12px ui-monospace,Menlo,Consolas,monospace";
     box.parentNode.insertBefore(bar, box);
+    /* v453 (Oscar): one press copies both panels (and which switches are on) to the clipboard, to paste in a message */
+    var cp = document.createElement("button");
+    cp.type = "button";
+    cp.textContent = "Copy all to the clipboard";
+    cp.style.cssText = "width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--c2);background:var(--sunk);color:var(--ink);font:600 13px system-ui,sans-serif;cursor:pointer";
+    cp.addEventListener("click", function(){
+      var sw = FLAGS.filter(function(f){ return on[f[0]]; }).map(function(f){ return f[1]; });
+      var txt = "Polyorbit diagnostics · " + new Date().toLocaleString() + "\nswitches on: " + (sw.length ? sw.join(", ") : "none") + "\n\n" +
+        [].map.call(document.querySelectorAll(".dgbox"), function(p){ return p.textContent; }).join("\n\n");
+      var done = function(ok){ cp.textContent = ok ? "Copied \u2713" : "Copy failed - select the text by hand"; setTimeout(function(){ cp.textContent = "Copy all to the clipboard"; }, 1800); };
+      var fallback = function(){
+        try{ var ta = document.createElement("textarea"); ta.value = txt; ta.style.cssText = "position:fixed;left:-9999px;top:0"; document.body.appendChild(ta); ta.select(); var ok = document.execCommand("copy"); ta.remove(); done(ok); } catch(e){ done(false); }
+      };
+      if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function(){ done(true); }, fallback);
+      else fallback();
+    });
+    bar.appendChild(cp);
     var lab = document.createElement("span"); lab.textContent = "bisect (play with one on at a time):"; lab.style.cssText = "color:var(--ink-3);width:100%";
     bar.appendChild(lab);
     FLAGS.forEach(function(f){

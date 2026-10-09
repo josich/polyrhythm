@@ -449,6 +449,7 @@ input[type=range]::-moz-range-thumb{
 #alongTwo[data-on="1"]{border-color:var(--c2);color:var(--c2);background:color-mix(in srgb,var(--c2) 15%,transparent)}
 .along-pct{font-size:15px;font-weight:600;color:var(--ink-2);white-space:nowrap}
 .along-btns{margin-left:auto;display:flex;gap:8px;flex:none}   /* the buttons keep their place (v184) */
+@media (pointer:coarse){ .along-btns .icobtn{width:34px;height:34px} #alongMode button,.along-tgt button{min-height:32px} }   /* v458 (QA v454 V4) */
 #alongFlash{position:absolute;inset:-1px;border-radius:14px;pointer-events:none;opacity:0;z-index:4;
   border:3px solid var(--c2);box-shadow:0 0 0 5px color-mix(in srgb,var(--c2) 35%,transparent)}
 #beatNowIn .lp{color:var(--c2);font-weight:600}   /* the loop count, teal once the benchmark's length is passed (v185) */
@@ -631,6 +632,7 @@ input[type=range]::-moz-range-thumb{
 .along-card-word[data-kind="tight"]{color:var(--c2)}   /* the verdict's colour on the card (v202) */
 .along-card-word[data-kind="rush"],.along-card-word[data-kind="drag"]{color:var(--c1)}
 .along-card-word[data-kind="loose"]{color:var(--c3)}
+.along-card-word b{font-weight:inherit}.along-card-word b[data-kind="tight"]{color:var(--c2)}.along-card-word b[data-kind="rush"],.along-card-word b[data-kind="drag"]{color:var(--c1)}.along-card-word b[data-kind="loose"]{color:var(--c3)}   /* v458: a word per hand */
 .along-card-line{margin:4px 0;font-size:14px;color:var(--ink-2)}
 .along-card-line:empty{display:none}
 .along-card-line b{color:var(--ink)}
@@ -1718,7 +1720,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
   :root[data-gscr="1"] .canvas-hold{max-width:min(100%,max(120px,calc(100svh - 190px)))}
   :root[data-gscr="1"] #gameTop{margin-bottom:2px}
   :root[data-gscr="1"] #gameTop b{font-size:24px}
-  :root[data-gscr="1"] .stage:has(> #pracCard:not([hidden])){grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center}   /* v448 (QA v446 V1) */
+  :is(:root[data-gscr="1"],:root[data-wgame="1"]) .stage:has(> #pracCard:not([hidden])){grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center}   /* v448 (QA v446 V1); v458 (QA v454 V3): the wheel game in place too */
 }
 
 /* ---- v426: Routines (Oscar's rework, design/routines-proto.html) ------------------------------------------------
@@ -3538,7 +3540,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v457"></script>
+<script src="./app.js?v=v458"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3551,8 +3553,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v457";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-09 14:59";          /* and when it was built, for ?diag */
+  var BUILD = "v458";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-09 15:14";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

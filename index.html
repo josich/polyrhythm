@@ -2351,7 +2351,8 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .ptempos{display:flex;flex-direction:column;gap:4px}
 .ptempo{display:grid;grid-template-columns:44px minmax(0,1fr) auto 18px;gap:8px;align-items:center;font:12.5px "IBM Plex Mono",monospace;color:var(--ink-2);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 8px;cursor:pointer;text-align:left}
 .ptempo b{color:var(--ink);font-weight:600}
-.ptempo i{font-style:normal}.ptempo i.up{color:var(--c2)}.ptempo i.down{color:var(--c3)}
+.ptempo i{font-style:normal}.ptempo i.up{color:var(--c2)}.ptempo i.down{color:var(--c3)}.ptempo i.old{color:var(--ink-3)}
+.pchart circle.old{fill:none;stroke:var(--ink-3);stroke-width:1.5}.pchart text.fs.old{fill:var(--ink-3)}   /* v455: runs scored before v454 */
 .ptempo .n{color:var(--ink-3)}
 .ptempo svg{width:13px;height:13px;color:var(--c2)}
 .log-play{display:inline-flex;align-items:center;gap:6px;border-color:var(--c2);color:var(--ink)}
@@ -3521,7 +3522,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v454"></script>
+<script src="./app.js?v=v455"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3534,8 +3535,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v454";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-09 14:14";          /* and when it was built, for ?diag */
+  var BUILD = "v455";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-09 14:31";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

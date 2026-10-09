@@ -888,6 +888,10 @@ button.along-card-pct .go i{font-style:normal;font-family:var(--title);font-size
 .modal.chal-modal{z-index:70;background:rgba(0,0,0,.72)}   /* over the other sheets; .modal is declared later, hence the double class */
 .chal-sheet{position:relative;max-width:400px;text-align:center;padding:24px 22px 20px;border-color:color-mix(in srgb,var(--c1) 45%,var(--line))}
 .modal.ask-modal{z-index:80}   /* v241: double class - the later .modal{z-index:50} rule out-ranked the single class and the confirm box sat BEHIND the log and awards sheets (Oscar) */
+/* v454 (Oscar's bisect on the phone: "no shadows" = fluent): while the wheel plays, the panels lose their blurred shadows,
+   text shadows and filters - every repaint near them re-rasterised the 30 px blur. The edge flashes keep theirs; pulse
+   layers are ::after and are not matched. Back at rest. */
+:root[data-calm="1"] *:not(#beatFlash):not(#alongFlash){box-shadow:none!important;text-shadow:none!important;filter:none!important}
 #beatFlash{position:fixed;inset:0;z-index:45;pointer-events:none;opacity:0;
   box-shadow:inset 0 0 110px 34px var(--c1)}
 .ask-sheet{max-width:340px;text-align:center;padding:22px 22px 18px}
@@ -2033,7 +2037,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .cintro .ci-hand.mirror{transform:scaleX(-1)}
 .cintro .ci-hand.off{opacity:.25}
 .cintro .ci-eye{width:30px;height:30px;color:var(--ink-2);align-self:center;flex:none}
-.tapwave{position:fixed;width:84px;height:84px;border-radius:50%;border:6px solid var(--wc);background:color-mix(in srgb,var(--wc) 18%,transparent);pointer-events:none;z-index:46;opacity:0;will-change:transform,opacity}
+.tapwave{position:fixed;left:0;top:0;width:84px;height:84px;border-radius:50%;border:6px solid var(--wc);background:color-mix(in srgb,var(--wc) 18%,transparent);pointer-events:none;z-index:46;opacity:0;will-change:transform,opacity}
 .blind-flash{position:absolute;left:50%;top:50%;width:22%;aspect-ratio:1/1;opacity:0;pointer-events:none;color:var(--ink);z-index:3;transform:translate(-50%,-50%)}
 .blind-flash svg{width:100%;height:100%;display:block;overflow:visible}
 .cintro .ci-note{color:var(--c3)} .cintro .ci-note[hidden]{display:none}
@@ -3517,7 +3521,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v453"></script>
+<script src="./app.js?v=v454"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3530,8 +3534,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v453";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-09 13:59";          /* and when it was built, for ?diag */
+  var BUILD = "v454";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-09 14:14";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

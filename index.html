@@ -625,9 +625,7 @@ input[type=range]::-moz-range-thumb{
 .along-card{max-width:380px}
 .along-card .chal-kicker{font-size:clamp(26px,7vw,34px);color:var(--c2)}
 .along-card-pct{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;font-size:64px;font-weight:500;line-height:1;letter-spacing:-.03em;margin:10px 0 2px;color:var(--ink)}
-.along-card-pct[data-cmp="up"]{color:var(--c2)}
-.along-card-pct[data-cmp="down"]{color:var(--c3)}
-.along-card-pct[data-cmp="same"]{color:var(--c1)}
+.along-card-pct[data-cmp="up"]{color:var(--c2)}   /* v457: "up" = the run is clean */
 .along-card-word{font-family:var(--title);font-stretch:110%;font-weight:600;font-size:18px;margin:0 0 12px;color:var(--ink-2)}
 .along-card-word .star{color:var(--c1);margin-left:6px}
 .along-card-word[data-kind="tight"]{color:var(--c2)}   /* the verdict's colour on the card (v202) */
@@ -642,9 +640,25 @@ input[type=range]::-moz-range-thumb{
 .along-card-line.note{color:var(--ink-3);font-size:13px}
 /* v305 (Oscar): the tempo big and plain, the new clean tempo in its own box, the next step as one button */
 .along-card-bpm{font-family:"IBM Plex Mono",monospace;font-size:24px;font-weight:600;color:var(--ink);margin:2px 0 4px;letter-spacing:.02em}
-.along-card-clean{display:flex;flex-direction:column;align-items:center;gap:2px;margin:10px 0 4px;padding:9px 12px;border:1px solid var(--c2);border-radius:12px;background:color-mix(in srgb,var(--c2) 12%,transparent)}
-.along-card-clean span{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
-.along-card-clean b{font-family:"IBM Plex Mono",monospace;font-size:22px;color:var(--c2)}
+.along-card-clean{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:8px;margin:10px 0 4px;padding:9px 12px;border:1px solid var(--c2);border-radius:12px;background:color-mix(in srgb,var(--c2) 12%,transparent);color:var(--c2);font-weight:700;font-size:16px}
+.along-card-clean span{color:var(--c2)}
+.along-card-clean .cs{font-size:19px;line-height:1}
+.along-card-clean b{font-family:"IBM Plex Mono",monospace;font-size:20px;color:var(--c2)}
+/* v457 (Oscar: the colours were confusing): two questions, two signs. The % is teal only when the run is clean (at or past
+   the clean line), plain otherwise; the chip beside it compares with the run before at this tempo; the bar shows the score
+   against the line (its notch); the one star is the "Clean at" band. */
+.along-card-score{display:flex;align-items:center;justify-content:center;gap:10px;margin:10px 0 2px}
+.along-card-score .along-card-pct{margin:0}
+.along-card-delta{font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:600;padding:3px 9px;border-radius:999px;border:1.5px solid var(--line-2);color:var(--ink-3);white-space:nowrap}
+.along-card-delta[data-k="up"]{color:var(--c2);border-color:color-mix(in srgb,var(--c2) 55%,var(--line))}
+.along-card-delta[data-k="down"]{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 55%,var(--line))}
+.along-card-delta[data-k="new"]{font-size:11px;letter-spacing:.12em}
+.along-card-bar{position:relative;width:min(250px,100%);height:28px;margin:2px auto 8px}
+.along-card-bar .trk{position:absolute;left:0;right:0;top:8px;height:8px;border-radius:5px;background:var(--sunk);border:1px solid var(--line)}
+.along-card-bar .fil{position:absolute;left:0;top:8px;height:8px;border-radius:5px;background:var(--line-2)}
+.along-card-bar[data-ok="1"] .fil{background:var(--c2)}
+.along-card-bar .ntc{position:absolute;top:2px;width:2px;height:20px;margin-left:-1px;border-radius:1px;background:var(--ink-2)}
+.along-card-bar .nlb{position:absolute;top:22px;transform:translateX(-50%);font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--ink-3)}
 .along-card-clean[hidden]{display:none}
 .along-card .ask-btns{margin-top:14px;justify-content:space-between}   /* v309 (Oscar): to the sides */
 .along-card .btn,button.along-card-pct{transition:opacity .25s}
@@ -692,6 +706,7 @@ button.along-card-pct .go i{font-style:normal;font-family:var(--title);font-size
 .along-gnote{margin:10px 2px 2px;font-size:12.5px;color:var(--ink-2)} .along-gnote b{color:var(--c1);font-weight:700} .along-gnote .no{color:var(--c3)}
 .along-tgt button[data-on="1"]{border-color:var(--lc,var(--c2));color:var(--ink);background:color-mix(in srgb,var(--lc,var(--c2)) 16%,transparent)}
 .along-hist b{color:var(--ink-2);font-weight:500}
+.along-hist b.up{color:var(--c2)}.along-hist b.down{color:var(--c3)}   /* v457: the card's signs in the banner's line */
 #alongCv{display:block;width:100%;height:46px;margin-top:8px;border-radius:8px;background:var(--sunk);border:1px solid var(--line)}
 #alongSec[data-two="1"] #alongCv{background:transparent;border-color:transparent}   /* v181: two boxes of its own, drawn on the canvas */
 .along-ends{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-top:5px;padding:0 2px}
@@ -891,7 +906,7 @@ button.along-card-pct .go i{font-style:normal;font-family:var(--title);font-size
 /* v454 (Oscar's bisect on the phone: "no shadows" = fluent): while the wheel plays, the panels lose their blurred shadows,
    text shadows and filters - every repaint near them re-rasterised the 30 px blur. The edge flashes keep theirs; pulse
    layers are ::after and are not matched. Back at rest. */
-:root[data-calm="1"] *:not(#beatFlash):not(#alongFlash){box-shadow:none!important;text-shadow:none!important;filter:none!important}
+:root[data-calm="1"]{--shadow:none}   /* v457 (QA v454 V1): only the panels' 30 px blurred shadow goes - shadows that ARE a sign (the course step ring, today's dot, silent-loop dots) stay */
 #beatFlash{position:fixed;inset:0;z-index:45;pointer-events:none;opacity:0;
   box-shadow:inset 0 0 110px 34px var(--c1)}
 .ask-sheet{max-width:340px;text-align:center;padding:22px 22px 18px}
@@ -3236,11 +3251,12 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   <div class="sheet ask-sheet along-card" role="dialog" aria-modal="true" aria-labelledby="alongCardK">
     <p class="chal-kicker" id="alongCardK">PRECISION</p>
     <div class="along-card-bpm" id="alongCardBpm"></div>
-    <button type="button" class="along-card-pct" id="alongCardPct">0 %</button>   <!-- v310: opens the pattern's row in the log -->
+    <div class="along-card-score"><button type="button" class="along-card-pct" id="alongCardPct">0 %</button><span class="along-card-delta" id="alongCardDelta" hidden></span></div>   <!-- v310: the % opens the pattern's row in the log; v457: the chip = against the run before -->
+    <div class="along-card-bar" id="alongCardBar" hidden aria-hidden="true"><span class="trk"></span><span class="fil" id="alongCardFil"></span><span class="ntc" id="alongCardNtc"></span><span class="nlb" id="alongCardNlb"></span></div>   <!-- v457: the score against the clean line -->
     <div class="along-card-word" id="alongCardWord"></div>
-    <p class="along-card-line" id="alongCardPrev"></p>
+    <p class="along-card-line" id="alongCardPrev" hidden></p>
     <p class="along-card-line" id="alongCardMiss"></p>
-    <div class="along-card-clean" id="alongCardClean" hidden><span>New clean tempo</span><b id="alongCardCleanV"></b></div>
+    <div class="along-card-clean" id="alongCardClean" hidden><span class="cs">&#9733;</span><span>Clean at</span><b id="alongCardCleanV"></b></div>
     <p class="along-card-line note" id="alongCardNote"></p>
     <button type="button" class="btn along-card-next" id="alongCardNext" hidden></button>   <!-- v306 (Oscar): the next step above Close / Run again -->
     <div class="ask-btns">
@@ -3522,7 +3538,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v456"></script>
+<script src="./app.js?v=v457"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3535,8 +3551,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v456";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-09 14:35";          /* and when it was built, for ?diag */
+  var BUILD = "v457";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-09 14:59";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

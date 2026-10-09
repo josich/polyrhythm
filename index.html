@@ -1676,7 +1676,12 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .prac-card .pc-txt{flex:1;min-width:0;display:grid;gap:2px}
 .prac-card .pc-txt b{font-size:14px;font-weight:700;color:var(--ink)}
 .prac-card .pc-txt span{font-size:11.5px;color:var(--ink-3)}
-#pracGo{flex:none;min-height:34px;color:var(--c1);border-color:var(--c1)}
+.prac-card{flex-wrap:wrap}
+.prac-slide{flex:1 0 100%;position:relative;height:44px;border-radius:22px;background:var(--sunk);border:1.5px solid color-mix(in srgb,var(--c1) 55%,var(--line));touch-action:none;user-select:none;-webkit-user-select:none;overflow:hidden}
+.prac-slide .ps-lbl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding-left:40px;font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--c1);pointer-events:none}
+.prac-slide .ps-thumb{position:absolute;left:3px;top:3px;width:35px;height:35px;border-radius:50%;background:var(--c1);color:var(--ground);display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none;will-change:transform}
+.prac-slide .ps-thumb svg{width:20px;height:20px}
+.prac-slide[data-drag="1"] .ps-thumb{cursor:grabbing}
 #pracX{flex:none;width:34px;height:34px;border-radius:10px;color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));font-size:18px}
 .prac-card[data-mode="prac"] #pracX{display:none}
 .prac-card[data-mode="prac"] .pc-txt b{color:var(--c1);letter-spacing:.12em;text-transform:uppercase;font-size:12.5px}
@@ -2789,8 +2794,9 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <div class="prac-card" id="pracCard" hidden>
       <span class="pc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4.5a8 8 0 1 0 8 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 12.5l-3.4-3.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M16.5 3.5l3.5 1-1 3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       <span class="pc-txt"><b id="pracT">Practice it slower</b><span id="pracD">80 % tempo</span></span>
-      <button type="button" class="btn sm" id="pracGo">Practice</button>
       <button type="button" class="icobtn" id="pracX" title="Not now" aria-label="Not now">&times;</button>
+      <!-- v447 (Oscar): taps land here during a game, so the card's action is a slide, never a tap -->
+      <div class="prac-slide" id="pracSlide"><span class="ps-lbl" id="pracGoT">Slide to practice</span><span class="ps-thumb" id="pracThumb" tabindex="0" role="button" aria-label="Slide to practice"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
     </div>
 
     <div class="course-foot" id="courseFoot">
@@ -3512,7 +3518,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v446"></script>
+<script src="./app.js?v=v447"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3525,8 +3531,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v446";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-09 11:31";          /* and when it was built, for ?diag */
+  var BUILD = "v447";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-09 12:19";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

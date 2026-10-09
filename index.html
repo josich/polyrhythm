@@ -1673,7 +1673,9 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root:not([data-editor="1"]) #gbWin{display:none}
 /* v444 (Oscar): the practice level - a slower copy of the level, made to look like training, not the level */
 .prac-card{display:flex;align-items:center;gap:10px;padding:10px 10px 10px 12px;border-radius:14px;background:color-mix(in srgb,var(--c1) 10%,var(--panel));border:1.5px solid color-mix(in srgb,var(--c1) 55%,var(--line))}
-.prac-card[hidden],:root:not([data-gscr="1"]) .prac-card{display:none!important}
+:root[data-wgame="1"] .wrap > :not(.stage),:root[data-wgame="1"] .stage > :not(.dial):not(#pracCard){opacity:.35;pointer-events:none}   /* v450 (Oscar): a wheel game, in place */
+.prac-card[hidden],:root:not([data-gscr="1"]):not([data-wgame="1"]) .prac-card{display:none!important}
+:root:has(#pracCard:not([hidden])) #coachCard{display:none!important}   /* v450: the practice card wins over the first game's coach card */
 .prac-card .pc-ico{flex:none;width:30px;height:30px;color:var(--c1)} .prac-card .pc-ico svg{width:100%;height:100%;display:block}
 .prac-card .pc-txt{flex:1;min-width:0;display:grid;gap:2px}
 .prac-card .pc-txt b{font-size:14px;font-weight:700;color:var(--ink)}
@@ -3524,7 +3526,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v449"></script>
+<script src="./app.js?v=v450"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3537,8 +3539,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v449";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-09 12:55";          /* and when it was built, for ?diag */
+  var BUILD = "v450";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-09 13:07";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

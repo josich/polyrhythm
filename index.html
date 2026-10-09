@@ -2788,7 +2788,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <!-- v444 (Oscar): stuck on a level - practise it slower; during practice, the way back -->
     <div class="prac-card" id="pracCard" hidden>
       <span class="pc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4.5a8 8 0 1 0 8 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 12.5l-3.4-3.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M16.5 3.5l3.5 1-1 3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-      <span class="pc-txt"><b id="pracT">Practice it slower</b><span id="pracD">80 % tempo · no stars</span></span>
+      <span class="pc-txt"><b id="pracT">Practice it slower</b><span id="pracD">80 % tempo</span></span>
       <button type="button" class="btn sm" id="pracGo">Practice</button>
       <button type="button" class="icobtn" id="pracX" title="Not now" aria-label="Not now">&times;</button>
     </div>
@@ -3512,7 +3512,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v444"></script>
+<script src="./app.js?v=v445"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3525,8 +3525,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v444";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-09 10:51";          /* and when it was built, for ?diag */
+  var BUILD = "v445";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-09 11:17";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

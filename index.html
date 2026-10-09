@@ -1669,6 +1669,22 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 #gbX{width:34px;height:34px;border-radius:10px;color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));font-size:18px}
 #gbWin{width:34px;height:34px;border-radius:10px;color:var(--c1);border-color:color-mix(in srgb,var(--c1) 45%,var(--line));font-size:14px}
 :root:not([data-editor="1"]) #gbWin{display:none}
+/* v444 (Oscar): the practice level - a slower copy of the level, made to look like training, not the level */
+.prac-card{display:flex;align-items:center;gap:10px;padding:10px 10px 10px 12px;border-radius:14px;background:color-mix(in srgb,var(--c1) 10%,var(--panel));border:1.5px solid color-mix(in srgb,var(--c1) 55%,var(--line))}
+.prac-card[hidden],:root:not([data-gscr="1"]) .prac-card{display:none!important}
+.prac-card .pc-ico{flex:none;width:30px;height:30px;color:var(--c1)} .prac-card .pc-ico svg{width:100%;height:100%;display:block}
+.prac-card .pc-txt{flex:1;min-width:0;display:grid;gap:2px}
+.prac-card .pc-txt b{font-size:14px;font-weight:700;color:var(--ink)}
+.prac-card .pc-txt span{font-size:11.5px;color:var(--ink-3)}
+#pracGo{flex:none;min-height:34px;color:var(--c1);border-color:var(--c1)}
+#pracX{flex:none;width:34px;height:34px;border-radius:10px;color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));font-size:18px}
+.prac-card[data-mode="prac"] #pracX{display:none}
+.prac-card[data-mode="prac"] .pc-txt b{color:var(--c1);letter-spacing:.12em;text-transform:uppercase;font-size:12.5px}
+:root[data-gprac="1"] .dial{border:2px dashed var(--c1)}
+:root[data-gprac="1"] #gbName,:root[data-gprac="1"] #gbBpm{color:var(--c1)}
+.prac-done{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:3;pointer-events:none;white-space:nowrap;
+  font-family:"Archivo",system-ui,sans-serif;font-weight:800;font-size:clamp(26px,9vw,40px);color:var(--c2);text-shadow:0 2px 14px rgba(0,0,0,.55)}
+.prac-done[hidden]{display:none}
 :root[data-gscr="1"][data-cal="1"] :is(#gbPause,#gbWin){visibility:hidden}
 @media (max-width:340px){ :root[data-gscr="1"] #gbMode{font-size:0;gap:0;padding:6px 8px} }
 @media (max-height:700px){ :root[data-gscr="1"] #gameTop b{font-size:30px} :root[data-gscr="1"] .wrap{padding-top:calc(8px + env(safe-area-inset-top, 0px))} }
@@ -2745,6 +2761,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         <!-- the stars of a clear land here one by one, over the wheel -->
         <div class="chal-stars" id="chalStars" hidden aria-hidden="true"><b>★</b><b>★</b><b>★</b></div>
         <div class="blind-flash" id="blindFlash" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-eyeoff"/></svg></div>   <!-- v362 -->
+        <div class="prac-done" id="pracDone" hidden aria-live="polite">Learned!</div>   <!-- v444: a practice level cleared -->
       </div>
       <!-- one fixed-height slot, so swapping tip for readout cannot resize the dial -->
       <div class="dial-foot">
@@ -2768,6 +2785,13 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         <span><div class="k" id="achToastK">Award</div><div class="t" id="achToastT"></div><div class="d" id="achToastD"></div></span>
       </div>
     </section>
+    <!-- v444 (Oscar): stuck on a level - practise it slower; during practice, the way back -->
+    <div class="prac-card" id="pracCard" hidden>
+      <span class="pc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4.5a8 8 0 1 0 8 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 12.5l-3.4-3.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M16.5 3.5l3.5 1-1 3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span class="pc-txt"><b id="pracT">Practice it slower</b><span id="pracD">80 % tempo · no stars</span></span>
+      <button type="button" class="btn sm" id="pracGo">Practice</button>
+      <button type="button" class="icobtn" id="pracX" title="Not now" aria-label="Not now">&times;</button>
+    </div>
 
     <div class="course-foot" id="courseFoot">
       <button type="button" class="course-go" id="courseGo"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><rect x="3" y="12" width="3.2" height="8" rx="1"/><rect x="8.3" y="7" width="3.2" height="13" rx="1"/><rect x="13.6" y="4" width="3.2" height="16" rx="1"/><rect x="18.9" y="10" width="3.2" height="10" rx="1"/></g></svg><span id="courseGoT">Practice</span></button>
@@ -3488,7 +3512,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v443"></script>
+<script src="./app.js?v=v444"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3501,8 +3525,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v443";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-09 09:57";          /* and when it was built, for ?diag */
+  var BUILD = "v444";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-09 10:51";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -2268,6 +2268,13 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .log-row[aria-expanded="true"]{border-color:var(--line-2)}
 /* v232: rows holding data newer than the previous look are orange with the button's dot, until tapped */
 .log-row{position:relative}
+/* v460 (Oscar): a row that unfolds wears a short grey line at its bottom centre; the log and Precision bars in their colours.
+   ::before (their ::after is the new-dot); gone while the row is open. */
+.log-row:not(.pro-more)::before,#cgrid .lvl-row[data-ci]:not([data-lock])::before,.log-door::before,.along-door::before{content:"";position:absolute;left:50%;bottom:3px;width:22px;height:3px;margin-left:-11px;border-radius:2px;background:var(--line-2);pointer-events:none}
+.log-row[aria-expanded="true"]::before,#cgrid .lvl-row[aria-expanded="true"]::before{opacity:0}
+#cgrid .lvl-row[data-ci]{position:relative}.along-door{position:relative}
+.log-door::before{background:color-mix(in srgb,var(--c1) 70%,transparent)}
+.along-door::before{background:color-mix(in srgb,var(--c2) 70%,transparent)}
 .log-row[data-new="1"]{border-color:var(--c1)}
 .log-row[data-new="1"]::after{content:"";position:absolute;top:-5px;right:-5px;width:10px;height:10px;border-radius:50%;background:var(--c1);border:2px solid var(--panel)}
 .log-row .date{min-width:0}
@@ -3542,7 +3549,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v459"></script>
+<script src="./app.js?v=v460"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3555,8 +3562,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v459";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-09 15:21";          /* and when it was built, for ?diag */
+  var BUILD = "v460";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-09 15:27";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

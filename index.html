@@ -680,6 +680,17 @@ input[type=range]::-moz-range-thumb{
 .along-card-where .t{min-width:0;text-align:left;line-height:1.25}
 .along-card-where b{font-family:"IBM Plex Mono",monospace;font-weight:600;white-space:nowrap}
 .along-card-where b[data-k="t"]{color:var(--c2)}.along-card-where b[data-k="o"]{color:var(--c1)}.along-card-where b[data-k="p"]{color:var(--c3)}
+/* v488: a wheel mark's mini card, opened from its lollipop */
+.wio-pop{position:fixed;z-index:44;min-width:150px;max-width:min(240px,calc(100vw - 16px));box-sizing:border-box;padding:9px 12px 10px;background:var(--panel);border:1px solid var(--line-2);border-radius:12px;box-shadow:0 10px 26px -10px rgba(0,0,0,.7);color:var(--ink);transform-origin:50% 100%}
+.wio-pop[hidden]{display:none}
+.wio-pop .wn{display:flex;align-items:center;gap:7px;font-weight:600;font-size:14px;padding-right:26px;line-height:1.25}
+.wio-pop .wn i{flex:none;width:9px;height:9px;border-radius:50%;background:var(--lc,var(--ink-3))}
+.wio-pop .wv{display:flex;align-items:baseline;gap:8px;margin:5px 0 3px}
+.wio-pop .wv span{font-family:"IBM Plex Mono",monospace;font-size:22px;font-weight:600;letter-spacing:-.01em}
+.wio-pop .wv b{font-size:14px;font-weight:600}
+.wio-pop [data-k="t"]{color:var(--c2)}.wio-pop [data-k="o"]{color:var(--c1)}.wio-pop [data-k="p"]{color:var(--c3)}
+.wio-pop .ws{font-size:12px;color:var(--ink-3);line-height:1.35}
+.wio-pop .wio-x{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:7px;border:1px solid color-mix(in srgb,var(--c3) 45%,var(--line));background:none;color:var(--c3);font-size:16px;line-height:1;cursor:pointer;padding:0}
 /* v481 (Oscar: "the one in the monetization mock-up"): the gold band carries the sweep of light of the Pro card mock-up
    (design/pro-card-proto.html, option B) - a soft band of light crosses it every 3.6 s and rests in between. Its
    transform alone moves (the no-paint rule); none under reduced motion. */
@@ -3339,6 +3350,12 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
   </div>
 </div>
+<div class="wio-pop" id="wioPop" hidden role="dialog" aria-label="This mark">   <!-- v488: a lollipop's mini card -->
+  <button type="button" class="wio-x" id="wioPopX" aria-label="Close">&#215;</button>
+  <div class="wn"><i aria-hidden="true"></i><span id="wioPopN"></span></div>
+  <div class="wv" id="wioPopV"></div>
+  <div class="ws" id="wioPopS"></div>
+</div>
 <div class="modal ask-modal" id="askModal" hidden>
   <div class="sheet ask-sheet" role="alertdialog" aria-modal="true" aria-labelledby="askTitle" aria-describedby="askText">
     <div class="chal-brand"><svg viewBox="0 0 512 512" width="22" height="22" aria-hidden="true"><path d="M256 256L256 56 A200 200 0 1 1 82.8 156.0 Z" fill="var(--ink)" opacity=".12"/><circle cx="256" cy="256" r="200" fill="none" stroke="var(--line-2)" stroke-width="10"/><path d="M256 256L70.7 149.0" stroke="var(--ink)" stroke-width="7" stroke-linecap="round"/><circle cx="256.0" cy="56.0" r="30" fill="var(--c1)"/><circle cx="456.0" cy="256.0" r="26" fill="var(--c2)"/><circle cx="256.0" cy="456.0" r="26" fill="var(--c2)"/><circle cx="56.0" cy="256.0" r="26" fill="var(--c2)"/><circle cx="256" cy="256" r="26" fill="var(--ink)"/></svg><span id="askTitle">Polyorbit</span></div>
@@ -3612,7 +3629,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v487"></script>
+<script src="./app.js?v=v488"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3625,8 +3642,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v487";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-12 16:45";          /* and when it was built, for ?diag */
+  var BUILD = "v488";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-12 16:58";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -1,4 +1,4 @@
-/* Polyorbit v470 - built from polyrhythm-circle.html by build-pwa.sh; edit the source, not this file */
+/* Polyorbit v471 - built from polyrhythm-circle.html by build-pwa.sh; edit the source, not this file */
 (function(){"use strict";var BOOT_LESSON_CUT=false;(function(){try{var ls=localStorage,put=function(k,v){if(v===null||v===undefined)ls.removeItem(k);else ls.setItem(k,v);};var keep=JSON.parse(ls.getItem("polyrhythm-circle:tour-keep")||"null");if(keep&&keep.keys){Object.keys(keep.keys).forEach(function(k){put(k,keep.keys[k]);});BOOT_LESSON_CUT=!!keep.lesson;}
 ls.removeItem("polyrhythm-circle:tour-keep");var pr=JSON.parse(ls.getItem("polyrhythm-circle:tour-presets")||"null");if(pr&&typeof pr==="object"){put("polyrhythm-circle:presets:v1",pr.raw);ls.removeItem("polyrhythm-circle:tour-presets");}
 var lb=JSON.parse(ls.getItem("polyrhythm-circle:tour-logbak")||"null");if(lb&&typeof lb==="object"){Object.keys(lb).forEach(function(k){put(k,lb[k]);});ls.removeItem("polyrhythm-circle:tour-logbak");}}catch(e){}})();var SOUNDS=[{id:"kick",name:"Kick"},{id:"snare",name:"Snare"},{id:"hihat",name:"Hi-hat"},{id:"wood",name:"Wood block"},{id:"click",name:"Click"},{id:"clap",name:"Clap"},{id:"beep",name:"Beep"},{id:"bell",name:"Bell"},{id:"rim",name:"Rim"},{id:"shaker",name:"Shaker"},{id:"cowbell",name:"Cowbell"},{id:"sticks",name:"Sticks"},{id:"clave",name:"Clave"},{id:"tom",name:"Tom"},{id:"cabasa",name:"Cabasa"},{id:"tamb",name:"Tambourine"}];var DEFAULT_SOUND=["kick","wood","beep","rim"];function soundOk(id){return SOUNDS.some(function(x){return x.id===id;});}
@@ -841,16 +841,12 @@ gameWin.addEventListener("click",function(){if(!game||game.state==="cleared"||ga
 function gameAllClear(){var ri,k;for(ri=0;ri<S.rings.length;ri++){var r=S.rings[ri],tot=total(r);for(k=0;k<tot;k++)if(!r.bg&&gameJ(r.steps[k])&&!game.cleared[ri][k])return false;}
 return true;}
 function gameApplyCarry(tnow){if(!game.carry)return;game.carry.forEach(function(row,ri){row.forEach(function(v,k){if(v)game.cleared[ri][k]=tnow;});});game.carry=S.rings.map(function(){return[];});}
-function gameBlindRev(tnow,p){if(!game||S.tapMode!=="game"||!(game.mode==="blind"||game.blind)||game.state!=="play")return 0;if(typeof p==="number"&&p>=game.loop+1)return 0;var a=0,ramp=function(t0){return Math.min(1,Math.max(0,(tnow-(t0||0))/140));};if(game.failed)a=ramp(game.missAt);if(game.softAt)a=Math.max(a,ramp(game.softAt));return a;}
+function gameBlindRev(tnow,p){if(!game||S.tapMode!=="game"||!(game.mode==="blind"||game.blind)||game.state!=="play"||!game.failed)return 0;if(typeof p==="number"&&p>=game.loop+1)return 0;return Math.min(1,Math.max(0,(tnow-(game.missAt||0))/140));}
 function gameBlindLost(ph,m){var ri,k;for(ri=0;ri<S.rings.length;ri++){var r=S.rings[ri];if(r.bg)continue;var tot=total(r),oph=offPhase(r);for(k=0;k<tot;k++){if(!gameJ(r.steps[k])||(game.cleared[ri]&&game.cleared[ri][k]))continue;var fr=stepPos(r,k)+oph;fr-=Math.floor(fr);if(ph>game.loop+fr+m)return true;}}
 return false;}
-function gameBlindMiss(tnow){if(game.state!=="play"||!(game.mode==="blind"||game.blind)){game.softAt=0;return;}
-if(game.failed)return;var hp=heardPhase(performance.now()-calOffsetMs());if(hp===null)return;if(gameBlindLost(hp,gameTol()+0.05/cycleDur())){if(!game.softAt)game.softAt=tnow;}
-else game.softAt=0;}
-function gameRestore(tnow){game.softAt=0;game.cleared=S.rings.map(function(){return[];});gameApplyCarry(tnow);game.restoreAt=tnow;game.failed=false;game.attempt++;paintGame();}
+function gameRestore(tnow){game.cleared=S.rings.map(function(){return[];});gameApplyCarry(tnow);game.restoreAt=tnow;game.failed=false;game.attempt++;paintGame();}
 var gameFlashTimer=null;function gameFlash(grade){tapNowIn.dataset.grade=grade;clearTimeout(gameFlashTimer);gameFlashTimer=setTimeout(function(){tapNowIn.dataset.grade="";},260);}
-function gameTick(p,tnow){if(!game||!S.playing)return;var hp=heardPhase(performance.now());if(hp===null||hp<0)return;var loop=game.state==="play"?Math.floor(hp-gameTol()):Math.floor(hp);if(game.loop>=0&&loop<=game.loop){gameBlindMiss(tnow);return;}
-var first=(game.loop<0);game.loop=Math.max(0,loop);if(first){game.state="listen";paintGame();return;}
+function gameTick(p,tnow){if(!game||!S.playing)return;var hp=heardPhase(performance.now());if(hp===null||hp<0)return;var loop=game.state==="play"?Math.floor(hp-gameTol()):Math.floor(hp);if(game.loop>=0&&loop<=game.loop)return;var first=(game.loop<0);game.loop=Math.max(0,loop);if(first){game.state="listen";paintGame();return;}
 if(game.state==="listen"){game.state="play";game.handCue=false;game.playLoop0=loop;if(game.tapLoop==null||game.tapLoop<loop-1||game.tapLoop>loop)game.tapLoop=null;gameApplyCarry(tnow);paintGame();if(game.mode==="blind"||game.blind)blindFlash();if(!game.course)coachShow(game.two?"two":"game");return;}
 if(game.state==="play"){if(!game.failed&&gameAllClear())gameClear(tnow);else{gameRestore(tnow);pracCount();if(game.strayNext){game.failed=true;game.missAt=tnow;paintGame();}}
 game.strayNext=false;}}

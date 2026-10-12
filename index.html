@@ -721,6 +721,14 @@ button.along-card-pct .go i{font-style:normal;font-family:var(--title);font-size
 #alongSec[data-game="1"] :is(#alongCv,.along-ends,#alongHist,#alongInf,#alongStar,#alongPct){display:none!important}   /* v449: the game reads no histogram */
 .along-mode button{display:inline-flex;align-items:center;gap:5px} .along-mode button svg{width:13px;height:13px;flex:none}   /* v451 (Oscar): the modes wear their icons */
 .along-mode button[data-am="score"] svg{color:var(--c2)} .along-mode button[data-am="game"] svg{color:var(--c4)}
+/* v482: Gaps - the click drops out for whole loops while the taps stay judged (the App-Plan session's proposal) */
+.along-gaps button svg{width:13px;height:13px;flex:none;color:var(--c3)} .along-gaps button{display:inline-flex;align-items:center;gap:5px}
+#alongSec[data-game="1"] #alongGaps{display:none!important}
+.along-card-gaps{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px 18px;margin:2px 0 4px;font:600 15px var(--mono, ui-monospace),monospace;color:var(--ink)}
+.along-card-gaps .ag{display:inline-flex;align-items:center;gap:6px} .along-card-gaps svg{width:18px;height:18px;color:var(--ink-3)} .along-card-gaps .ag.sil svg{color:var(--c3)}
+.along-card-gaps .agw{width:100%;display:flex;justify-content:center;align-items:center;gap:6px;font:600 14px system-ui,sans-serif}
+.along-card-gaps .agw svg{width:16px;height:16px;color:var(--c3)}
+.along-card-gaps b[data-kind="tight"]{color:var(--c2)} .along-card-gaps b[data-kind="rush"],.along-card-gaps b[data-kind="drag"]{color:var(--c1)} .along-card-gaps b[data-kind="loose"]{color:var(--c3)}
 .along-gnote{margin:10px 2px 2px;font-size:12.5px;color:var(--ink-2)} .along-gnote b{color:var(--c1);font-weight:700} .along-gnote .no{color:var(--c3)}
 .along-tgt button[data-on="1"]{border-color:var(--lc,var(--c2));color:var(--ink);background:color-mix(in srgb,var(--lc,var(--c2)) 16%,transparent)}
 .along-hist b{color:var(--ink-2);font-weight:500}
@@ -2786,6 +2794,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
     <!-- v449 (Oscar): play this wheel as a game - Score is Precision as it was, Game a one-level game of the chosen rings -->
     <div class="along-tgt along-mode" id="alongMode"><span class="k">Mode</span><button type="button" data-am="score" data-on="1"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="13" width="3.2" height="7.5" rx="1" fill="currentColor"/><rect x="8.4" y="7.5" width="3.2" height="13" rx="1" fill="currentColor"/><rect x="13.3" y="3.5" width="3.2" height="17" rx="1" fill="currentColor"/><rect x="18.2" y="10.5" width="3.2" height="10" rx="1" fill="currentColor"/></svg>Score</button><button type="button" data-am="game"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg>Game</button></div>
+    <!-- v482: Gaps - the click goes silent for whole loops; the taps are still judged -->
+    <div class="along-tgt along-gaps" id="alongGaps"><span class="k">Gaps</span><button type="button" data-ag="off" data-on="1">Off</button><button type="button" data-ag="22" data-on="0"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mute"/></svg>2+2</button><button type="button" data-ag="13" data-on="0"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mute"/></svg>1+3</button><button type="button" data-ag="rnd" data-on="0"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mute"/></svg>Random</button></div>
     <!-- v192: what a tap is judged against - the whole pattern, or one ring (the pulse) -->
     <div class="along-tgt" id="alongTgt" hidden></div>
     <p class="along-gnote" id="alongGNote" hidden></p>
@@ -3302,6 +3312,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <div class="along-card-score"><button type="button" class="along-card-pct" id="alongCardPct">0 %</button><span class="along-card-delta" id="alongCardDelta" hidden></span></div>   <!-- v310: the % opens the pattern's row in the log; v457: the chip = against the run before -->
     <div class="along-card-bar" id="alongCardBar" hidden aria-hidden="true"><span class="trk"></span><span class="fil" id="alongCardFil"></span><span class="ntc" id="alongCardNtc"></span><span class="nlb" id="alongCardNlb"></span></div>   <!-- v457: the score against the clean line -->
     <div class="along-card-word" id="alongCardWord"></div>
+    <div class="along-card-gaps" id="alongCardGaps" hidden></div>   <!-- v482: with the click / in the silence -->
     <p class="along-card-line" id="alongCardPrev" hidden></p>
     <p class="along-card-line" id="alongCardMiss"></p>
     <div class="along-card-clean" id="alongCardClean" hidden><span class="cs">&#9733;</span><span>Clean at</span><b id="alongCardCleanV"></b></div>
@@ -3586,7 +3597,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v481"></script>
+<script src="./app.js?v=v482"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3599,8 +3610,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v481";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-12 15:22";          /* and when it was built, for ?diag */
+  var BUILD = "v482";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-12 15:27";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -645,10 +645,12 @@ input[type=range]::-moz-range-thumb{
 .along-card-line.note{color:var(--ink-3);font-size:13px}
 /* v305 (Oscar): the tempo big and plain, the new clean tempo in its own box, the next step as one button */
 .along-card-bpm{font-family:"IBM Plex Mono",monospace;font-size:24px;font-weight:600;color:var(--ink);margin:2px 0 4px;letter-spacing:.02em}
-.along-card-clean{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:8px;margin:10px 0 4px;padding:9px 12px;border:1px solid var(--c2);border-radius:12px;background:color-mix(in srgb,var(--c2) 12%,transparent);color:var(--c2);font-weight:700;font-size:16px}
-.along-card-clean span{color:var(--c2)}
+/* v480 (Oscar: too many teal buttons on the card): the new clean tempo is an achievement, orange with its star; the
+   next step (Try N BPM) is a plain grey button; teal stays for the score, Run again and the log */
+.along-card-clean{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:8px;margin:10px 0 4px;padding:9px 12px;border:1px solid var(--c1);border-radius:12px;background:color-mix(in srgb,var(--c1) 12%,transparent);color:var(--c1);font-weight:700;font-size:16px}
+.along-card-clean span{color:var(--c1)}
 .along-card-clean .cs{font-size:19px;line-height:1}
-.along-card-clean b{font-family:"IBM Plex Mono",monospace;font-size:20px;color:var(--c2)}
+.along-card-clean b{font-family:"IBM Plex Mono",monospace;font-size:20px;color:var(--c1)}
 /* v457 (Oscar: the colours were confusing): two questions, two signs. The % is teal only when the run is clean (at or past
    the clean line), plain otherwise; the chip beside it compares with the run before at this tempo; the bar shows the score
    against the line (its notch); the one star is the "Clean at" band. */
@@ -678,9 +680,9 @@ button.along-card-pct .go i{font-style:normal;font-family:var(--title);font-size
 .along-card[data-arm="0"] button.along-card-pct{pointer-events:none}
 .along-card[data-arm="0"] :is(.btn,button.along-card-pct){transition:none}   /* v359 (Oscar): asleep at once - the fade to .35 showed the buttons lit for a moment first */
 .along-card[data-arm="0"] .btn{pointer-events:none;opacity:.35}   /* v308: asleep for a second after the card appears */
-.along-card-next{width:100%;margin-top:14px;border-color:var(--c2);color:var(--ink)}
+.along-card-next{width:100%;margin-top:14px;border-color:var(--line-2);color:var(--ink-2)}   /* v480: grey */
 .along-card-next:not([hidden]) + .ask-btns{margin-top:8px}   /* v306: the next step sits above the pair */
-.along-card-next svg{width:14px;height:14px;color:var(--c2)}
+.along-card-next svg{width:14px;height:14px;color:var(--ink-3)}
 .along-card .ask-btns .btn.lead{border-color:var(--c2);color:var(--ink)}
 @media (max-height:420px){   /* v314 (QA v311 V3): a landscape phone keeps Close and Run again on screen */
   .along-card .chal-kicker{font-size:20px}
@@ -714,6 +716,7 @@ button.along-card-pct .go i{font-style:normal;font-family:var(--title);font-size
 .along-tgt button[data-on="1"]{border-color:var(--lc,var(--c2));color:var(--ink);background:color-mix(in srgb,var(--lc,var(--c2)) 16%,transparent)}
 .along-hist b{color:var(--ink-2);font-weight:500}
 .along-hist b.up{color:var(--c2)}.along-hist b.down{color:var(--c3)}   /* v457: the card's signs in the banner's line */
+.along-hist b.clean{color:var(--c1)}   /* v480: the new clean tempo in orange, as on the card */
 #alongCv{display:block;width:100%;height:46px;margin-top:8px;border-radius:8px;background:var(--sunk);border:1px solid var(--line)}
 #alongSec[data-two="1"] #alongCv{background:transparent;border-color:transparent}   /* v181: two boxes of its own, drawn on the canvas */
 .along-ends{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-top:5px;padding:0 2px}
@@ -3574,7 +3577,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v479"></script>
+<script src="./app.js?v=v480"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3587,8 +3590,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v479";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-12 15:01";          /* and when it was built, for ?diag */
+  var BUILD = "v480";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-12 15:16";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

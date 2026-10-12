@@ -1721,6 +1721,59 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
   :root[data-cwin="1"] #coursePanel > #cgrid,:root[data-gwin="1"] #tapPanel > #lvlList{min-height:80px!important}
   :root[data-gscr="1"] #coachCard{display:none!important}
 }
+/* v496 (Oscar's pick of design/precision-screen-proto.html): Precision on its own screen, the course screen's shape - a bar
+   (Precision, Log, Options, the cross at the right), the tempo with -5 / +5 and tags for the options in use, the banner's
+   histogram, the wheel. The options are the banner's own rows, in a panel under the bar. Tours, lessons and the course
+   keep the banner in the page as before. */
+#precBar,#precTop{display:none}
+:root[data-pscr="1"] .wrap > :not(#precBar):not(#precTop):not(#alongSec):not(.stage){display:none!important}
+:root[data-pscr="1"] .stage{grid-template-columns:minmax(0,1fr);gap:10px}
+:root[data-pscr="1"] :is(#rack,#stageBar,#stageScore,#courseStrip,#courseFoot,#dialPat){display:none!important}
+:root[data-pscr="1"] .dial-head > :not(#dialRatio){display:none!important}   /* the ratio in the wheel's corner, as on every screen (v437) */
+:root[data-pscr="1"] .dial{padding:10px 12px}
+:root[data-pscr="1"] .wrap{padding-top:calc(14px + env(safe-area-inset-top, 0px));padding-bottom:calc(12px + env(safe-area-inset-bottom, 0px))}
+:root[data-pscr="1"] .canvas-hold{max-width:min(100%,max(180px,calc(100vh - 330px)));max-width:min(100%,max(180px,calc(100svh - 330px)))}
+:root[data-pscr="1"] #precBar{display:grid;grid-template-columns:minmax(0,1fr) 34px auto 34px;align-items:center;gap:8px;margin:0 0 8px;position:relative}
+#precBar .pb-ttl{min-width:0;display:grid;gap:1px}
+#precBar .pb-ttl b{font-family:var(--title);font-stretch:var(--title-stretch);font-weight:800;font-size:18px;line-height:1.1;color:var(--c2)}
+#precBar .pb-ttl span{font-size:11.5px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#precBar .pb-ttl span:empty{display:none}
+#pbLog{width:34px;height:34px;border-radius:10px;color:var(--c1);border-color:color-mix(in srgb,var(--c1) 45%,var(--line))}
+#pbLog svg{width:17px;height:17px;display:block}
+#pbOpts{display:inline-flex;align-items:center;gap:6px;height:34px;box-sizing:border-box;padding:0 11px;font-size:12.5px;border-color:color-mix(in srgb,var(--c2) 55%,var(--line))}
+#pbOpts svg{width:15px;height:15px;color:var(--c2);flex:none}
+#pbOpts[data-on="1"]{background:color-mix(in srgb,var(--c2) 14%,var(--sunk))}
+#pbX{width:34px;height:34px;border-radius:10px;color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));font-size:18px}
+:root[data-pscr="1"] #precTop{display:grid;justify-items:center;gap:7px;margin:0 0 8px}
+.pt-tempo{display:flex;align-items:center;justify-content:center;gap:16px}
+.pt-tempo .ct-num b{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:40px;line-height:.9;letter-spacing:-.03em}
+.pt-tempo .ct-num span{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.pt-tags{all:unset;cursor:pointer;display:flex;flex-wrap:wrap;justify-content:center;gap:5px;max-width:100%}
+.pt-tags[hidden]{display:none}
+.pt-tags span{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3);border:1px dashed var(--line-2);border-radius:999px;padding:2px 9px;white-space:nowrap}
+.pt-tags span.p{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
+.pt-tags span.g{color:var(--c4);border-color:color-mix(in srgb,var(--c4) 45%,var(--line))}
+:root[data-prun="1"] :is(#pbLog,#pbOpts,#pbDown,#pbUp,#pbTags){opacity:.35;pointer-events:none}   /* a run, a game or a calibration: nothing changes under it */
+#precBar > #precPop{position:absolute;right:0;top:calc(100% + 6px);z-index:44;width:min(350px,100%);box-sizing:border-box;background:var(--panel);border:1px solid var(--line-2);border-radius:12px;padding:4px 12px 12px;box-shadow:0 12px 32px rgba(0,0,0,.5)}
+#precBar > #precPop[hidden]{display:none}
+.pp-only{display:none!important}
+#precBar > #precPop .pp-only:not([hidden]){display:flex!important}
+#ppHands button{display:inline-flex;align-items:center;gap:5px} #ppHands button svg{width:13px;height:13px;flex:none;color:var(--c2)}
+:root[data-pscr="1"] #alongSec :is(.along-lbl,.along-btns,#alongWord,#alongStar){display:none!important}
+:root[data-pscr="1"] #alongSec .along-row{justify-content:center;min-height:0}
+:root[data-pscr="1"] #alongSec .along-row:has(#alongPct[hidden]){display:none}
+:root[data-pscr="1"] .wrap > #alongSec{margin-bottom:8px}
+:root[data-pscr="1"] #twoSplit{position:fixed;inset:0;z-index:30}   /* taps anywhere: the split follows the screen, as in the course */
+:root[data-pscr="1"] #twoSplit::before{top:12px;bottom:12px}
+@media (orientation:landscape) and (max-height:520px){
+  :root[data-pscr="1"] .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr);column-gap:16px;align-items:start}
+  :root[data-pscr="1"] #precBar{grid-column:1;grid-row:1}
+  :root[data-pscr="1"] #precTop{grid-column:1;grid-row:2}
+  :root[data-pscr="1"] .wrap > #alongSec{grid-column:1;grid-row:3}
+  :root[data-pscr="1"] .stage{grid-column:2;grid-row:1 / span 3}
+  :root[data-pscr="1"] .canvas-hold{max-width:min(100%,max(110px,calc(100svh - 110px)))}
+  .pt-tempo .ct-num b{font-size:30px}
+}
 /* v372: the game screen - bar, tempo, the wheel; nothing else */
 #gameBar,#gameTop{display:none}
 #tapPause{display:none}   /* v374 (Oscar): games play on their own screen, whose bar has Pause; the window's one made no sense (the screen's button still clicks it) */
@@ -1737,10 +1790,10 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 /* v373: the whole screen is the tap area - the split's edges follow the screen, as in the course */
 :root[data-gscr="1"] #twoSplit{position:fixed;inset:0;z-index:30}
 :root[data-gscr="1"] #twoSplit::before{top:12px;bottom:12px}
-:is(:root[data-gscr="1"],:root[data-course="1"]) #twoSplit::before{   /* v403 (QA v401 V1): no seam through the hub's countdown */
+:is(:root[data-gscr="1"],:root[data-course="1"],:root[data-pscr="1"]) #twoSplit::before{   /* v403 (QA v401 V1): no seam through the hub's countdown */
   -webkit-mask-image:linear-gradient(to bottom,#000 var(--sg0,9999px),transparent var(--sg0,9999px),transparent var(--sg1,9999px),#000 var(--sg1,9999px));
   mask-image:linear-gradient(to bottom,#000 var(--sg0,9999px),transparent var(--sg0,9999px),transparent var(--sg1,9999px),#000 var(--sg1,9999px))}
-:root[data-gscr="1"] #twoSplit span{padding:0 18px 16px;font-size:12px}
+:is(:root[data-gscr="1"],:root[data-pscr="1"]) #twoSplit span{padding:0 18px 16px;font-size:12px}
 :root[data-gscr="1"] #gameTop{display:flex;justify-content:center;margin:0 0 8px}
 #gameTop b{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:42px;line-height:.9;letter-spacing:-.03em;display:inline-block}
 #gameTop .ct-num span{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
@@ -1751,7 +1804,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root:not([data-editor="1"]) #gbWin{display:none}
 /* v444 (Oscar): the practice level - a slower copy of the level, made to look like training, not the level */
 .prac-card{display:flex;align-items:center;gap:10px;padding:10px 10px 10px 12px;border-radius:14px;background:color-mix(in srgb,var(--c1) 10%,var(--panel));border:1.5px solid color-mix(in srgb,var(--c1) 55%,var(--line))}
-:root[data-wgame="1"] .wrap > :not(.stage),:root[data-wgame="1"] .stage > :not(.dial):not(#pracCard){opacity:.35;pointer-events:none}   /* v450 (Oscar): a wheel game, in place */
+:root[data-wgame="1"] .wrap > :not(.stage):not(#precBar):not(#precTop),:root[data-wgame="1"] .stage > :not(.dial):not(#pracCard){opacity:.35;pointer-events:none}   /* v450 (Oscar): a wheel game, in place */
 .prac-card[hidden],:root:not([data-gscr="1"]):not([data-wgame="1"]) .prac-card{display:none!important}
 #alongSec,.prac-card{contain:layout style}   /* v452 (Oscar: hitches at the loop's end): their text changes stay inside them, not a page layout */
 :root:has(#pracCard:not([hidden])) #coachCard{display:none!important}   /* v450: the practice card wins over the first game's coach card */
@@ -2815,6 +2868,18 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <button type="button" class="icobtn cb-x" id="gbX" title="Leave the game" aria-label="Leave the game">&times;</button>
   </div>
   <div class="game-top" id="gameTop"><div class="ct-num"><b id="gbBpm">0</b><span>bpm</span></div></div>
+  <!-- v496 (Oscar's pick of design/precision-screen-proto.html): Precision on its own screen - its bar (the cross at the right,
+       as everywhere) and the tempo; the rest of the page steps aside while it is open -->
+  <div class="prec-bar" id="precBar">
+    <div class="pb-ttl"><b>Precision</b><span id="pbSub"></span></div>
+    <button type="button" class="icobtn" id="pbLog" title="This pattern in the practice log" aria-label="Open this pattern in the practice log"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M3.5 10h17M8.5 3v4M15.5 3v4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button>
+    <button type="button" class="btn sm" id="pbOpts" data-on="0" aria-expanded="false" title="Judge, hands, gaps, loop forever, mode"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="7" r="2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="10" cy="17" r="2" fill="none" stroke="currentColor" stroke-width="2"/></svg><span>Options</span></button>
+    <button type="button" class="icobtn" id="pbX" title="Leave Precision" aria-label="Leave Precision">&times;</button>
+  </div>
+  <div class="prec-top" id="precTop">
+    <div class="pt-tempo"><button type="button" class="jump wide" id="pbDown" aria-label="Tempo down 5">&minus;5</button><div class="ct-num"><b id="pbBpm">0</b><span>bpm</span></div><button type="button" class="jump wide" id="pbUp" aria-label="Tempo up 5">+5</button></div>
+    <button type="button" class="pt-tags" id="pbTags" hidden title="Change the options"></button>
+  </div>
   <!-- v397 (Oscar): Precision is a main feature - a bar of its own above the wheel, not an icon in the wheel's head -->
   <button type="button" class="along-door" id="alongBtn" data-on="0" aria-pressed="false" title="Precision: play along and see your timing"><span class="ad-lbl">Precision</span><span class="ad-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="13" width="3.2" height="7.5" rx="1" fill="currentColor"/><rect x="8.4" y="7.5" width="3.2" height="13" rx="1" fill="currentColor"/><rect x="13.3" y="3.5" width="3.2" height="17" rx="1" fill="currentColor"/><rect x="18.2" y="10.5" width="3.2" height="10" rx="1" fill="currentColor"/></svg></span></button>
   <section class="along-sec" id="alongSec" hidden>
@@ -2831,12 +2896,18 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         <button class="icobtn" id="alongX" title="Close" aria-label="Close the precision banner">&times;</button>
       </span>
     </div>
-    <!-- v449 (Oscar): play this wheel as a game - Score is Precision as it was, Game a one-level game of the chosen rings -->
-    <div class="along-tgt along-mode" id="alongMode"><span class="k">Mode</span><button type="button" data-am="score" data-on="1"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="13" width="3.2" height="7.5" rx="1" fill="currentColor"/><rect x="8.4" y="7.5" width="3.2" height="13" rx="1" fill="currentColor"/><rect x="13.3" y="3.5" width="3.2" height="17" rx="1" fill="currentColor"/><rect x="18.2" y="10.5" width="3.2" height="10" rx="1" fill="currentColor"/></svg>Score</button><button type="button" data-am="game"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg>Game</button></div>
-    <!-- v482: Gaps - the click goes silent for whole loops; the taps are still judged -->
-    <div class="along-tgt along-gaps" id="alongGaps"><span class="k">Gaps</span><button type="button" data-ag="off" data-on="1">Off</button><button type="button" data-ag="22" data-on="0"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mute"/></svg>2+2</button><button type="button" data-ag="13" data-on="0"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mute"/></svg>1+3</button><button type="button" data-ag="rnd" data-on="0"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mute"/></svg>Random</button></div>
-    <!-- v192: what a tap is judged against - the whole pattern, or one ring (the pulse) -->
-    <div class="along-tgt" id="alongTgt" hidden></div>
+    <!-- v496: the options - the banner's own rows; while Precision's screen is on they sit in a panel under its bar -->
+    <div class="prec-pop" id="precPop">
+      <!-- v496: two hands and loop forever as rows of the panel (the banner's head keeps its icons for the tour and the course) -->
+      <div class="along-tgt pp-only" id="ppHands"><span class="k">Hands</span><button type="button" data-ph="1">One</button><button type="button" data-ph="2"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-hand"/></svg>Two</button></div>
+      <!-- v192: what a tap is judged against - the whole pattern, or one ring (the pulse) -->
+      <div class="along-tgt" id="alongTgt" hidden></div>
+      <!-- v482: Gaps - the click goes silent for whole loops; the taps are still judged -->
+      <div class="along-tgt along-gaps" id="alongGaps"><span class="k">Gaps</span><button type="button" data-ag="off" data-on="1">Off</button><button type="button" data-ag="22" data-on="0"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mute"/></svg>2+2</button><button type="button" data-ag="13" data-on="0"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mute"/></svg>1+3</button><button type="button" data-ag="rnd" data-on="0"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mute"/></svg>Random</button></div>
+      <div class="along-tgt pp-only" id="ppInf"><span class="k">Forever</span><button type="button" data-pi="0">Off</button><button type="button" data-pi="1">On</button></div>
+      <!-- v449 (Oscar): play this wheel as a game - Score is Precision as it was, Game a one-level game of the chosen rings -->
+      <div class="along-tgt along-mode" id="alongMode"><span class="k">Mode</span><button type="button" data-am="score" data-on="1"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="13" width="3.2" height="7.5" rx="1" fill="currentColor"/><rect x="8.4" y="7.5" width="3.2" height="13" rx="1" fill="currentColor"/><rect x="13.3" y="3.5" width="3.2" height="17" rx="1" fill="currentColor"/><rect x="18.2" y="10.5" width="3.2" height="10" rx="1" fill="currentColor"/></svg>Score</button><button type="button" data-am="game"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg>Game</button></div>
+    </div>
     <p class="along-gnote" id="alongGNote" hidden></p>
     <canvas id="alongCv" height="46" aria-label="Your taps: early to the left, late to the right"></canvas>
     <div class="along-ends"><span>early</span><span>the beat</span><span>late</span></div>
@@ -3645,7 +3716,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v495"></script>
+<script src="./app.js?v=v496"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3658,8 +3729,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v495";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-12 21:35";          /* and when it was built, for ?diag */
+  var BUILD = "v496";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-12 22:33";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

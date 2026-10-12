@@ -2494,6 +2494,10 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 :is(.mine-list,#lvlList) .lvl-row[data-drag="1"]{border-color:var(--c2);box-shadow:0 0 0 2px color-mix(in srgb,var(--c2) 40%,transparent),0 8px 20px -8px rgba(0,0,0,.65)}
 :is(.mine-list,#lvlList) .lvl-row[data-drag="1"] .grip{color:var(--c2);cursor:grabbing}
 :root[data-tour="1"] :is(.mine-list,#lvlList) .lvl-row .grip{visibility:hidden}
+/* v465 (Oscar): after a drop the two rows that traded places blink their edge twice
+   (swapBlink) - an overlay whose opacity alone moves, per the no-paint rule */
+.swaphost{position:relative}
+.swapfx{position:absolute;inset:-1px;border-radius:inherit;border:2px solid var(--c2);box-shadow:0 0 0 2px color-mix(in srgb,var(--c2) 40%,transparent);background:color-mix(in srgb,var(--c2) 8%,transparent);pointer-events:none;opacity:0;will-change:opacity;z-index:3}
 .mine-list .lvl-row .ops button[data-del]:hover{border-color:var(--c3);color:var(--c3)}
 .mine-list:empty{display:none}
 .lvl-row .ops button[data-seq]{color:var(--c1)}
@@ -3577,7 +3581,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
   var BUILD = "v465";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-12 10:24";          /* and when it was built, for ?diag */
+  var BUILT = "2026-10-12 10:54";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

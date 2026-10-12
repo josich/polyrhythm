@@ -669,6 +669,13 @@ input[type=range]::-moz-range-thumb{
 .along-card-bar .ntc{position:absolute;top:2px;width:2px;height:20px;margin-left:-1px;border-radius:1px;background:var(--ink-2)}
 .along-card-bar .nlb{position:absolute;top:22px;transform:translateX(-50%);font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--ink-3)}
 .along-card-clean[hidden]{display:none}
+/* v486: where I'm off - one line under the missed hits, a tiny wheel lighting the dot (mock design/where-off-proto.html) */
+.along-card-where{display:flex;align-items:center;gap:9px;width:fit-content;max-width:100%;box-sizing:border-box;margin:10px auto 2px;padding:6px 12px 6px 7px;border-radius:12px;background:var(--sunk);border:1px solid var(--line);font-size:15px;color:var(--ink)}
+.along-card-where[hidden]{display:none}
+.along-card-where svg{width:30px;height:30px;flex:none}
+.along-card-where .t{min-width:0;text-align:left;line-height:1.25}
+.along-card-where b{font-family:"IBM Plex Mono",monospace;font-weight:600;white-space:nowrap}
+.along-card-where b[data-k="t"]{color:var(--c2)}.along-card-where b[data-k="o"]{color:var(--c1)}.along-card-where b[data-k="p"]{color:var(--c3)}
 /* v481 (Oscar: "the one in the monetization mock-up"): the gold band carries the sweep of light of the Pro card mock-up
    (design/pro-card-proto.html, option B) - a soft band of light crosses it every 3.6 s and rests in between. Its
    transform alone moves (the no-paint rule); none under reduced motion. */
@@ -701,6 +708,7 @@ button.along-card-pct .go i{font-style:normal;font-family:var(--title);font-size
   .along-card-word{font-size:15px;margin:0 0 6px}
   .along-card-line{margin:2px 0;font-size:13px}
   .along-card-clean{margin:6px 0 2px;padding:5px 10px}
+  .along-card-where{margin:5px auto 0;padding:3px 10px 3px 5px;font-size:13.5px}.along-card-where svg{width:24px;height:24px}   /* v486 */
   .along-card-next{margin-top:8px}
   .along-card .ask-btns{margin-top:8px}
   #alongModal .along-card{padding-top:12px;padding-bottom:12px}
@@ -3301,6 +3309,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <div class="cs-pct" id="csPct">0 %</div>
     <p class="cs-line" id="csLine"></p>
     <p class="cs-line" id="csHands"></p>
+    <div class="along-card-where" id="csWhere" hidden></div>   <!-- v486: where I'm off -->
     <button type="button" class="course-go" id="csGo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg><span id="csGoT">Next step</span></button>
     <div class="cs-two"><button type="button" class="btn" id="csAgain">Again</button><button type="button" class="btn" id="csBack">Back to the course</button></div>
   </div>
@@ -3315,6 +3324,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <div class="along-card-gaps" id="alongCardGaps" hidden></div>   <!-- v482: with the click / in the silence -->
     <p class="along-card-line" id="alongCardPrev" hidden></p>
     <p class="along-card-line" id="alongCardMiss"></p>
+    <div class="along-card-where" id="alongCardWhere" hidden></div>   <!-- v486: where I'm off -->
     <div class="along-card-clean" id="alongCardClean" hidden><span class="cs">&#9733;</span><span>Clean at</span><b id="alongCardCleanV"></b></div>
     <p class="along-card-line note" id="alongCardNote"></p>
     <button type="button" class="btn along-card-next" id="alongCardNext" hidden></button>   <!-- v306 (Oscar): the next step above Close / Run again -->
@@ -3597,7 +3607,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v485"></script>
+<script src="./app.js?v=v486"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3610,8 +3620,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v485";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-12 16:29";          /* and when it was built, for ?diag */
+  var BUILD = "v486";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-12 16:42";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

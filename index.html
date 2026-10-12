@@ -839,7 +839,7 @@ button.along-card-pct .go i{font-style:normal;font-family:var(--title);font-size
 }
 .seq-box[data-over="1"]{border-color:var(--c2);box-shadow:0 0 0 2px color-mix(in srgb,var(--c2) 22%,transparent)}
 /* The level list: one row a level, loaded onto the wheel by its name, moved
-   with the arrows. Rows are plain so a hundred of them still read. */
+   by its grip in the editor (v464; arrows before). Rows are plain so a hundred of them still read. */
 /* the list scrolls inside its own box, about seven rows tall (Oscar, v90: the ladder
    had grown past a screen); position:relative so a row's offsetTop is list-relative */
 .lvl-list{display:flex;flex-direction:column;gap:6px;max-height:342px;overflow-y:auto;position:relative;padding:2px;scrollbar-width:thin}
@@ -1621,11 +1621,13 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
   :root[data-course="1"][data-cpoly="1"][data-cexam="1"] .dial{width:calc(100vh - 150px);width:calc(100svh - 150px);min-width:120px}   /* v364 (QA v363 V2): an exam has no step line or hand boxes - the wheel takes their room */   /* v328 (QA v325 V2): the step line's room */
   :root[data-course="1"] .ct-step{font-size:12px}
 }
+#lvlList .lvl-row.ed{grid-template-columns:auto 22px minmax(0,1fr) auto}   /* v464: the editor's rows start with a grip */
 @media (max-width:400px){   /* v383 (QA v382 V1): a sequence step's buttons sit on their own line, so its name keeps the row */
   .seq-list .lvl-row{grid-template-columns:22px minmax(0,1fr);row-gap:4px}
   .seq-list .lvl-row .ops{grid-column:2;justify-content:flex-end}
-  :root[data-editor="1"] #lvlList .lvl-row{grid-template-columns:22px minmax(0,1fr);row-gap:4px}   /* v417 (QA v414 V1) */
-  :root[data-editor="1"] #lvlList .lvl-row .ops{grid-column:2;justify-content:flex-end}
+  #lvlList .lvl-row.ed{grid-template-columns:auto 22px minmax(0,1fr);row-gap:4px}   /* v417 (QA v414 V1); v464 the grip spans both lines */
+  #lvlList .lvl-row.ed .grip{grid-row:1 / span 2}
+  #lvlList .lvl-row.ed .ops{grid-column:3;justify-content:flex-end}
 }
 @media (orientation:landscape) and (max-height:520px){   /* v383 (QA v382 V2): the floor is the wheel's, not the box's (its padding takes 26 px) */
   :root[data-course="1"] .dial{min-width:122px}
@@ -2480,11 +2482,12 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .mine-lbl{margin:14px 0 8px}
 .mine-list .lvl-row{grid-template-columns:auto minmax(0,1fr) auto}   /* no position number; a grip at the left (v463) */
 .mine-list .lvl-row .body{cursor:pointer}
-/* v463 (Oscar): presets reorder by drag like the routines - the grip replaces the arrows */
-.mine-list .lvl-row .grip{color:var(--ink-3);font-size:16px;letter-spacing:-2px;padding:0 6px 0 10px;margin:-6px -4px -6px -8px;align-self:stretch;display:flex;align-items:center;justify-content:center;min-width:34px;box-sizing:border-box;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
-.mine-list .lvl-row[data-drag="1"]{border-color:var(--c2);box-shadow:0 0 0 2px color-mix(in srgb,var(--c2) 40%,transparent),0 8px 20px -8px rgba(0,0,0,.65)}
-.mine-list .lvl-row[data-drag="1"] .grip{color:var(--c2);cursor:grabbing}
-:root[data-tour="1"] .mine-list .lvl-row .grip{visibility:hidden}
+/* v463 (Oscar): presets reorder by drag like the routines - the grip replaces the arrows;
+   v464 the level editor's rows too (#lvlList .lvl-row.ed: grip, number, body, buttons) */
+:is(.mine-list,#lvlList) .lvl-row .grip{color:var(--ink-3);font-size:16px;letter-spacing:-2px;padding:0 6px 0 10px;margin:-6px -4px -6px -8px;align-self:stretch;display:flex;align-items:center;justify-content:center;min-width:34px;box-sizing:border-box;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+:is(.mine-list,#lvlList) .lvl-row[data-drag="1"]{border-color:var(--c2);box-shadow:0 0 0 2px color-mix(in srgb,var(--c2) 40%,transparent),0 8px 20px -8px rgba(0,0,0,.65)}
+:is(.mine-list,#lvlList) .lvl-row[data-drag="1"] .grip{color:var(--c2);cursor:grabbing}
+:root[data-tour="1"] :is(.mine-list,#lvlList) .lvl-row .grip{visibility:hidden}
 .mine-list .lvl-row .ops button[data-del]:hover{border-color:var(--c3);color:var(--c3)}
 .mine-list:empty{display:none}
 .lvl-row .ops button[data-seq]{color:var(--c1)}
@@ -3554,7 +3557,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v463"></script>
+<script src="./app.js?v=v464"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3567,8 +3570,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v463";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-12 09:54";          /* and when it was built, for ?diag */
+  var BUILD = "v464";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-12 10:11";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -532,6 +532,10 @@ input[type=range]::-moz-range-thumb{
 .tour-picks[hidden]{display:none}
 .tour-picks button{font-weight:600;font-size:12.5px;font-family:inherit;text-align:left;border-radius:11px;border:1px solid var(--line-2);background:var(--sunk);color:var(--ink);padding:9px;display:flex;flex-direction:column;gap:3px;cursor:pointer}
 .tour-picks button small{font-weight:400;font-size:10.5px;color:var(--ink-3);line-height:1.25}
+.tour-picks button.tp-time{grid-column:1 / -1;flex-direction:row;align-items:center;gap:10px;border-color:color-mix(in srgb,var(--c5) 60%,var(--line-2))}   /* v487: Timing basics, the first course */
+.tour-picks button.tp-time svg{width:22px;height:22px;flex:none;color:var(--c5)}
+.tour-picks button.tp-time span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.tour-picks button.tp-time[aria-pressed="true"]{border-color:var(--c5);background:color-mix(in srgb,var(--c5) 14%,var(--sunk))}
 .picos{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:3px}   /* v332 (Oscar): a preset's sections as their coloured icons */
 .picos svg{width:14px;height:14px;display:block}
 .tour-picks button[aria-pressed="true"]{border-color:var(--c2);background:color-mix(in srgb,var(--c2) 14%,var(--sunk))}
@@ -3273,8 +3277,9 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   <div class="tour-t" id="tourT"></div>
   <div class="tour-d" id="tourD"></div>
   <div class="tour-picks" id="tourPicks" hidden>
+    <button type="button" data-p="time" class="tp-time"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-metro"/></svg><span>Improve my timing<small>start the Timing basics course</small></span></button>   <!-- v487 (Oscar): the first course, offered by name -->
     <button type="button" data-p="metro"><span class="picos" data-picos="metro"></span>Metronome<small>practise with the wheel</small></button>
-    <button type="button" data-p="practice"><span class="picos" data-picos="practice"></span>Practice<small>sessions, routines, timing</small></button>
+    <button type="button" data-p="practice"><span class="picos" data-picos="practice"></span>Practice<small>sessions, routines, Precision</small></button>
     <button type="button" data-p="learn"><span class="picos" data-picos="learn"></span>Learn<small>courses and the game</small></button>
     <button type="button" data-p="all"><span class="picos" data-picos="all"></span>Everything<small>every part at once</small></button>
   </div>
@@ -3607,7 +3612,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v486"></script>
+<script src="./app.js?v=v487"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3620,8 +3625,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v486";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-12 16:42";          /* and when it was built, for ?diag */
+  var BUILD = "v487";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-12 16:45";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -2598,7 +2598,7 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;border:1px solid var(
 /* the app's name and, in grey, what it is */
 h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-spacing:.01em;line-height:1.15;margin-top:2px;white-space:nowrap}
 #splash{position:fixed;inset:0;z-index:200;background:var(--ground);display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:6px;padding:0 24px calc(6vh + env(safe-area-inset-bottom, 0px));text-align:center;transition:opacity .4s ease;pointer-events:none}
+  gap:6px;padding:0 24px calc(6vh + env(safe-area-inset-bottom, 0px));text-align:center;transition:opacity .2s ease;pointer-events:none}
 #splash svg{margin-bottom:22px}
 #splash .sp-name{font-family:var(--title);font-stretch:var(--title-stretch);font-weight:600;font-size:38px;line-height:1.05;letter-spacing:-.015em;color:var(--ink)}
 #splash .sp-sub{font-weight:500;font-size:16px;color:var(--ink-3);letter-spacing:.01em}
@@ -3569,7 +3569,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v474"></script>
+<script src="./app.js?v=v475"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3582,8 +3582,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v474";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-12 12:46";          /* and when it was built, for ?diag */
+  var BUILD = "v475";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-12 12:53";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

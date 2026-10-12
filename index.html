@@ -1563,7 +1563,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rcat svg{width:12px;height:12px;flex:none;transition:transform .16s ease}
 .rcat[data-fold="1"] svg{transform:rotate(-90deg)}
 .rcat .rgname{flex:1 1 auto;min-width:0}
-.rcat .rgcount{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:0}
+.rcat .rgcount{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:0;white-space:nowrap;flex:none}   /* v484 (QA v478 V2) */
 @media (prefers-reduced-motion:reduce){ .rgroup svg{transition:none} }
 
 /* Practice session. Written as a sentence you can read straight through, with
@@ -2090,6 +2090,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .blind-flash{position:absolute;left:50%;top:50%;width:22%;aspect-ratio:1/1;opacity:0;pointer-events:none;color:var(--ink);z-index:3;transform:translate(-50%,-50%)}
 .blind-flash svg{width:100%;height:100%;display:block;overflow:visible}
 .cintro .ci-note{color:var(--c3)} .cintro .ci-note[hidden]{display:none}
+@media (max-height:340px){ .course-sheet.cintro{padding:10px 14px 10px;gap:4px} .cintro .ci-t{font-size:18px} .cintro .ci-hand{width:34px;height:40px} .cintro .ci-hands{margin:0} }   /* v484 (QA v478 V3) */
 .cintro .course-go.pad{border-color:var(--c1);background:color-mix(in srgb,var(--c1) 12%,transparent)} .cintro .course-go.pad svg{color:var(--c1)}
 .cintro .ci-later{align-self:center;border-color:transparent;color:var(--ink-3)}
 /* v338 (Oscar): a one-hand step - its own half takes the taps; v339: the other hand's edge and label are grey */
@@ -3596,7 +3597,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v483"></script>
+<script src="./app.js?v=v484"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3609,8 +3610,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v483";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-12 15:34";          /* and when it was built, for ?diag */
+  var BUILD = "v484";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-12 16:07";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

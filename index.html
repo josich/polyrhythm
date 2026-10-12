@@ -2609,7 +2609,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 #splash .sp-sub{font-weight:500;font-size:16px;color:var(--ink-3);letter-spacing:.01em}
 #splash[data-out="1"]{opacity:0}
 @media (prefers-reduced-motion:reduce){ #splash{transition:none} }
-#srecChip{position:fixed;top:calc(4px + env(safe-area-inset-top, 0px));left:50%;transform:translateX(-50%);z-index:85;padding:3px 10px;border-radius:999px;border:1.5px solid var(--c3);background:var(--panel);color:var(--c3);font:700 11px/1.3 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;cursor:pointer}
+#srecChip{position:fixed;bottom:calc(8px + env(safe-area-inset-bottom, 0px));left:8px;z-index:79;padding:3px 10px;border-radius:999px;border:1.5px solid var(--c3);background:var(--panel);color:var(--c3);font:700 11px/1.3 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;cursor:pointer}
 #srecChip[hidden]{display:none}
 </style>
 
@@ -3574,7 +3574,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v478"></script>
+<script src="./app.js?v=v479"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3587,8 +3587,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v478";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-12 14:12";          /* and when it was built, for ?diag */
+  var BUILD = "v479";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-12 15:01";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -1977,6 +1977,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .course-strip .tk.acc::after{content:">";position:absolute;top:-1px;font-size:9px;color:var(--ink-3)}
 .course-strip .tk::before{content:"";position:absolute;inset:-1px;border-radius:inherit;border:1px solid var(--hc,var(--line-2));background:color-mix(in srgb,var(--hc,var(--line-2)) 22%,transparent);opacity:0;will-change:opacity;pointer-events:none}
 .course-strip .tk.R{--hc:var(--c1)} .course-strip .tk.L{--hc:var(--c2)}
+.course-strip[data-only="R"] .tk.L,.course-strip[data-only="L"] .tk.R{color:var(--dot-off);--hc:var(--line-2)}   /* v465: a hand alone - the other hand's strokes are heard, not tapped */
 .course-strip .tk.lit::before{opacity:1}
 :root[data-course="1"] #courseFoot{display:flex;flex-direction:column;gap:8px;margin-top:4px}
 .ctrack{display:flex;align-items:center;margin:0 -6px;padding:6px 12px}   /* v340 (Oscar): room for the current step's ring above and below, clear of the labels */   /* v322 (QA v321 V3): the dots' 12 px tap zones sit inside the padding, so they no longer widen the box (the dots stay 6 px in) */
@@ -1996,6 +1997,11 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root[data-cpoly="1"] .ctrack b.cur .sn{color:var(--ink)}
 :root[data-cpoly="1"] .ctrack{padding-bottom:22px}
 :root[data-cpoly="1"] .ctrackl{display:none}
+.ct-lad[data-lbl="1"] .ctrack b{position:relative}   /* v465: a rudiment on the phone - a label under each dot: R, L, then the tempos */
+.ct-lad[data-lbl="1"] .ctrack b .sn{display:block;position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);font-family:"IBM Plex Mono",monospace;font-size:10.5px;line-height:1;color:var(--ink-3);pointer-events:none}
+.ct-lad[data-lbl="1"] .ctrack b.goal .sn{color:var(--c4)} .ct-lad[data-lbl="1"] .ctrack b.cur .sn{color:var(--ink)}
+.ct-lad[data-lbl="1"] .ctrack{padding-bottom:22px}
+.ct-lad[data-lbl="1"] .ctrackl{display:none}
 .cwave{position:fixed;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;border:2px solid var(--wc,var(--c1));pointer-events:none;z-index:60;opacity:0}
 .course-go{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:13px;border:1.5px solid var(--c2);font:inherit;font-weight:700;font-size:15px;background:color-mix(in srgb,var(--c2) 12%,transparent);color:var(--ink);cursor:pointer}
 .course-go svg{width:17px;height:17px;color:var(--c2)}
@@ -3557,7 +3563,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v464"></script>
+<script src="./app.js?v=v465"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3570,8 +3576,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v464";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-12 10:11";          /* and when it was built, for ?diag */
+  var BUILD = "v465";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-12 10:24";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -669,6 +669,15 @@ input[type=range]::-moz-range-thumb{
 .along-card-bar .ntc{position:absolute;top:2px;width:2px;height:20px;margin-left:-1px;border-radius:1px;background:var(--ink-2)}
 .along-card-bar .nlb{position:absolute;top:22px;transform:translateX(-50%);font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--ink-3)}
 .along-card-clean[hidden]{display:none}
+/* v481 (Oscar: "the one in the monetization mock-up"): the gold band carries the sweep of light of the Pro card mock-up
+   (design/pro-card-proto.html, option B) - a soft band of light crosses it every 3.6 s and rests in between. Its
+   transform alone moves (the no-paint rule); none under reduced motion. */
+.along-card-clean{position:relative;overflow:hidden}
+.along-card-clean::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.10) 50%,transparent 70%);
+  transform:translateX(-120%);will-change:transform;animation:cleanSweep 3.6s ease-in-out infinite}
+@keyframes cleanSweep{0%,55%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+@media (prefers-reduced-motion:reduce){ .along-card-clean::after{animation:none;opacity:0} }
 .along-card .ask-btns{margin-top:14px;justify-content:space-between}   /* v309 (Oscar): to the sides */
 .along-card .btn,button.along-card-pct{transition:opacity .25s}
 /* v310 (Oscar): the result is the button to the pattern's row in the log - "52 % › Log", the arrow teal, "Log" dim */
@@ -3577,7 +3586,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v480"></script>
+<script src="./app.js?v=v481"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3590,8 +3599,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v480";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-12 15:16";          /* and when it was built, for ?diag */
+  var BUILD = "v481";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-12 15:22";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

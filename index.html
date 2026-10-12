@@ -3569,7 +3569,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v475"></script>
+<script src="./app.js?v=v476"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3582,8 +3582,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v475";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-12 12:53";          /* and when it was built, for ?diag */
+  var BUILD = "v476";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-12 13:04";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 
@@ -3887,6 +3887,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       perf.textContent = "frames (last 3 s): mean " + mean.toFixed(1) + " ms · worst " + a[a.length - 1].toFixed(0) + " ms · over 50 ms: " +
         a.filter(function(x){ return x > 50; }).length + " · long tasks since open: " + longs + mem + " · nodes " + document.querySelectorAll("*").length + drawLine +
         "\nboot: parse+run " + Math.round(performance.timing.domInteractive - performance.timing.responseEnd) + " ms" +
+        (window.POLY_BOOTLINE ? "\nboot steps (ms since the page began loading): " + window.POLY_BOOTLINE() : "") +   /* v476 */
         "\nlong frames: " + loafs + " · worst blocking " + Math.round(worstBlock) + " ms · script " + Math.round(loafScript) + " ms · rendering " + Math.round(loafRender) + " ms (style+layout " + Math.round(loafLayout) + " ms)" + (top.length ? "\n  " + top.join("\n  ") : "");
     }, 1000);
   })();

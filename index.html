@@ -758,7 +758,8 @@ button.along-card-pct .go i{font-style:normal;font-family:var(--title);font-size
 /* v482: Gaps - the click drops out for whole loops while the taps stay judged (the App-Plan session's proposal) */
 .along-gaps button svg{width:13px;height:13px;flex:none;color:var(--c3)} .along-gaps button{display:inline-flex;align-items:center;gap:5px}
 #alongSec[data-game="1"] #alongGaps{display:none!important}
-.along-card-gaps{display:flex;flex-wrap:nowrap;white-space:nowrap;justify-content:center;align-items:center;gap:6px 18px;margin:2px 0 4px;font:600 15px var(--mono, ui-monospace),monospace;color:var(--ink)}
+#precBar > #precPop{max-height:calc(100svh - 70px);overflow-y:auto;overscroll-behavior:contain}   /* QA v483 V2: a short landscape tab scrolls the panel, not the page */
+.along-card-gaps{display:flex;flex-wrap:nowrap;white-space:nowrap;justify-content:center;align-items:center;gap:6px 18px;margin:2px 0 4px;font:600 15px "IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;color:var(--ink)}
 .along-card-gaps .ag{display:inline-flex;align-items:center;gap:6px} .along-card-gaps svg{width:18px;height:18px;color:var(--ink-3)} .along-card-gaps .ag.sil svg{color:var(--c3)}
 .along-card-gaps .agw{margin-left:4px;font:600 14px system-ui,sans-serif}
 .along-card-gaps b[data-kind="tight"]{color:var(--c2)} .along-card-gaps b[data-kind="rush"],.along-card-gaps b[data-kind="drag"]{color:var(--c1)} .along-card-gaps b[data-kind="loose"]{color:var(--c3)}
@@ -3719,7 +3720,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v497"></script>
+<script src="./app.js?v=v498"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3732,8 +3733,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v497";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-12 23:23";          /* and when it was built, for ?diag */
+  var BUILD = "v498";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-12 23:26";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

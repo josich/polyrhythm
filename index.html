@@ -2604,6 +2604,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 #splash .sp-sub{font-weight:500;font-size:16px;color:var(--ink-3);letter-spacing:.01em}
 #splash[data-out="1"]{opacity:0}
 @media (prefers-reduced-motion:reduce){ #splash{transition:none} }
+#srecChip{position:fixed;top:calc(4px + env(safe-area-inset-top, 0px));left:50%;transform:translateX(-50%);z-index:85;padding:3px 10px;border-radius:999px;border:1.5px solid var(--c3);background:var(--panel);color:var(--c3);font:700 11px/1.3 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;cursor:pointer}
+#srecChip[hidden]{display:none}
 </style>
 
 <!-- the app's own splash: Android shows its icon-and-name card in the system font
@@ -3581,7 +3583,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
   var BUILD = "v471";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-12 11:46";          /* and when it was built, for ?diag */
+  var BUILT = "2026-10-12 12:10";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 
@@ -3740,6 +3742,31 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       else fallback();
     });
     bar.appendChild(cp);
+    /* v471: the session recorder - record real practice on this phone, then send the file */
+    (function(){
+      var R = window.POLY_REC; if(!R) return;
+      var wrap = document.createElement("div");
+      wrap.style.cssText = "width:100%;display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 2px;padding:10px 12px;border-radius:10px;border:1.5px solid var(--c3);background:var(--sunk)";
+      var info = document.createElement("div");
+      info.style.cssText = "width:100%;color:var(--ink-2);font:13px/1.45 system-ui,sans-serif";
+      var go = document.createElement("button"), send = document.createElement("button");
+      [go, send].forEach(function(b){ b.type = "button"; b.style.cssText = "flex:1 1 140px;padding:10px 12px;border-radius:10px;border:1.5px solid var(--c3);background:var(--panel);color:var(--ink);font:600 13px system-ui,sans-serif;cursor:pointer"; });
+      send.style.borderColor = "var(--c2)";
+      var paint = function(){
+        var on = R.on();
+        if(on){ var s = Math.floor(R.since() / 1000); info.innerHTML = "<b style='color:var(--c3)'>Recording \u00b7 " + Math.floor(s / 60) + ":" + (s % 60 < 10 ? "0" : "") + (s % 60) + "</b> \u00b7 go back to the app and practise. Tap the red REC chip at the top to stop and send."; go.textContent = "Stop the recording"; }
+        else { info.innerHTML = "<b>Record a session</b> \u00b7 up to 10 minutes of normal practice. It records only timings and what the app was doing: no sound, no screen."; go.textContent = "Record and go to the app"; }
+        send.textContent = "Send the last recording"; send.disabled = on || !R.has(); send.style.opacity = send.disabled ? ".4" : "1";
+      };
+      go.addEventListener("click", function(){
+        if(R.on()){ R.stop(); paint(); return; }
+        R.start(); setTimeout(function(){ location.href = "./"; }, 150);
+      });
+      send.addEventListener("click", function(){ R.send().then(function(r){ info.textContent = r === "shared" ? "Sent." : r === "saved" ? "Saved to the downloads folder." : r === "cancelled" ? "Not sent." : "Nothing to send."; setTimeout(paint, 2500); }); });
+      wrap.appendChild(info); wrap.appendChild(go); wrap.appendChild(send);
+      bar.appendChild(wrap);
+      paint(); setInterval(function(){ if(R.on()) paint(); }, 1000);
+    })();
     var lab = document.createElement("span"); lab.textContent = "bisect (play with one on at a time):"; lab.style.cssText = "color:var(--ink-3);width:100%";
     bar.appendChild(lab);
     FLAGS.forEach(function(f){

@@ -2301,7 +2301,14 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 #ctabs .cpl .t{font-size:10.5px;color:var(--ink-3);white-space:nowrap}
 /* v497 (Oscar): the Reading course's screen - the course screen's look; a bar of notation over an empty wheel */
 #readScr{display:none}
-:root[data-rdg="1"] .wrap > :not(#readScr){display:none!important}
+:root[data-rdg="1"] .wrap > :not(#readScr):not(.stage){display:none!important}   /* v503: the app's wheel under the bar */
+#readFoot{display:none}
+:root[data-rdg="1"] body .wrap > .stage:not(#rdNone){display:grid!important;grid-template-columns:minmax(0,1fr);gap:8px;margin-top:8px}   /* outranks the Courses window's own rule, as #readScr does */
+:root[data-rdg="1"] .stage > :not(.dial):not(#readFoot){display:none!important}
+:root[data-rdg="1"] .stage > #readFoot{display:flex;flex-direction:column;gap:8px}
+:root[data-rdg="1"] .dial :is(.dial-head,.dial-foot,#stageScore,#twoSplit){display:none!important}
+:root[data-rdg="1"] .dial{padding:8px}
+:root[data-rdg="1"] .canvas-hold{max-width:min(100%,520px,max(190px,calc(100vh - var(--rdh,440px))));max-width:min(100%,520px,max(190px,calc(100svh - var(--rdh,440px))))}
 :root[data-rdg="1"] body .wrap > #readScr.read-scr{display:flex!important}   /* outranks the Courses window's own rule */
 :root[data-rdg="1"] .wrap{padding-top:calc(14px + env(safe-area-inset-top, 0px))!important;padding-bottom:calc(16px + env(safe-area-inset-bottom, 0px))!important}
 .read-scr{flex-direction:column;gap:9px;max-width:560px;margin:0 auto;user-select:none;-webkit-user-select:none;touch-action:manipulation}
@@ -2310,14 +2317,33 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rd-bar .cb-mode{border-color:color-mix(in srgb,var(--c5) 55%,var(--line))}
 .rd-bar .cb-mode svg{color:var(--c5)}
 #rdX{width:34px;height:34px;border-radius:10px;color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));font-size:18px}
-.rd-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px 5px}
-.rd-steps .g{grid-column:span 2;font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);text-align:center;border-bottom:1px dashed var(--line-2);padding-bottom:3px}
-.rd-steps button{height:30px;border-radius:9px;border:1px solid var(--line);background:var(--sunk);color:var(--ink-3);font-size:11.5px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;padding:0;min-width:0}
-.rd-steps button svg{width:13px;height:13px;flex:none}
+.rd-steps{display:flex;gap:8px;align-items:flex-end}   /* v503: nine steps and the exam, as icons */
+.rd-steps .grp{display:flex;flex-direction:column;gap:3px;flex:5 1 0;min-width:0}
+.rd-steps .grp.al{flex:4 1 0} .rd-steps .grp.ex{flex:1.25 1 0}
+.rd-steps .row{display:flex;gap:3px}
+.rd-steps .g{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);text-align:center;border-bottom:1px dashed var(--line-2);padding-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:clip}
+.rd-steps button{flex:1 1 0;height:30px;border-radius:9px;border:1px solid var(--line);background:var(--sunk);color:var(--ink-3);font-size:11.5px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;padding:0;min-width:0}
+.rd-steps button svg{width:14px;height:14px;flex:none}
+.rd-steps .ex button{color:var(--c4)} .rd-steps .ex button[data-done="1"]{color:var(--c1)}
 .rd-steps button[data-done="1"]{color:var(--c2)}
 .rd-steps button[data-cur="1"]{color:var(--ink);border-color:color-mix(in srgb,var(--c5) 70%,var(--line));background:color-mix(in srgb,var(--c5) 14%,var(--sunk))}
 .rd-steps button:disabled{opacity:.4;cursor:default}
-.rd-steps[data-endless="1"]{display:block}
+.rd-nota{position:relative}   /* v503: the playhead is an HTML line moved by transform */
+.rd-hd{position:absolute;left:0;top:0;width:2px;margin-left:-1px;border-radius:1px;background:#E5484D;opacity:0;pointer-events:none;will-change:transform}
+.rd-ns .nh{transform-box:fill-box;transform-origin:center}   /* a hit's jump, a miss's shake */
+.rd-foot .rd-tempo{margin-top:2px}
+.rd-card{position:relative}
+.rdc-x{position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:10px;color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));font-size:17px}
+.rdc-k{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;color:var(--ink-3);text-transform:uppercase;padding:0 36px}
+.rdc-t{font-size:30px} .rdc-t[data-k="intro"]{color:var(--ink);font-size:24px} .rdc-t[data-k="pass"]{color:var(--c1)}
+.rdc-fig{display:flex;justify-content:center;margin:2px 0 0}
+.rdc-fig svg{display:block;height:88px;width:auto;max-width:100%}
+.rdc-stars{margin:0;font-size:38px;line-height:1;letter-spacing:.12em;color:var(--c1)} .rdc-stars i{font-style:normal;color:var(--line-2)}
+.rdc-l{font-size:14px;line-height:1.35}
+.rdc-alt{width:100%;height:42px;border-radius:12px;font-weight:600}
+.rd-st{color:var(--c1);letter-spacing:.06em;margin-left:2px} .rd-st i{font-style:normal;color:var(--line-2)}
+.rd-ds{display:flex;flex-wrap:wrap;gap:4px 10px} .rd-ds li.ex button{color:var(--c4)}
+.rd-info{margin:0 0 6px;color:var(--ink-2)}
 .rd-tally{margin:0;text-align:center;font-size:12.5px;color:var(--ink-3)}
 .rd-tally span{color:var(--c2);font-weight:700}
 .rd-tally b{font-family:"IBM Plex Mono",monospace;color:var(--ink);font-size:14px}
@@ -2328,11 +2354,6 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rd-say b.g{color:var(--c2)} .rd-say b.p{color:var(--c3)} .rd-say b.o{color:var(--c1);font-family:inherit}
 .rd-clean{display:inline-flex;align-items:center;gap:4px;font-family:"IBM Plex Mono",monospace;font-size:11.5px;font-weight:600;letter-spacing:.06em;color:var(--c2);border:1px solid color-mix(in srgb,var(--c2) 55%,var(--line));background:color-mix(in srgb,var(--c2) 12%,var(--sunk));border-radius:999px;padding:1px 9px 1px 7px;vertical-align:middle;line-height:18px}
 .rd-clean svg{width:11px;height:11px}
-.rd-dial{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:4px;align-self:center;width:100%;max-width:max(230px, calc(100svh - 410px));box-sizing:border-box}
-.rd-dial[data-ok="1"]{border-color:color-mix(in srgb,var(--c2) 60%,var(--line))}
-.rd-dial[data-tap="1"]{cursor:pointer}
-#rdWheel svg{display:block;width:100%;height:auto;touch-action:none}
-.rd-flash{position:absolute;inset:-1px;border:2px solid var(--c3);border-radius:14px;opacity:0;pointer-events:none}
 .rd-tempo{display:flex;justify-content:center;align-items:center;gap:16px}
 .rd-tempo[hidden]{display:none}
 .rd-tempo .rdb{display:flex;align-items:baseline;gap:5px}
@@ -2355,41 +2376,23 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rd-ns .n{color:var(--ink)} .rd-ns .n.ok{color:var(--c2)} .rd-ns .n.miss{color:var(--c3)} .rd-ns .n.near{color:var(--c1)}
 .rd-ns .cw{font-family:"IBM Plex Mono",monospace;font-size:10.5px;fill:var(--ink-3);text-anchor:middle;opacity:.7}
 .rd-ns .cw.sm{font-size:8.5px}
+.rd-ns .cw.tr{font-size:7.4px;letter-spacing:-.04em}   /* v505: "trip let" fits a triplet's spacing */
 .rd-ns .cw.on{fill:var(--ink-2);font-weight:600;opacity:1}
 .rd-ns .cw.x{fill:var(--c3);opacity:1;font-weight:600}
 .rd-ns .tn{font-family:var(--title);font-style:italic;font-weight:700;font-size:11px;fill:var(--ink-2);text-anchor:middle}
 .rd-ns .tb{stroke:var(--ink-2);stroke-width:1.1;fill:none}
 .rd-ns .hd{stroke:#E5484D;stroke-width:2;stroke-linecap:round}
-.rd-wh .ring{fill:none;stroke:var(--line);stroke-width:1.3}
-.rd-wh .slot{fill:var(--sunk);stroke:var(--line-2);stroke-width:1.6}
-.rd-wh .on{fill:var(--c1)} .rd-wh .ok{fill:var(--c2)} .rd-wh .ex{fill:var(--c3)}
-.rd-wh .exx{stroke:var(--ground);stroke-width:2;stroke-linecap:round}
-.rd-wh .mr{fill:none;stroke:var(--c3);stroke-width:1.7;stroke-dasharray:3.2 2.6}
-.rd-wh .tk{fill:var(--line-2)}
-.rd-wh .wl{font-family:"IBM Plex Mono",monospace;font-size:10px;fill:var(--ink-3);text-anchor:middle;dominant-baseline:central}
-.rd-wh .wl.b{fill:var(--ink-2);font-weight:600;font-size:11.5px}
-.rd-wh .hand{stroke:var(--ink-2);stroke-width:2.2;stroke-linecap:round}
-.rd-wh .bar{stroke:var(--ink-3);stroke-width:1.4}
-.rd-wh .rd-hub{cursor:pointer}
-.rd-wh .hub{fill:color-mix(in srgb,var(--ink) 20%,var(--sunk));stroke:var(--line-2);stroke-width:1}
-.rd-wh .hubi{fill:var(--ink)}
-.rd-wh .hubn{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:20px;fill:var(--c2);text-anchor:middle;dominant-baseline:central}
 .clist .cst.inf{border:1.5px solid color-mix(in srgb,var(--c2) 55%,var(--line));color:var(--c2);font-size:13px;line-height:1}
 :root[data-rsel="1"][data-cpg="1"] #cwinOpts{visibility:hidden}   /* the way to take a course (phone / pad, left-handed) is not the reading course's; v500: on its own page */
 #ctabs[data-more="1"]{-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 26px),transparent)}
-@media (max-height:620px){ .rd-dial{max-width:max(200px, calc(100svh - 380px))} :root[data-rdg="1"] .read-scr{gap:7px} }
+@media (max-height:620px){ :root[data-rdg="1"] .read-scr{gap:7px} }
 /* a short landscape screen (a browser tab): the notation and the buttons left, the wheel right */
 @media (orientation:landscape) and (max-height:520px){
   :root[data-rdg="1"] .wrap{padding-top:calc(8px + env(safe-area-inset-top, 0px))!important;padding-bottom:calc(8px + env(safe-area-inset-bottom, 0px))!important}
-  :root[data-rdg="1"] body .wrap > #readScr.read-scr{display:grid!important;grid-template-columns:minmax(0,1fr) auto;column-gap:14px;row-gap:6px;max-width:900px;align-items:start}
-  .read-scr > .rd-bar{grid-column:1 / -1;grid-row:1}
-  .read-scr > .rd-steps{grid-column:1;grid-row:2}
-  .read-scr > .rd-nota{grid-column:1;grid-row:3}
-  .read-scr > .rd-tempo{grid-column:1;grid-row:4}
-  .read-scr > .rd-btns{grid-column:1;grid-row:5}
-  .read-scr > .rd-more-row{grid-column:1;grid-row:6}
-  .read-scr > .rd-say{grid-column:2;grid-row:2;align-self:center}
-  .read-scr > .rd-dial{grid-column:2;grid-row:3 / span 4;width:calc(100svh - 92px);max-width:none;min-width:140px}
+  :root[data-rdg="1"] .wrap{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:14px;align-items:start;max-width:900px}
+  :root[data-rdg="1"] .wrap > #readScr{grid-column:1;grid-row:1}
+  :root[data-rdg="1"] .wrap > .stage{grid-column:2;grid-row:1;margin-top:0}
+  :root[data-rdg="1"] .canvas-hold{max-width:calc(100svh - 150px);width:calc(100svh - 150px);min-width:120px}
   .rd-steps .g{display:none}
   .rd-steps button{height:26px}
   .rd-tempo .jump{height:32px}
@@ -3006,11 +3009,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <div class="rd-steps" id="rdSteps"></div>
     <div class="rd-nota" id="rdNota"></div>
     <p class="rd-say" id="rdSay" aria-live="polite"></p>
-    <div class="rd-dial" id="rdDial"><div id="rdWheel"></div><div class="rd-flash" id="rdFlash"></div></div>
-    <div class="rd-tempo" id="rdTempo" hidden><button type="button" class="jump wide" id="rdDown" aria-label="Slower">&minus;5</button><div class="rdb"><b id="rdBpm">70</b><span>bpm</span></div><button type="button" class="jump wide" id="rdUp" aria-label="Faster">+5</button></div>
-    <div class="rd-btns" id="rdBtns"></div>
-    <div class="rd-more-row" id="rdMore" hidden></div>
-  </section>
+  </section>   <!-- v503: the wheel is the app's own (.stage), the buttons sit under it in #readFoot -->
   <!-- v372 (Oscar): the game's own screen - the course screen's look, opened from the Play time window -->
   <!-- v426: a routine plays on its own screen - its name and step, the strip with a playhead, the tempo, the wheel -->
   <div class="rt-runbar" id="rtRunBar">
@@ -3154,6 +3153,11 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <div class="prac-slide" id="pracSlide"><span class="ps-lbl" id="pracGoT">Slide to practice</span><span class="ps-thumb" id="pracThumb" tabindex="0" role="button" aria-label="Slide to practice"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
     </div>
 
+    <div class="rd-foot" id="readFoot">   <!-- v503: the Reading course's buttons, under the app's wheel -->
+      <div class="rd-tempo" id="rdTempo" hidden><button type="button" class="jump wide" id="rdDown" aria-label="Slower">&minus;5</button><div class="rdb"><b id="rdBpm">70</b><span>bpm</span></div><button type="button" class="jump wide" id="rdUp" aria-label="Faster">+5</button></div>
+      <div class="rd-btns" id="rdBtns"></div>
+      <div class="rd-more-row" id="rdMore" hidden></div>
+    </div>
     <div class="course-foot" id="courseFoot">
       <button type="button" class="course-go" id="courseGo"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><rect x="3" y="12" width="3.2" height="8" rx="1"/><rect x="8.3" y="7" width="3.2" height="13" rx="1"/><rect x="13.6" y="4" width="3.2" height="16" rx="1"/><rect x="18.9" y="10" width="3.2" height="10" rx="1"/></g></svg><span id="courseGoT">Practice</span></button>
       <button type="button" class="course-tick" id="coursePadTick" hidden><span class="bx" aria-hidden="true"></span><span id="coursePadTickT">I played it cleanly</span></button>
@@ -3576,6 +3580,19 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <button type="button" class="course-go" id="cuGo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h12M12 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Go to the course</span></button>
   </div>
 </div>
+<!-- v503 (Oscar: "the That's it is too small - a pop-up in front with the next button"): the Reading course's card -->
+<div class="modal course-sheet-wrap rd-card-wrap" id="rdCard" hidden>
+  <div class="course-sheet rd-card" id="rdCardIn" data-arm="1" role="dialog" aria-modal="true" aria-labelledby="rdcT">
+    <button type="button" class="icobtn rdc-x" id="rdcX" title="Close" aria-label="Close">&times;</button>
+    <div class="rdc-k" id="rdcK"></div>
+    <div class="cs-k rdc-t" id="rdcT">That&rsquo;s it!</div>
+    <div class="rdc-fig" id="rdcF" hidden></div>
+    <p class="rdc-stars" id="rdcSt" hidden></p>
+    <p class="cs-line rdc-l" id="rdcL"></p>
+    <button type="button" class="course-go" id="rdcGo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h12M12 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="rdcGoT">Next</span></button>
+    <button type="button" class="btn rdc-alt" id="rdcAlt" hidden>Another bar</button>
+  </div>
+</div>
 <div class="modal course-sheet-wrap" id="courseSheet" hidden>
   <div class="course-sheet" id="courseSheetCard" data-arm="1" role="dialog" aria-modal="true" aria-labelledby="csK">
     <div class="cs-k" id="csK">CLEAN</div>
@@ -3887,7 +3904,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v503"></script>
+<script src="./app.js?v=v505"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3900,8 +3917,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v503";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-13 11:27";          /* and when it was built, for ?diag */
+  var BUILD = "v505";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-13 11:38";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

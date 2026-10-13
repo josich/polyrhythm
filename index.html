@@ -2311,7 +2311,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root[data-rdg="1"] .dial{padding:8px}
 :root[data-rdg="1"] .canvas-hold{max-width:min(100%,520px,max(190px,calc(100vh - var(--rdh,440px))));max-width:min(100%,520px,max(190px,calc(100svh - var(--rdh,440px))))}
 :root[data-rdg="1"] body .wrap > #readScr.read-scr{display:flex!important}   /* outranks the Courses window's own rule */
-:root[data-rdg="1"] .wrap{padding-top:calc(14px + env(safe-area-inset-top, 0px))!important;padding-bottom:calc(16px + env(safe-area-inset-bottom, 0px))!important}
+:root[data-rdg="1"] .wrap{padding-top:calc(30px + env(safe-area-inset-top, 0px))!important;padding-bottom:calc(16px + env(safe-area-inset-bottom, 0px))!important}
 .read-scr{flex-direction:column;gap:9px;max-width:560px;margin:0 auto;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 .rd-bar{display:grid;grid-template-columns:auto minmax(0,1fr) auto 34px;align-items:center;gap:8px}   /* v502: the editor's star before the cross */
 #rdWin{width:34px;height:34px;border-radius:10px;color:var(--c1);border-color:color-mix(in srgb,var(--c1) 45%,var(--line));font-size:14px}
@@ -2325,9 +2325,11 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rd-steps .g{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);text-align:center;border-bottom:1px dashed var(--line-2);padding-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:clip}
 .rd-steps button{flex:1 1 0;height:30px;border-radius:9px;border:1px solid var(--line);background:var(--sunk);color:var(--ink-3);font-size:11.5px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;padding:0;min-width:0}
 .rd-steps button svg{width:14px;height:14px;flex:none}
-.rd-steps .ex button{color:var(--c4)} .rd-steps .ex button[data-done="1"]{color:var(--c1)}
-.rd-steps button[data-done="1"]{color:var(--c2)}
-.rd-steps button[data-cur="1"]{color:var(--ink);border-color:color-mix(in srgb,var(--c5) 70%,var(--line));background:color-mix(in srgb,var(--c5) 14%,var(--sunk))}
+.rd-steps button{--kc:var(--c1);color:var(--kc);border-color:color-mix(in srgb,var(--kc) 40%,var(--line))}   /* v508 (Oscar): a colour per kind - build orange, tap teal, the exam purple; filled once done */
+.rd-steps button[data-k="t"]{--kc:var(--c2)} .rd-steps button[data-k="x"]{--kc:var(--c4)}
+.rd-steps button[data-done="1"]{background:var(--kc);border-color:var(--kc);color:var(--ground)}
+.rd-steps button[data-cur="1"]{border:2px solid var(--kc);background:color-mix(in srgb,var(--kc) 18%,var(--sunk))}
+.rd-steps button[data-cur="1"][data-done="1"]{background:var(--kc);box-shadow:inset 0 0 0 2px var(--panel)}
 .rd-steps button:disabled{opacity:.4;cursor:default}
 .rd-nota{position:relative}   /* v503: the playhead is an HTML line moved by transform */
 .rd-hd{position:absolute;left:0;top:0;width:2px;margin-left:-1px;border-radius:1px;background:#E5484D;opacity:0;pointer-events:none;will-change:transform}
@@ -2351,9 +2353,28 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rd-tally b{font-family:"IBM Plex Mono",monospace;color:var(--ink);font-size:14px}
 .rd-nota{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:4px 4px 2px}
 .rd-nota svg{display:block;width:100%;height:auto}
-.rd-say{margin:0;text-align:center;font-size:13px;color:var(--ink-3);min-height:22px;line-height:22px}
+.rd-say{display:none;position:relative;z-index:6;margin:8px 6px 0;text-align:center;font-size:clamp(14px,4.4vw,17px);font-weight:600;line-height:1.3;min-height:1.3em;color:var(--ink)}   /* v508 (Oscar): under the wheel, big */
 .rd-say b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ink)}
 .rd-say b.g{color:var(--c2)} .rd-say b.p{color:var(--c3)} .rd-say b.o{color:var(--c1);font-family:inherit}
+.rd-say b.w{font-family:inherit}
+:root[data-rdg="1"] .dial > .rd-say{display:block}
+.rd-say .rd-clean{font-size:14px;line-height:22px;padding:1px 11px 1px 9px} .rd-say .rd-clean svg{width:14px;height:14px}
+/* v508 (Oscar: "the exam does not look like an exam screen"): the other courses' exam look - the purple edge, the purple
+   line under the name, and its own row of three bars in place of the steps */
+:root[data-rdg="1"][data-rdx="1"] .dial{border-color:var(--c4)!important}
+:root[data-rdg="1"][data-rdx="1"] #rdSub{color:var(--c4)}
+:root[data-rdg="1"][data-rdx="1"] .rd-bar .cb-mode{border-color:color-mix(in srgb,var(--c4) 55%,var(--line))}
+:root[data-rdg="1"][data-rdx="1"] .rd-bar .cb-mode svg{color:var(--c4)}
+.rd-steps .grp.rdx{flex:1 1 100%}
+.rd-steps .rdx .g{color:var(--c4);border-bottom-color:color-mix(in srgb,var(--c4) 50%,var(--line-2))}
+.rd-steps .xb{flex:1 1 0;height:30px;border-radius:9px;border:1px solid color-mix(in srgb,var(--c4) 45%,var(--line));background:var(--sunk);color:var(--c4);display:flex;align-items:center;justify-content:center;gap:5px;font:600 11.5px "IBM Plex Mono",monospace;letter-spacing:.04em;min-width:0}
+.rd-steps .xb svg{width:14px;height:14px;flex:none}
+.rd-steps .xb[data-done="1"]{background:var(--c4);border-color:var(--c4);color:var(--ground)}
+.rd-steps .xb[data-cur="1"]{border:2px solid var(--c4);background:color-mix(in srgb,var(--c4) 16%,var(--sunk));color:var(--ink)}
+html[data-skin="light"] .rd-steps .xb[data-done="1"],html[data-skin="light"] .rd-steps button[data-done="1"]{color:#fff}
+.rdc-t[data-k="exam"]{color:var(--c4)}
+.rd-btns{justify-content:center}
+@media (max-width:359px){ .rd-steps:not(.rd-ds){flex-wrap:wrap;row-gap:6px} .rd-steps:not(.rd-ds) .grp:first-child{flex:1 1 100%} }   /* v508 (QA v506 V1): finger-sized steps on a 320 phone */
 .rd-clean{display:inline-flex;align-items:center;gap:4px;font-family:"IBM Plex Mono",monospace;font-size:11.5px;font-weight:600;letter-spacing:.06em;color:var(--c2);border:1px solid color-mix(in srgb,var(--c2) 55%,var(--line));background:color-mix(in srgb,var(--c2) 12%,var(--sunk));border-radius:999px;padding:1px 9px 1px 7px;vertical-align:middle;line-height:18px}
 .rd-clean svg{width:11px;height:11px}
 .rd-tempo{display:flex;justify-content:center;align-items:center;gap:16px}
@@ -3010,7 +3031,6 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
     <div class="rd-steps" id="rdSteps"></div>
     <div class="rd-nota" id="rdNota"></div>
-    <p class="rd-say" id="rdSay" aria-live="polite"></p>
   </section>   <!-- v503: the wheel is the app's own (.stage), the buttons sit under it in #readFoot -->
   <!-- v372 (Oscar): the game's own screen - the course screen's look, opened from the Play time window -->
   <!-- v426: a routine plays on its own screen - its name and step, the strip with a playhead, the tempo, the wheel -->
@@ -3125,6 +3145,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         <div class="prac-done" id="pracDone" hidden aria-live="polite">Learned!</div>   <!-- v444: a practice level cleared -->
       </div>
       <!-- one fixed-height slot, so swapping tip for readout cannot resize the dial -->
+      <p class="rd-say" id="rdSay" aria-live="polite"></p>   <!-- v508 (Oscar): the Reading course's line, under the wheel -->
       <div class="dial-foot">
         <!-- v221: the pattern in play (a session's step) sits under the wheel, above the line -->
         <p class="patname mono" id="dialPat" hidden></p>
@@ -3906,7 +3927,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v507"></script>
+<script src="./app.js?v=v508"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3919,8 +3940,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v507";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-13 12:56";          /* and when it was built, for ?diag */
+  var BUILD = "v508";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-13 13:06";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

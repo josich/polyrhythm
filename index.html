@@ -1762,7 +1762,36 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 #precBar > #precPop[hidden]{display:none}
 .pp-only{display:none!important}
 #precBar > #precPop .pp-only:not([hidden]){display:flex!important}
-#ppHands button{display:inline-flex;align-items:center;gap:5px} #ppHands button svg{width:13px;height:13px;flex:none;color:var(--c2)}
+/* v501 (Oscar): the options panel, clear and organised - one segment, switches, coloured ring chips, a gaps slider */
+#precBar > #precPop{padding:10px 12px 12px}
+#precPop #alongMode{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0}
+#precPop #alongMode[hidden]{display:none}
+#precPop #alongMode button{height:38px;border-radius:10px;justify-content:center;font-size:13px;padding:0 10px}
+#precPop #alongMode button svg{width:16px;height:16px}
+#precPop #alongMode button[data-am="game"]{--lc:var(--c4)}
+.pp-togs{flex-direction:column;gap:6px;margin-top:10px}
+#precBar > #precPop .pp-togs.pp-only:not([hidden]){display:flex!important}
+.pp-tog{display:flex;align-items:center;gap:10px;height:42px;padding:0 12px;border:1px solid var(--line-2);border-radius:10px;background:var(--sunk);color:var(--ink-2);font:inherit;font-size:13px;font-weight:600;cursor:pointer;min-width:0;text-align:left;width:100%;box-sizing:border-box}
+.pp-tog[hidden]{display:none}
+.pp-tog .pi{width:19px;height:19px;flex:none;color:var(--ink-3)}
+.pp-tog .pl{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pp-tog .sw{flex:none;width:30px;height:17px;border-radius:999px;background:var(--line);position:relative}
+.pp-tog .sw::after{content:"";position:absolute;left:2px;top:2px;width:13px;height:13px;border-radius:50%;background:var(--ink-3);transition:transform .15s}
+.pp-tog[aria-pressed="true"]{border-color:color-mix(in srgb,var(--c2) 60%,var(--line));background:color-mix(in srgb,var(--c2) 12%,var(--sunk));color:var(--ink)}
+.pp-tog[aria-pressed="true"] .pi{color:var(--c2)}
+.pp-tog[aria-pressed="true"] .sw{background:color-mix(in srgb,var(--c2) 45%,var(--line))}
+.pp-tog[aria-pressed="true"] .sw::after{transform:translateX(13px);background:var(--c2)}
+#precPop #alongTgt{margin-top:12px}
+#alongTgt button i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:0}
+#alongGaps:not([hidden]){display:block;margin-top:12px}
+#alongGaps .pg-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+#alongGaps .k{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+#alongGaps .pg-v{font-size:12px;color:var(--ink)}
+#alongGaps .pg-v.p{color:var(--c3)}
+#ppGap{width:100%;margin:8px 0 6px;display:block}
+#alongGaps .pg-loops{display:flex;align-items:center;justify-content:space-between;padding:0 3px}
+#alongGaps .pg-loops i{width:12px;height:12px;border-radius:50%;background:color-mix(in srgb,var(--c2) 70%,var(--sunk));box-sizing:border-box;flex:none}
+#alongGaps .pg-loops i.s{background:transparent;border:1.5px dashed color-mix(in srgb,var(--c3) 75%,var(--line))}
 :root[data-pscr="1"] #alongSec :is(.along-lbl,.along-btns,#alongWord,#alongStar){display:none!important}
 :root[data-pscr="1"] #alongSec .along-row{justify-content:center;min-height:0}
 :root[data-pscr="1"] #alongSec .along-row:has(#alongPct[hidden]){display:none}
@@ -3032,15 +3061,18 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
     <!-- v496: the options - the banner's own rows; while Precision's screen is on they sit in a panel under its bar -->
     <div class="prec-pop" id="precPop">
-      <!-- v496: two hands and loop forever as rows of the panel (the banner's head keeps its icons for the tour and the course) -->
-      <div class="along-tgt pp-only" id="ppHands"><span class="k">Hands</span><button type="button" data-ph="1">One</button><button type="button" data-ph="2"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-hand"/></svg>Two</button></div>
+      <!-- v449 (Oscar): play this wheel as a game - Score is Precision as it was, Game a one-level game of the chosen rings -->
+      <div class="along-tgt along-mode" id="alongMode"><button type="button" data-am="score" data-on="1"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="13" width="3.2" height="7.5" rx="1" fill="currentColor"/><rect x="8.4" y="7.5" width="3.2" height="13" rx="1" fill="currentColor"/><rect x="13.3" y="3.5" width="3.2" height="17" rx="1" fill="currentColor"/><rect x="18.2" y="10.5" width="3.2" height="10" rx="1" fill="currentColor"/></svg>Score</button><button type="button" data-am="game"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg>Game</button></div>
+      <!-- v501 (Oscar: "messy and not intuitive"): the options laid out like a step sheet - the mode as one segment, Two hands and
+           Loop forever as switches, the judged rings as chips with their colour, the gaps as a slider with its loops drawn -->
+      <div class="pp-togs pp-only" id="ppTogs">
+        <button type="button" class="pp-tog" id="ppHands" aria-pressed="false" title="Two hands: ring 1 on the right half of the screen, ring 2 on the left"><svg class="pi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-hand"/></svg><span class="pl">Two hands</span><span class="sw" aria-hidden="true"></span></button>
+        <button type="button" class="pp-tog" id="ppInf" aria-pressed="false" title="Loop forever: the run goes on until you stop it"><svg class="pi" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12c-2-2.7-3.6-4-5.3-4a4 4 0 0 0 0 8c1.7 0 3.3-1.3 5.3-4zm0 0c2 2.7 3.6 4 5.3 4a4 4 0 0 0 0-8c-1.7 0-3.3 1.3-5.3 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span class="pl">Loop forever</span><span class="sw" aria-hidden="true"></span></button>
+      </div>
       <!-- v192: what a tap is judged against - the whole pattern, or one ring (the pulse) -->
       <div class="along-tgt" id="alongTgt" hidden></div>
       <!-- v482: Gaps - the click goes silent for whole loops; the taps are still judged -->
-      <div class="along-tgt along-gaps" id="alongGaps"><span class="k">Gaps</span><button type="button" data-ag="off" data-on="1">Off</button><button type="button" data-ag="22" data-on="0"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mute"/></svg>2+2</button><button type="button" data-ag="13" data-on="0"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mute"/></svg>1+3</button><button type="button" data-ag="rnd" data-on="0"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mute"/></svg>Random</button></div>
-      <div class="along-tgt pp-only" id="ppInf"><span class="k">Forever</span><button type="button" data-pi="0">Off</button><button type="button" data-pi="1">On</button></div>
-      <!-- v449 (Oscar): play this wheel as a game - Score is Precision as it was, Game a one-level game of the chosen rings -->
-      <div class="along-tgt along-mode" id="alongMode"><span class="k">Mode</span><button type="button" data-am="score" data-on="1"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="13" width="3.2" height="7.5" rx="1" fill="currentColor"/><rect x="8.4" y="7.5" width="3.2" height="13" rx="1" fill="currentColor"/><rect x="13.3" y="3.5" width="3.2" height="17" rx="1" fill="currentColor"/><rect x="18.2" y="10.5" width="3.2" height="10" rx="1" fill="currentColor"/></svg>Score</button><button type="button" data-am="game"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg>Game</button></div>
+      <div class="along-gaps" id="alongGaps"><div class="pg-head"><span class="k">Gaps</span><span class="pg-v mono" id="ppGapV">Off</span></div><input type="range" id="ppGap" min="0" max="3" step="1" value="0" aria-label="Gaps: loops where the click goes silent"><div class="pg-loops" id="ppGapLoops" aria-hidden="true"></div></div>
     </div>
     <p class="along-gnote" id="alongGNote" hidden></p>
     <canvas id="alongCv" height="46" aria-label="Your taps: early to the left, late to the right"></canvas>
@@ -3853,7 +3885,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v500"></script>
+<script src="./app.js?v=v501"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3866,8 +3898,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v500";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-13 07:52";          /* and when it was built, for ?diag */
+  var BUILD = "v501";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-13 09:23";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

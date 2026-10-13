@@ -1735,6 +1735,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root[data-pscr="1"] .dial{padding:10px 12px}
 :root[data-pscr="1"] .wrap{padding-top:calc(14px + env(safe-area-inset-top, 0px));padding-bottom:calc(12px + env(safe-area-inset-bottom, 0px))}
 :root[data-pscr="1"] .canvas-hold{max-width:min(100%,max(180px,calc(100vh - 330px)));max-width:min(100%,max(180px,calc(100svh - 330px)))}
+@media (max-height:700px){ :root[data-pscr="1"] .canvas-hold{max-width:min(100%,max(180px,calc(100svh - 348px)))} }   /* v525 (QA v523 V3): room for the result rows */
 :root[data-pscr="1"] #precBar{display:grid;grid-template-columns:minmax(0,1fr) 34px auto 34px;align-items:center;gap:8px;margin:0 0 8px;position:relative}
 #pbLog{grid-column:2} #pbOpts{grid-column:3} #pbX{grid-column:4}   /* v497: each in its own column, so a button the tour hides leaves the others where they are */
 :root[data-tour="1"][data-pscr="1"] #pbOpts{grid-column:3 / -1;justify-self:end}   /* v497: the tour hides the cross - Options takes the corner */
@@ -2432,7 +2433,7 @@ html[data-skin="light"] .rd-steps .xb[data-done="1"],html[data-skin="light"] .rd
   :root[data-rdg="1"] .wrap{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:14px;align-items:start;max-width:900px}
   :root[data-rdg="1"] .wrap > #readScr{grid-column:1;grid-row:1}
   :root[data-rdg="1"] .wrap > .stage{grid-column:2;grid-row:1;margin-top:0}
-  :root[data-rdg="1"] .canvas-hold{max-width:calc(100svh - 150px);width:calc(100svh - 150px);min-width:120px}
+  :root[data-rdg="1"] .canvas-hold{max-width:calc(100svh - 162px);width:calc(100svh - 162px);min-width:120px}   /* v524 (QA v523 V4): no scroll */
   .rd-steps .g{display:none}
   .rd-steps button{height:26px}
   .rd-tempo .jump{height:32px}
@@ -2620,7 +2621,7 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .log-donut text{font-family:"IBM Plex Mono",monospace;fill:var(--ink);font-size:14px;font-weight:600}
 .log-donut text.u{font-size:8px;fill:var(--ink-3);font-weight:400;letter-spacing:.1em}
 .log-bars{display:flex;flex-direction:column;gap:3px;min-width:0}   /* v323 (QA v322 V1): six bars fit the ring's 100 px */
-.log-bar{display:grid;grid-template-columns:64px minmax(0,1fr) 40px;align-items:center;gap:8px;font-size:11px;line-height:14px}
+.log-bar{display:grid;grid-template-columns:64px minmax(0,1fr) minmax(40px,auto);align-items:center;gap:8px;font-size:11px;line-height:14px}
 .log-bar .k{color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .log-bar .bar{height:8px;background:var(--sunk);border:1px solid var(--line);border-radius:5px;overflow:hidden}
 .log-bar .bar i{display:block;height:100%;border-radius:4px;background:var(--lc)}
@@ -3952,7 +3953,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v523"></script>
+<script src="./app.js?v=v525"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3965,8 +3966,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v523";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-13 18:11";          /* and when it was built, for ?diag */
+  var BUILD = "v525";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-13 20:00";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -2050,6 +2050,25 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root[data-cwin="1"] #coursePanel > *{flex:none}
 :root[data-cwin="1"] #coursePanel > #cgrid{flex:1 1 0;min-height:180px;max-height:none}
 @media (max-height:700px){ :root[data-cwin="1"] #cmodeHelp{display:none} }
+/* v500 (Oscar: "too much content in one window"): two pages, like Routines - the list of courses, then one course's levels */
+#cPageHead{display:none;align-items:center;gap:10px;margin:2px 0 6px;min-width:0}
+:root[data-cwin="1"][data-cpg="1"]:not([data-course="1"]) #cPageHead{display:flex}
+:root[data-cwin="1"]:not([data-cpg="1"]) #coursePanel > :is(#cLvlLbl,#cgrid,#cnote){display:none!important}
+:root[data-cwin="1"]:not([data-cpg="1"]) #coursePanel > #ctabs{flex:0 1 auto;max-height:none;min-height:0}
+:root[data-cwin="1"][data-cpg="1"] #coursePanel > #ctabs{display:none!important}
+#coursePanel > #cLvlLbl{margin-top:14px}
+:root[data-cwin="1"][data-cpg="1"] #coursePanel > #cLvlLbl{margin-top:6px}
+#cBack{width:34px;height:34px;border-radius:10px;font-size:20px;color:var(--ink-2);flex:none;display:grid;place-items:center;padding:0}
+#cPageHead .c-eico{flex:none;width:24px;display:grid;place-items:center}
+#cPageHead .c-eico svg{width:21px;height:21px;color:var(--c5);display:block}
+#cPageHead .c-et{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+#cPageHead .c-et b{font-size:15.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cPageHead .cpl{display:flex;align-items:center;gap:8px;min-width:0}
+#cPageHead .cpl .n{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:600;color:var(--c4);white-space:nowrap;line-height:1.1}
+#cPageHead .cpl .n small{font-size:10px;color:var(--ink-3);font-weight:400}
+#cPageHead .cpl .bar{flex:1;min-width:24px;height:5px;border-radius:3px;background:var(--line);overflow:hidden}
+#cPageHead .cpl .bar i{display:block;height:100%;background:var(--c4)}
+#cPageHead .cpl .t{font-size:10.5px;color:var(--ink-3);white-space:nowrap}
 /* v366 (Oscar's sketch): the notation over the tempo and the steps while a course run plays - it covers, it never moves anything */
 #courseNotes{grid-column:4;width:34px;height:34px;border-radius:10px;color:var(--ink-3)}
 @media (max-width:360px){ :root[data-cnotes="1"] #courseBar #courseWin{display:none} }   /* v367 (QA v366 m3): it sat under the panel and still took taps */
@@ -2326,7 +2345,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rd-wh .hubi{fill:var(--ink)}
 .rd-wh .hubn{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:20px;fill:var(--c2);text-anchor:middle;dominant-baseline:central}
 .clist .cst.inf{border:1.5px solid color-mix(in srgb,var(--c2) 55%,var(--line));color:var(--c2);font-size:13px;line-height:1}
-:root[data-rsel="1"] #cwinOpts{visibility:hidden}   /* the way to take a course (phone / pad, left-handed) is not the reading course's */
+:root[data-rsel="1"][data-cpg="1"] #cwinOpts{visibility:hidden}   /* the way to take a course (phone / pad, left-handed) is not the reading course's; v500: on its own page */
 #ctabs[data-more="1"]{-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 26px),transparent)}
 @media (max-height:620px){ .rd-dial{max-width:max(200px, calc(100svh - 380px))} :root[data-rdg="1"] .read-scr{gap:7px} }
 /* a short landscape screen (a browser tab): the notation and the buttons left, the wheel right */
@@ -3307,6 +3326,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
     <div class="cwin-pop" id="cwinPop"></div>   <!-- v376: the options' menu (filled at boot from the parts below) -->
     <div class="lvl-list ccourses" id="ctabs" role="listbox" aria-label="Course"></div>   <!-- v365 (Oscar): courses as rows, each with its play -->
+    <!-- v500 (Oscar): in the window a course has its own page, like a routine's steps - the back arrow, the course and its progress -->
+    <div class="c-ehead" id="cPageHead"><button type="button" class="icobtn" id="cBack" title="All courses" aria-label="All courses">&#8249;</button><span class="c-eico" id="cPageIco"></span><div class="c-et"><b id="cPageName"></b><span id="cPageMeta"></span></div></div>
     <div class="share-lbl lvl-lbl"><span>Take it:</span><i></i></div>
     <div class="cmode" id="cmode" role="group" aria-label="Where you play">
       <button type="button" data-cmode="phone" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M11 18.5h2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>On the phone</button>
@@ -3315,7 +3336,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <p class="empty sec-help" id="cmodeHelp"></p>
     <div class="cleft-row"><button type="button" class="btn sm" id="cleftBtn" aria-pressed="false" title="Left-handed: the hands swap, on the screen and in the exams"><svg class="lhand" viewBox="0 0 112 132" aria-hidden="true"><g transform="translate(112 0) scale(-1 1)"><use href="#ghostHandTint"/><use href="#ghostHandTint"/><use href="#ghostHandTint"/><use href="#ghostHandTint"/></g></svg>Left-handed</button></div>
     <div class="cprog" id="cprog"></div>
-    <div class="share-lbl lvl-lbl"><span>Levels:</span><i></i></div>
+    <div class="share-lbl lvl-lbl" id="cLvlLbl"><span>Levels:</span><i></i></div>
     <div class="lvl-list rlist clist" id="cgrid"></div>
     <p class="lvl-note" id="cnote"></p>
     <div class="lvl-foot" id="courseEdFoot"><button type="button" class="btn sm" id="courseFake">Fake course progress</button><button type="button" class="btn sm" id="courseWipe">Reset course</button></div>
@@ -3832,7 +3853,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v499"></script>
+<script src="./app.js?v=v500"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3845,8 +3866,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v499";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-12 23:48";          /* and when it was built, for ?diag */
+  var BUILD = "v500";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-13 07:52";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

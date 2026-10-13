@@ -456,6 +456,7 @@ input[type=range]::-moz-range-thumb{
 #alongTwo[data-on="1"]{border-color:var(--c2);color:var(--c2);background:color-mix(in srgb,var(--c2) 15%,transparent)}
 .along-pct{font-size:15px;font-weight:600;color:var(--ink-2);white-space:nowrap}
 .along-btns{margin-left:auto;display:flex;gap:8px;flex:none}   /* the buttons keep their place (v184) */
+@media (pointer:coarse){ .rd-steps button{min-height:32px} }   /* v523 (QA v522 V2) */
 @media (pointer:coarse){ .along-btns .icobtn{width:34px;height:34px} #alongMode button,.along-tgt button{min-height:32px} }   /* v458 (QA v454 V4) */
 @media (max-width:340px){ .along-row{gap:4px} #alongSec .along-lbl{letter-spacing:.5px} .along-btns{gap:3px} .along-btns .icobtn{width:30px;height:30px} }   /* v493 (QA v491 V1): four buttons and the % fit at 320 px */
 #alongFlash{position:absolute;inset:-1px;border-radius:14px;pointer-events:none;opacity:0;z-index:4;
@@ -638,7 +639,7 @@ input[type=range]::-moz-range-thumb{
 .along-card{max-width:380px}
 .along-card .chal-kicker{font-size:clamp(26px,7vw,34px);color:var(--c2)}
 .along-card-pct{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;font-size:64px;font-weight:500;line-height:1;letter-spacing:-.03em;margin:10px 0 2px;color:var(--ink)}
-.along-card-pct[data-cmp="up"]{color:var(--c2)}   /* v457: "up" = the run is clean */
+.along-card-pct[data-cmp="up"]{color:var(--c2)} .along-card-pct[data-cmp="down"]{color:var(--c3)}   /* v457: "up" = the run is clean */
 .along-card-word{font-family:var(--title);font-stretch:110%;font-weight:600;font-size:18px;margin:0 0 12px;color:var(--ink-2)}
 .along-card-word .star{color:var(--c1);margin-left:6px}
 .along-card-word[data-kind="tight"]{color:var(--c2)}   /* the verdict's colour on the card (v202) */
@@ -674,9 +675,9 @@ input[type=range]::-moz-range-thumb{
 .along-card-bar{position:relative;width:min(250px,100%);height:28px;margin:2px auto 8px}
 .along-card-bar .trk{position:absolute;left:0;right:0;top:8px;height:8px;border-radius:5px;background:var(--sunk);border:1px solid var(--line)}
 .along-card-bar .fil{position:absolute;left:0;top:8px;height:8px;border-radius:5px;background:var(--line-2)}
-.along-card-bar[data-ok="1"] .fil{background:var(--c2)}
+.along-card-bar[data-ok="1"] .fil{background:var(--c2)} .along-card-bar[data-ok="f"] .fil{background:var(--c3)}
 .along-card-bar .ntc{position:absolute;top:2px;width:2px;height:20px;margin-left:-1px;border-radius:1px;background:var(--ink-2)}
-.along-card-bar .nlb{position:absolute;top:22px;transform:translateX(-50%);font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--ink-3)}
+.along-card-bar .nlb{position:absolute;top:22px;transform:translateX(-50%);white-space:nowrap;font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--ink-3)}
 .along-card-clean[hidden]{display:none}
 /* v486: where I'm off - one line under the missed hits, a tiny wheel lighting the dot (mock design/where-off-proto.html) */
 .along-card-where{display:flex;align-items:center;gap:9px;width:fit-content;max-width:100%;box-sizing:border-box;margin:10px auto 2px;padding:6px 12px 6px 7px;border-radius:12px;background:var(--sunk);border:1px solid var(--line);font-size:15px;color:var(--ink)}
@@ -2059,7 +2060,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root[data-rscr="1"] #sessNowIn .sil{display:none}   /* v435 (Oscar): SILENT ran out of the box; it sits under the tempo here */
 .rr-bpm i{font-style:normal;color:var(--c3);margin-left:.6em;font-weight:600}
 .rr-bpm i[hidden]{display:none}
-.rr-next{margin:0;text-align:center;font-size:12px;color:var(--ink-3);min-height:18px}
+.rr-next{display:none!important}   /* v523 (Oscar): the loops left are counted under the wheel; the line on top went */
 .rr-next b{font-family:"IBM Plex Mono",monospace;color:var(--ink);font-weight:600;border:1px solid var(--line-2);border-radius:999px;padding:1px 8px;margin:0 3px}
 @media (max-height:640px){ :root[data-rscr="1"] .rr-bpm b{font-size:30px} :root[data-rscr="1"] .canvas-hold{max-width:min(100%,max(150px,calc(100svh - 300px)))} }
 @media (orientation:landscape) and (max-height:520px){
@@ -2128,6 +2129,8 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 #cbX{width:34px;height:34px;border-radius:10px;color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));font-size:18px}
 :root[data-course="1"] #courseTempo{display:flex;flex-direction:column;align-items:stretch;gap:6px;margin:0 0 8px}
 .ct-num{display:flex;align-items:baseline;justify-content:center;gap:8px}
+.ct-note{display:inline-block;width:13px;height:19px;color:var(--ink-2);flex:none;align-self:center} .ct-note svg{width:100%;height:100%;display:block}   /* v523 (QA v522 NW2) */
+.ci-nv{display:inline-block;width:11px;height:16px;color:var(--ink-2);vertical-align:-3px;margin-right:4px} .ci-nv svg{width:100%;height:100%;display:block}
 #courseTempo b{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:42px;line-height:.9;letter-spacing:-.03em;display:inline-block}
 #courseTempo .ct-num span{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
 .ct-lad{display:flex;flex-direction:column;gap:3px}
@@ -2339,13 +2342,11 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rd-ns .nh{transform-box:fill-box;transform-origin:center}   /* a hit's jump, a miss's shake */
 .rd-foot .rd-tempo{margin-top:2px}
 .rd-card{position:relative}
-.rdc-x{position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:10px;color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));font-size:16px}   /* v519: one cross size inside a card (30 px, as .chal-x) */
-.rdc-k{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;color:var(--ink-3);text-transform:uppercase;padding:0 36px}
-.rdc-t{font-size:30px} .rdc-t[data-k="intro"]{color:var(--ink);font-size:24px} .rdc-t[data-k="pass"]{color:var(--c1)}
 .rdc-fig{display:flex;justify-content:center;margin:2px 0 0}
 .rdc-fig svg{display:block;height:88px;width:auto;max-width:100%}
-.rdc-stars{margin:0;font-size:38px;line-height:1;letter-spacing:.12em;color:var(--c1)} .rdc-stars i{font-style:normal;color:var(--line-2)}
 .rdc-l{font-size:14px;line-height:1.35}
+.rd-tempo .rdb .rd-note{width:13px;height:19px;color:var(--ink-2)}   /* v523 (QA v522 NW2): the page Tempo's note glyph, the course screen's size */
+.rdc-note{display:inline-block;width:11px;height:16px;vertical-align:-3px;margin-right:4px;color:var(--ink-2)} .rdc-note svg{width:100%;height:100%;display:block}
 .rdc-alt{width:100%;height:42px;border-radius:12px;font-weight:600}
 .rd-st{color:var(--c1);letter-spacing:.06em;margin-left:2px} .rd-st i{font-style:normal;color:var(--line-2)}
 .cdet .rd-steps.rd-ds{margin:2px 0 10px;flex-wrap:wrap;row-gap:9px}   /* v506: the lesson's detail shows the screen's step icons (an ol's numbers ran into the steps) */
@@ -2389,7 +2390,6 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rd-steps .xb[data-done="1"]{background:var(--c4);border-color:var(--c4);color:var(--ground)}
 .rd-steps .xb[data-cur="1"]{border:2px solid var(--c4);background:color-mix(in srgb,var(--c4) 16%,var(--sunk));color:var(--ink)}
 html[data-skin="light"] .rd-steps .xb[data-done="1"],html[data-skin="light"] .rd-steps button[data-done="1"]{color:#fff}
-.rdc-t[data-k="exam"]{color:var(--c4)}
 .rd-btns{justify-content:center}
 @media (max-width:359px){ .rd-steps:not(.rd-ds){flex-wrap:wrap;row-gap:6px} .rd-steps:not(.rd-ds) .grp:first-child{flex:1 1 100%} }   /* v508 (QA v506 V1): finger-sized steps on a 320 phone */
 .rd-clean{display:inline-flex;align-items:center;gap:4px;font-family:"IBM Plex Mono",monospace;font-size:11.5px;font-weight:600;letter-spacing:.06em;color:var(--c2);border:1px solid color-mix(in srgb,var(--c2) 55%,var(--line));background:color-mix(in srgb,var(--c2) 12%,var(--sunk));border-radius:999px;padding:1px 9px 1px 7px;vertical-align:middle;line-height:18px}
@@ -3043,7 +3043,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <button type="button" class="icobtn" id="courseNotes" data-on="0" aria-pressed="false" title="Show the notation while you play" aria-label="Notation"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="8.2" cy="17" rx="3.9" ry="2.9" transform="rotate(-22 8.2 17)" fill="currentColor"/><path d="M11.8 16.4V4.5c2.4 1.2 4.6 2.2 6.2 4.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>   <!-- v366 -->
     <button type="button" class="icobtn cb-x" id="cbX" title="Leave the course screen" aria-label="Leave the course screen">&times;</button>
   </div>
-  <div class="course-tempo" id="courseTempo"><div class="ct-num"><b id="ctBpm">0</b><span>bpm</span></div><div class="ct-lad"><div class="ctrackk" id="courseTrackK" hidden>Steps:</div><div class="ctrack" id="courseTrack"></div><div class="ctrackl" id="courseTrackL"></div></div><p class="ct-step" id="ctStepT"></p><div class="course-score" id="courseScore" hidden aria-hidden="true"></div></div>
+  <div class="course-tempo" id="courseTempo"><div class="ct-num"><span class="ct-note" id="ctNote" aria-hidden="true"></span><b id="ctBpm">0</b><span>bpm</span></div><div class="ct-lad"><div class="ctrackk" id="courseTrackK" hidden>Steps:</div><div class="ctrack" id="courseTrack"></div><div class="ctrackl" id="courseTrackL"></div></div><p class="ct-step" id="ctStepT"></p><div class="course-score" id="courseScore" hidden aria-hidden="true"></div></div>
   <!-- v497 (Oscar): the Reading course's screen - a bar of notation over an empty wheel cut for the bar; build it, then tap it -->
   <section class="read-scr" id="readScr" aria-label="Reading">
     <div class="rd-bar">
@@ -3118,7 +3118,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <!-- v192: what a tap is judged against - the whole pattern, or one ring (the pulse) -->
       <div class="along-tgt" id="alongTgt" hidden></div>
       <!-- v482: Gaps - the click goes silent for whole loops; the taps are still judged -->
-      <div class="along-gaps" id="alongGaps"><div class="pg-head"><span class="k">Silent loops</span><span class="pg-v mono" id="ppGapV">Off</span></div><input type="range" id="ppGap" min="0" max="3" step="1" value="0" aria-label="Gaps: loops where the click goes silent"><div class="pg-loops" id="ppGapLoops" aria-hidden="true"></div></div>
+      <div class="along-gaps" id="alongGaps"><div class="pg-head"><span class="k">Silent loops</span><span class="pg-v mono" id="ppGapV">Off</span></div><input type="range" id="ppGap" min="0" max="3" step="1" value="0" aria-label="Silent loops: loops where the click goes silent"><div class="pg-loops" id="ppGapLoops" aria-hidden="true"></div></div>
     </div>
     <p class="along-gnote" id="alongGNote" hidden></p>
     <canvas id="alongCv" height="46" aria-label="Your taps: early to the left, late to the right"></canvas>
@@ -3201,7 +3201,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
 
     <div class="rd-foot" id="readFoot">   <!-- v503: the Reading course's buttons, under the app's wheel -->
-      <div class="rd-tempo" id="rdTempo" hidden><button type="button" class="jump wide" id="rdDown" aria-label="Slower">&minus;5</button><div class="rdb"><b id="rdBpm">70</b><span>bpm</span></div><button type="button" class="jump wide" id="rdUp" aria-label="Faster">+5</button></div>
+      <div class="rd-tempo" id="rdTempo" hidden><button type="button" class="jump wide" id="rdDown" aria-label="Slower">&minus;5</button><div class="rdb"><span class="bpm-note rd-note" id="rdNote" aria-hidden="true"></span><b id="rdBpm">70</b><span>bpm</span></div><button type="button" class="jump wide" id="rdUp" aria-label="Faster">+5</button></div>
       <div class="rd-btns" id="rdBtns"></div>
       <div class="rd-more-row" id="rdMore" hidden></div>
     </div>
@@ -3600,7 +3600,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <button type="button" data-p="metro"><span class="picos" data-picos="metro"></span>Metronome<small>the wheel, tempo, patterns</small></button>
     <button type="button" data-p="practice"><span class="picos" data-picos="practice"></span>Practice<small>+ session, routines, Precision, log</small></button>
     <button type="button" data-p="learn"><span class="picos" data-picos="learn"></span>Learn<small>+ courses, Play time, log</small></button>
-    <button type="button" data-p="all"><span class="picos" data-picos="all"></span>Everything<small>every part at once</small></button>
+    <button type="button" data-p="all"><span class="picos" data-picos="all"></span>Everything<small>every part of the app</small></button>
   </div>
   <!-- v260 (Oscar's screenshot): Skip left the header's corner for the bottom-left, level with Next -
        the header line had no room for the stage name and the step count on a narrow phone -->
@@ -3952,7 +3952,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v522"></script>
+<script src="./app.js?v=v523"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3965,8 +3965,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v522";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-13 16:24";          /* and when it was built, for ?diag */
+  var BUILD = "v523";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-13 18:11";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

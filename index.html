@@ -2342,7 +2342,8 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rdc-l{font-size:14px;line-height:1.35}
 .rdc-alt{width:100%;height:42px;border-radius:12px;font-weight:600}
 .rd-st{color:var(--c1);letter-spacing:.06em;margin-left:2px} .rd-st i{font-style:normal;color:var(--line-2)}
-.rd-ds{display:flex;flex-wrap:wrap;gap:4px 10px} .rd-ds li.ex button{color:var(--c4)}
+.cdet .rd-steps.rd-ds{margin:2px 0 10px;flex-wrap:wrap;row-gap:9px}   /* v506: the lesson's detail shows the screen's step icons (an ol's numbers ran into the steps) */
+.cdet .rd-ds .grp:first-child{flex:1 1 100%}   /* two rows: with the count, then alone and the exam - the icons stay finger-sized */
 .rd-info{margin:0 0 6px;color:var(--ink-2)}
 .rd-tally{margin:0;text-align:center;font-size:12.5px;color:var(--ink-3)}
 .rd-tally span{color:var(--c2);font-weight:700}
@@ -2376,7 +2377,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rd-ns .n{color:var(--ink)} .rd-ns .n.ok{color:var(--c2)} .rd-ns .n.miss{color:var(--c3)} .rd-ns .n.near{color:var(--c1)}
 .rd-ns .cw{font-family:"IBM Plex Mono",monospace;font-size:10.5px;fill:var(--ink-3);text-anchor:middle;opacity:.7}
 .rd-ns .cw.sm{font-size:8.5px}
-.rd-ns .cw.tr{font-size:7.4px;letter-spacing:-.04em}   /* v505: "trip let" fits a triplet's spacing */
+.rd-ns .cw.tr{font-size:7.4px}   /* v506: sized per beat by rdNotaSvg; textLength holds every count word to its own width */
 .rd-ns .cw.on{fill:var(--ink-2);font-weight:600;opacity:1}
 .rd-ns .cw.x{fill:var(--c3);opacity:1;font-weight:600}
 .rd-ns .tn{font-family:var(--title);font-style:italic;font-weight:700;font-size:11px;fill:var(--ink-2);text-anchor:middle}
@@ -3904,7 +3905,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v505"></script>
+<script src="./app.js?v=v506"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3917,8 +3918,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v505";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-13 11:38";          /* and when it was built, for ?diag */
+  var BUILD = "v506";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-13 12:17";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

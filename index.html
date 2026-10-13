@@ -1758,6 +1758,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .pt-tags span.p{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
 .pt-tags span.g{color:var(--c4);border-color:color-mix(in srgb,var(--c4) 45%,var(--line))}
 :root[data-prun="1"] :is(#pbLog,#pbOpts,#pbDown,#pbUp,#pbTags){opacity:.35;pointer-events:none}   /* a run, a game or a calibration: nothing changes under it */
+@media (pointer:coarse){ #pbTags{min-height:32px} }   /* QA v500 V3 */
 #precBar > #precPop{position:absolute;right:0;top:calc(100% + 6px);z-index:44;width:min(350px,100%);box-sizing:border-box;background:var(--panel);border:1px solid var(--line-2);border-radius:12px;padding:4px 12px 12px;box-shadow:0 12px 32px rgba(0,0,0,.5)}
 #precBar > #precPop[hidden]{display:none}
 .pp-only{display:none!important}
@@ -2027,8 +2028,8 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rt-done .mt{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink-2)}
 .rt-dbtns{display:flex;gap:8px}
 .rt-dbtns .btn{flex:1;padding:11px 8px;font-size:13.5px}
-#rdAgain{border-color:var(--c2);color:var(--ink)}
-#rdClose{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
+#rtdAgain{border-color:var(--c2);color:var(--ink)}
+#rtdClose{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
 /* the run screen: the bar, the strip and the tempo, the wheel; nothing else */
 #rtRunBar,#rtRunTop{display:none}
 :root[data-rscr="1"] .wrap > :not(#rtRunBar):not(#rtRunTop):not(.stage){display:none!important}
@@ -3074,7 +3075,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <!-- v192: what a tap is judged against - the whole pattern, or one ring (the pulse) -->
       <div class="along-tgt" id="alongTgt" hidden></div>
       <!-- v482: Gaps - the click goes silent for whole loops; the taps are still judged -->
-      <div class="along-gaps" id="alongGaps"><div class="pg-head"><span class="k">Gaps</span><span class="pg-v mono" id="ppGapV">Off</span></div><input type="range" id="ppGap" min="0" max="3" step="1" value="0" aria-label="Gaps: loops where the click goes silent"><div class="pg-loops" id="ppGapLoops" aria-hidden="true"></div></div>
+      <div class="along-gaps" id="alongGaps"><div class="pg-head"><span class="k">Silent loops</span><span class="pg-v mono" id="ppGapV">Off</span></div><input type="range" id="ppGap" min="0" max="3" step="1" value="0" aria-label="Gaps: loops where the click goes silent"><div class="pg-loops" id="ppGapLoops" aria-hidden="true"></div></div>
     </div>
     <p class="along-gnote" id="alongGNote" hidden></p>
     <canvas id="alongCv" height="46" aria-label="Your taps: early to the left, late to the right"></canvas>
@@ -3326,7 +3327,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <!-- saved setups as rows in a scrolling box, the levels' rows (Oscar, v110) -->
       <div class="share-lbl lvl-lbl mine-lbl"><span>Saved:</span><i></i></div>
       <div class="lvl-list mine-list" id="mine"></div>
-      <p class="empty" id="pempty">Nothing saved yet — presets stay in this browser.</p>
+      <p class="empty" id="pempty">Nothing saved yet.</p>
     </div>
 
     <div class="pane" data-pane="rhythms" hidden>
@@ -3519,7 +3520,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <button type="button" class="pro-card pro-only" id="proCard"><svg class="pro-mark" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="12.5" fill="none" stroke="var(--ink-2)" stroke-width="2"/><circle cx="17" cy="4.5" r="4" fill="var(--c1)"/><circle cx="28" cy="22" r="2.6" fill="var(--c2)"/><circle cx="7" cy="24.5" r="2.6" fill="var(--c2)"/><circle cx="17" cy="17" r="3" fill="var(--ink-2)"/></svg><span><b>Polyorbit <span class="pc-badge">PRO</span></b><small id="proCardSub">Unlock all features with the Pro plan</small></span><span class="pc-price" id="proCardPrice">&euro;4.99</span></button>   <!-- v384 -->
     <div class="sm-presets" id="smPresets">
       <button type="button" data-p="metro"><span class="picos" data-picos="metro"></span>Metronome<small>the wheel, tempo, patterns</small></button>
-      <button type="button" data-p="practice"><span class="picos" data-picos="practice"></span>Practice<small>+ session, sequence, Precision, log</small></button>
+      <button type="button" data-p="practice"><span class="picos" data-picos="practice"></span>Practice<small>+ session, routines, Precision, log</small></button>
       <button type="button" data-p="learn"><span class="picos" data-picos="learn"></span>Learn<small>+ courses, Play time, log</small></button>
       <button type="button" data-p="all"><span class="picos" data-picos="all"></span>Everything<small>every part of the app</small></button>
     </div>
@@ -3551,9 +3552,9 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   <div class="tour-d" id="tourD"></div>
   <div class="tour-picks" id="tourPicks" hidden>
     <button type="button" data-p="time" class="tp-time"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-metro"/></svg><span>Improve my timing<small>start the Timing basics course</small></span></button>   <!-- v487 (Oscar): the first course, offered by name -->
-    <button type="button" data-p="metro"><span class="picos" data-picos="metro"></span>Metronome<small>practise with the wheel</small></button>
-    <button type="button" data-p="practice"><span class="picos" data-picos="practice"></span>Practice<small>sessions, routines, Precision</small></button>
-    <button type="button" data-p="learn"><span class="picos" data-picos="learn"></span>Learn<small>courses and the game</small></button>
+    <button type="button" data-p="metro"><span class="picos" data-picos="metro"></span>Metronome<small>the wheel, tempo, patterns</small></button>
+    <button type="button" data-p="practice"><span class="picos" data-picos="practice"></span>Practice<small>+ session, routines, Precision, log</small></button>
+    <button type="button" data-p="learn"><span class="picos" data-picos="learn"></span>Learn<small>+ courses, Play time, log</small></button>
     <button type="button" data-p="all"><span class="picos" data-picos="all"></span>Everything<small>every part at once</small></button>
   </div>
   <!-- v260 (Oscar's screenshot): Skip left the header's corner for the bottom-left, level with Next -
@@ -3677,12 +3678,12 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 </div>
 <!-- v426: a routine played to its end -->
 <div class="modal rt-done-modal" id="rtDone" hidden>
-  <div class="rt-done" role="dialog" aria-modal="true" aria-labelledby="rdName">
+  <div class="rt-done" role="dialog" aria-modal="true" aria-labelledby="rtdName">
     <span class="k">Routine done</span>
-    <h3 id="rdName"></h3>
-    <div class="rstrip" id="rdStrip"></div>
-    <span class="mt" id="rdMeta"></span>
-    <div class="rt-dbtns"><button type="button" class="btn" id="rdClose">Close</button><button type="button" class="btn" id="rdAgain">Play again</button></div>
+    <h3 id="rtdName"></h3>
+    <div class="rstrip" id="rtdStrip"></div>
+    <span class="mt" id="rtdMeta"></span>
+    <div class="rt-dbtns"><button type="button" class="btn" id="rtdClose">Close</button><button type="button" class="btn" id="rtdAgain">Play again</button></div>
   </div>
 </div>
 
@@ -3905,7 +3906,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v506"></script>
+<script src="./app.js?v=v507"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3918,8 +3919,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v506";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-13 12:17";          /* and when it was built, for ?diag */
+  var BUILD = "v507";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-13 12:56";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

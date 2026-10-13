@@ -2375,6 +2375,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root[data-rdg="1"] .dial > .rd-mode{display:flex;position:absolute;top:8px;right:8px;z-index:6;width:34px;height:34px;box-sizing:border-box;border-radius:10px;
   align-items:center;justify-content:center;border:2px solid var(--rdk);background:color-mix(in srgb,var(--rdk) 16%,var(--sunk));color:var(--rdk);pointer-events:none}
 :root[data-rdg="1"] .dial > .rd-mode svg{width:20px;height:20px}
+:root[data-rdg="1"][data-rdrun="1"] .play{display:none}   /* v512: no play / pause button in a tap run - the bar's cross stops it */
 .rd-steps .grp.rdx{flex:1 1 100%}
 .rd-steps .rdx .g{color:var(--c4);border-bottom-color:color-mix(in srgb,var(--c4) 50%,var(--line-2))}
 .rd-steps .xb{flex:1 1 0;height:30px;border-radius:9px;border:1px solid color-mix(in srgb,var(--c4) 45%,var(--line));background:var(--sunk);color:var(--c4);display:flex;align-items:center;justify-content:center;gap:5px;font:600 11.5px "IBM Plex Mono",monospace;letter-spacing:.04em;min-width:0}
@@ -3938,7 +3939,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v511"></script>
+<script src="./app.js?v=v512"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3951,8 +3952,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v511";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-13 13:33";          /* and when it was built, for ?diag */
+  var BUILD = "v512";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-13 13:40";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

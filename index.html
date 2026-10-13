@@ -65,6 +65,7 @@
    the surface rather than more of it. */
 html[data-skin="light"][data-chal="1"] .play,html[data-skin="light"][data-chal="1"] .play:hover,
 html[data-skin="light"][data-along="2"] .play,html[data-skin="light"][data-along="2"] .play:hover,
+html[data-skin="light"][data-rdg="1"][data-rdk="t"]:not([data-rdrun="1"]) .play,
 html[data-skin="light"][data-video="1"] .play,html[data-skin="light"][data-video="1"] .play:hover,
 html[data-skin="light"] .chal-cta,html[data-skin="light"] .chal-cta:hover,
 html[data-skin="light"] .ring-card .btn.perbtn[data-on="1"],
@@ -356,7 +357,7 @@ input[type=range]::-moz-range-thumb{
 :root[data-stage="1"] #stageX{grid-column:7}
 #stageNotes{grid-column:5;grid-row:1;width:28px;height:28px;border-radius:8px;align-self:center;color:var(--ink-3)}   /* v368 */
 #stageNotes svg{width:15px;height:15px}
-#stageNotes[data-on="1"]{color:var(--c4);border-color:var(--c4);background:color-mix(in srgb,var(--c4) 14%,transparent)}
+#stageNotes[data-on="1"]{color:var(--ink);border-color:var(--ink-2);background:color-mix(in srgb,var(--ink) 10%,transparent)}   /* v519 (Oscar): notation in neutral ink */
 @media (min-width:600px) and (orientation:landscape){ #stageNotes{visibility:hidden} }   /* the notation never shows there */   /* the rightmost place: Share's column, free on stage (v173) */
 .stage-bpm-row{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .stage-bpm{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1 1 auto;min-width:0;gap:2px}   /* v177: BPM under the number, so the row is the digits and the two buttons */
@@ -408,7 +409,7 @@ input[type=range]::-moz-range-thumb{
 @media (min-width:600px) and (orientation:landscape){ :root[data-stage="1"] #stageScore:not([hidden]){display:none} }   /* portrait-only (Oscar); after the show rule so it wins at equal specificity */
 #posLbl{grid-column:3;text-align:right;display:none}   /* v254: always empty since v72, it held half the ratio's room */
 /* the note that opens the score: a small round button at the header's end */
-#scoreBtn{grid-column:5;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none;border-color:var(--c4)}   /* purple, ring 4's colour (Oscar, v144) */
+#scoreBtn{grid-column:5;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none;border-color:var(--ink-3);color:var(--ink-2)}   /* v519 (Oscar): notation in neutral ink (purple since v144) */
 #scoreBtn svg.note{width:11px;height:15px;display:block}
 /* the share button beside it: greyed whenever a clip cannot be made */
 #flashBtn{grid-column:6;align-self:center;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none}
@@ -676,7 +677,7 @@ input[type=range]::-moz-range-thumb{
 .along-card-bar .fil{position:absolute;left:0;top:8px;height:8px;border-radius:5px;background:var(--line-2)}
 .along-card-bar[data-ok="1"] .fil{background:var(--c2)}
 .along-card-bar .ntc{position:absolute;top:2px;width:2px;height:20px;margin-left:-1px;border-radius:1px;background:var(--ink-2)}
-.along-card-bar .nlb{position:absolute;top:22px;transform:translateX(-50%);font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--ink-3)}
+.along-card-bar .nlb{position:absolute;top:22px;transform:translateX(-50%);white-space:nowrap;font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--ink-3)}
 .along-card-clean[hidden]{display:none}
 /* v486: where I'm off - one line under the missed hits, a tiny wheel lighting the dot (mock design/where-off-proto.html) */
 .along-card-where{display:flex;align-items:center;gap:9px;width:fit-content;max-width:100%;box-sizing:border-box;margin:10px auto 2px;padding:6px 12px 6px 7px;border-radius:12px;background:var(--sunk);border:1px solid var(--line);font-size:15px;color:var(--ink)}
@@ -1163,7 +1164,7 @@ html[data-skin="light"] .pro-card .pc-price,html[data-skin="light"][data-proown=
 #proManage,#proTogGo,#ptClose{min-height:36px;padding:0 14px}
 .pd-acts .log-rm,.pd-acts .log-play{min-height:36px}   /* v386 (QA v385 V1): the Buy button kept its 52 px on short screens */
 .pro-grab{align-self:center;width:40px;height:4px;border-radius:2px;background:var(--line-2);flex:none}
-.modal.pro-modal .icobtn.pro-x{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));width:40px;height:40px;font-size:20px;flex:none}
+.modal.pro-modal .icobtn.pro-x{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));width:34px;height:34px;border-radius:10px;font-size:18px;flex:none}
 .pro-head{display:flex;align-items:center;gap:10px}
 .pro-head .pro-name{font-family:var(--title);font-size:22px;font-weight:700}
 .pro-head .pro-badge{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;letter-spacing:.12em;color:var(--c1);border:1.5px solid var(--c1);border-radius:6px;padding:2px 7px}
@@ -1638,7 +1639,9 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 #courseBar,#courseTempo,#courseStrip,#courseFoot{display:none}
 :root[data-course="1"] .wrap > :not(#courseBar):not(#courseTempo):not(#alongSec):not(.stage){display:none!important}
 :root[data-course="1"] .stage{grid-template-columns:minmax(0,1fr);gap:10px}
-:root[data-course="1"] :is(#rack,#stageBar,#stageScore,.dial-head,.dial-foot){display:none!important}
+:root[data-course="1"] :is(#rack,#stageBar,#stageScore,.dial-foot){display:none!important}
+:root[data-course="1"] .dial-head > :not(#dialRatio){display:none!important}   /* v519 (QA v517 B11): the ratio in the wheel's corner, as on every screen */
+:root[data-course="1"] .dial-head{margin-bottom:0} :root[data-course="1"] #dialRatio{font-size:16px}
 :root[data-course="1"] .dial{padding:10px 12px}
 :root[data-course="1"] .wrap{padding-top:calc(14px + env(safe-area-inset-top, 0px));padding-bottom:calc(12px + env(safe-area-inset-bottom, 0px))}   /* v322: the page's 30 px head and 64 px foot made the course screen scroll */
 :root[data-course="1"] .canvas-hold{max-width:min(100%,max(170px,calc(100vh - 500px - var(--csx,0px))));max-width:min(100%,max(170px,calc(100svh - 500px - var(--csx,0px))))}   /* the ready screen fits whole */
@@ -1813,7 +1816,9 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 #tapPause{display:none}   /* v374 (Oscar): games play on their own screen, whose bar has Pause; the window's one made no sense (the screen's button still clicks it) */
 :root[data-gscr="1"] .wrap > :not(#gameBar):not(#gameTop):not(.stage){display:none!important}
 :root[data-gscr="1"] .stage{grid-template-columns:minmax(0,1fr);gap:10px}
-:root[data-gscr="1"] :is(#rack,#stageBar,#stageScore,#courseStrip,#courseFoot,.dial-head){display:none!important}
+:root[data-gscr="1"] :is(#rack,#stageBar,#stageScore,#courseStrip,#courseFoot){display:none!important}
+:root[data-gscr="1"] .dial-head > :not(#dialRatio){display:none!important}   /* v519 (QA v517 B11): the ratio in the wheel's corner */
+:root[data-gscr="1"] .dial-head{margin-bottom:0} :root[data-gscr="1"] #dialRatio{font-size:16px}
 :root[data-gscr="1"] .dial{padding:10px 12px}
 :root[data-gscr="1"] .wrap{padding-top:calc(14px + env(safe-area-inset-top, 0px));padding-bottom:calc(12px + env(safe-area-inset-bottom, 0px))}
 :root[data-gscr="1"] .canvas-hold{max-width:min(100%,max(200px,calc(100vh - 250px)));max-width:min(100%,max(200px,calc(100svh - 250px)))}
@@ -1831,7 +1836,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root[data-gscr="1"] #gameTop{display:flex;justify-content:center;margin:0 0 8px}
 #gameTop b{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:42px;line-height:.9;letter-spacing:-.03em;display:inline-block}
 #gameTop .ct-num span{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
-#gbMode svg{color:var(--c2)}
+#gbMode svg{color:var(--c4)}
 #gbPause{--pc:var(--c1)}
 #gbX{width:34px;height:34px;border-radius:10px;color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));font-size:18px}
 #gbWin{width:34px;height:34px;border-radius:10px;color:var(--c1);border-color:color-mix(in srgb,var(--c1) 45%,var(--line));font-size:14px}
@@ -1973,7 +1978,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rt-shead{display:flex;align-items:center;gap:8px;min-width:0}
 .rt-st{flex:1;min-width:0;font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rt-st .mono{font-family:"IBM Plex Mono",monospace}
-.rt-sheet .icobtn.rt-x{width:36px;height:36px;border-radius:10px;font-size:19px;color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));flex:none}
+.rt-sheet .icobtn.rt-x{width:34px;height:34px;border-radius:10px;font-size:18px;color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line));flex:none}
 .rt-seg{display:flex;background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:3px;gap:3px}
 .rt-seg button{all:unset;flex:1;text-align:center;color:var(--ink-3);font-weight:600;font-size:13.5px;padding:9px 6px;border-radius:7px;cursor:pointer}
 .rt-seg button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:0 0 0 1px var(--line-2)}
@@ -2027,9 +2032,9 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rt-done h3{margin:0;font-size:20px;font-weight:700;overflow-wrap:anywhere}
 .rt-done .mt{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink-2)}
 .rt-dbtns{display:flex;gap:8px}
-.rt-dbtns .btn{flex:1;padding:11px 8px;font-size:13.5px}
+.rt-dbtns .btn{flex:1;padding:9px 8px;font-size:13.5px}
 #rtdAgain{border-color:var(--c2);color:var(--ink)}
-#rtdClose{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
+#rtdClose{color:var(--ink);border-color:var(--c3)}
 /* the run screen: the bar, the strip and the tempo, the wheel; nothing else */
 #rtRunBar,#rtRunTop{display:none}
 :root[data-rscr="1"] .wrap > :not(#rtRunBar):not(#rtRunTop):not(.stage){display:none!important}
@@ -2094,10 +2099,10 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 #cPageHead .c-et{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 #cPageHead .c-et b{font-size:15.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #cPageHead .cpl{display:flex;align-items:center;gap:8px;min-width:0}
-#cPageHead .cpl .n{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:600;color:var(--c4);white-space:nowrap;line-height:1.1}
+#cPageHead .cpl .n{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:600;color:var(--c5);white-space:nowrap;line-height:1.1}
 #cPageHead .cpl .n small{font-size:10px;color:var(--ink-3);font-weight:400}
 #cPageHead .cpl .bar{flex:1;min-width:24px;height:5px;border-radius:3px;background:var(--line);overflow:hidden}
-#cPageHead .cpl .bar i{display:block;height:100%;background:var(--c4)}
+#cPageHead .cpl .bar i{display:block;height:100%;background:var(--c5)}
 #cPageHead .cpl .t{font-size:10.5px;color:var(--ink-3);white-space:nowrap}
 /* v366 (Oscar's sketch): the notation over the tempo and the steps while a course run plays - it covers, it never moves anything */
 #courseNotes{grid-column:4;width:34px;height:34px;border-radius:10px;color:var(--ink-3)}
@@ -2109,9 +2114,9 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 #ctabs .lvl-row .meta span{white-space:normal;line-height:1.3}
 #ctabs .ops button[data-cplay]{width:34px;height:34px}
 #courseNotes svg{width:17px;height:17px}
-#courseNotes[data-on="1"]{color:var(--c4);border-color:var(--c4);background:color-mix(in srgb,var(--c4) 14%,transparent)}
+#courseNotes[data-on="1"]{color:var(--ink);border-color:var(--ink-2);background:color-mix(in srgb,var(--ink) 10%,transparent)}
 :root[data-course="1"] #courseTempo{position:relative}
-.course-score{position:absolute;inset:-2px 0;z-index:3;pointer-events:none;background:var(--panel);border:1.5px solid var(--c4);border-radius:12px;padding:3px 6px;color:var(--ink);overflow:hidden}
+.course-score{position:absolute;inset:-2px 0;z-index:3;pointer-events:none;background:var(--panel);border:1.5px solid var(--ink-3);border-radius:12px;padding:3px 6px;color:var(--ink);overflow:hidden}
 .course-score svg{display:block;width:100%;height:100%}
 .course-score .stline{position:absolute;top:0;left:0;width:2px;border-radius:1px;background:#E5484D;opacity:.9;will-change:transform;pointer-events:none}
 :root[data-cnotes="1"] #courseTempo > :not(#courseScore){pointer-events:none}   /* a tap there is a tap for its half, never a step pick */   /* v351 (QA v350 V2): the cross keeps the last column when the editor's star is not there */
@@ -2119,6 +2124,8 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 #courseWin{width:34px;height:34px;border-radius:10px;color:var(--c1);border-color:color-mix(in srgb,var(--c1) 45%,var(--line));font-size:14px}   /* v344: the editor's cheat, as the game's (v154) */
 .cb-mode{display:flex;align-items:center;gap:5px;font-size:11px;padding:5px 9px;border-radius:999px;border:1px solid color-mix(in srgb,var(--c2) 55%,var(--line));color:var(--ink-2);white-space:nowrap}
 .cb-mode svg{width:13px;height:13px;color:var(--c2)}
+:root[data-course="1"]:not([data-cpad="1"]) #courseBar .cb-mode{border-color:color-mix(in srgb,var(--c5) 55%,var(--line))} :root[data-course="1"]:not([data-cpad="1"]) #courseBar .cb-mode svg{color:var(--c5)}   /* v519 (QA v517 B13): the courses' blue */
+#gameBar #gbMode{border-color:color-mix(in srgb,var(--c4) 55%,var(--line))}   /* the game's purple */
 .cb-ttl{text-align:center;min-width:0}
 .cb-ttl b{display:block;font-family:var(--title);font-stretch:var(--title-stretch);font-weight:800;font-size:18px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cb-ttl span{display:block;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -2244,7 +2251,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .cs-k[data-k="no"]{color:var(--c3)} .cs-k[data-k="short"]{color:var(--ink-3)} .cs-k[data-k="goal"]{color:var(--c4)}
 .cs-pct{font-family:"IBM Plex Mono",monospace;font-size:48px;font-weight:500;line-height:1;color:var(--c2)}
 .cs-pct[data-k="no"]{color:var(--c3)} .cs-pct[data-k="short"]{color:var(--ink-3)}
-.cs-line{margin:0;font-size:13px;color:var(--ink-2)} .cs-line b{color:var(--ink)} .cs-line:empty{display:none}
+.cs-line{margin:0;font-size:13px;color:var(--ink-2)} .cs-line b{color:var(--ink)} .cs-line b.down{color:var(--c3)} .cs-line b.up{color:var(--c2)} .cs-line:empty{display:none}
 .cs-two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .cs-two:has(> [hidden]){grid-template-columns:1fr}   /* v320 (QA v317 V4): one button takes the row */
 :root[data-tour="1"] #cgrid [data-cstep]{pointer-events:none;cursor:default}   /* v323 (QA v322 m6): the lesson's ladder is read, not played */
@@ -2252,7 +2259,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .course-sheet[data-arm="0"] button{pointer-events:none;opacity:.35}
 .course-sheet[data-arm="0"] button{transition:none}   /* v359: asleep at once, awake with the fade */
 .course-sheet button{transition:opacity .25s}
-#csAgain{border-color:var(--c2)} #csBack{border-color:var(--c3)}
+#csAgain{border-color:var(--c2);color:var(--ink)} #csBack{border-color:var(--c3);color:var(--ink)}
 /* ---- v316: Courses ---- */
 #ctabs.lvl-list{max-height:none;overflow:visible}   /* v365: the course rows */
 #ctabs.lvl-list{overflow-y:auto;overscroll-behavior:contain}   /* v478 (Oscar): four courses - on a short screen the rows scroll in their own box, two and a half in view */
@@ -2295,10 +2302,10 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .cprog .t{font-size:11px;color:var(--ink-3);white-space:nowrap}
 #cprog{display:none}   /* v369: the progress lives on each course's row */
 #ctabs .cpl{display:flex;align-items:center;gap:8px;min-width:0;margin-top:2px}
-#ctabs .cpl .n{font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:600;color:var(--c4);white-space:nowrap;line-height:1.1}
+#ctabs .cpl .n{font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:600;color:var(--c5);white-space:nowrap;line-height:1.1}
 #ctabs .cpl .n small{font-size:10px;color:var(--ink-3);font-weight:400}
 #ctabs .cpl .bar{flex:1;min-width:24px;height:5px;border-radius:3px;background:var(--line);overflow:hidden}
-#ctabs .cpl .bar i{display:block;height:100%;background:var(--c4)}
+#ctabs .cpl .bar i{display:block;height:100%;background:var(--c5)}
 #ctabs .cpl .t{font-size:10.5px;color:var(--ink-3);white-space:nowrap}
 /* v497 (Oscar): the Reading course's screen - the course screen's look; a bar of notation over an empty wheel */
 #readScr{display:none}
@@ -2307,7 +2314,8 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root[data-rdg="1"] body .wrap > .stage:not(#rdNone){display:grid!important;grid-template-columns:minmax(0,1fr);gap:8px;margin-top:8px}   /* outranks the Courses window's own rule, as #readScr does */
 :root[data-rdg="1"] .stage > :not(.dial):not(#readFoot){display:none!important}
 :root[data-rdg="1"] .stage > #readFoot{display:flex;flex-direction:column;gap:8px}
-:root[data-rdg="1"] .dial :is(.dial-head,.dial-foot,#stageScore,#twoSplit){display:none!important}
+:root[data-rdg="1"] .dial :is(#stageScore,#twoSplit,#dialPat){display:none!important}
+:root[data-rdg="1"] .dial-head > :not(#dialRatio){display:none!important}   /* v518 (QA v517 B11, D7): the corner ratio and the row under the wheel, as on the other screens */
 :root[data-rdg="1"] .dial{padding:8px}
 :root[data-rdg="1"] .canvas-hold{max-width:min(100%,520px,max(190px,calc(100vh - var(--rdh,440px))));max-width:min(100%,520px,max(190px,calc(100svh - var(--rdh,440px))))}
 :root[data-rdg="1"] body .wrap > #readScr.read-scr{display:flex!important}   /* outranks the Courses window's own rule */
@@ -2328,14 +2336,15 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rd-steps .g{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);text-align:center;border-bottom:1px dashed var(--line-2);padding-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:clip}
 .rd-steps button{flex:1 1 0;height:30px;border-radius:9px;border:1px solid var(--line);background:var(--sunk);color:var(--ink-3);font-size:11.5px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;padding:0;min-width:0}
 .rd-steps button svg{width:14px;height:14px;flex:none}
-.rd-steps button{--kc:var(--c1);color:var(--kc);border-color:color-mix(in srgb,var(--kc) 40%,var(--line))}   /* v508 (Oscar): a colour per kind - build orange, tap teal, the exam purple; filled once done */
-.rd-steps button[data-k="t"]{--kc:var(--c2)} .rd-steps button[data-k="x"]{--kc:var(--c4)}
-.rd-steps button[data-done="1"]{background:var(--kc);border-color:var(--kc);color:var(--ground)}
+.rd-steps button{--kc:var(--ink-3);color:var(--kc);border-color:color-mix(in srgb,var(--kc) 40%,var(--line))}   /* v518 (QA v517 B4): the courses' track colours - done teal, the next one orange, the rest grey, the exam purple; the icons tell Build from Tap */
+.rd-steps button[data-next="1"]{--kc:var(--c1)}
+.rd-steps button[data-k="x"]{--kc:var(--c4)}
+.rd-steps button[data-done="1"]{--kc:var(--c2);background:var(--kc);border-color:var(--kc);color:var(--ground)}
 .rd-steps button[data-cur="1"]{border:2px solid var(--kc);background:color-mix(in srgb,var(--kc) 18%,var(--sunk))}
 .rd-steps button[data-cur="1"][data-done="1"]{background:var(--kc);box-shadow:inset 0 0 0 2px var(--panel)}
 .rd-steps button:disabled{opacity:.4;cursor:default}
 .rd-nota{position:relative}   /* v503: the playhead is an HTML line moved by transform */
-.rd-hd{position:absolute;left:0;top:0;width:2px;margin-left:-1px;border-radius:1px;background:#E5484D;opacity:0;pointer-events:none;will-change:transform}
+.rd-hd{position:absolute;left:0;top:0;width:2px;margin-left:-1px;border-radius:1px;background:var(--ink-2);opacity:0;pointer-events:none;will-change:transform}   /* v518 (QA v517 D17, Q4): notation in ink */
 .rd-ns .nh{transform-box:fill-box;transform-origin:center}   /* a hit's jump, a miss's shake */
 .rd-foot .rd-tempo{margin-top:2px}
 .rd-card{position:relative}
@@ -2360,7 +2369,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rd-say b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ink)}
 .rd-say b.g{color:var(--c2)} .rd-say b.p{color:var(--c3)} .rd-say b.o{color:var(--c1);font-family:inherit}
 .rd-say b.w{font-family:inherit}
-:root[data-rdg="1"] .dial > .rd-say{display:block}
+:root[data-rdg="1"] .dial > .rd-say{display:none}   /* v518 (QA v517 D7): the line lives in the row under the wheel (#dialHint) */
 .rd-say .rd-clean{font-size:14px;line-height:22px;padding:1px 11px 1px 9px} .rd-say .rd-clean svg{width:14px;height:14px}
 /* v508 (Oscar: "the exam does not look like an exam screen"): the other courses' exam look - the purple edge, the purple
    line under the name, and its own row of three bars in place of the steps */
@@ -2370,20 +2379,27 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root[data-rdg="1"][data-rdx="1"] .rd-bar .cb-mode svg{color:var(--c4)}
 /* v511 (Oscar: "still confusing"): the wheel section wears the step's mode - its icon in the top right corner and its edge in the
    mode's colour, the step chips' code: Build orange, Tap teal, the exam purple */
-:root[data-rdg="1"]{--rdk:var(--c1)}
-:root[data-rdg="1"][data-rdk="t"]{--rdk:var(--c2)}
-:root[data-rdg="1"][data-rdk="x"]{--rdk:var(--c4)}
-:root[data-rdg="1"] .wrap .dial{border:2px solid var(--rdk)!important;padding:7px}
+:root[data-rdg="1"]{--rdk:var(--ink-3);--rde:var(--line)}   /* v518 (QA v517 D8): a 1 px edge; Build plain, Tap teal (a judged run, as Precision), the exam purple */
+:root[data-rdg="1"][data-rdk="t"]{--rdk:var(--c2);--rde:var(--c2)}
+:root[data-rdg="1"][data-rdk="x"]{--rdk:var(--c4);--rde:var(--c4)}
+:root[data-rdg="1"] .wrap .dial{border:1px solid var(--rde)!important;padding:8px}
 .rd-mode{display:none}
 :root[data-rdg="1"] .dial > .rd-mode{display:flex;position:absolute;top:8px;right:8px;z-index:6;width:34px;height:34px;box-sizing:border-box;border-radius:10px;
   align-items:center;justify-content:center;border:2px solid var(--rdk);background:color-mix(in srgb,var(--rdk) 16%,var(--sunk));color:var(--rdk);pointer-events:none}
 :root[data-rdg="1"] .dial > .rd-mode svg{width:20px;height:20px}
 :root[data-rdg="1"][data-rdrun="1"] .play{display:none}   /* v512: no play / pause button in a tap run - the bar's cross stops it */
+:root[data-rdg="1"][data-rdk="t"]:not([data-rdrun="1"]) .play,:root[data-rdg="1"][data-rdk="t"]:not([data-rdrun="1"]) .play:hover{opacity:.95;background:var(--c2);border-color:var(--c2);color:var(--ground)}   /* v518 (QA v517 B9): the hub that starts a judged run is teal, as on the course screen and Precision */
+#rdTempo .ct-num b{font-size:42px}   /* v518 (QA v517 B3): the big tempo under the bar, as on the course screen */
+:root[data-rdg="1"][data-rdplay="1"] #rdTempo .jump{opacity:.35;pointer-events:none}   /* nothing changes under a run */
+@media (max-height:700px){ #rdTempo .ct-num b{font-size:30px} #rdTempo .jump{height:36px} :root[data-rdg="1"] .canvas-hold{max-width:min(100%,520px,max(170px,calc(100svh - var(--rdh,440px))))} }   /* a short phone: the tempo row and the wheel give a little, so the screen fits */
+.rdc-ico{display:flex;justify-content:center;margin:4px 0 0} .rdc-ico[hidden]{display:none}
+.rdc-ico svg{width:46px;height:46px} .rdc-ico[data-k="b"]{color:var(--ink-2)} .rdc-ico[data-k="t"]{color:var(--c2)} .rdc-ico[data-k="x"]{color:var(--c4)}
+.rd-card .rdc-later[hidden]{display:none}
 .rd-steps .grp.rdx{flex:1 1 100%}
 .rd-steps .rdx .g{color:var(--c4);border-bottom-color:color-mix(in srgb,var(--c4) 50%,var(--line-2))}
 .rd-steps .xb{flex:1 1 0;height:30px;border-radius:9px;border:1px solid color-mix(in srgb,var(--c4) 45%,var(--line));background:var(--sunk);color:var(--c4);display:flex;align-items:center;justify-content:center;gap:5px;font:600 11.5px "IBM Plex Mono",monospace;letter-spacing:.04em;min-width:0}
 .rd-steps .xb svg{width:14px;height:14px;flex:none}
-.rd-steps .xb[data-done="1"]{background:var(--c4);border-color:var(--c4);color:var(--ground)}
+.rd-steps .xb[data-done="1"]{background:var(--c2);border-color:var(--c2);color:var(--ground)}   /* v518: done is teal */
 .rd-steps .xb[data-cur="1"]{border:2px solid var(--c4);background:color-mix(in srgb,var(--c4) 16%,var(--sunk));color:var(--ink)}
 html[data-skin="light"] .rd-steps .xb[data-done="1"],html[data-skin="light"] .rd-steps button[data-done="1"]{color:#fff}
 .rdc-t[data-k="exam"]{color:var(--c4)}
@@ -2418,7 +2434,7 @@ html[data-skin="light"] .rd-steps .xb[data-done="1"],html[data-skin="light"] .rd
 .rd-ns .cw.x{fill:var(--c3);opacity:1;font-weight:600}
 .rd-ns .tn{font-family:var(--title);font-style:italic;font-weight:700;font-size:11px;fill:var(--ink-2);text-anchor:middle}
 .rd-ns .tb{stroke:var(--ink-2);stroke-width:1.1;fill:none}
-.rd-ns .hd{stroke:#E5484D;stroke-width:2;stroke-linecap:round}
+.rd-ns .hd{stroke:var(--ink-2);stroke-width:2;stroke-linecap:round}
 .clist .cst.inf{border:1.5px solid color-mix(in srgb,var(--c2) 55%,var(--line));color:var(--c2);font-size:13px;line-height:1}
 :root[data-rsel="1"][data-cpg="1"] #cwinOpts{visibility:hidden}   /* the way to take a course (phone / pad, left-handed) is not the reading course's; v500: on its own page */
 #ctabs[data-more="1"]{-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 26px),transparent)}
@@ -2429,11 +2445,11 @@ html[data-skin="light"] .rd-steps .xb[data-done="1"],html[data-skin="light"] .rd
   :root[data-rdg="1"] .wrap{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:14px;align-items:start;max-width:900px}
   :root[data-rdg="1"] .wrap > #readScr{grid-column:1;grid-row:1}
   :root[data-rdg="1"] .wrap > .stage{grid-column:2;grid-row:1;margin-top:0}
-  :root[data-rdg="1"] .canvas-hold{max-width:calc(100svh - 150px);width:calc(100svh - 150px);min-width:120px}
+  :root[data-rdg="1"] .canvas-hold{max-width:calc(100svh - 170px);width:calc(100svh - 170px);min-width:110px}   /* v518: the corner ratio and the row under the wheel take their room */
   .rd-steps .g{display:none}
   .rd-steps button{height:26px}
   .rd-tempo .jump{height:32px}
-  .rd-tempo .rdb b{font-size:22px}
+  #rdTempo .ct-num b{font-size:26px}
   .rd-btns .btn{height:38px}
 }
 .clist .rcat .cdone{color:var(--c2)}
@@ -2812,6 +2828,12 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
    like the game's and the stage's - the sheets' closes, the banner's, the challenge's, the awards',
    the ring card's remove, and the x on preset / level / sequence rows */
 #alongX,#chalQuit,#planClose,#scoreClose,#achClose,#shareClose,#helpClose,#logClose,.icobtn.chal-x,#rack .icobtn[data-del]{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
+/* v519 (QA v517 D1): one cross - 34 px, radius 10 in sheets and bars; 30 px inside a card */
+#planClose,#scoreClose,#achClose,#shareClose,#helpClose,#logClose,#smClose{width:34px;height:34px;border-radius:10px;font-size:18px;flex:none}
+.icobtn.chal-x{width:30px;height:30px;border-radius:10px;font-size:16px}
+/* D2: one closing text button - ink text, pink edge, 36 px; D18: one card frame - radius 20, line-2 edge */
+#alongCardClose,#rtdClose,#csBack{color:var(--ink);border-color:var(--c3);min-height:36px}
+.sheet.along-card{border-radius:20px;border-color:var(--line-2)}
 .lvl-row .ops button[data-del]{color:var(--c3)}
 .empty{color:var(--ink-3);font-size:12px;margin-top:11px}
 .sec-help{margin:2px 0 10px}
@@ -2989,7 +3011,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
     <div class="tools">
       <button class="btn count" id="countBtn" data-on="0" aria-pressed="false"
-              title="Play three counting beats before the rings start">Count-in</button>
+              title="Count a bar in before the rings start">Count-in</button>
       <button class="btn tap" id="tap" data-armed="0"><span id="tapTxt">Tap tempo</span></button>
       <div class="vol">
         <span class="lbl">Volume</span>
@@ -3043,6 +3065,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <button type="button" class="icobtn" id="rdWin" title="Cheat: pass this step now" aria-label="Pass this step now">&#9733;</button>   <!-- v502 (Oscar): the editor's star, as in the other courses -->
       <button type="button" class="icobtn" id="rdX" title="Leave the lesson" aria-label="Leave the lesson">&times;</button>
     </div>
+    <div class="rd-tempo pt-tempo" id="rdTempo"><button type="button" class="jump wide" id="rdDown" aria-label="Slower">&minus;5</button><div class="ct-num"><b id="rdBpm">70</b><span>bpm</span></div><button type="button" class="jump wide" id="rdUp" aria-label="Faster">+5</button></div>   <!-- v518 (QA v517 B3): under the bar, as on the course screen -->
     <div class="rd-steps" id="rdSteps"></div>
     <div class="rd-nota" id="rdNota"></div>
   </section>   <!-- v503: the wheel is the app's own (.stage), the buttons sit under it in #readFoot -->
@@ -3192,7 +3215,6 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
 
     <div class="rd-foot" id="readFoot">   <!-- v503: the Reading course's buttons, under the app's wheel -->
-      <div class="rd-tempo" id="rdTempo" hidden><button type="button" class="jump wide" id="rdDown" aria-label="Slower">&minus;5</button><div class="rdb"><b id="rdBpm">70</b><span>bpm</span></div><button type="button" class="jump wide" id="rdUp" aria-label="Faster">+5</button></div>
       <div class="rd-btns" id="rdBtns"></div>
       <div class="rd-more-row" id="rdMore" hidden></div>
     </div>
@@ -3620,15 +3642,16 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 </div>
 <!-- v503 (Oscar: "the That's it is too small - a pop-up in front with the next button"): the Reading course's card -->
 <div class="modal course-sheet-wrap rd-card-wrap" id="rdCard" hidden>
-  <div class="course-sheet rd-card" id="rdCardIn" data-arm="1" role="dialog" aria-modal="true" aria-labelledby="rdcT">
-    <button type="button" class="icobtn rdc-x" id="rdcX" title="Close" aria-label="Close">&times;</button>
-    <div class="rdc-k" id="rdcK"></div>
-    <div class="cs-k rdc-t" id="rdcT">That&rsquo;s it!</div>
+  <div class="course-sheet rd-card" id="rdCardIn" data-arm="1" role="dialog" aria-modal="true" aria-labelledby="rdcT">   <!-- v518 (QA v517 B7, D4, D5): the course cards' parts - a start card like the course intro, a result like the course sheet -->
+    <div class="ci-code" id="rdcK" hidden></div>
+    <div class="cs-k" id="rdcT"></div>
     <div class="rdc-fig" id="rdcF" hidden></div>
-    <p class="rdc-stars" id="rdcSt" hidden></p>
+    <div class="rdc-ico" id="rdcI" hidden></div>
     <p class="cs-line rdc-l" id="rdcL"></p>
-    <button type="button" class="course-go" id="rdcGo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h12M12 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="rdcGoT">Next</span></button>
+    <p class="cs-line" id="rdcM"></p>
+    <button type="button" class="course-go" id="rdcGo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg><span id="rdcGoT">Next</span></button>
     <button type="button" class="btn rdc-alt" id="rdcAlt" hidden>Another bar</button>
+    <button type="button" class="btn sm ci-later rdc-later" id="rdcLater" hidden>Not now</button>
   </div>
 </div>
 <div class="modal course-sheet-wrap" id="courseSheet" hidden>
@@ -3639,7 +3662,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <p class="cs-line" id="csHands"></p>
     <div class="along-card-where" id="csWhere" hidden></div>   <!-- v486: where I'm off -->
     <button type="button" class="course-go" id="csGo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg><span id="csGoT">Next step</span></button>
-    <div class="cs-two"><button type="button" class="btn" id="csAgain">Again</button><button type="button" class="btn" id="csBack">Back to the course</button></div>
+    <div class="cs-two"><button type="button" class="btn" id="csBack">Back to the course</button><button type="button" class="btn" id="csAgain">Run again</button></div>   <!-- v519 (QA v517 B10): leave on the left, again on the right -->
   </div>
 </div>
 <div class="modal ask-modal" id="alongModal" hidden>
@@ -3942,7 +3965,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v517"></script>
+<script src="./app.js?v=v518"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3955,8 +3978,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v517";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-13 15:00";          /* and when it was built, for ?diag */
+  var BUILD = "v518";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-13 15:38";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

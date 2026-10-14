@@ -519,6 +519,25 @@ input[type=range]::-moz-range-thumb{
 .tw-line{margin:-6px 0 18px;font-size:14.5px;line-height:1.45;color:var(--ink-2)}
 .tw-line b{color:var(--ink);font-weight:600}
 .tw-line[data-k="done"]{color:var(--c2);font-weight:600}
+/* v531 (QA v530 V1): a landscape browser tab - the card's buttons fit without scrolling inside it */
+@media (max-height:440px){
+  .modal.tour-welcome{padding:8px 20px}
+  .tw-sheet{padding:12px 18px 8px}
+  .tw-k{font-size:12px}
+  .tw-logo{margin:6px 0 4px}
+  .tw-logo svg{width:40px;height:40px}
+  .tw-logo span{font-size:28px}
+  .tw-sub{display:none}
+  .tw-line{margin:4px 0 10px;font-size:13.5px}
+  #tourWelcome .chal-cta{padding:10px 14px;font-size:17px}
+  .tw-links .tour-skip{margin-top:4px}
+}
+.chal-how{margin:12px 0 0;font-size:14px;line-height:1.45;color:var(--ink-2)}   /* v531 */
+.chal-how b{color:var(--ink);font-weight:600}
+.chal-how[data-k="done"]{color:var(--c2);font-weight:600}
+.chal-how[hidden]{display:none}
+.tour.up{top:max(8px, env(safe-area-inset-top, 0px));bottom:auto}   /* v531 (QA v530 NI3): the card goes up while a bottom sheet holds what it talks about */
+@media (pointer:coarse){ .sm-row .btn.sm{min-height:34px} }   /* v531 (QA v530 V2) */
 #twInstall{position:relative;animation:twBeat 1.6s ease-in-out infinite}
 #twInstall::after{content:"";position:absolute;inset:-2px;border-radius:inherit;pointer-events:none;opacity:0;
   box-shadow:0 0 0 4px color-mix(in srgb,var(--c2) 45%,transparent),0 0 22px 4px color-mix(in srgb,var(--c2) 40%,transparent);animation:twGlow 1.6s ease-in-out infinite}
@@ -728,7 +747,9 @@ button.along-card-pct .go i{font-style:normal;font-family:var(--title);font-size
 .along-card[data-arm="0"] .btn{pointer-events:none;opacity:.35}   /* v308: asleep for a second after the card appears */
 .along-card-next{width:100%;margin-top:14px;border-color:var(--line-2);color:var(--ink-2)}   /* v480: grey */
 .along-card-next:not([hidden]) + .ask-btns{margin-top:8px}   /* v306: the next step sits above the pair */
-.along-card-next svg{width:14px;height:14px;color:var(--ink-3)}
+.along-card-next{display:flex;align-items:center;justify-content:center;gap:6px}   /* v531 (QA v530 NV3): the triangle on the words' middle */
+.along-card-next[hidden]{display:none}
+.along-card-next svg{width:14px;height:14px;color:var(--ink-3);flex:none}
 .along-card .ask-btns .btn.lead{border-color:var(--c2);color:var(--ink)}
 @media (max-height:420px){   /* v314 (QA v311 V3): a landscape phone keeps Close and Run again on screen */
   .along-card .chal-kicker{font-size:20px}
@@ -2535,6 +2556,7 @@ html[data-skin="light"] .rd-steps .xb[data-done="1"],html[data-skin="light"] .rd
    two dropdowns onto their own lines and broke the sentence */
 select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 .sess-gap{margin-left:14px}
+.sess-pair{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}   /* v531 (QA v530 NV2): a label stays with its box */
 @media (max-width:940px){ .sess-gap{margin-left:0} }
 /* the summary reads left, the way into the detail sits bottom right */
 .sess-foot{
@@ -3290,7 +3312,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         <option value="none">Current rhythm</option>
         <option value="seq">Sequence</option>
       </select>
-      <span class="sess-txt sess-gap">Silent loops</span>
+      <span class="sess-pair sess-gap"><span class="sess-txt">Silent loops</span>
       <select class="snd sess-sel" id="sSil" aria-label="Silent loops">
         <option value="0">off</option>
         <option value="8">1 in 8</option>
@@ -3299,17 +3321,17 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         <option value="3">1 in 3</option>
         <option value="2">every other</option>
         <option value="1">all but first</option>
-      </select>
+      </select></span>
       <!-- v206: random gaps INSIDE the bar - about 1 in N sounding hits drops out, from the second loop
            of each pattern on (the review's "speed trainer" point, the half the session did not have) -->
-      <span class="sess-txt sess-gap">Beat gaps</span>
+      <span class="sess-pair sess-gap"><span class="sess-txt">Beat gaps</span>
       <select class="snd sess-sel" id="sGap" aria-label="Random beat gaps">
         <option value="0">off</option>
         <option value="8">1 in 8</option>
         <option value="6">1 in 6</option>
         <option value="4">1 in 4</option>
         <option value="3">1 in 3</option>
-      </select>
+      </select></span>
     </div>
 
     <div class="rstrip sess-strip" id="sStrip"></div>
@@ -3566,6 +3588,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <p class="tw-sub">Polyrhythm metronome</p>
     <p class="tw-line" id="twLine" style="display:none"></p>   <!-- v530 (Oscar): install before playing in a browser tab -->
     <button type="button" class="btn chal-cta" id="twInstall" style="display:none">Install Polyorbit</button>
+    <button type="button" class="btn chal-cta" id="twGo" style="display:none">Continue here</button>   <!-- v531 (QA v530 NC2): one big button after the how-to -->
     <button type="button" class="btn chal-cta" id="twNext">Next</button>
     <div class="tw-links"><button type="button" class="tour-skip" id="twBrowse" style="display:none">Play in the browser</button>
     <button type="button" class="tour-skip tw-skip" id="twSkip">Skip tour</button></div>
@@ -3797,10 +3820,11 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <button type="button" class="btn chal-cta" id="chalGo">Play</button>
     <div class="chal-more">
       <button type="button" class="btn sm" id="chalAgain" hidden>Play again</button>
-      <button type="button" class="btn sm" id="chalInstall" hidden title="Install Polyorbit on this device">Install app</button>
+      <button type="button" class="btn sm" id="chalInstall" hidden title="Install Polyorbit on this device">Install Polyorbit</button>
       <button type="button" class="btn sm" id="chalKeep" hidden title="Add it to your levels">Keep</button>
       <button type="button" class="btn sm" id="chalLater">Not now</button>
     </div>
+    <p class="chal-how" id="chalHow" hidden></p>   <!-- v531 (QA v530 m3): the how-to has its own line -->
   </div>
 </div>
 <!-- achievement icons (v151): hand-drawn strokes at the app's line weight, one colour each -->
@@ -3968,7 +3992,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v530"></script>
+<script src="./app.js?v=v531"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3981,8 +4005,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v530";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-14 11:11";          /* and when it was built, for ?diag */
+  var BUILD = "v531";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-14 12:34";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 
@@ -4046,9 +4070,10 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     prompt: function(){
       if(!deferred) return Promise.resolve("none");
       var d = deferred;
-      try{ d.prompt(); } catch(e){ deferred = null; return Promise.resolve("none"); }
-      return d.userChoice.then(function(r){ deferred = null; said(); return (r && r.outcome) || "dismissed"; },
-                               function(){ deferred = null; said(); return "dismissed"; });
+      deferred = null;   /* v531 (QA v530 m5): one dialog per offer, a second press finds none */
+      try{ d.prompt(); } catch(e){ return Promise.resolve("none"); }
+      return d.userChoice.then(function(r){ said(); return (r && r.outcome) || "dismissed"; },
+                               function(){ said(); return "dismissed"; });
     }
   };
   addEventListener("beforeinstallprompt", function(e){

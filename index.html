@@ -532,6 +532,28 @@ input[type=range]::-moz-range-thumb{
   #tourWelcome .chal-cta{padding:10px 14px;font-size:17px}
   .tw-links .tour-skip{margin-top:4px}
 }
+/* v532: the survey */
+.fb-sheet{max-width:440px;display:flex;flex-direction:column;gap:12px;max-height:calc(100svh - 32px)}
+.fb-sheet > *{flex:none}
+.fb-lead{margin:0;font-size:13px;color:var(--ink-2)}
+.fb-q{display:flex;flex-direction:column;gap:6px}
+.fb-lbl{font-size:13.5px;font-weight:600;color:var(--ink)}
+.fb-hint{font-size:11.5px;color:var(--ink-3);margin-top:-3px}
+.fb-chips{display:flex;flex-wrap:wrap;gap:6px}
+.fb-chip{all:unset;box-sizing:border-box;min-height:32px;padding:5px 11px;border:1px solid var(--line-2);border-radius:999px;font-size:12.5px;color:var(--ink-2);cursor:pointer;display:inline-flex;align-items:center}
+.fb-chip[aria-pressed="true"]{border-color:var(--c2);color:var(--ink);background:color-mix(in srgb,var(--c2) 16%,transparent)}
+.fb-chip[data-neg="1"][aria-pressed="true"]{border-color:var(--c3);background:color-mix(in srgb,var(--c3) 14%,transparent)}
+.fb-sec{display:flex;flex-direction:column;gap:5px;padding:8px 0 2px;border-top:1px solid var(--line)}
+.fb-sec .fb-chips{gap:5px}
+.fb-sec .fb-chip{padding:5px 10px}
+.fb-sec > b{font-size:12.5px;font-weight:600;color:var(--ink)}
+.fb-in{width:100%;box-sizing:border-box;background:var(--sunk);border:1px solid var(--line-2);border-radius:10px;padding:9px 11px;color:var(--ink);font:inherit;font-size:14px}
+.fb-in:focus{outline:none;border-color:var(--c2)}
+.fb-text{min-height:96px;resize:vertical;line-height:1.4}
+.fb-send{margin-top:2px}
+.fb-send:disabled{opacity:.4;cursor:default}
+.fb-note{margin:-4px 0 0;font-size:11.5px;color:var(--ink-3);text-align:center}
+.fb-note[data-k="sent"]{color:var(--c2);font-weight:600}
 .chal-how{margin:12px 0 0;font-size:14px;line-height:1.45;color:var(--ink-2)}   /* v531 */
 .chal-how b{color:var(--ink);font-weight:600}
 .chal-how[data-k="done"]{color:var(--c2);font-weight:600}
@@ -2848,9 +2870,9 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 /* v204, Oscar: every cross that closes a sheet, leaves a mode or removes something is pink (c3),
    like the game's and the stage's - the sheets' closes, the banner's, the challenge's, the awards',
    the ring card's remove, and the x on preset / level / sequence rows */
-#alongX,#chalQuit,#planClose,#scoreClose,#achClose,#shareClose,#helpClose,#logClose,.icobtn.chal-x,#rack .icobtn[data-del]{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
+#alongX,#chalQuit,#planClose,#scoreClose,#achClose,#shareClose,#helpClose,#logClose,#fbClose,.icobtn.chal-x,#rack .icobtn[data-del]{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
 /* v519 (QA v517 D1): one cross - 34 px, radius 10 in sheets and bars; 30 px inside a card */
-#planClose,#scoreClose,#achClose,#shareClose,#helpClose,#logClose,#smClose{width:34px;height:34px;border-radius:10px;font-size:18px;flex:none}
+#planClose,#scoreClose,#achClose,#shareClose,#helpClose,#logClose,#smClose,#fbClose{width:34px;height:34px;border-radius:10px;font-size:18px;flex:none}
 .icobtn.chal-x{width:30px;height:30px;border-radius:10px;font-size:16px}
 /* D2: one closing text button - ink text, pink edge, 36 px; D18: one card frame - radius 20, line-2 edge */
 #alongCardClose,#rtdClose,#csBack{color:var(--ink);border-color:var(--c3);min-height:36px}
@@ -3617,6 +3639,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <p class="sup-note" id="supNote" hidden></p>
     </div>
     <div class="sm-rule">More</div>
+    <div class="sm-row"><span>Enquesta</span><button type="button" class="btn sm" id="menuFb" title="Envia'ns la teva opinió">Respon</button></div>   <!-- v532 -->
     <div class="sm-row" id="menuInstRow" style="display:none"><span>Install Polyorbit</span><button type="button" class="btn sm" id="menuInst" title="Full screen, works offline, its own icon">Install</button></div>   <!-- v530 -->
     <div class="sm-row"><span id="menuCalLbl">Sound delay</span><button type="button" class="btn sm" id="menuCal" title="Measure this phone's delay: ten clicks, tap along">Calibrate</button></div>   <!-- v376 -->
     <div class="sm-row pro-test"><span>Pro gates (test)</span><button type="button" class="btn sm" id="proGateBtn">Off</button></div>   <!-- v384: editor only -->
@@ -3888,6 +3911,27 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 </svg>
 <!-- the achievements sheet (v151) -->
 <!-- v227: the practice log sheet - days first, then the patterns Precision has measured -->
+<!-- v532 (Oscar): the play test's survey, in Catalan, sent through the player's own email app -->
+<div class="modal" id="fbModal" hidden>
+  <div class="sheet fb-sheet" role="dialog" aria-modal="true" aria-labelledby="fbTitle">
+    <div class="sheet-head">
+      <h2 id="fbTitle">Enquesta</h2>
+      <button class="icobtn" id="fbClose" title="Tanca" aria-label="Tanca">&times;</button>
+    </div>
+    <p class="fb-lead">Un minut. Les respostes s'envien per correu.</p>
+    <input class="fb-in" id="fbName" type="text" maxlength="60" placeholder="El teu nom" autocomplete="name">
+    <div class="fb-q"><span class="fb-lbl">L'app és clara?</span>
+      <div class="fb-chips" data-q="clara"><button type="button" class="fb-chip" data-v="Sí">Sí</button><button type="button" class="fb-chip" data-v="Més o menys">Més o menys</button><button type="button" class="fb-chip" data-v="No" data-neg="1">No</button></div></div>
+    <div class="fb-q"><span class="fb-lbl">L'app et resulta útil?</span>
+      <div class="fb-chips" data-q="util"><button type="button" class="fb-chip" data-v="Sí">Sí</button><button type="button" class="fb-chip" data-v="Més o menys">Més o menys</button><button type="button" class="fb-chip" data-v="No" data-neg="1">No</button></div></div>
+    <div class="fb-q"><span class="fb-lbl">Les seccions</span><small class="fb-hint">Marca només les que hagis provat.</small>
+      <div id="fbSecs"></div></div>
+    <div class="fb-q"><span class="fb-lbl">Comentaris</span>
+      <textarea class="fb-in fb-text" id="fbText" maxlength="1500" placeholder="Què t'ha agradat, què t'ha confós, què hi trobes a faltar…"></textarea></div>
+    <button type="button" class="btn chal-cta fb-send" id="fbSend" disabled>Envia per correu</button>
+    <p class="fb-note" id="fbNote">S'obrirà el teu correu amb les respostes: només cal prémer Envia.</p>
+  </div>
+</div>
 <div class="modal" id="logModal" hidden>
   <div class="sheet log-sheet" role="dialog" aria-modal="true" aria-labelledby="logTitle">
     <div class="sheet-head">
@@ -3992,7 +4036,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v531"></script>
+<script src="./app.js?v=v532"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4005,8 +4049,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v531";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-14 12:34";          /* and when it was built, for ?diag */
+  var BUILD = "v532";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-14 16:34";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

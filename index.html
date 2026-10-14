@@ -138,6 +138,7 @@ button,input,select{font:inherit;color:inherit;-webkit-tap-highlight-color:trans
    wrap they stay on the right, under the title, not at the left edge */
 .np-right{display:flex;align-items:center;gap:10px;flex:none;margin-left:auto}
 .np-right .btn.mode{padding:7px 12px}
+@media (max-width:380px){ .nameplate{gap:10px} .np-right{gap:8px} }   /* v533 (QA v531-user NV1): one line at 360 px */
 .btn.skin{display:inline-flex;align-items:center;gap:7px;padding:7px 12px}
 .btn.skin svg{width:15px;height:15px;flex:none}
 .tagline{color:var(--ink-2);font-size:13px;max-width:52ch;margin:7px 0 0}
@@ -1899,6 +1900,8 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 /* v493 (QA v491 m4): in a Precision run the coach card at the foot lies over the wheel's lowest part - taps on it pass through to
    the wheel (judged as usual); its "Got it" keeps its own */
 :root[data-along="1"] #coachCard{pointer-events:none}
+:root[data-gscr="1"] #coachCard{pointer-events:none}   /* v533 (QA v531-user NW3): taps reach the game; Got it keeps its click */
+:root[data-gscr="1"] #coachCard #coachOk{pointer-events:auto}
 :root[data-along="1"] #coachCard #coachOk{pointer-events:auto}
 .prac-card .pc-ico{flex:none;width:30px;height:30px;color:var(--c1)} .prac-card .pc-ico svg{width:100%;height:100%;display:block}
 .prac-card .pc-txt{flex:1;min-width:0;display:grid;gap:2px}
@@ -4030,13 +4033,13 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
     <p class="build mono" id="buildTag"></p>
     <!-- the installed app has no address bar: this is the way to the ?diag page from inside it (v121) -->
-    <p class="build mono"><a href="./?diag" class="diaglink">Diagnostics</a> &middot; frame times and this device's own readings</p>
+    <p class="build mono"><a href="./?diag" class="diaglink">Report a problem</a> &middot; record a session and send it</p>
     <!-- v264 (Oscar): one row per concept; a tap plays that part of the tour, with hands and cards -->
     <div class="lvl-list rlist lesson-list" id="lessonList"></div>
   </div>
 </div>
 
-<script src="./app.js?v=v532"></script>
+<script src="./app.js?v=v533"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4049,8 +4052,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v532";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-14 16:34";          /* and when it was built, for ?diag */
+  var BUILD = "v533";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-14 22:48";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

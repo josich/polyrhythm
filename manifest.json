@@ -31,5 +31,11 @@
       "purpose": "maskable"
     }
   ],
-  "orientation": "portrait"
+  "orientation": "portrait",
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://josich.github.io/polyrhythm/manifest.json"
+    }
+  ]
 }

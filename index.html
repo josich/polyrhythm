@@ -514,6 +514,15 @@ input[type=range]::-moz-range-thumb{
 @keyframes twBeat{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
 @keyframes twGlow{0%,100%{opacity:0}50%{opacity:1}}
 .tw-skip{margin-top:10px}
+.tw-links{display:flex;justify-content:center;flex-wrap:wrap;column-gap:18px}   /* v530 */
+.tw-links .tour-skip{margin-top:10px}
+.tw-line{margin:-6px 0 18px;font-size:14.5px;line-height:1.45;color:var(--ink-2)}
+.tw-line b{color:var(--ink);font-weight:600}
+.tw-line[data-k="done"]{color:var(--c2);font-weight:600}
+#twInstall{position:relative;animation:twBeat 1.6s ease-in-out infinite}
+#twInstall::after{content:"";position:absolute;inset:-2px;border-radius:inherit;pointer-events:none;opacity:0;
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--c2) 45%,transparent),0 0 22px 4px color-mix(in srgb,var(--c2) 40%,transparent);animation:twGlow 1.6s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){ #twInstall,#twInstall::after{animation:none} }
 /* v301 (Oscar): a hand on a slider or a drag slides - down onto the thumb, along to the right, up, and back */
 .ghost.slide svg{animation:ghostSlide 2.4s ease-in-out infinite}
 .ghost.slide .hand{animation:none}
@@ -3555,8 +3564,11 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <p class="tw-k" id="twK">Welcome to</p>
     <div class="tw-logo" id="twLogo"><span>Polyorbit</span></div>
     <p class="tw-sub">Polyrhythm metronome</p>
+    <p class="tw-line" id="twLine" style="display:none"></p>   <!-- v530 (Oscar): install before playing in a browser tab -->
+    <button type="button" class="btn chal-cta" id="twInstall" style="display:none">Install Polyorbit</button>
     <button type="button" class="btn chal-cta" id="twNext">Next</button>
-    <button type="button" class="tour-skip tw-skip" id="twSkip">Skip tour</button>
+    <div class="tw-links"><button type="button" class="tour-skip" id="twBrowse" style="display:none">Play in the browser</button>
+    <button type="button" class="tour-skip tw-skip" id="twSkip">Skip tour</button></div>
     <p class="tw-bad" id="twBad" hidden></p>
   </div>
 </div>
@@ -3582,6 +3594,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <p class="sup-note" id="supNote" hidden></p>
     </div>
     <div class="sm-rule">More</div>
+    <div class="sm-row" id="menuInstRow" style="display:none"><span>Install Polyorbit</span><button type="button" class="btn sm" id="menuInst" title="Full screen, works offline, its own icon">Install</button></div>   <!-- v530 -->
     <div class="sm-row"><span id="menuCalLbl">Sound delay</span><button type="button" class="btn sm" id="menuCal" title="Measure this phone's delay: ten clicks, tap along">Calibrate</button></div>   <!-- v376 -->
     <div class="sm-row pro-test"><span>Pro gates (test)</span><button type="button" class="btn sm" id="proGateBtn">Off</button></div>   <!-- v384: editor only -->
     <div class="sm-row pro-test"><span>Pro owned (test)</span><button type="button" class="btn sm" id="proOwnBtn">No</button></div>
@@ -3955,7 +3968,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v529"></script>
+<script src="./app.js?v=v530"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -3968,8 +3981,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v529";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-14 10:56";          /* and when it was built, for ?diag */
+  var BUILD = "v530";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-14 11:11";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 
@@ -4022,36 +4035,33 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     });
   }
 
-  /* ---- install button ------------------------------------------------- */
-  function showInstall(){
-    if(standalone() || document.getElementById("installBtn")) return;
-    var b = document.createElement("button");
-    b.id = "installBtn";
-    b.className = "btn";
-    b.textContent = "Install app";
-    b.style.borderColor = "var(--c2)";
-    b.style.color = "var(--ink)";
-    b.addEventListener("click", function(){
-      if(!deferred) return;
-      deferred.prompt();
-      deferred.userChoice.then(function(res){
-        if(res && res.outcome === "accepted") b.remove();
-        deferred = null;
-      });
-    });
-    var host = document.querySelector(".np-right") || document.body;
-    host.appendChild(b);
-  }
+  /* ---- install (v530) ---------------------------------------------------
+     The header's corner button is gone (Oscar). The app asks on its welcome card and in the
+     menu; this part only keeps the browser's install dialog and says when it changes. */
+  var installed = false;
+  function said(){ try{ document.dispatchEvent(new Event("polyinstall")); } catch(e){} }
+  window.POLY_INSTALL = {
+    can: function(){ return !!deferred; },
+    installed: function(){ return installed; },
+    prompt: function(){
+      if(!deferred) return Promise.resolve("none");
+      var d = deferred;
+      try{ d.prompt(); } catch(e){ deferred = null; return Promise.resolve("none"); }
+      return d.userChoice.then(function(r){ deferred = null; said(); return (r && r.outcome) || "dismissed"; },
+                               function(){ deferred = null; said(); return "dismissed"; });
+    }
+  };
   addEventListener("beforeinstallprompt", function(e){
     e.preventDefault();
     deferred = e;
     promptFired = true;
-    showInstall();
+    said();
   });
-  addEventListener("appinstalled", function(){
-    var b = document.getElementById("installBtn");
-    if(b) b.remove();
-  });
+  addEventListener("appinstalled", function(){ installed = true; deferred = null; said(); });
+  /* opened in a tab while the app is installed (Chrome on Android): the card says so */
+  if(!standalone() && navigator.getInstalledRelatedApps){
+    navigator.getInstalledRelatedApps().then(function(list){ if(list && list.length){ installed = true; said(); } }).catch(function(){});
+  }
 
   /* ---- keep the screen awake while it plays --------------------------- */
   var lock = null;
@@ -4335,7 +4345,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     say("beforeinstallprompt", promptFired
       ? "fired - Install app is available"
       : "not fired (already installed, criteria unmet, or Chrome is still checking)");
-    say("verdict", promptFired ? "installable - use the Install app button"
+    say("verdict", promptFired ? "installable - the welcome card and the menu offer Install"
       : !secureOrigin ? "blocked: serve this over https"
       : standalone() ? "already installed"
       : "everything above looks fine, so Chrome is either still checking (reload once) "

@@ -533,7 +533,8 @@ input[type=range]::-moz-range-thumb{
   .tw-logo span{font-size:28px}
   .tw-sub{display:none}
   .tw-line{margin:4px 0 10px;font-size:13.5px}
-  #tourWelcome .chal-cta{padding:10px 14px;font-size:17px}
+  #tourWelcome .chal-cta,#tourCalCard .chal-cta{padding:10px 14px;font-size:17px}
+  .tc-t{margin:4px 0 6px;font-size:22px}   /* v542 (QA v537-user): Later inside the card at 640 x 300 */
   .tw-links .tour-skip{margin-top:4px}
 }
 /* v532: the survey */
@@ -1176,11 +1177,11 @@ button.along-card-pct .go i{font-style:normal;font-family:var(--title);font-size
 .info:hover{color:var(--ink);border-color:var(--ink-3)}
 /* v537 (Oscar): every section's guide one tap away, in the same place - right after its title */
 .info.sec-info{width:24px;height:24px;font-size:12px;margin-left:8px;align-self:center;position:relative}
-.sess-head .lbl:has(+ .sec-info){margin-right:0}   /* the (i) sits right after the title; the free room after it */
-.sess-head .sec-info{margin-left:2px;margin-right:auto}
+.sess-head .sec-info{margin-left:0;margin-right:0}   /* v542 (Oscar): the (i) at the right end of the head; the section icon beside the title */
 .info.sec-info::after{content:"";position:absolute;inset:-9px}   /* a finger-sized target, the look unchanged */
 .pb-ttl .sec-info{margin-left:10px;justify-self:start}
-#logTitle .sec-info{display:inline-grid;margin-left:2px;vertical-align:middle}   /* the title's own 8 px gap + 2 = the bars' 10 */
+#logTitle .sec-info{display:inline-grid;margin-left:2px;vertical-align:middle}
+:root[data-tourlog="1"] #logTitle::after{content:"Example";display:inline-block;margin-left:10px;padding:2px 7px;border:1px solid var(--c1);border-radius:6px;color:var(--c1);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;vertical-align:middle}   /* v542: the guide's made-up days */   /* the title's own 8 px gap + 2 = the bars' 10 */
 :root[data-tour="1"] .sec-info{display:none!important}
 .modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:grid;place-items:center;padding:20px}
 /* ---- v384: Pro (MONETIZATION-PLAN.md). Tags, the menu's card, the pop-up sheet, the thank-you card. ---- */
@@ -1705,7 +1706,16 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .foldsec[data-fold="1"] .sess-head > *:not(.caret):not(.lbl):not(.fold-bpm):not(.fold-ico):not(.sec-info){display:none}   /* v537: the guide (i) stays on a folded bar too */
 /* a folded bar carries a glyph for what is inside: a clock for the session, a
    note for the sequence, a controller for play time */
-.fold-ico{display:none;width:15px;height:15px;color:var(--ink-3);flex:none;margin-left:auto}
+.fold-ico{display:none;width:15px;height:15px;color:var(--ink-3);flex:none;margin-left:0;margin-right:auto}   /* v542: beside the title */
+#tempoPanel .fold-bpm{margin-left:auto}
+/* v542 (QA v537-user): a 320 px phone - the folded tempo and the session's buttons fit beside the (i) */
+@media (max-width:359px){
+  .sess-head{gap:5px}
+  .fold-bpm{gap:3px}
+  .fold-bpm .jump.mini{width:28px}
+  #sessionPanel .sess-head .btn.icon{width:27px;padding-left:0;padding-right:0}
+  #sessBtn{padding-left:9px;padding-right:9px}
+}
 .fold-ico svg{width:100%;height:100%;display:block}
 .fold-ico.note{width:11px;height:15px}
 .foldsec[data-fold="1"] .fold-ico{display:block}
@@ -3049,7 +3059,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   <section class="transport foldsec" id="tempoPanel">
     <div class="sess-head">
       <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
-      <span class="lbl">Tempo</span><button type="button" class="info sec-info" data-guide="tempo" data-fold-keep title="Guide: Tempo" aria-label="Guide: Tempo">i</button>
+      <span class="lbl">Tempo</span>
       <!-- folded, the heading carries the tempo itself: the number reads only,
            so tapping it opens the panel, and the two nudges do not -->
       <span class="fold-bpm">
@@ -3059,6 +3069,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         <span class="fb-unit">BPM</span>
         <button class="jump mini" id="fbUp5" data-fold-keep aria-label="Tempo up 5">+5</button>
       </span>
+      <button type="button" class="info sec-info" data-guide="tempo" data-fold-keep title="Guide: Tempo" aria-label="Guide: Tempo">i</button>   <!-- v542 (Oscar): the (i) at the right end -->
     </div>
     <div>
       <div class="bpm-block">
@@ -3316,7 +3327,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   <section class="presets foldsec" id="sessionPanel">
     <div class="sess-head">
       <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
-      <span class="lbl">Practice session</span><button type="button" class="info sec-info" data-guide="session" data-fold-keep title="Guide: Practice session" aria-label="Guide: Practice session">i</button>
+      <span class="lbl">Practice session</span>
       <span class="fold-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
       <button class="btn sm icon" id="sessPong" data-on="0"
               title="Play the plan out and back again"
@@ -3345,6 +3356,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         </svg>
       </button>
       <button class="btn pulse-host" id="sessBtn" data-on="0">Start</button>
+      <button type="button" class="info sec-info" data-guide="session" data-fold-keep title="Guide: Practice session" aria-label="Guide: Practice session">i</button>
     </div>
 
     <p class="empty sec-help" id="sessLink" hidden><span id="sessLinkTxt"></span></p>
@@ -3405,8 +3417,9 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   <section class="presets foldsec" id="seqPanel">
     <div class="sess-head">
       <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
-      <span class="lbl">Routines</span><button type="button" class="info sec-info" data-guide="routines" data-fold-keep title="Guide: Routines" aria-label="Guide: Routines">i</button>
+      <span class="lbl">Routines</span>
       <span class="fold-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h10M4 12h10M4 18h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M18 11v8M14 15h8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>
+      <button type="button" class="info sec-info" data-guide="routines" data-fold-keep title="Guide: Routines" aria-label="Guide: Routines">i</button>
       <button class="icobtn" id="rwinX" title="Close" aria-label="Close">&times;</button>
     </div>
     <div class="rt-view" id="rtListView">
@@ -3436,9 +3449,10 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   <section class="presets foldsec" id="patPanel">
     <div class="sess-head">
       <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
-      <span class="lbl">Patterns</span><button type="button" class="info sec-info" data-guide="presets" data-fold-keep title="Guide: Patterns" aria-label="Guide: Patterns">i</button>
+      <span class="lbl">Patterns</span>
       <!-- a ring with three dots: the app icon in one line -->
       <span class="fold-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.2" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="3.8" r="2" fill="currentColor"/><circle cx="19.1" cy="16.1" r="2" fill="currentColor"/><circle cx="4.9" cy="16.1" r="2" fill="currentColor"/></svg></span>
+      <button type="button" class="info sec-info" data-guide="presets" data-fold-keep title="Guide: Presets" aria-label="Guide: Presets">i</button>
     </div>
     <!-- shown only while a sequence step is waiting to be filled -->
     <div class="pickbar" id="pickBar" hidden>
@@ -3494,10 +3508,11 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   <section class="presets foldsec" id="coursePanel">
     <div class="sess-head">
       <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
-      <span class="lbl">Courses</span><button type="button" class="info sec-info" data-guide="course" data-fold-keep title="Guide: Courses" aria-label="Guide: Courses">i</button>
+      <span class="lbl">Courses</span>
+      <span class="fold-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2.5 9L12 4.5 21.5 9 12 13.5zM6.5 11v4.5c1.6 1.6 3.4 2.4 5.5 2.4s3.9-.8 5.5-2.4V11M21.5 9v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg></span>
+      <button type="button" class="info sec-info" data-guide="course" data-fold-keep title="Guide: Courses" aria-label="Guide: Courses">i</button>
       <button type="button" class="btn sm cwin-opts" id="cwinOpts" data-fold-keep aria-expanded="false" title="How you take the course"><span id="cwinWayT">On the phone</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>   <!-- v376 -->
       <button type="button" class="icobtn cwin-x" id="cwinX" data-fold-keep title="Close the courses" aria-label="Close the courses">&times;</button>   <!-- v368 -->
-      <span class="fold-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2.5 9L12 4.5 21.5 9 12 13.5zM6.5 11v4.5c1.6 1.6 3.4 2.4 5.5 2.4s3.9-.8 5.5-2.4V11M21.5 9v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg></span>
     </div>
     <div class="cwin-pop" id="cwinPop"></div>   <!-- v376: the options' menu (filled at boot from the parts below) -->
     <div class="lvl-list ccourses" id="ctabs" role="listbox" aria-label="Course"></div>   <!-- v365 (Oscar): courses as rows, each with its play -->
@@ -3520,9 +3535,10 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   <section class="presets foldsec" id="tapPanel">
     <div class="sess-head">
       <button class="caret" data-fold-toggle aria-expanded="true" title="Fold this section" aria-label="Fold this section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
-      <span class="lbl">Play time</span><button type="button" class="info sec-info" data-guide="play" data-fold-keep title="Guide: Play time" aria-label="Guide: Play time">i</button>
-      <button type="button" class="icobtn cwin-x" id="gwinX" data-fold-keep title="Close Play time" aria-label="Close Play time">&times;</button>   <!-- v372 -->
+      <span class="lbl">Play time</span>
       <span class="fold-ico" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.3L15.5 15h-7l-.9.8A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.5v3M6.5 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.2" cy="11.2" r="1.05" fill="currentColor"/><circle cx="17.5" cy="12.9" r="1.05" fill="currentColor"/></svg></span>
+      <button type="button" class="info sec-info" data-guide="play" data-fold-keep title="Guide: Play time" aria-label="Guide: Play time">i</button>
+      <button type="button" class="icobtn cwin-x" id="gwinX" data-fold-keep title="Close Play time" aria-label="Close Play time">&times;</button>   <!-- v372 -->
     </div>
     <!-- v160 (Oscar: the head felt busy and tight): the game buttons on their own row
          under the name, then a "Modes:" rule before the tabs, like the "Levels:" one -->
@@ -3655,7 +3671,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 <div class="modal tour-welcome" id="tourCalCard" hidden>
   <div class="sheet tw-sheet" role="dialog" aria-modal="true" aria-labelledby="tcT">
     <p class="tw-k">Before you tap</p>
-    <p class="tc-t" id="tcT">Tune it to your phone</p>
+    <p class="tc-t" id="tcT">Calibrate your phone's sound!</p>
     <p class="tw-line">Tap along with 10 clicks.</p>
     <p class="tw-line tc-miss" id="tcMiss" hidden>Too few taps.</p>
     <button type="button" class="btn chal-cta" id="tcGo">Ready, go!</button>
@@ -3969,6 +3985,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <div class="fb-chips" data-q="clara"><button type="button" class="fb-chip" data-v="Sí">Sí</button><button type="button" class="fb-chip" data-v="Més o menys">Més o menys</button><button type="button" class="fb-chip" data-v="No" data-neg="1">No</button></div></div>
     <div class="fb-q"><span class="fb-lbl">L'app et resulta útil?</span>
       <div class="fb-chips" data-q="util"><button type="button" class="fb-chip" data-v="Sí">Sí</button><button type="button" class="fb-chip" data-v="Més o menys">Més o menys</button><button type="button" class="fb-chip" data-v="No" data-neg="1">No</button></div></div>
+    <div class="fb-q"><span class="fb-lbl">Les guies (i) t'ajuden?</span>
+      <div class="fb-chips" data-q="guies"><button type="button" class="fb-chip" data-v="Sí">Sí</button><button type="button" class="fb-chip" data-v="Més o menys">Més o menys</button><button type="button" class="fb-chip" data-v="No" data-neg="1">No</button></div></div>
     <div class="fb-q"><span class="fb-lbl">Les seccions</span><small class="fb-hint">Marca només les que hagis provat.</small>
       <div id="fbSecs"></div></div>
     <div class="fb-q"><span class="fb-lbl">Comentaris</span>
@@ -4081,7 +4099,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v541"></script>
+<script src="./app.js?v=v542"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4094,8 +4112,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v541";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-15 13:27";          /* and when it was built, for ?diag */
+  var BUILD = "v542";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-15 15:18";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

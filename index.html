@@ -734,6 +734,12 @@ input[type=range]::-moz-range-thumb{
 /* v486: where I'm off - one line under the missed hits, a tiny wheel lighting the dot (mock design/where-off-proto.html) */
 .along-card-where{display:flex;align-items:center;gap:9px;width:fit-content;max-width:100%;box-sizing:border-box;margin:10px auto 2px;padding:6px 12px 6px 7px;border-radius:12px;background:var(--sunk);border:1px solid var(--line);font-size:15px;color:var(--ink)}
 .along-card-where[hidden]{display:none}
+/* v538 (Oscar): the Precision card's line is the way to the lollipops - a tap closes the card and opens the named dot's card */
+.along-card-where[data-go="1"]{cursor:pointer;border-color:color-mix(in srgb,var(--c2) 45%,var(--line));-webkit-tap-highlight-color:transparent}
+.along-card-where .go{display:none;flex:none;margin-left:2px;color:var(--c2);font-weight:700;font-size:18px;line-height:1}
+.along-card-where[data-go="1"] .go{display:block}
+[data-arm="0"] .along-card-where[data-go="1"]{opacity:.35;pointer-events:none;transition:none}
+.along-card-where[data-go="1"]{transition:opacity .25s}
 .along-card-where svg{width:30px;height:30px;flex:none}
 .along-card-where .t{min-width:0;text-align:left;line-height:1.25}
 .along-card-where b{font-family:"IBM Plex Mono",monospace;font-weight:600;white-space:nowrap}
@@ -3747,7 +3753,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <div class="along-card-gaps" id="alongCardGaps" hidden></div>   <!-- v482: with the click / in the silence -->
     <p class="along-card-line" id="alongCardPrev" hidden></p>
     <p class="along-card-line" id="alongCardMiss"></p>
-    <div class="along-card-where" id="alongCardWhere" hidden></div>   <!-- v486: where I'm off -->
+    <div class="along-card-where" id="alongCardWhere" hidden></div>   <!-- v486: where I'm off; v538: a tap shows it on the wheel -->
     <div class="along-card-clean" id="alongCardClean" hidden><span class="cs">&#9733;</span><span>Clean at</span><b id="alongCardCleanV"></b></div>
     <p class="along-card-line note" id="alongCardNote"></p>
     <button type="button" class="btn along-card-next" id="alongCardNext" hidden></button>   <!-- v306 (Oscar): the next step above Close / Run again -->
@@ -4059,7 +4065,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v537"></script>
+<script src="./app.js?v=v538"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4072,8 +4078,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v537";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-15 12:29";          /* and when it was built, for ?diag */
+  var BUILD = "v538";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-15 13:00";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

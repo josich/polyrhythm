@@ -677,7 +677,7 @@ input[type=range]::-moz-range-thumb{
 :root:not([data-tour="1"])[data-sh-gtwo="0"] #gtabs .gmrow[data-gmode="two"]{display:none!important}
 #tourNext{min-width:104px;border-color:var(--c2);color:var(--ink)}
 #tourNext:disabled{opacity:.35;border-color:var(--line);cursor:default}
-#tourNext{position:relative}
+#tourNext{position:relative;margin-left:auto}   /* v551 (QA v550-first10-user NI4): on the right, Skip or not */
 #tourNext::after{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;opacity:0;
   box-shadow:0 0 0 3px color-mix(in srgb,var(--c2) 50%,transparent),0 0 16px 2px color-mix(in srgb,var(--c2) 40%,transparent)}
 #tourNext[data-ready="1"]::after{animation:nextGlow .92s ease-out 2}   /* v294: Next has just turned on */
@@ -3071,7 +3071,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <span class="fold-bpm">
         <button class="jump mini" id="fbDown5" data-fold-keep aria-label="Tempo down 5">&minus;5</button>
         <span class="bpm-note" id="fbNote" aria-hidden="true"></span>
-        <span class="fb-num" id="fbNum">96</span>
+        <span class="fb-num" id="fbNum">100</span>
         <span class="fb-unit">BPM</span>
         <button class="jump mini" id="fbUp5" data-fold-keep aria-label="Tempo up 5">+5</button>
       </span>
@@ -3085,7 +3085,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
         </span>
         <span class="bpm-read">
           <span class="bpm-note" id="bpmNote" aria-hidden="true"></span>
-          <button class="bpm-num" id="bpmNum" title="Click to type a tempo">96</button>
+          <button class="bpm-num" id="bpmNum" title="Click to type a tempo">100</button>
           <input class="bpm-in mono" id="bpmIn" type="number" min="1" max="660" step="1"
                  inputmode="numeric" aria-label="Type a tempo" hidden>
           <span class="bpm-unit">BPM</span>
@@ -3324,7 +3324,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <div class="stage-bar" id="stageBar" hidden>
       <div class="stage-bpm-row">
         <button class="jump wide stage-jump" id="stDown" aria-label="Tempo down 5">&minus;5</button>
-        <div class="stage-bpm"><span class="stage-num mono" id="stBpm">96</span><span class="stage-unit">BPM</span></div>
+        <div class="stage-bpm"><span class="stage-num mono" id="stBpm">100</span><span class="stage-unit">BPM</span></div>
         <button class="jump wide stage-jump" id="stUp" aria-label="Tempo up 5">+5</button>
       </div>
     </div>
@@ -4107,7 +4107,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v550"></script>
+<script src="./app.js?v=v551"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4120,8 +4120,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v550";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-15 21:00";          /* and when it was built, for ?diag */
+  var BUILD = "v551";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-15 22:38";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

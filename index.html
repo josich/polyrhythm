@@ -502,6 +502,7 @@ input[type=range]::-moz-range-thumb{
 .tour.top{z-index:79}   /* v256: over a sheet (the log), under the confirm box */
 /* v301 (Oscar): the tour opens on a big welcome card, the challenge pop-up's look */
 .modal.tour-welcome{z-index:70;background:rgba(0,0,0,.72)}
+:root[data-tour="1"] .modal.tour-welcome{background:var(--ground)}   /* v539 (Oscar): the tour's welcome hides the app - it is seen from the first card on */
 .tw-sheet{position:relative;max-width:380px;text-align:center;padding:30px 24px 18px;border-color:color-mix(in srgb,var(--c2) 45%,var(--line))}
 .tw-k{margin:0;font-size:15px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
 .tw-logo{display:flex;align-items:center;justify-content:center;gap:clamp(8px,3vw,14px);margin:18px 0 6px}
@@ -578,6 +579,19 @@ input[type=range]::-moz-range-thumb{
   72%{transform:translate(3.2em,-10%);opacity:.35}
   92%,100%{transform:translate(0,-10%);opacity:.35}}
 @media (prefers-reduced-motion:reduce){ #twNext,#twNext::after,.ghost.slide svg{animation:none} }
+/* v539 (Oscar: "the hand hides the dot all the time"): a hand on a dot comes down onto it, taps, then moves down and away so
+   the dot shows what the tap did, and comes back - transform and opacity only */
+.ghost.dotloop svg{animation:ghostDot 2.8s ease-in-out infinite}
+.ghost.dotloop .hand{animation:none}
+.ghost.dotloop .ring{display:none}
+@keyframes ghostDot{
+  0%{transform:translate(0,1.9em);opacity:.3}
+  16%{transform:translate(0,0);opacity:1}
+  24%{transform:translate(0,4%);opacity:1}
+  32%{transform:translate(0,0);opacity:1}
+  44%{transform:translate(0,0);opacity:1}
+  66%,100%{transform:translate(0,1.9em);opacity:.3}}
+@media (prefers-reduced-motion:reduce){ .ghost.dotloop svg{animation:none;transform:translate(0,1.9em)} }
 .tour-skip{padding:8px 4px;border:0;background:none;font-size:12.5px;letter-spacing:.04em;color:var(--ink-2);opacity:.8;text-decoration:underline;text-underline-offset:3px;text-decoration-color:color-mix(in srgb,var(--ink-2) 50%,transparent);cursor:pointer}   /* v290 (Oscar): more noticeable, still quieter than Next */
 .tour-k{display:flex;gap:10px;align-items:baseline;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--c2)}
 .tour-k #tourStage{min-width:0}
@@ -3639,7 +3653,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 <!-- v537 (Oscar): the tour's first step - the app tunes itself to the phone before the wheel cards -->
 <div class="modal tour-welcome" id="tourCalCard" hidden>
   <div class="sheet tw-sheet" role="dialog" aria-modal="true" aria-labelledby="tcT">
-    <p class="tw-k">First</p>
+    <p class="tw-k">Before you tap</p>
     <p class="tc-t" id="tcT">Tune it to your phone</p>
     <p class="tw-line">Tap along with 10 clicks.</p>
     <button type="button" class="btn chal-cta" id="tcGo">Ready, go!</button>
@@ -4065,7 +4079,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v538"></script>
+<script src="./app.js?v=v539"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4078,8 +4092,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v538";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-15 13:00";          /* and when it was built, for ?diag */
+  var BUILD = "v539";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-15 13:12";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

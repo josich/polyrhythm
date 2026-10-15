@@ -502,7 +502,7 @@ input[type=range]::-moz-range-thumb{
 .tour.top{z-index:79}   /* v256: over a sheet (the log), under the confirm box */
 /* v301 (Oscar): the tour opens on a big welcome card, the challenge pop-up's look */
 .modal.tour-welcome{z-index:70;background:rgba(0,0,0,.72)}
-:root[data-tour="1"] .modal.tour-welcome{background:var(--ground)}   /* v539 (Oscar): the tour's welcome hides the app - it is seen from the first card on */
+:root[data-tour="1"] #tourWelcome.modal.tour-welcome{background:var(--ground)}   /* v539 (Oscar): the tour's welcome hides the app - it is seen from the first card on */
 .tw-sheet{position:relative;max-width:380px;text-align:center;padding:30px 24px 18px;border-color:color-mix(in srgb,var(--c2) 45%,var(--line))}
 .tw-k{margin:0;font-size:15px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
 .tw-logo{display:flex;align-items:center;justify-content:center;gap:clamp(8px,3vw,14px);margin:18px 0 6px}
@@ -516,6 +516,7 @@ input[type=range]::-moz-range-thumb{
 @keyframes twBeat{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
 @keyframes twGlow{0%,100%{opacity:0}50%{opacity:1}}
 .tw-skip{margin-top:10px}
+#tourCalCard .tw-line.tc-miss{color:var(--c3);font-weight:600}#tourCalCard .tc-miss[hidden]{display:none}   /* v540 */
 .tc-t{margin:14px 0 10px;font-family:var(--title);font-stretch:var(--title-stretch);font-weight:700;font-size:clamp(24px,7vw,32px);line-height:1.1;color:var(--ink)}   /* v537 */
 .tw-links{display:flex;justify-content:center;flex-wrap:wrap;column-gap:18px}   /* v530 */
 .tw-links .tour-skip{margin-top:10px}
@@ -1842,7 +1843,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .pt-tags span{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3);border:1px dashed var(--line-2);border-radius:999px;padding:2px 9px;white-space:nowrap}
 .pt-tags span.p{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
 .pt-tags span.g{color:var(--c4);border-color:color-mix(in srgb,var(--c4) 45%,var(--line))}
-:root[data-prun="1"] :is(#pbLog,#pbOpts,#pbDown,#pbUp,#pbTags){opacity:.35;pointer-events:none}   /* a run, a game or a calibration: nothing changes under it */
+:root[data-prun="1"] :is(#pbLog,#pbOpts,#pbDown,#pbUp,#pbTags,#precBar .sec-info){opacity:.35;pointer-events:none}   /* a run, a game or a calibration: nothing changes under it */
 @media (pointer:coarse){ #pbTags{min-height:32px} }   /* QA v500 V3 */
 #precBar > #precPop{position:absolute;right:0;top:calc(100% + 6px);z-index:44;width:min(350px,100%);box-sizing:border-box;background:var(--panel);border:1px solid var(--line-2);border-radius:12px;padding:4px 12px 12px;box-shadow:0 12px 32px rgba(0,0,0,.5)}
 #precBar > #precPop[hidden]{display:none}
@@ -3656,6 +3657,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <p class="tw-k">Before you tap</p>
     <p class="tc-t" id="tcT">Tune it to your phone</p>
     <p class="tw-line">Tap along with 10 clicks.</p>
+    <p class="tw-line tc-miss" id="tcMiss" hidden>Too few taps.</p>
     <button type="button" class="btn chal-cta" id="tcGo">Ready, go!</button>
     <div class="tw-links"><button type="button" class="tour-skip" id="tcLater">Later</button></div>
   </div>
@@ -4079,7 +4081,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v539"></script>
+<script src="./app.js?v=v540"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4092,8 +4094,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v539";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-15 13:12";          /* and when it was built, for ?diag */
+  var BUILD = "v540";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-15 13:17";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

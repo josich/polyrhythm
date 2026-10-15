@@ -516,6 +516,7 @@ input[type=range]::-moz-range-thumb{
 @keyframes twBeat{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
 @keyframes twGlow{0%,100%{opacity:0}50%{opacity:1}}
 .tw-skip{margin-top:10px}
+#tourCalCard #tcLater{min-height:44px;padding:0 22px}   /* v543 (QA v542-user NV1) */
 #tourCalCard .tw-line.tc-miss{color:var(--c3);font-weight:600}#tourCalCard .tc-miss[hidden]{display:none}   /* v540 */
 .tc-t{margin:14px 0 10px;font-family:var(--title);font-stretch:var(--title-stretch);font-weight:700;font-size:clamp(24px,7vw,32px);line-height:1.1;color:var(--ink)}   /* v537 */
 .tw-links{display:flex;justify-content:center;flex-wrap:wrap;column-gap:18px}   /* v530 */
@@ -523,6 +524,7 @@ input[type=range]::-moz-range-thumb{
 .tw-line{margin:-6px 0 18px;font-size:14.5px;line-height:1.45;color:var(--ink-2)}
 .tw-line b{color:var(--ink);font-weight:600}
 .tw-line[data-k="done"]{color:var(--c2);font-weight:600}
+.tw-line .tw-prog{display:block;margin-top:6px;font-size:13px;color:var(--ink-3)}   /* v543 */
 /* v531 (QA v530 V1): a landscape browser tab - the card's buttons fit without scrolling inside it */
 @media (max-height:440px){
   .modal.tour-welcome{padding:8px 20px}
@@ -750,6 +752,7 @@ input[type=range]::-moz-range-thumb{
 /* v486: where I'm off - one line under the missed hits, a tiny wheel lighting the dot (mock design/where-off-proto.html) */
 .along-card-where{display:flex;align-items:center;gap:9px;width:fit-content;max-width:100%;box-sizing:border-box;margin:10px auto 2px;padding:6px 12px 6px 7px;border-radius:12px;background:var(--sunk);border:1px solid var(--line);font-size:15px;color:var(--ink)}
 .along-card-where[hidden]{display:none}
+.along-card-where:not([data-go="1"]){background:none;border-color:transparent}   /* v543 (QA v542-user NC5): only the button looks like one */
 /* v538 (Oscar): the Precision card's line is the way to the lollipops - a tap closes the card and opens the named dot's card */
 .along-card-where[data-go="1"]{cursor:pointer;border-color:color-mix(in srgb,var(--c2) 45%,var(--line));-webkit-tap-highlight-color:transparent}
 .along-card-where .go{display:none;flex:none;margin-left:2px;color:var(--c2);font-weight:700;font-size:18px;line-height:1}
@@ -1177,9 +1180,10 @@ button.along-card-pct .go i{font-style:normal;font-family:var(--title);font-size
 .info:hover{color:var(--ink);border-color:var(--ink-3)}
 /* v537 (Oscar): every section's guide one tap away, in the same place - right after its title */
 .info.sec-info{width:24px;height:24px;font-size:12px;margin-left:8px;align-self:center;position:relative}
-.sess-head .sec-info{margin-left:0;margin-right:0}   /* v542 (Oscar): the (i) at the right end of the head; the section icon beside the title */
+.sess-head .sec-info{margin-left:4px;margin-right:0}
+.sess-head .info.sec-info::after{inset:-9px -9px -9px -2px}   /* v543 (QA v542-user NI4) */   /* v542 (Oscar): the (i) at the right end of the head; the section icon beside the title */
 .info.sec-info::after{content:"";position:absolute;inset:-9px}   /* a finger-sized target, the look unchanged */
-.pb-ttl .sec-info{margin-left:10px;justify-self:start}
+.pb-ttl .sec-info{margin-left:10px;justify-self:end}   /* v543: at the right, like the sections' */
 #logTitle .sec-info{display:inline-grid;margin-left:2px;vertical-align:middle}
 :root[data-tourlog="1"] #logTitle::after{content:"Example";display:inline-block;margin-left:10px;padding:2px 7px;border:1px solid var(--c1);border-radius:6px;color:var(--c1);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;vertical-align:middle}   /* v542: the guide's made-up days */   /* the title's own 8 px gap + 2 = the bars' 10 */
 :root[data-tour="1"] .sec-info{display:none!important}
@@ -1788,7 +1792,9 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 #cbX{grid-column:5}
 /* v376: the courses' options menu */
 #cwinOpts{display:none}
-:root[data-cwin="1"]:not([data-course="1"]) #cwinOpts{display:inline-flex;align-items:center;gap:6px;margin-left:auto;font-size:12px;padding:6px 10px}
+:root[data-cwin="1"]:not([data-course="1"]) #cwinOpts{display:inline-flex;align-items:center;gap:6px;margin-left:0;font-size:12px;padding:6px 10px;min-width:0;flex:0 1 auto}
+#cwinWayT{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sess-head :is(#cwinX,#gwinX,#rwinX){flex:none}   /* v543 (QA v542 V1) */
 #cwinOpts svg{width:16px;height:16px}
 #cwinOpts[data-on="1"]{border-color:var(--c2)}
 :root[data-cwin="1"]:not([data-course="1"]) #cwinX{margin-left:8px!important}
@@ -3672,7 +3678,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   <div class="sheet tw-sheet" role="dialog" aria-modal="true" aria-labelledby="tcT">
     <p class="tw-k">Before you tap</p>
     <p class="tc-t" id="tcT">Calibrate your phone's sound!</p>
-    <p class="tw-line">Tap along with 10 clicks.</p>
+    <p class="tw-line">Tap along with 10 clicks so your taps are judged fairly.</p>
     <p class="tw-line tc-miss" id="tcMiss" hidden>Too few taps.</p>
     <button type="button" class="btn chal-cta" id="tcGo">Ready, go!</button>
     <div class="tw-links"><button type="button" class="tour-skip" id="tcLater">Later</button></div>
@@ -3987,6 +3993,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <div class="fb-chips" data-q="util"><button type="button" class="fb-chip" data-v="Sí">Sí</button><button type="button" class="fb-chip" data-v="Més o menys">Més o menys</button><button type="button" class="fb-chip" data-v="No" data-neg="1">No</button></div></div>
     <div class="fb-q"><span class="fb-lbl">Les guies (i) t'ajuden?</span>
       <div class="fb-chips" data-q="guies"><button type="button" class="fb-chip" data-v="Sí">Sí</button><button type="button" class="fb-chip" data-v="Més o menys">Més o menys</button><button type="button" class="fb-chip" data-v="No" data-neg="1">No</button></div></div>
+    <div class="fb-q"><span class="fb-lbl">La calibració ha estat clara?</span>
+      <div class="fb-chips" data-q="calib"><button type="button" class="fb-chip" data-v="Sí">Sí</button><button type="button" class="fb-chip" data-v="Més o menys">Més o menys</button><button type="button" class="fb-chip" data-v="No" data-neg="1">No</button></div></div>
     <div class="fb-q"><span class="fb-lbl">Les seccions</span><small class="fb-hint">Marca només les que hagis provat.</small>
       <div id="fbSecs"></div></div>
     <div class="fb-q"><span class="fb-lbl">Comentaris</span>
@@ -4099,7 +4107,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v542"></script>
+<script src="./app.js?v=v543"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4112,8 +4120,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v542";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-15 15:18";          /* and when it was built, for ?diag */
+  var BUILD = "v543";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-15 16:14";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -3643,7 +3643,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
     <div class="sm-rule">More</div>
     <div class="sm-row"><span>Enquesta</span><button type="button" class="btn sm" id="menuFb" title="Envia'ns la teva opinió">Respon</button></div>   <!-- v532 -->
-    <div class="sm-row" id="menuInstRow" style="display:none"><span>Install Polyorbit</span><button type="button" class="btn sm" id="menuInst" title="Full screen, works offline, its own icon">Install</button></div>   <!-- v530 -->
+    <div class="sm-row" id="menuInstRow" style="display:none"><span id="menuInstLbl">Install Polyorbit</span><button type="button" class="btn sm" id="menuInst" title="Full screen, works offline, its own icon">Install</button></div>   <!-- v530 -->
     <div class="sm-row"><span id="menuCalLbl">Sound delay</span><button type="button" class="btn sm" id="menuCal" title="Measure this phone's delay: ten clicks, tap along">Calibrate</button></div>   <!-- v376 -->
     <div class="sm-row pro-test"><span>Pro gates (test)</span><button type="button" class="btn sm" id="proGateBtn">Off</button></div>   <!-- v384: editor only -->
     <div class="sm-row pro-test"><span>Pro owned (test)</span><button type="button" class="btn sm" id="proOwnBtn">No</button></div>
@@ -4039,7 +4039,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v535"></script>
+<script src="./app.js?v=v536"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4052,8 +4052,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v535";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-15 11:48";          /* and when it was built, for ?diag */
+  var BUILD = "v536";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-15 12:01";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -1,6 +1,6 @@
 /* Offline cache for Polyorbit.
    Bump CACHE whenever you redeploy, or phones will keep serving the old app. */
-var CACHE = "polyrhythm-v554";
+var CACHE = "polyrhythm-v555";
 /* proof that a response really is this app and not a host's error page */
 var MARK = "polyrhythm-circle:session";
 var ASSETS = [
@@ -10,6 +10,15 @@ var ASSETS = [
   "./icon-192.png",
   "./icon-512.png",
   "./icon-512-maskable.png",
+  "./licences/GPL-3.0.txt",
+  "./licences/LGPL-3.0.txt",
+  "./licences/MPL-2.0.txt",
+  "./licences/OFL-Archivo.txt",
+  "./licences/OFL-IBMPlexMono.txt",
+  "./licences/capacitor-MIT.txt",
+  "./licences/keep-awake-MIT.txt",
+  "./licences/lamejs-LICENSE.txt",
+  "./licences/mp4-muxer-MIT.txt",   // v555: the credits page works offline
   "./apple-touch-icon.png",
   "./fonts.css",
   "./fonts/archivo.woff2",

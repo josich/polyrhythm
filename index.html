@@ -695,7 +695,21 @@ input[type=range]::-moz-range-thumb{
 #tourNext[data-ready="1"]::after{animation:nextGlow .92s ease-out 2}   /* v294: Next has just turned on */
 @keyframes nextGlow{0%{opacity:0}35%{opacity:1}100%{opacity:0}}   /* v257: greyed until the step's action is done */
 :root[data-tour="1"] [data-tour-lock="1"]{pointer-events:none}
-:root[data-rthold="1"] #rtsDone{visibility:hidden}   /* v554: the guide's step-plan card - Done comes once Ramp is picked */   /* v257: shown but not for touching in this step */
+:root[data-rthold="1"] #rtsDone{visibility:hidden}
+:root[data-store="play"] .pro-test{display:none!important}   /* v555: no Pro test switches in the store build */
+.cred-sheet{max-width:480px}
+.cred-by{margin:2px 0 4px;color:var(--ink-2);font-size:13.5px}
+.cred-lead{margin:0 0 10px;color:var(--ink-3);font-size:13px}
+.cred-list{display:flex;flex-direction:column;gap:8px}
+.cred-item{border:1px solid var(--line);border-radius:12px;padding:9px 12px;background:var(--sunk)}
+.cred-item b{font-size:14px}
+.cred-item .cred-l{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--c2);margin-left:6px}
+.cred-item small{display:block;color:var(--ink-3);font-size:12px;margin-top:2px}
+.cred-files{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:4px}
+.cred-files .cred-btn{all:unset;cursor:pointer;color:var(--c2);font-size:12.5px;font-weight:600;padding:6px 0;text-decoration:underline;text-underline-offset:3px}
+.cred-txt{margin:8px 0 0;max-height:240px;overflow:auto;white-space:pre-wrap;font:11px/1.45 "IBM Plex Mono",monospace;color:var(--ink-2);
+  background:var(--ground);border-radius:8px;padding:8px}
+.cred-foot{margin:12px 0 10px;color:var(--ink-3);font-size:12px;line-height:1.45}   /* v554: the guide's step-plan card - Done comes once Ramp is picked */   /* v257: shown but not for touching in this step */
 .tour-run-row{margin:6px 0 2px}
 :root[data-along="1"] :is(#stageBtn,#stDown,#stUp){opacity:.35;pointer-events:none}   /* v286 (QA M3): the stage's -5 / +5 changed the tempo under a run */
 :root[data-chalprev="1"] #chalModal :is(#chalGo,#chalLater,#chalAgain,#chalKeep,#chalInstall){display:none!important}   /* v277: the lesson's preview - only the cross */
@@ -3726,6 +3740,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     </div>
     <div class="sm-rule">More</div>
     <div class="sm-row"><span>Enquesta</span><button type="button" class="btn sm" id="menuFb" title="Envia'ns la teva opinió">Respon</button></div>   <!-- v532 -->
+    <div class="sm-row"><span>Feedback</span><button type="button" class="btn sm" id="menuMail" title="Write to polyorbit.app@gmail.com">Write to us</button></div>   <!-- v555 -->
     <div class="sm-row" id="menuInstRow" style="display:none"><span id="menuInstLbl">Install Polyorbit</span><button type="button" class="btn sm" id="menuInst" title="Full screen, works offline, its own icon">Install</button></div>   <!-- v530 -->
     <div class="sm-row"><span id="menuCalLbl">Sound delay</span><button type="button" class="btn sm" id="menuCal" title="Measure this phone's delay: ten clicks, tap along">Calibrate</button></div>   <!-- v376 -->
     <div class="sm-row pro-test"><span>Pro gates (test)</span><button type="button" class="btn sm" id="proGateBtn">Off</button></div>   <!-- v384: editor only -->
@@ -4122,12 +4137,29 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <p class="build mono" id="buildTag"></p>
     <!-- the installed app has no address bar: this is the way to the ?diag page from inside it (v121) -->
     <p class="build mono"><a href="./?diag" class="diaglink">Report a problem</a> &middot; record a session and send it</p>
+    <p class="build mono"><a href="#" class="diaglink" id="credLink">Credits and licences</a> &middot; <a href="#" class="diaglink" id="privLink">Privacy policy</a></p>   <!-- v555 -->
     <!-- v264 (Oscar): one row per concept; a tap plays that part of the tour, with hands and cards -->
     <div class="lvl-list rlist lesson-list" id="lessonList"></div>
   </div>
 </div>
 
-<script src="./app.js?v=v554"></script>
+<!-- v555: Credits and licences (launch/credits-page.md), from the Guides window -->
+<div class="modal" id="credModal" hidden>
+  <div class="sheet cred-sheet" role="dialog" aria-modal="true" aria-labelledby="credTitle">
+    <div class="sheet-head">
+      <h2 id="credTitle">Credits and licences</h2>
+      <button class="icobtn" id="credClose" title="Close" aria-label="Close">&times;</button>
+    </div>
+    <p class="cred-by">Made by <b>Polyorbit</b> &middot; polyorbit.app@gmail.com</p>
+    <p class="cred-lead">Open-source parts inside. Thank you to their authors.</p>
+    <div class="cred-list" id="credList"></div>
+    <p class="cred-foot">The library's rhythms are traditional patterns written for Polyorbit. The 40 rudiments follow the
+      Percussive Arts Society's standard list; Polyorbit is not affiliated with or endorsed by the PAS.</p>
+    <button type="button" class="btn sm" id="credPrivacy">Privacy policy</button>
+  </div>
+</div>
+
+<script src="./app.js?v=v555"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4140,8 +4172,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v554";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-16 09:09";          /* and when it was built, for ?diag */
+  var BUILD = "v555";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-16 10:52";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

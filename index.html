@@ -688,7 +688,7 @@ input[type=range]::-moz-range-thumb{
 :root:not([data-tour="1"])[data-sh-gblind="0"] #gtabs .gmrow[data-gmode="blind"],
 :root:not([data-tour="1"])[data-sh-gtwo="0"] #gtabs .gmrow[data-gmode="two"]{display:none!important}
 #tourNext{min-width:104px;border-color:var(--c2);color:var(--ink)}
-#tourNext:disabled{opacity:.35;border-color:var(--line);cursor:default}
+#tourNext[data-off="1"]{opacity:.35;border-color:var(--line);cursor:default}
 #tourNext{position:relative;margin-left:auto}   /* v551 (QA v550-first10-user NI4): on the right, Skip or not */
 #tourNext::after{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;opacity:0;
   box-shadow:0 0 0 3px color-mix(in srgb,var(--c2) 50%,transparent),0 0 16px 2px color-mix(in srgb,var(--c2) 40%,transparent)}
@@ -1514,6 +1514,7 @@ canvas{
 .ach-toast .t{font-size:13.5px;font-weight:600;line-height:1.2;color:var(--ink)}
 .ach-toast .d{font-size:11.5px;color:var(--ink-3)}
 @keyframes achIn{from{transform:translateX(-50%) translateY(8px) scale(.96);opacity:0}to{transform:translateX(-50%);opacity:1}}
+.ach-toast[data-fix="1"]{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom));max-width:min(calc(100vw - 32px),340px)}   /* v561 (QA v560-user NC2) */
 @media (prefers-reduced-motion:reduce){.ach-toast{animation:none}}
 /* v557 (Oscar): the toast at z 47 - above the lollipops' layer (.fxcv 40), their mini card (44), the edge flash (45) and the tap rings (46); under the tour card and every sheet */
 .ach-card h2.chal-title{color:var(--c1)}
@@ -3681,7 +3682,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 <!-- v552 (Oscar): after a calibration the verdict and its quality stay on the wheel until this card is pressed -->
 <div class="coach caldone" id="calDoneCard" hidden>
   <span class="cd-ico" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-  <div class="coach-txt"><div class="t">Calibration saved</div><div class="d">Repeat it any time from ☰ › Sound delay.</div></div>
+  <div class="coach-txt"><div class="t">Calibration saved</div><div class="d" id="calDoneD">Repeat it any time from ☰ › Sound delay.</div></div>
   <button type="button" class="btn sm" id="calDoneGo">Continue</button>
 </div>
 <div class="coach" id="coachCard" hidden>
@@ -4161,7 +4162,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v560"></script>
+<script src="./app.js?v=v561"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4174,8 +4175,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v560";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-20 12:51";          /* and when it was built, for ?diag */
+  var BUILD = "v561";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-20 14:19";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

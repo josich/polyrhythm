@@ -1507,7 +1507,7 @@ canvas{
 .ach-cell .p{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3)}
 .ach-cell .p b{color:var(--ink-2);font-weight:500}
 .ach-cell.locked .nm{color:var(--ink-3)}
-.ach-toast{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:4;display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:12px;
+.ach-toast{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:47;display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:12px;
   background:var(--sunk);border:1px solid color-mix(in srgb,var(--c1) 45%,var(--line));box-shadow:var(--shadow);max-width:min(92%,340px);
   animation:achIn .5s cubic-bezier(.2,.9,.3,1.15) both}
 .ach-toast .k{font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--c1)}
@@ -1515,6 +1515,7 @@ canvas{
 .ach-toast .d{font-size:11.5px;color:var(--ink-3)}
 @keyframes achIn{from{transform:translateX(-50%) translateY(8px) scale(.96);opacity:0}to{transform:translateX(-50%);opacity:1}}
 @media (prefers-reduced-motion:reduce){.ach-toast{animation:none}}
+/* v557 (Oscar): the toast at z 47 - above the lollipops' layer (.fxcv 40), their mini card (44), the edge flash (45) and the tap rings (46); under the tour card and every sheet */
 .ach-card h2.chal-title{color:var(--c1)}
 /* a badge not yet looked at (v152, Oscar): the row pulses in orange until it is opened,
    and the badge itself blinks in the sheet until the sheet is closed */
@@ -2511,7 +2512,8 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root[data-rdg="1"] .dial > .rd-mode{display:flex;position:absolute;top:8px;right:8px;z-index:6;width:34px;height:34px;box-sizing:border-box;border-radius:10px;
   align-items:center;justify-content:center;border:2px solid var(--rdk);background:color-mix(in srgb,var(--rdk) 16%,var(--sunk));color:var(--rdk);pointer-events:none}
 :root[data-rdg="1"] .dial > .rd-mode svg{width:20px;height:20px}
-:root[data-rdg="1"][data-rdrun="1"] .play{display:none}   /* v512: no play / pause button in a tap run - the bar's cross stops it */
+:root[data-rdg="1"][data-rdrun="1"] .play{display:none}
+:root[data-rdg="1"][data-rdrun="1"] #rdTempo button{opacity:.3;pointer-events:none}   /* v557 (Oscar): -5 / +5 sit where the finger taps - out of reach while a tap run plays; a tap there counts as a tap */   /* v512: no play / pause button in a tap run - the bar's cross stops it */
 .rdc-ico{display:flex;justify-content:center;margin:4px 0 0} .rdc-ico[hidden]{display:none}
 .rdc-ico svg{width:46px;height:46px} .rdc-ico[data-k="b"]{color:var(--c1)} .rdc-ico[data-k="t"]{color:var(--c2)} .rdc-ico[data-k="x"]{color:var(--c4)}
 .rd-card .rdc-later[hidden]{display:none}
@@ -4159,7 +4161,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v556"></script>
+<script src="./app.js?v=v557"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4172,8 +4174,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v556";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-20 09:04";          /* and when it was built, for ?diag */
+  var BUILD = "v557";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-20 09:22";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

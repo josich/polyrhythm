@@ -2336,7 +2336,8 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .course-sheet{width:min(100%,440px);min-width:0;margin:0 auto;background:var(--panel);border:1px solid var(--line-2);border-radius:20px;padding:18px 16px 16px;text-align:center;display:flex;flex-direction:column;gap:8px;box-shadow:0 10px 40px -10px rgba(0,0,0,.6)}
 .course-sheet .course-go{min-width:0} .course-sheet .course-go span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cs-code{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:.72em;letter-spacing:0;color:var(--ink-2);margin-right:10px}
-:root:has(#courseSheet:not([hidden])) #alongSec{position:relative;z-index:71}
+:root:has(#courseSheet:not([hidden]):not([data-ex="1"])) #alongSec{position:relative;z-index:71}
+:root[data-cask="1"] #ctStepT{visibility:hidden}   /* v562 (QA v561-user NV2): the exam's card is about the exam */   /* v562 (QA v561-user NV1): not over an exam's or a pad's card */
 .modal.course-sheet-wrap#courseSheet:is([data-low="1"],[data-low="2"]){align-items:start}
 :root:has(#courseSheet[data-low="2"]:not([hidden])) #alongSec{z-index:auto}   /* v354 (QA v353 V1): the card would overlap it - the card wins */   /* v352 (Oscar): centred like every course card; moved down only as far as the lit histogram needs (courseSheetPlace) */
 @media (max-height:520px){ :root:has(#courseSheet:not([hidden])) #alongSec{z-index:auto} }   /* a short landscape screen has no room for both: the card wins */   /* v338 (Oscar): the run's histogram stays lit above the result card's backdrop */
@@ -4162,7 +4163,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v561"></script>
+<script src="./app.js?v=v562"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4175,8 +4176,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v561";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-20 14:19";          /* and when it was built, for ?diag */
+  var BUILD = "v562";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-20 15:54";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

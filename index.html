@@ -2947,9 +2947,9 @@ select.sess-sel{width:auto;min-width:126px;color:var(--ink)}
 /* v204, Oscar: every cross that closes a sheet, leaves a mode or removes something is pink (c3),
    like the game's and the stage's - the sheets' closes, the banner's, the challenge's, the awards',
    the ring card's remove, and the x on preset / level / sequence rows */
-#alongX,#chalQuit,#planClose,#scoreClose,#achClose,#shareClose,#helpClose,#logClose,#fbClose,.icobtn.chal-x,#rack .icobtn[data-del]{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
+#alongX,#chalQuit,#planClose,#scoreClose,#achClose,#shareClose,#helpClose,#logClose,#fbClose,#credClose,.icobtn.chal-x,#rack .icobtn[data-del]{color:var(--c3);border-color:color-mix(in srgb,var(--c3) 45%,var(--line))}
 /* v519 (QA v517 D1): one cross - 34 px, radius 10 in sheets and bars; 30 px inside a card */
-#planClose,#scoreClose,#achClose,#shareClose,#helpClose,#logClose,#smClose,#fbClose{width:34px;height:34px;border-radius:10px;font-size:18px;flex:none}
+#planClose,#scoreClose,#achClose,#shareClose,#helpClose,#logClose,#smClose,#fbClose,#credClose{width:34px;height:34px;border-radius:10px;font-size:18px;flex:none}
 .icobtn.chal-x{width:30px;height:30px;border-radius:10px;font-size:16px}
 /* D2: one closing text button - ink text, pink edge, 36 px; D18: one card frame - radius 20, line-2 edge */
 #alongCardClose,#rtdClose,#csBack{color:var(--ink);border-color:var(--c3);min-height:36px}
@@ -4159,7 +4159,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v555"></script>
+<script src="./app.js?v=v556"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4172,8 +4172,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v555";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-16 10:52";          /* and when it was built, for ?diag */
+  var BUILD = "v556";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-20 09:04";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

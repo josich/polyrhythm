@@ -2481,7 +2481,10 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rd-steps button[data-cur="1"]{border:2px solid var(--kc);background:color-mix(in srgb,var(--kc) 18%,var(--sunk))}
 .rd-steps button[data-cur="1"][data-done="1"]{background:var(--kc);box-shadow:inset 0 0 0 2px var(--panel)}
 .rd-steps button:disabled{opacity:.4;cursor:default}
-.rd-nota{position:relative}   /* v503: the playhead is an HTML line moved by transform */
+.rd-nota{position:relative}
+.rd-nota[data-ear="1"] > svg,.rd-nota[data-ear="1"] .rd-hd{visibility:hidden}   /* v568: build it by ear */
+.rd-earv{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--c1);pointer-events:none}
+.rd-nota .rd-earv svg{width:36px;height:36px;max-width:36px;opacity:.85}   /* v503: the playhead is an HTML line moved by transform */
 .rd-hd{position:absolute;left:0;top:0;width:2px;margin-left:-1px;border-radius:1px;background:#E5484D;opacity:0;pointer-events:none;will-change:transform}
 .rd-ns .nh{transform-box:fill-box;transform-origin:center}   /* a hit's jump, a miss's shake */
 .rd-foot .rd-tempo{margin-top:2px}
@@ -4174,7 +4177,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v567"></script>
+<script src="./app.js?v=v568"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4187,8 +4190,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v567";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-23 13:39";          /* and when it was built, for ?diag */
+  var BUILD = "v568";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-23 13:50";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

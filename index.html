@@ -1514,7 +1514,7 @@ canvas{
 .ach-toast .t{font-size:13.5px;font-weight:600;line-height:1.2;color:var(--ink)}
 .ach-toast .d{font-size:11.5px;color:var(--ink-3)}
 @keyframes achIn{from{transform:translateX(-50%) translateY(8px) scale(.96);opacity:0}to{transform:translateX(-50%);opacity:1}}
-.ach-toast[data-fix="1"]{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom));max-width:min(calc(100vw - 32px),340px)}   /* v561 (QA v560-user NC2) */
+.ach-toast[data-fix="1"]{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom));max-width:min(calc(100vw - 32px),340px);pointer-events:none}   /* v564 (QA v563 m1): it has no action - never in the way */   /* v561 (QA v560-user NC2) */
 @media (prefers-reduced-motion:reduce){.ach-toast{animation:none}}
 /* v557 (Oscar): the toast at z 47 - above the lollipops' layer (.fxcv 40), their mini card (44), the edge flash (45) and the tap rings (46); under the tour card and every sheet */
 .ach-card h2.chal-title{color:var(--c1)}
@@ -2340,7 +2340,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root[data-cask="1"] #ctStepT{visibility:hidden}   /* v562 (QA v561-user NV2): the exam's card is about the exam */   /* v562 (QA v561-user NV1): not over an exam's or a pad's card */
 .modal.course-sheet-wrap#courseSheet:is([data-low="1"],[data-low="2"]){align-items:start}
 :root:has(#courseSheet[data-low="2"]:not([hidden])) #alongSec{z-index:auto}   /* v354 (QA v353 V1): the card would overlap it - the card wins */   /* v352 (Oscar): centred like every course card; moved down only as far as the lit histogram needs (courseSheetPlace) */
-@media (max-height:520px){ :root:has(#courseSheet:not([hidden])) #alongSec{z-index:auto} }   /* a short landscape screen has no room for both: the card wins */   /* v338 (Oscar): the run's histogram stays lit above the result card's backdrop */
+@media (max-height:520px){ :root:has(#courseSheet:not([hidden]):not([data-ex="1"])) #alongSec{z-index:auto} }   /* a short landscape screen has no room for both: the card wins */   /* v338 (Oscar): the run's histogram stays lit above the result card's backdrop */
 .ccode{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:.82em;color:var(--ink-3);margin-right:7px}
 .ct-step .ccode{color:var(--c2);font-size:.9em}
 :root[data-cpoly="1"] .ct-step{cursor:pointer}
@@ -2372,7 +2372,8 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .cintro .ci-note{color:var(--c3)} .cintro .ci-note[hidden]{display:none}
 @media (max-height:340px){ .course-sheet.cintro{padding:10px 14px 10px;gap:4px} .cintro .ci-t{font-size:18px} .cintro .ci-hand{width:34px;height:40px} .cintro .ci-hands{margin:0} }   /* v484 (QA v478 V3) */
 .cintro .course-go.pad{border-color:var(--c1);background:color-mix(in srgb,var(--c1) 12%,transparent)} .cintro .course-go.pad svg{color:var(--c1)}
-.cintro .ci-later{align-self:center;border-color:transparent;color:var(--ink-3)}
+.cintro .ci-later{align-self:center;border-color:transparent;color:var(--ink-3);min-height:36px}   /* v564 (QA v563 V2) */
+@media (max-height:340px){ .course-sheet:not(.cintro){padding:10px 14px 10px;gap:5px} }   /* v564 (QA v563 V1): 640 x 300 */
 /* v338 (Oscar): a one-hand step - its own half takes the taps; v339: the other hand's edge and label are grey */
 :root[data-course="1"][data-one] #twoSplit{display:block}
 :root[data-one="0"] #twoSplit .ts-l,:root[data-one="1"] #twoSplit .ts-r{--tc:var(--line-2)}   /* v339 (Oscar): the unused hand's edge and label in grey - no veil over the screen; its taps are ignored and it never flashes */
@@ -4163,7 +4164,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v563"></script>
+<script src="./app.js?v=v564"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4176,8 +4177,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v563";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-22 09:40";          /* and when it was built, for ?diag */
+  var BUILD = "v564";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-23 11:13";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

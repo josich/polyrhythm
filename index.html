@@ -2066,6 +2066,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rt-row.warm .wico svg{width:18px;height:18px}
 #ctabs .lvl-row.cwarm{border-color:color-mix(in srgb,var(--c1) 45%,var(--line))}
 #ctabs .lvl-row.cwarm .n svg{color:var(--c1)}
+:root[data-tour="1"] #ctabs .lvl-row.cwarm{display:none!important}   /* v571 (QA v570 m2): not inside a guide */
 .rt-body{all:unset;box-sizing:border-box;min-width:0;display:grid;gap:5px;cursor:pointer}
 .rt-body .nm{font-weight:600;font-size:13.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rt-body .mt{font-size:11px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;overflow-wrap:anywhere}   /* v427 (QA v426 V5): wraps, the date stays */
@@ -2298,7 +2299,8 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .course-strip .tk.acc::after{content:">";position:absolute;top:-1px;font-size:9px;color:var(--ink-3)}
 .course-strip .tk::before{content:"";position:absolute;inset:-1px;border-radius:inherit;border:1px solid var(--hc,var(--line-2));background:color-mix(in srgb,var(--hc,var(--line-2)) 22%,transparent);opacity:0;will-change:opacity;pointer-events:none}
 .course-strip .tk.R{--hc:var(--c1)} .course-strip .tk.L{--hc:var(--c2)}
-.course-strip[data-only="R"] .tk.L,.course-strip[data-only="L"] .tk.R{color:var(--dot-off);--hc:var(--line-2)}   /* v465: a hand alone - the other hand's strokes are heard, not tapped */
+.course-strip[data-only="R"] .tk.L,.course-strip[data-only="L"] .tk.R{color:var(--dot-off);--hc:var(--line-2)}
+.course-strip[data-acc="1"] .tk:not(.acc){color:var(--dot-off);--hc:var(--line-2)}   /* v571: the accents stage taps only the accents */   /* v465: a hand alone - the other hand's strokes are heard, not tapped */
 .course-strip .tk.lit::before{opacity:1}
 :root[data-course="1"] #courseFoot{display:flex;flex-direction:column;gap:8px;margin-top:4px}
 .ctrack{display:flex;align-items:center;margin:0 -6px;padding:6px 12px}   /* v340 (Oscar): room for the current step's ring above and below, clear of the labels */   /* v322 (QA v321 V3): the dots' 12 px tap zones sit inside the padding, so they no longer widen the box (the dots stay 6 px in) */
@@ -2368,7 +2370,8 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .ctrack b.cur{box-shadow:0 0 0 3px var(--ground),0 0 0 5px var(--rc)}   /* v338 (Oscar): a ring round the step being played, in its dot's colour */
 /* v343: the unlock card - a big open padlock in orange */
 .cunlock{padding:26px 18px 18px;gap:6px}
-.cu-done{display:flex;flex-direction:column;align-items:center;gap:3px;margin:0 0 14px;padding:0 0 12px;border-bottom:1px dashed var(--line-2);text-align:center}   /* v570 */
+.cu-done{display:flex;flex-direction:column;align-items:center;gap:3px;margin:2px 0 14px;padding:12px 0 0;border-top:1px dashed var(--line-2);text-align:center}
+@media (max-height:420px){ .cu-done{display:none!important} #courseIntro :is(.ci-why,.ci-fig){display:none!important} }   /* v571 (QA v570 V1 / V2): short landscape - the button stays on screen */   /* v570 */
 .cu-done .k{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--c2);font-weight:600}
 .cu-done .c{font-size:14px;color:var(--ink);line-height:1.3}
 .cu-done .sc{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink-3)}
@@ -3828,11 +3831,11 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 </div>
 <div class="modal course-sheet-wrap" id="courseUnlock" hidden>
   <div class="course-sheet cunlock" role="dialog" aria-modal="true" aria-labelledby="cuT">
-    <div class="cu-done" id="cuDone" hidden><span class="k" id="cuDoneK"></span><span class="c" id="cuCan"></span><span class="sc" id="cuSc"></span></div>   <!-- v570 -->
     <svg id="cuLock" class="cu-lock" viewBox="0 0 64 64" aria-hidden="true"><path d="M21 29V19a11 11 0 0 1 21.6-3" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><rect x="11" y="29" width="42" height="30" rx="7" fill="currentColor"/><circle cx="32" cy="41" r="4.6" fill="var(--panel)"/><path d="M32 43v8" stroke="var(--panel)" stroke-width="4" stroke-linecap="round"/></svg>
     <div class="cu-t" id="cuT">Level 2 unlocked</div>
     <div class="cu-name" id="cuName"></div>
     <p class="cs-line" id="cuNote"></p>
+    <div class="cu-done" id="cuDone" hidden><span class="k" id="cuDoneK"></span><span class="c" id="cuCan"></span><span class="sc" id="cuSc"></span></div>   <!-- v570; v571: under the news -->
     <button type="button" class="course-go" id="cuGo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h12M12 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Go to the course</span></button>
   </div>
 </div>
@@ -4210,7 +4213,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v570"></script>
+<script src="./app.js?v=v571"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4223,8 +4226,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v570";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-23 17:03";          /* and when it was built, for ?diag */
+  var BUILD = "v571";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-23 20:17";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

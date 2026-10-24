@@ -3788,7 +3788,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <p class="sup-note" id="supNote" hidden></p>
     </div>
     <div class="sm-rule">More</div>
-    <div class="sm-row"><span>Enquesta</span><button type="button" class="btn sm" id="menuFb" title="Envia'ns la teva opinió">Respon</button></div>   <!-- v532 -->
+    <div class="sm-row"><span>Survey</span><button type="button" class="btn sm" id="menuFb" title="Tell us what you think">Answer</button></div>   <!-- v532 -->
     <div class="sm-row"><span>Feedback</span><button type="button" class="btn sm" id="menuMail" title="Write to polyorbit.app@gmail.com">Write to us</button></div>   <!-- v555 -->
     <div class="sm-row" id="menuInstRow" style="display:none"><span id="menuInstLbl">Install Polyorbit</span><button type="button" class="btn sm" id="menuInst" title="Full screen, works offline, its own icon">Install</button></div>   <!-- v530 -->
     <div class="sm-row"><span id="menuCalLbl">Sound delay</span><button type="button" class="btn sm" id="menuCal" title="Measure this phone's delay: ten clicks, tap along">Calibrate</button></div>   <!-- v376 -->
@@ -4069,25 +4069,25 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 <div class="modal" id="fbModal" hidden>
   <div class="sheet fb-sheet" role="dialog" aria-modal="true" aria-labelledby="fbTitle">
     <div class="sheet-head">
-      <h2 id="fbTitle">Enquesta</h2>
-      <button class="icobtn" id="fbClose" title="Tanca" aria-label="Tanca">&times;</button>
+      <h2 id="fbTitle">Survey</h2>
+      <button class="icobtn" id="fbClose" title="Close" aria-label="Close">&times;</button>
     </div>
-    <p class="fb-lead">Un minut. Les respostes s'envien per correu.</p>
-    <input class="fb-in" id="fbName" type="text" maxlength="60" placeholder="El teu nom" autocomplete="name">
-    <div class="fb-q"><span class="fb-lbl">L'app és clara?</span>
-      <div class="fb-chips" data-q="clara"><button type="button" class="fb-chip" data-v="Sí">Sí</button><button type="button" class="fb-chip" data-v="Més o menys">Més o menys</button><button type="button" class="fb-chip" data-v="No" data-neg="1">No</button></div></div>
-    <div class="fb-q"><span class="fb-lbl">L'app et resulta útil?</span>
-      <div class="fb-chips" data-q="util"><button type="button" class="fb-chip" data-v="Sí">Sí</button><button type="button" class="fb-chip" data-v="Més o menys">Més o menys</button><button type="button" class="fb-chip" data-v="No" data-neg="1">No</button></div></div>
-    <div class="fb-q"><span class="fb-lbl">Les guies (i) t'ajuden?</span>
-      <div class="fb-chips" data-q="guies"><button type="button" class="fb-chip" data-v="Sí">Sí</button><button type="button" class="fb-chip" data-v="Més o menys">Més o menys</button><button type="button" class="fb-chip" data-v="No" data-neg="1">No</button></div></div>
-    <div class="fb-q"><span class="fb-lbl">La calibració ha estat clara?</span>
-      <div class="fb-chips" data-q="calib"><button type="button" class="fb-chip" data-v="Sí">Sí</button><button type="button" class="fb-chip" data-v="Més o menys">Més o menys</button><button type="button" class="fb-chip" data-v="No" data-neg="1">No</button></div></div>
-    <div class="fb-q"><span class="fb-lbl">Les seccions</span><small class="fb-hint">Marca només les que hagis provat.</small>
+    <p class="fb-lead">One minute. Your answers go by email.</p>
+    <input class="fb-in" id="fbName" type="text" maxlength="60" placeholder="Your name" autocomplete="name">
+    <div class="fb-q"><span class="fb-lbl">Is the app clear?</span>
+      <div class="fb-chips" data-q="clara"><button type="button" class="fb-chip" data-v="Yes">Yes</button><button type="button" class="fb-chip" data-v="Somewhat">Somewhat</button><button type="button" class="fb-chip" data-v="No" data-neg="1">No</button></div></div>
+    <div class="fb-q"><span class="fb-lbl">Is the app useful to you?</span>
+      <div class="fb-chips" data-q="util"><button type="button" class="fb-chip" data-v="Yes">Yes</button><button type="button" class="fb-chip" data-v="Somewhat">Somewhat</button><button type="button" class="fb-chip" data-v="No" data-neg="1">No</button></div></div>
+    <div class="fb-q"><span class="fb-lbl">Do the (i) guides help?</span>
+      <div class="fb-chips" data-q="guies"><button type="button" class="fb-chip" data-v="Yes">Yes</button><button type="button" class="fb-chip" data-v="Somewhat">Somewhat</button><button type="button" class="fb-chip" data-v="No" data-neg="1">No</button></div></div>
+    <div class="fb-q"><span class="fb-lbl">Was the calibration clear?</span>
+      <div class="fb-chips" data-q="calib"><button type="button" class="fb-chip" data-v="Yes">Yes</button><button type="button" class="fb-chip" data-v="Somewhat">Somewhat</button><button type="button" class="fb-chip" data-v="No" data-neg="1">No</button></div></div>
+    <div class="fb-q"><span class="fb-lbl">The sections</span><small class="fb-hint">Mark only the ones you tried.</small>
       <div id="fbSecs"></div></div>
-    <div class="fb-q"><span class="fb-lbl">Comentaris</span>
-      <textarea class="fb-in fb-text" id="fbText" maxlength="1500" placeholder="Què t'ha agradat, què t'ha confós, què hi trobes a faltar…"></textarea></div>
-    <button type="button" class="btn chal-cta fb-send" id="fbSend" disabled>Envia per correu</button>
-    <p class="fb-note" id="fbNote">S'obrirà el teu correu amb les respostes: només cal prémer Envia.</p>
+    <div class="fb-q"><span class="fb-lbl">Comments</span>
+      <textarea class="fb-in fb-text" id="fbText" maxlength="1500" placeholder="What you liked, what confused you, what you missed…"></textarea></div>
+    <button type="button" class="btn chal-cta fb-send" id="fbSend" disabled>Send by email</button>
+    <p class="fb-note" id="fbMsg">Your email app opens with the answers: just press Send.</p>
   </div>
 </div>
 <div class="modal" id="logModal" hidden>
@@ -4217,7 +4217,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v575"></script>
+<script src="./app.js?v=v576"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4230,8 +4230,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v575";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-24 10:32";          /* and when it was built, for ?diag */
+  var BUILD = "v576";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-24 10:40";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

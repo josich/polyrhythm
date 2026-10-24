@@ -2381,6 +2381,14 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .cu-done .sc b{color:var(--c2);font-weight:600}
 .cu-done[hidden],.cu-done .sc[hidden]{display:none}
 .cu-lock{width:104px;height:104px;margin:0 auto 6px;color:var(--c1);display:block}
+.cu-trophy[hidden]{display:none} .cu-trophy{width:96px;height:96px}   /* v582: a course complete */
+.cs-groove{display:flex;align-items:center;gap:10px;width:100%;margin:2px 0 10px;padding:8px 12px;border-radius:12px;border:1px solid color-mix(in srgb,var(--c2) 45%,var(--line));background:color-mix(in srgb,var(--c2) 10%,var(--sunk));color:var(--ink);font:inherit;font-weight:600;font-size:14px;text-align:left;cursor:pointer}
+.cs-groove[hidden]{display:none} .cs-groove svg{width:18px;height:18px;color:var(--c2);flex:none} .cs-groove span{display:flex;flex-direction:column;line-height:1.25} .cs-groove small{font-weight:400;font-size:11.5px;color:var(--ink-3)}
+.rd-pick{display:flex;flex-direction:column;gap:6px;padding:2px}   /* v582: Name it */
+.rd-opt{display:block;width:100%;padding:2px 4px;border-radius:10px;border:1.5px solid var(--line);background:var(--sunk);cursor:pointer;color:inherit}
+.rd-opt svg{display:block;width:auto;max-width:100%;height:46px;margin:0 auto}
+.rd-opt[data-bad="1"]{border-color:var(--c3);opacity:.55} .rd-opt[data-ok="1"]{border-color:var(--c2);background:color-mix(in srgb,var(--c2) 14%,var(--sunk))}
+.rdc-ico[data-k="n"]{color:var(--c1)}
 .cu-t{font-family:var(--title);font-stretch:var(--title-stretch);font-weight:800;font-size:26px;letter-spacing:.02em;color:var(--c1);line-height:1.1}
 .cu-name{font-size:16px;font-weight:600;color:var(--ink)}
 .cunlock .course-go{margin-top:8px}
@@ -2602,7 +2610,8 @@ html[data-skin="light"] .rd-steps .xb[data-done="1"],html[data-skin="light"] .rd
 .rd-ns .tb{stroke:var(--ink-2);stroke-width:1.1;fill:none}
 .rd-ns .hd{stroke:#E5484D;stroke-width:2;stroke-linecap:round}
 .clist .cst.inf{border:1.5px solid color-mix(in srgb,var(--c2) 55%,var(--line));color:var(--c2);font-size:13px;line-height:1}
-:root[data-rsel="1"][data-cpg="1"] #cwinOpts{visibility:hidden}   /* the way to take a course (phone / pad, left-handed) is not the reading course's; v500: on its own page */
+:root[data-rsel="1"][data-cpg="1"]:not([data-editor="1"]) #cwinOpts{visibility:hidden}   /* v582 (Oscar): the editor's Fake / Reset reach the Reading course too */
+:root[data-rsel="1"][data-cpg="1"] #cwinPop > :not(#courseEdFoot){display:none}   /* the way to take a course (phone / pad, left-handed) is not the reading course's; v500: on its own page */
 #ctabs[data-more="1"]{-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 26px),transparent)}
 @media (max-height:620px){ :root[data-rdg="1"] .read-scr{gap:7px} }
 /* a short landscape screen (a browser tab): the notation and the buttons left, the wheel right */
@@ -3835,6 +3844,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 </div>
 <div class="modal course-sheet-wrap" id="courseUnlock" hidden>
   <div class="course-sheet cunlock" role="dialog" aria-modal="true" aria-labelledby="cuT">
+    <svg id="cuTrophy" class="cu-lock cu-trophy" viewBox="0 0 24 24" aria-hidden="true" hidden><use href="#i-trophy"/></svg>   <!-- v582: a course complete -->
     <svg id="cuLock" class="cu-lock" viewBox="0 0 64 64" aria-hidden="true"><path d="M21 29V19a11 11 0 0 1 21.6-3" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/><rect x="11" y="29" width="42" height="30" rx="7" fill="currentColor"/><circle cx="32" cy="41" r="4.6" fill="var(--panel)"/><path d="M32 43v8" stroke="var(--panel)" stroke-width="4" stroke-linecap="round"/></svg>
     <div class="cu-t" id="cuT">Level 2 unlocked</div>
     <div class="cu-name" id="cuName"></div>
@@ -3863,6 +3873,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <div class="cs-pct" id="csPct">0 %</div>
     <p class="cs-line" id="csLine"></p>
     <p class="cs-line" id="csHands"></p>
+    <button type="button" class="cs-groove" id="csGroove" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg><span>Paradiddle groove<small>in Rhythms, with Funk</small></span></button>   <!-- v582 -->
     <div class="along-card-where" id="csWhere" hidden></div>   <!-- v486: where I'm off -->
     <button type="button" class="course-go" id="csGo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg><span id="csGoT">Next step</span></button>
     <div class="cs-two"><button type="button" class="btn" id="csAgain">Again</button><button type="button" class="btn" id="csBack">Back to the course</button></div>
@@ -4217,7 +4228,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v581"></script>
+<script src="./app.js?v=v582"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4230,8 +4241,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v581";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-24 11:21";          /* and when it was built, for ?diag */
+  var BUILD = "v582";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-24 11:56";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -2370,7 +2370,18 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .ct-step .ccode{color:var(--c2);font-size:.9em}
 :root[data-cpoly="1"] .ct-step{cursor:pointer}
 .ctrack b{--rc:var(--line-2)} .ctrack b.ok{--rc:var(--c2)} .ctrack b.now{--rc:var(--c1)} .ctrack b.goal{--rc:var(--c4)}
-.ctrack b.cur{box-shadow:0 0 0 3px var(--ground),0 0 0 5px var(--rc)}   /* v338 (Oscar): a ring round the step being played, in its dot's colour */
+.ctrack b.cur{box-shadow:0 0 0 3px var(--ground),0 0 0 5px var(--rc)}
+/* v584 (Oscar): an exam's stages as boxes on the track - done filled, the current one ringed, a blind one with the eye */
+.ctrack b.xs{width:26px;height:26px;border-radius:8px;background:transparent;border:2px dashed color-mix(in srgb,var(--c4) 50%,var(--line-2));display:flex;align-items:center;justify-content:center;font:600 12px/1 "IBM Plex Mono",monospace;color:var(--ink-3);box-shadow:none}
+.ctrack b.xs svg{width:15px;height:15px}
+#courseTempo .ctrack b.xs{display:flex!important;font:600 12px/1 "IBM Plex Mono",monospace!important;letter-spacing:0!important}   /* #courseTempo b sizes the big tempo */
+.ctrack b.xs.ok{background:var(--c4);border:2px solid var(--c4);color:var(--panel)}
+.ctrack b.xs.xnext{border-style:solid;border-color:var(--c4);color:var(--ink-2)}
+.ctrack b.xs.xcur{border:2px solid var(--c4);background:color-mix(in srgb,var(--c4) 20%,transparent);color:var(--ink);box-shadow:0 0 0 3px var(--ground),0 0 0 5px var(--c4)}
+.ctrack i.xi{background:var(--line)} .ctrack i.xi.ok{background:var(--c4)}
+.ct-lad[data-x="1"] .ctrackk:not([hidden]){display:block;color:var(--c4)}
+.ct-lad[data-x="1"] .ctrackl{display:none}
+.ct-lad[data-x="1"] .ctrack{padding-bottom:6px!important}   /* v338 (Oscar): a ring round the step being played, in its dot's colour */
 /* v343: the unlock card - a big open padlock in orange */
 .cunlock{padding:26px 18px 18px;gap:6px}
 .cu-done{display:flex;flex-direction:column;align-items:center;gap:3px;margin:2px 0 14px;padding:12px 0 0;border-top:1px dashed var(--line-2);text-align:center}
@@ -4237,7 +4248,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v584"></script>
+<script src="./app.js?v=v585"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4250,8 +4261,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v584";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-26 15:45";          /* and when it was built, for ?diag */
+  var BUILD = "v585";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-26 15:52";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

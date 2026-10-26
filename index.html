@@ -2522,7 +2522,16 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rd-nota{position:relative}
 .rd-nota[data-ear="1"] > svg,.rd-nota[data-ear="1"] .rd-hd{visibility:hidden}   /* v568: build it by ear */
 .rd-earv{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--c1);pointer-events:none}
-.rd-nota .rd-earv svg{width:36px;height:36px;max-width:36px;opacity:.85}   /* v503: the playhead is an HTML line moved by transform */
+.rd-nota .rd-earv svg{width:36px;height:36px;max-width:36px;opacity:.85}
+/* v584 (Oscar): in Build it by ear the whole veiled area is the Hear it button - speaker, words, a play triangle - and it
+   flashes on every beat while the bar sounds (an opacity layer, per the no-paint rule) */
+.rd-nota button.rd-earv{pointer-events:auto;gap:10px;margin:0;padding:0;font:inherit;font-size:17px;font-weight:700;letter-spacing:.01em;color:var(--c1);
+  border:1.5px dashed color-mix(in srgb,var(--c1) 55%,var(--line));border-radius:12px;background:color-mix(in srgb,var(--c1) 7%,transparent);cursor:pointer;--pc:var(--c1)}
+.rd-nota button.rd-earv svg{width:30px;height:30px;max-width:30px;opacity:1}
+.rd-nota button.rd-earv svg.tri{width:18px;height:18px;max-width:18px}
+.rd-nota button.rd-earv[data-hearing="1"]{border-style:solid}
+.rd-earv .rd-earp{position:absolute;inset:0;border-radius:inherit;background:color-mix(in srgb,var(--c1) 34%,transparent);opacity:0;pointer-events:none;will-change:opacity}
+:root[data-rdg="1"][data-rdear="1"] .play{display:none}   /* v584: no play on the wheel until the bar has been heard once */   /* v503: the playhead is an HTML line moved by transform */
 .rd-hd{position:absolute;left:0;top:0;width:2px;margin-left:-1px;border-radius:1px;background:#E5484D;opacity:0;pointer-events:none;will-change:transform}
 .rd-ns .nh{transform-box:fill-box;transform-origin:center}   /* a hit's jump, a miss's shake */
 .rd-foot .rd-tempo{margin-top:2px}
@@ -4228,7 +4237,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v583"></script>
+<script src="./app.js?v=v584"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4241,8 +4250,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v583";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-26 15:22";          /* and when it was built, for ?diag */
+  var BUILD = "v584";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-26 15:45";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

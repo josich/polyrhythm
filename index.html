@@ -2443,7 +2443,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root[data-one="0"] #twoSplit .ts-l,:root[data-one="1"] #twoSplit .ts-r{--tc:var(--line-2)}
 /* v591 (Oscar's sketch): the half that takes no taps wears offset rows of faint dots, kept clear of the wheel - one static
    layer, painted once */
-:root[data-course="1"][data-one] #twoSplit::after{content:"";position:absolute;top:var(--dt,0px);bottom:var(--db,0px);width:50%;pointer-events:none;opacity:.22;
+:root[data-course="1"][data-one] #twoSplit::after{content:"";position:absolute;top:var(--dt,0px);bottom:0;width:50%;pointer-events:none;opacity:.264;
   background-image:radial-gradient(circle,var(--ink-3) 1.15px,transparent 1.7px),radial-gradient(circle,var(--ink-3) 1.15px,transparent 1.7px);
   background-size:16px 16px;background-position:0 0,8px 8px;
   -webkit-mask-image:radial-gradient(circle at var(--dx,50%) var(--dy,50%),transparent var(--dr,0px),#000 calc(var(--dr,0px) + 26px));
@@ -4271,7 +4271,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v595"></script>
+<script src="./app.js?v=v596"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4284,8 +4284,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v595";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-27 13:09";          /* and when it was built, for ?diag */
+  var BUILD = "v596";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-27 14:40";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

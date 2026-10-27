@@ -2280,6 +2280,9 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .cb-mode{display:flex;align-items:center;gap:5px;font-size:11px;padding:5px 9px;border-radius:999px;border:1px solid color-mix(in srgb,var(--c2) 55%,var(--line));color:var(--ink-2);white-space:nowrap}
 .cb-mode svg{width:13px;height:13px;color:var(--c2)}
 .cb-ttl{text-align:center;min-width:0}
+#alongCardPct .stopped{font-size:28px;font-weight:700;color:var(--ink-2)}
+#ctabs .nm-ro .cndot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--c1);margin-left:6px;vertical-align:.25em}   /* v595 */
+.cb-ttl b[data-wrap="1"]{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.05}   /* v595 (QA v594 V1): two lines rather than an ellipsis */
 .cb-ttl b{display:block;font-family:var(--title);font-stretch:var(--title-stretch);font-weight:800;font-size:18px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cb-ttl span{display:block;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:359px){ .cb-ttl span{letter-spacing:.02em;font-size:9.5px} }   /* v328 (QA v325 V1): "Level 2 · Three against two" on one line at 320 px */
@@ -2361,7 +2364,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root[data-course="1"] #twoSplit::before{top:var(--dt,12px);bottom:12px}   /* v592 (QA v591-user NV2): from the wheel down, not through the tempo and the step's words */
 :root[data-course="1"] #twoSplit span{padding:0 18px 16px;font-size:12px}
 .modal.rd-card-wrap[data-low="1"]{align-items:end;padding-bottom:max(12px,env(safe-area-inset-bottom))}   /* v593 */
-@media (orientation:landscape) and (max-height:520px){.modal.rd-card-wrap[data-low="1"]{align-items:center;grid-template-columns:minmax(0,46%);justify-content:end}}   /* v594 (QA v593 m5): beside the options */
+@media (orientation:landscape) and (max-height:520px){.modal.rd-card-wrap[data-low="1"]{align-items:center;grid-template-columns:minmax(0,38%);justify-content:end}}   /* v594 (QA v593 m5): beside the options */
 .modal.course-sheet-wrap{z-index:70;align-items:center;grid-template-columns:minmax(0,1fr);background:color-mix(in srgb,var(--ground) 55%,transparent)}   /* v338 (Oscar): centred; the column never grows past the screen (a long button pushed the sheet off to the right) */
 .course-sheet{width:min(100%,440px);min-width:0;margin:0 auto;background:var(--panel);border:1px solid var(--line-2);border-radius:20px;padding:18px 16px 16px;text-align:center;display:flex;flex-direction:column;gap:8px;box-shadow:0 10px 40px -10px rgba(0,0,0,.6)}
 .course-sheet .course-go{min-width:0} .course-sheet .course-go span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -4268,7 +4271,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v594"></script>
+<script src="./app.js?v=v595"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4281,8 +4284,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v594";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-27 12:39";          /* and when it was built, for ?diag */
+  var BUILD = "v595";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-27 13:09";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

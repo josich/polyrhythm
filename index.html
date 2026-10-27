@@ -2361,6 +2361,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root[data-course="1"] #twoSplit::before{top:var(--dt,12px);bottom:12px}   /* v592 (QA v591-user NV2): from the wheel down, not through the tempo and the step's words */
 :root[data-course="1"] #twoSplit span{padding:0 18px 16px;font-size:12px}
 .modal.rd-card-wrap[data-low="1"]{align-items:end;padding-bottom:max(12px,env(safe-area-inset-bottom))}   /* v593 */
+@media (orientation:landscape) and (max-height:520px){.modal.rd-card-wrap[data-low="1"]{align-items:center;grid-template-columns:minmax(0,46%);justify-content:end}}   /* v594 (QA v593 m5): beside the options */
 .modal.course-sheet-wrap{z-index:70;align-items:center;grid-template-columns:minmax(0,1fr);background:color-mix(in srgb,var(--ground) 55%,transparent)}   /* v338 (Oscar): centred; the column never grows past the screen (a long button pushed the sheet off to the right) */
 .course-sheet{width:min(100%,440px);min-width:0;margin:0 auto;background:var(--panel);border:1px solid var(--line-2);border-radius:20px;padding:18px 16px 16px;text-align:center;display:flex;flex-direction:column;gap:8px;box-shadow:0 10px 40px -10px rgba(0,0,0,.6)}
 .course-sheet .course-go{min-width:0} .course-sheet .course-go span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -4267,7 +4268,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v593"></script>
+<script src="./app.js?v=v594"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4280,8 +4281,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v593";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-27 11:57";          /* and when it was built, for ?diag */
+  var BUILD = "v594";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-27 12:39";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

@@ -50,3 +50,7 @@ to sign up for. Clearing your browser's data for this site is what removes them.
 The link works for anyone — send it on and they can install it the same way.
 Mention the Install step, or they will end up with a bookmark and never get the
 icon.
+
+---
+
+Made by Josich · polyorbit.app@gmail.com

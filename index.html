@@ -2280,6 +2280,8 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .cb-mode{display:flex;align-items:center;gap:5px;font-size:11px;padding:5px 9px;border-radius:999px;border:1px solid color-mix(in srgb,var(--c2) 55%,var(--line));color:var(--ink-2);white-space:nowrap}
 .cb-mode svg{width:13px;height:13px;color:var(--c2)}
 .cb-ttl{text-align:center;min-width:0}
+#cuDone .aw{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px;font-weight:700;color:var(--c1)}
+#cuDone .aw svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8}
 #alongCardPct .stopped{font-size:28px;font-weight:700;color:var(--ink-2)}
 #ctabs .nm-ro .cndot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--c1);margin-left:6px;vertical-align:.25em}   /* v595 */
 .cb-ttl b[data-wrap="1"]{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.05}   /* v595 (QA v594 V1): two lines rather than an ellipsis */
@@ -2448,6 +2450,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
   background-size:16px 16px;background-position:0 0,8px 8px;
   -webkit-mask-image:radial-gradient(circle at var(--dx,50%) var(--dy,50%),transparent var(--dr,0px),#000 calc(var(--dr,0px) + 26px));
   mask-image:radial-gradient(circle at var(--dx,50%) var(--dy,50%),transparent var(--dr,0px),#000 calc(var(--dr,0px) + 26px))}
+@media (orientation:landscape) and (max-height:520px){:root[data-course="1"][data-one] #twoSplit::after{display:none}}   /* v597 (QA v596-user NV2) */
 :root[data-course="1"][data-one="0"] #twoSplit::after{left:0}
 :root[data-course="1"][data-one="1"] #twoSplit::after{left:50%}
 :root[data-course="1"][data-onedots="0"] #twoSplit::after{display:none}   /* v592 (QA v591-user NV1): the next action is the exam - both halves take taps */   /* v339 (Oscar): the unused hand's edge and label in grey - no veil over the screen; its taps are ignored and it never flashes */
@@ -3892,7 +3895,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <div class="cu-t" id="cuT">Level 2 unlocked</div>
     <div class="cu-name" id="cuName"></div>
     <p class="cs-line" id="cuNote"></p>
-    <div class="cu-done" id="cuDone" hidden><span class="k" id="cuDoneK"></span><span class="c" id="cuCan"></span><span class="sc" id="cuSc"></span></div>   <!-- v570; v571: under the news -->
+    <div class="cu-done" id="cuDone" hidden><span class="k" id="cuDoneK"></span><span class="c" id="cuCan"></span><span class="sc" id="cuSc"></span><span class="aw" id="cuAw" hidden></span></div>   <!-- v570; v571: under the news -->
     <button type="button" class="course-go" id="cuGo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h12M12 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Go to the course</span></button>
   </div>
 </div>
@@ -4271,7 +4274,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v596"></script>
+<script src="./app.js?v=v597"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4284,8 +4287,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v596";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-27 14:40";          /* and when it was built, for ?diag */
+  var BUILD = "v597";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-27 15:30";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

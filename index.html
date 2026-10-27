@@ -2067,6 +2067,8 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rt-row.warm{border-color:color-mix(in srgb,var(--c1) 45%,var(--line))}
 .rt-row.warm .wico{display:flex;align-items:center;justify-content:center;min-width:24px;color:var(--c1)}
 .rt-row.warm .wico svg{width:18px;height:18px}
+.rt-row.warm .wsteps{display:none;font-size:12px;line-height:1.35;color:var(--ink-2);white-space:normal;margin-top:4px}   /* v592 (QA v591-user NC3) */
+.rt-row.warm[data-open="1"] .wsteps{display:block}
 #ctabs .lvl-row.cwarm{border-color:color-mix(in srgb,var(--c1) 45%,var(--line))}
 #ctabs .lvl-row.cwarm .n svg{color:var(--c1)}
 :root[data-tour="1"] #ctabs .lvl-row.cwarm{display:none!important}   /* v571 (QA v570 m2): not inside a guide */
@@ -2355,7 +2357,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root[data-course="1"][data-along="1"] :is(#courseGo,#courseLock){display:none!important}   /* v324: the tempo stays (Oscar: nothing above moves) */
 /* the whole screen is the tap surface: the Two fingers split, fixed to the screen's edges */
 :root[data-course="1"] #twoSplit{position:fixed;inset:0;z-index:30}
-:root[data-course="1"] #twoSplit::before{top:12px;bottom:12px}
+:root[data-course="1"] #twoSplit::before{top:var(--dt,12px);bottom:12px}   /* v592 (QA v591-user NV2): from the wheel down, not through the tempo and the step's words */
 :root[data-course="1"] #twoSplit span{padding:0 18px 16px;font-size:12px}
 .modal.course-sheet-wrap{z-index:70;align-items:center;grid-template-columns:minmax(0,1fr);background:color-mix(in srgb,var(--ground) 55%,transparent)}   /* v338 (Oscar): centred; the column never grows past the screen (a long button pushed the sheet off to the right) */
 .course-sheet{width:min(100%,440px);min-width:0;margin:0 auto;background:var(--panel);border:1px solid var(--line-2);border-radius:20px;padding:18px 16px 16px;text-align:center;display:flex;flex-direction:column;gap:8px;box-shadow:0 10px 40px -10px rgba(0,0,0,.6)}
@@ -2435,13 +2437,14 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 :root[data-one="0"] #twoSplit .ts-l,:root[data-one="1"] #twoSplit .ts-r{--tc:var(--line-2)}
 /* v591 (Oscar's sketch): the half that takes no taps wears offset rows of faint dots, kept clear of the wheel - one static
    layer, painted once */
-:root[data-course="1"][data-one] #twoSplit::after{content:"";position:absolute;top:var(--dt,0px);bottom:0;width:50%;pointer-events:none;opacity:.22;
+:root[data-course="1"][data-one] #twoSplit::after{content:"";position:absolute;top:var(--dt,0px);bottom:var(--db,0px);width:50%;pointer-events:none;opacity:.22;
   background-image:radial-gradient(circle,var(--ink-3) 1.15px,transparent 1.7px),radial-gradient(circle,var(--ink-3) 1.15px,transparent 1.7px);
   background-size:16px 16px;background-position:0 0,8px 8px;
   -webkit-mask-image:radial-gradient(circle at var(--dx,50%) var(--dy,50%),transparent var(--dr,0px),#000 calc(var(--dr,0px) + 26px));
   mask-image:radial-gradient(circle at var(--dx,50%) var(--dy,50%),transparent var(--dr,0px),#000 calc(var(--dr,0px) + 26px))}
 :root[data-course="1"][data-one="0"] #twoSplit::after{left:0}
-:root[data-course="1"][data-one="1"] #twoSplit::after{left:50%}   /* v339 (Oscar): the unused hand's edge and label in grey - no veil over the screen; its taps are ignored and it never flashes */
+:root[data-course="1"][data-one="1"] #twoSplit::after{left:50%}
+:root[data-course="1"][data-onedots="0"] #twoSplit::after{display:none}   /* v592 (QA v591-user NV1): the next action is the exam - both halves take taps */   /* v339 (Oscar): the unused hand's edge and label in grey - no veil over the screen; its taps are ignored and it never flashes */
 .cs-k{font-family:var(--title);font-stretch:var(--title-stretch);font-weight:800;font-size:26px;letter-spacing:.03em;color:var(--c2)}
 .cs-k[data-k="no"]{color:var(--c3)} .cs-k[data-k="short"]{color:var(--ink-3)} .cs-k[data-k="goal"]{color:var(--c4)}
 .cs-pct{font-family:"IBM Plex Mono",monospace;font-size:48px;font-weight:500;line-height:1;color:var(--c2)}
@@ -2550,6 +2553,8 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rd-nota button.rd-earv svg{width:30px;height:30px;max-width:30px;opacity:1}
 .rd-nota button.rd-earv svg.tri{width:18px;height:18px;max-width:18px}
 .rd-nota button.rd-earv[data-hearing="1"]{border-style:solid}
+.rd-nota button.rd-earv:disabled{color:var(--ink-3);border-color:var(--line);cursor:default}   /* v592 (Oscar): no more listening once a dot is placed */
+.rd-nota button.rd-earv:disabled svg.tri{display:none}
 .rd-earv .rd-earp{position:absolute;inset:0;border-radius:inherit;background:color-mix(in srgb,var(--c1) 34%,transparent);opacity:0;pointer-events:none;will-change:opacity}
 :root[data-rdg="1"][data-rdear="1"] .play{display:none}   /* v584: no play on the wheel until the bar has been heard once */   /* v503: the playhead is an HTML line moved by transform */
 .rd-hd{position:absolute;left:0;top:0;width:2px;margin-left:-1px;border-radius:1px;background:#E5484D;opacity:0;pointer-events:none;will-change:transform}
@@ -3799,7 +3804,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 <!-- v537 (Oscar): the tour's first step - the app tunes itself to the phone before the wheel cards -->
 <div class="modal tour-welcome" id="tourCalCard" hidden>
   <div class="sheet tw-sheet" role="dialog" aria-modal="true" aria-labelledby="tcT">
-    <p class="tw-k">Before you tap</p>
+    <p class="tw-k" id="tcK">Before you tap</p>
     <p class="tc-t" id="tcT">Calibrate your phone's sound!</p>
     <p class="tw-line">Tap along with 10 clicks so your taps are judged fairly.</p>
     <p class="tw-line tc-miss" id="tcMiss" hidden>Too few taps.</p>
@@ -4260,7 +4265,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v591"></script>
+<script src="./app.js?v=v592"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4273,8 +4278,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v591";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-27 09:57";          /* and when it was built, for ?diag */
+  var BUILD = "v592";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-27 10:56";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

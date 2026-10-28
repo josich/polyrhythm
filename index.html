@@ -1107,6 +1107,12 @@ button.along-card-pct .go i{font-style:normal;font-family:var(--title);font-size
   background:var(--c2);border-color:var(--c2);color:var(--ground);letter-spacing:.01em}
 .chal-cta:hover{filter:brightness(1.06)}
 .chal-more{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:12px}
+.rate-stars{all:unset;cursor:pointer;display:flex;justify-content:center;gap:4px;margin:16px auto 6px;font-size:44px;line-height:1;color:var(--c1)}   /* v599 */
+.rate-stars span{display:inline-block;animation:rateStar .42s cubic-bezier(.2,.9,.3,1.3) both}
+.rate-stars span:nth-child(2){animation-delay:.08s}.rate-stars span:nth-child(3){animation-delay:.16s}.rate-stars span:nth-child(4){animation-delay:.24s}.rate-stars span:nth-child(5){animation-delay:.32s}
+@keyframes rateStar{from{transform:scale(.2);opacity:0}60%{transform:scale(1.25);opacity:1}to{transform:scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){.rate-stars span{animation:none}}
+.rate-card .rate-t{font-family:var(--title);font-stretch:var(--title-stretch);font-size:24px;font-weight:700;line-height:1.15;margin:6px 0 8px;color:var(--ink)}
 .chal-more .btn.sm{padding:9px 14px;font-size:13px}
 /* while a game runs, or a challenge is on, the wheel's header trades Score and Share
    for one cross that leaves (Oscar, v109: the Game button was off screen) */
@@ -4222,6 +4228,18 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <button type="button" class="btn chal-cta" id="achCardGo">Nice</button>
   </div>
 </div>
+<!-- v599 (Oscar): a rating reminder after 10 h and 20 h of playing, at a quiet moment -->
+<div class="modal chal-modal" id="rateModal" hidden>
+  <div class="sheet chal-sheet rate-card" role="dialog" aria-modal="true" aria-labelledby="rateTitle">
+    <button type="button" class="icobtn chal-x" id="rateX" title="Close" aria-label="Close">&times;</button>
+    <div class="chal-brand"><svg viewBox="0 0 512 512" width="26" height="26" aria-hidden="true"><path d="M256 256L256 56 A200 200 0 1 1 82.8 156.0 Z" fill="var(--ink)" opacity=".12"/><circle cx="256" cy="256" r="200" fill="none" stroke="var(--line-2)" stroke-width="10"/><path d="M256 256L70.7 149.0" stroke="var(--ink)" stroke-width="7" stroke-linecap="round"/><circle cx="256.0" cy="56.0" r="30" fill="var(--c1)"/><circle cx="256.0" cy="56.0" r="46" fill="none" stroke="var(--c1)" stroke-width="8" opacity=".6"/><circle cx="456.0" cy="256.0" r="26" fill="var(--c2)"/><circle cx="256.0" cy="456.0" r="26" fill="var(--c2)"/><circle cx="56.0" cy="256.0" r="26" fill="var(--c2)"/><circle cx="256" cy="256" r="26" fill="var(--ink)"/></svg><span>Polyorbit</span></div>
+    <button type="button" class="rate-stars" id="rateStars" aria-label="Rate Polyorbit on Google Play"><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span></button>
+    <h2 class="rate-t" id="rateTitle">Help us by rating the app</h2>
+    <p class="chal-sub">A few words on Google Play help other musicians find it.</p>
+    <button type="button" class="btn chal-cta" id="rateGo">Rate on Google Play</button>
+    <div class="chal-more"><button type="button" class="btn sm" id="rateLater">Later</button></div>
+  </div>
+</div>
 <div class="modal" id="shareSheet" hidden>
   <div class="sheet share-sheet" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
     <div class="sheet-head">
@@ -4274,7 +4292,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v598"></script>
+<script src="./app.js?v=v599"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4287,8 +4305,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v598";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-27 21:00";          /* and when it was built, for ?diag */
+  var BUILD = "v599";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-10-28 09:36";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

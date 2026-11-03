@@ -780,6 +780,7 @@ input[type=range]::-moz-range-thumb{
 .along-card-bar .nlb{position:absolute;top:22px;transform:translateX(-50%);white-space:nowrap;font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--ink-3)}
 .along-card-clean[hidden]{display:none}
 /* v486: where I'm off - one line under the missed hits, a tiny wheel lighting the dot (mock design/where-off-proto.html) */
+.cs-echo{margin:8px auto 0;max-width:300px;text-align:center} .cs-echo[hidden]{display:none} .cs-echo small{display:block;color:var(--ink-3);font-size:11px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px} .cs-echo svg{display:block;width:100%;height:auto;max-height:84px}
 .along-card-where{display:flex;align-items:center;gap:9px;width:fit-content;max-width:100%;box-sizing:border-box;margin:10px auto 2px;padding:6px 12px 6px 7px;border-radius:12px;background:var(--sunk);border:1px solid var(--line);font-size:15px;color:var(--ink)}
 .along-card-where[hidden]{display:none}
 .along-card-where:not([data-go="1"]){background:none;border-color:transparent}   /* v543 (QA v542-user NC5): only the button looks like one */
@@ -3930,6 +3931,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
     <p class="cs-line" id="csHands"></p>
     <button type="button" class="cs-groove" id="csGroove" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg><span>Paradiddle groove<small>in Rhythms, with Funk</small></span></button>   <!-- v582 -->
     <div class="along-card-where" id="csWhere" hidden></div>   <!-- v486: where I'm off -->
+    <div class="cs-echo" id="csEcho" hidden></div>   <!-- v621: the echo's call as notation -->
     <button type="button" class="course-go" id="csGo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg><span id="csGoT">Next step</span></button>
     <div class="cs-two"><button type="button" class="btn" id="csAgain">Again</button><button type="button" class="btn" id="csBack">Back to the course</button></div>
   </div>
@@ -4295,7 +4297,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v620"></script>
+<script src="./app.js?v=v621"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4308,8 +4310,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v620";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-11-03 12:05";          /* and when it was built, for ?diag */
+  var BUILD = "v621";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-11-03 12:19";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

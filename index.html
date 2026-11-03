@@ -2444,7 +2444,7 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .tapwave{position:fixed;left:0;top:0;width:84px;height:84px;border-radius:50%;border:6px solid var(--wc);background:color-mix(in srgb,var(--wc) 18%,transparent);pointer-events:none;z-index:46;opacity:0;will-change:transform,opacity}
 .blind-flash{position:absolute;left:50%;top:50%;width:22%;aspect-ratio:1/1;opacity:0;pointer-events:none;color:var(--ink);z-index:3;transform:translate(-50%,-50%)}
 .blind-flash svg{width:100%;height:100%;display:block;overflow:visible}
-.cintro .ci-note{color:var(--c3)} .cintro .ci-note[hidden]{display:none}
+.cintro .ci-howt{display:block;margin-top:6px} .cintro .ci-note{color:var(--c3)} .cintro .ci-note[hidden]{display:none}
 @media (max-height:340px){ .course-sheet.cintro{padding:10px 14px 10px;gap:4px} .cintro .ci-t{font-size:18px} .cintro .ci-hand{width:34px;height:40px} .cintro .ci-hands{margin:0} }   /* v484 (QA v478 V3) */
 .cintro .course-go.pad{border-color:var(--c1);background:color-mix(in srgb,var(--c1) 12%,transparent)} .cintro .course-go.pad svg{color:var(--c1)}
 .cintro .ci-later{align-self:center;border-color:transparent;color:var(--ink-3);min-height:36px}   /* v564 (QA v563 V2) */
@@ -4295,7 +4295,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v618"></script>
+<script src="./app.js?v=v619"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4308,8 +4308,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v618";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-10-30 12:45";          /* and when it was built, for ?diag */
+  var BUILD = "v619";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-11-03 10:24";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

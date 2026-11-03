@@ -2416,6 +2416,9 @@ select.snd{padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);back
 .rd-pick{display:flex;flex-direction:column;gap:6px;padding:2px}   /* v582: Name it */
 .rd-opt{display:block;width:100%;padding:2px 4px;border-radius:10px;border:1.5px solid var(--line);background:var(--sunk);cursor:pointer;color:inherit}
 .rd-opt svg{display:block;width:auto;max-width:100%;height:46px;margin:0 auto}
+.rd-opt .rd-ns .ts{font-size:20px}   /* v623 (QA v622-user NV3) */
+#rdcGo[data-np] svg{display:none}   /* v623 (QA v622-user NC7): a build step's start plays nothing */
+@media (pointer:coarse){ #lvlList .lvl-row .ops button[data-share]{min-width:32px;min-height:32px} }   /* v623 (QA v622-user NV4) */
 .rd-opt[data-bad="1"]{border-color:var(--c3);opacity:.55} .rd-opt[data-ok="1"]{border-color:var(--c2);background:color-mix(in srgb,var(--c2) 14%,var(--sunk))}
 .rdc-ico[data-k="n"]{color:var(--c1)}
 .cu-t{font-family:var(--title);font-stretch:var(--title-stretch);font-weight:800;font-size:26px;letter-spacing:.02em;color:var(--c1);line-height:1.1}
@@ -2682,6 +2685,8 @@ html[data-skin="light"] .rd-steps .xb[data-done="1"],html[data-skin="light"] .rd
   .rd-tempo .jump{height:32px}
   .rd-tempo .rdb b{font-size:22px}
   .rd-btns .btn{height:38px}
+  .rd-hand{display:none!important}   /* v623 (QA v622-user NV2) */
+  .rd-steps .row{flex-wrap:wrap;row-gap:4px} .rd-steps button{min-width:32px}   /* v623 (QA v622 V1) */
 }
 .clist .rcat .cdone{color:var(--c2)}
 .clist .rcat[data-lock="1"]{opacity:.55}
@@ -4297,7 +4302,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v622"></script>
+<script src="./app.js?v=v623"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4310,8 +4315,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v622";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-11-03 12:56";          /* and when it was built, for ?diag */
+  var BUILD = "v623";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-11-03 15:31";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 

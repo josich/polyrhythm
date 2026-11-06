@@ -1382,6 +1382,11 @@ html[data-skin="light"] .pro-card .pc-price,html[data-skin="light"][data-proown=
 .sheet-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:4px}
 /* which copy this is - two phones disagreeing is nearly always two builds */
 .build{margin:0 0 10px;font-size:10.5px;color:var(--ink-3);letter-spacing:.04em}
+.rev-box{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 12px}   /* v641: the store reviewer's code */
+.rev-box[hidden]{display:none}
+.rev-box input{flex:1 1 140px;min-width:0;font:inherit;font-family:var(--mono);font-size:13px;padding:8px 10px;border-radius:9px;border:1px solid var(--line-2);background:var(--sunk);color:var(--ink)}
+.rev-note{flex-basis:100%;margin:0;font-size:12px;color:var(--ink-2)}
+.rev-note[data-ok="1"]{color:var(--c2)}
 .build .diaglink{color:var(--c2);text-decoration:none;border-bottom:1px dotted var(--c2)}
 .sheet h2{
   font-family:var(--title);font-stretch:var(--title-stretch);
@@ -4315,6 +4320,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
       <button class="icobtn" id="helpClose" title="Close" aria-label="Close">&times;</button>
     </div>
     <p class="build mono" id="buildTag"></p>
+    <div class="rev-box" id="revBox" hidden><input id="revCode" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Review code" aria-label="Review code"><button type="button" class="btn sm" id="revGo">Unlock</button><p class="rev-note" id="revNote" hidden></p></div>   <!-- v641 -->
     <!-- the installed app has no address bar: this is the way to the ?diag page from inside it (v121) -->
     <p class="build mono"><a href="./?diag" class="diaglink">Report a problem</a> &middot; record a session and send it</p>
     <p class="build mono"><a href="#" class="diaglink" id="credLink">Credits and licences</a> &middot; <a href="#" class="diaglink" id="privLink">Privacy policy</a></p>   <!-- v555 -->
@@ -4339,7 +4345,7 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
   </div>
 </div>
 
-<script src="./app.js?v=v640"></script>
+<script src="./app.js?v=v641"></script>
 
 <!-- polyrhythm-circle:session : the service worker checks a fetched page for this mark before it replaces the cached one (MARK in sw.js); it lived in the app script until that moved to app.js in v123 -->
 <script>
@@ -4352,8 +4358,8 @@ h1 .sub{display:block;font-size:.5em;font-weight:500;color:var(--ink-3);letter-s
 
   /* Stamped by build-pwa.sh. Two browsers disagreeing about how the app behaves
      is almost always two different builds, so make the build readable. */
-  var BUILD = "v640";          /* the version: the CACHE number in sw.js */
-  var BUILT = "2026-11-06 08:58";          /* and when it was built, for ?diag */
+  var BUILD = "v641";          /* the version: the CACHE number in sw.js */
+  var BUILT = "2026-11-06 09:53";          /* and when it was built, for ?diag */
   window.POLY_BUILD = BUILD;
   if(typeof paintBuild === "function") paintBuild();   /* the info sheet shows it */
 
